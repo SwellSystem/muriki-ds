@@ -1,0 +1,288 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Contorno e altura</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">A pergunta que decide se o sistema parece moderno ou remendado. Três níveis de contorno, cinco alturas, quatro posições de label — e a regra de quando usar cada um. As alturas são as que o <span class="mono" style="font-size:12.5px;">muriki-platform</span> já usa hoje (24/28/32/36 no <span class="mono" style="font-size:12.5px;">buttonVariants</span>); o que faltava era dizer <em>quando</em>.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Contorno — três níveis, e só três</p>
+    
+<div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:20px;">
+  
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">nível 0</span>
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);">Invisível</span>
+  </div>
+  <div style="background:oklch(98% 0.004 82);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:11px;min-height:112px;justify-content:center;">
+    <div style="display:flex;flex-direction:column;gap:7px;">
+      <div style="display:flex;align-items:center;gap:8px;"><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:transparent;border:1px solid transparent;">Revisar contrato OpenAPI</span></div>
+      <span class="cap">repouso — parece texto</span>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="height:28px;padding:0 9px;border-radius:7px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;background:oklch(97% 0.01 93.5);border:1px solid transparent;color:oklch(32% 0.02 248.5);">Revisar contrato OpenAPI<span style="margin-left:auto;color:oklch(58% 0.025 255);display:flex;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1 1-4Z"/></svg></span></span></div>
+      <span class="cap">hover — ganha fundo</span>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);border-color:oklch(47% 0.185 262.6);box-shadow:0 0 0 3px oklch(47% 0.185 262.6 / 0.16);background:oklch(99.3% 0.002 85);">Revisar contrato OpenAPI<span style="width:1px;height:15.5px;background:oklch(47% 0.185 262.6);margin-left:-6px;"></span></span></div>
+      <span class="cap">foco — vira campo de verdade</span>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <span style="font-size:12.5px;line-height:17px;color:oklch(32% 0.02 248.5);"><strong style="font-weight:600;">Onde:</strong> edição no lugar — título de tarefa, célula de tabela, bloco de doc, rótulo no canvas.</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Em superfície densa cada borda é multiplicada por N linhas. O campo só se revela quando o cursor chega.</span>
+  </div>
+</div>
+  
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">nível 1</span>
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);">Linha</span>
+  </div>
+  <div style="background:oklch(98% 0.004 82);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:11px;min-height:112px;justify-content:center;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+      <span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato</span>
+      <div style="display:flex;gap:8px;margin-top:4px;"><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:transparent;color:oklch(32% 0.02 248.5);border:1px solid transparent;">Cancelar</span></div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <span style="font-size:12.5px;line-height:17px;color:oklch(32% 0.02 248.5);"><strong style="font-weight:600;">Onde:</strong> formulário, modal, painel de configuração — onde o usuário veio para preencher.</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">A linha diz “isto é editável” antes do clique. É o único nível que aguenta um formulário longo sem virar caça ao campo.</span>
+  </div>
+</div>
+  
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">nível 2</span>
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);">Preenchido</span>
+  </div>
+  <div style="background:oklch(98% 0.004 82);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:11px;min-height:112px;justify-content:center;">
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(58% 0.025 255);background:oklch(97% 0.01 93.5);border:1px solid transparent;"><span style="color:oklch(58% 0.025 255);display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>Buscar tarefa, doc ou projeto</span>
+      <div style="display:flex;gap:7px;">
+        <span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);border:1px solid transparent;"><span style="color:oklch(45% 0.03 257.7);display:flex;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5h17l-6.5 7.6V19l-4 1.6v-8Z"/></svg></span>Meus</span>
+        <span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);border:1px solid transparent;">Esta semana</span>
+      </div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <span style="font-size:12.5px;line-height:17px;color:oklch(32% 0.02 248.5);"><strong style="font-weight:600;">Onde:</strong> busca global, barra de filtro, campo dentro de card branco ou sobre superfície escura.</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Onde a linha sumiria — sobre branco ou sobre escuro — o contraste vem do fundo. Também é o nível que pesa menos visualmente.</span>
+  </div>
+</div>
+</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Uma superfície, um nível</p>
+    
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:22px;">
+  <div style="display:flex;flex-direction:column;gap:9px;">
+    <div style="display:flex;align-items:center;gap:7px;"><span style="width:16px;height:16px;border-radius:999px;background:oklch(93% 0.05 27);color:oklch(42% 0.17 27);display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span><span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Três níveis no mesmo formulário</span></div>
+    
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:13px;">
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato OpenAPI</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Projeto</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(97% 0.01 93.5);border:1px solid transparent;">Muriki API</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Responsável</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:transparent;border:1px solid transparent;">Guilherme Teodoro</span></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:2px;">
+    <span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:transparent;color:oklch(32% 0.02 248.5);border:1px solid transparent;">Cancelar</span><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Criar tarefa</span>
+  </div>
+</div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Cada campo parece um componente diferente. O olho lê hierarquia onde não existe nenhuma — os três têm exatamente o mesmo peso.</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px;">
+    <div style="display:flex;align-items:center;gap:7px;"><span style="width:16px;height:16px;border-radius:999px;background:oklch(93% 0.05 150);color:oklch(42% 0.11 150);display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Um nível, do começo ao fim</span></div>
+    
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:13px;">
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato OpenAPI</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Projeto</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Muriki API</span></div>
+  <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Responsável</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Guilherme Teodoro</span></div>
+  <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:2px;">
+    <span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:transparent;color:oklch(32% 0.02 248.5);border:1px solid transparent;">Cancelar</span><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Criar tarefa</span>
+  </div>
+</div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">A superfície escolhe o nível, não o campo. Trocar de nível dentro de um formulário só se justifica quando o campo faz outra coisa — busca, por exemplo.</span>
+  </div>
+</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Altura — o cenário escolhe, não a importância</p>
+    <div class="card" style="padding:8px 26px 14px;">
+<div style="display:flex;flex-direction:column;">
+  
+<div style="display:grid;grid-template-columns:56px 1fr 190px 1.1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <span class="mono" style="font-size:12px;color:oklch(47% 0.185 262.6);font-weight:500;">24px</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:12px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+    <span style="height:24px;padding:0 9px;border-radius:5px;font-size:12px;display:flex;align-items:center;gap:8px;width:190px;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(97% 0.01 93.5);border:1px solid transparent;">Revisar contrato</span>
+    <span style="height:24px;padding:0 9px;border-radius:5px;font-size:12px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span>
+  </div>
+  <span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Toolbar de canvas</span>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Só ícone ou palavra curta. Nunca recebe label acima — o rótulo vira tooltip.</span>
+</div>
+  
+<div style="display:grid;grid-template-columns:56px 1fr 190px 1.1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <span class="mono" style="font-size:12px;color:oklch(47% 0.185 262.6);font-weight:500;">28px</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:12px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+    <span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:190px;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:transparent;border:1px solid transparent;">Revisar contrato</span>
+    <span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span>
+  </div>
+  <span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Linha de tabela, filtro</span>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">A altura padrão de tudo que vive dentro de uma lista. Label vira coluna, não fica acima.</span>
+</div>
+  
+<div style="display:grid;grid-template-columns:56px 1fr 190px 1.1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <span class="mono" style="font-size:12px;color:oklch(47% 0.185 262.6);font-weight:500;">32px</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+    <span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:190px;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato</span>
+    <span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span>
+  </div>
+  <span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Formulário, modal, header</span>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O padrão do sistema. Se você está em dúvida, é este.</span>
+</div>
+  
+<div style="display:grid;grid-template-columns:56px 1fr 190px 1.1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <span class="mono" style="font-size:12px;color:oklch(47% 0.185 262.6);font-weight:500;">36px</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+    <span style="height:36px;padding:0 13px;border-radius:7px;font-size:13.5px;display:flex;align-items:center;gap:8px;width:190px;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato</span>
+    <span style="height:36px;padding:0 14px;border-radius:7px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span>
+  </div>
+  <span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Ação principal de página</span>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Um por tela. O CTA do estado vazio, o “Criar” do header.</span>
+</div>
+  
+<div style="display:grid;grid-template-columns:56px 1fr 190px 1.1fr;gap:18px;align-items:center;padding:14px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <span class="mono" style="font-size:12px;color:oklch(47% 0.185 262.6);font-weight:500;">44px</span>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span style="font-size:13px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+    <span style="height:44px;padding:0 17px;border-radius:9px;font-size:15px;display:flex;align-items:center;gap:8px;width:190px;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(97% 0.01 93.5);border:1px solid transparent;">Revisar contrato</span>
+    <span style="height:44px;padding:0 18px;border-radius:9px;font-size:15px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Salvar</span>
+  </div>
+  <span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Mobile e busca global</span>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Piso de toque. No desktop só a busca global merece — ela quer ser encontrada de longe.</span>
+</div>
+</div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Peso vem da variante, nunca da altura</p>
+    
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:22px;">
+  <div style="display:flex;flex-direction:column;gap:9px;">
+    <div style="display:flex;align-items:center;gap:7px;"><span style="width:16px;height:16px;border-radius:999px;background:oklch(93% 0.05 27);color:oklch(42% 0.17 27);display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span><span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Ação importante ganhou altura</span></div>
+    
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;overflow:hidden;">
+  
+  <div style="display:flex;align-items:center;gap:11px;height:52px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Revisar contrato OpenAPI do módulo focus</span>
+    <span style="font-size:12px;color:oklch(45% 0.03 257.7);">4h</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;height:52px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);background:oklch(97% 0.015 262.6);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Regenerar client Kubb no platform</span>
+    <span style="height:36px;padding:0 14px;border-radius:7px;font-size:13.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Retomar</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;height:52px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Subir migration de focus_task_labels</span>
+    <span style="font-size:12px;color:oklch(45% 0.03 257.7);">4h</span>
+  </div>
+</div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O botão de 36px empurra a linha inteira para 52px e desalinha a lista. A importância vazou para a métrica errada.</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px;">
+    <div style="display:flex;align-items:center;gap:7px;"><span style="width:16px;height:16px;border-radius:999px;background:oklch(93% 0.05 150);color:oklch(42% 0.11 150);display:inline-flex;align-items:center;justify-content:center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Ação importante ganhou variante</span></div>
+    
+<div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:14px;overflow:hidden;">
+  
+  <div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Revisar contrato OpenAPI do módulo focus</span>
+    <span style="font-size:12px;color:oklch(45% 0.03 257.7);">4h</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);background:oklch(97% 0.015 262.6);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Regenerar client Kubb no platform</span>
+    <span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Retomar</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:5px;border:1.5px solid oklch(88% 0.012 98);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;flex-grow:1;">Subir migration de focus_task_labels</span>
+    <span style="font-size:12px;color:oklch(45% 0.03 257.7);">4h</span>
+  </div>
+</div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Mesma altura da superfície, peso vindo da cor. A linha continua no ritmo e a ação continua óbvia.</span>
+  </div>
+</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Label — quatro posições</p>
+    
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:20px;">
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="background:oklch(98% 0.004 82);border:1px solid oklch(94% 0.01 100);border-radius:10px;padding:16px;min-height:92px;display:flex;align-items:center;"><div style="display:flex;flex-direction:column;gap:6px;width:100%;"><span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Revisar contrato</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Acima · 14px medium</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O padrão. Formulário, modal, qualquer campo que o usuário veio preencher.</span>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="background:oklch(98% 0.004 82);border:1px solid oklch(94% 0.01 100);border-radius:10px;padding:16px;min-height:92px;display:flex;align-items:center;"><div style="display:flex;flex-direction:column;gap:9px;width:100%;">
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;font-weight:500;color:oklch(45% 0.03 257.7);width:74px;flex-shrink:0;">Projeto</span><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Muriki API</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:13px;font-weight:500;color:oklch(45% 0.03 257.7);width:74px;flex-shrink:0;">Prazo</span><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">12 set</span></div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Ao lado · coluna fixa</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Configuração longa, onde o par nome/valor lê melhor em duas colunas do que empilhado.</span>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="background:oklch(98% 0.004 82);border:1px solid oklch(94% 0.01 100);border-radius:10px;padding:16px;min-height:92px;display:flex;align-items:center;"><div style="display:flex;flex-direction:column;gap:5px;width:100%;"><span style="font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:oklch(45% 0.03 257.7);">Estimativa</span><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(32% 0.02 248.5);background:transparent;border:1px solid transparent;">4h 30m</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Caption · 11px caixa alta</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Painel de propriedades denso, onde o label é referência e não instrução.</span>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="background:oklch(98% 0.004 82);border:1px solid oklch(94% 0.01 100);border-radius:10px;padding:16px;min-height:92px;display:flex;align-items:center;"><div style="width:100%;"><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;color:oklch(58% 0.025 255);background:oklch(97% 0.01 93.5);border:1px solid transparent;"><span style="color:oklch(58% 0.025 255);display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>Buscar…</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Sem label</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Só busca e edição no lugar — onde o contexto já diz o que é. O nome vive no aria-label.</span>
+  </div>
+</div>
+</div>
+<div style="background:oklch(97% 0.05 94);border:1px solid oklch(87.8% 0.18 93.9);border-radius:14px;padding:16px 18px;display:flex;gap:14px;align-items:center;margin-top:4px;">
+  <div style="display:flex;flex-direction:column;gap:3px;flex-grow:1;">
+    <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">Label nunca é placeholder.</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(32% 0.02 248.5);max-width:560px;">O placeholder some quando o usuário digita — junto com ele some o nome do campo, e quem for revisar o formulário não sabe mais o que preencheu. Placeholder é exemplo do formato, não o nome da coisa.</span>
+  </div>
+  <div style="display:flex;gap:14px;flex-shrink:0;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:150px;box-sizing:border-box;color:oklch(58% 0.025 255);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">Data de entrega</span><span class="cap">placeholder como nome</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:12px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Data de entrega</span><span style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;width:150px;box-sizing:border-box;color:oklch(58% 0.025 255);background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);">12/09/2026</span></div><span class="cap">nome + exemplo</span></div>
+  </div>
+</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

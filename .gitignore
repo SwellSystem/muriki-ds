@@ -1,0 +1,16 @@
+node_modules/
+
+# Build do registry — gerado pela Action, servido pelo Pages.
+public/r/
+
+# NÃO VERSIONAR: a prancha de Autenticação nomeia rotas reais de login
+# (/api/auth/passkey/*, /totp/*) e registra quais provedores são decorativos.
+# Não é falha, mas é mapa da superfície de auth — fica só no canvas privado.
+design/Auth.dc.html
+design/gen-auth.mjs
+
+# O canvas semeado tem ~2 MB e embute TODAS as pranchas, Auth incluída.
+muriki-ds.html
+
+# Gerado por design/canvas.mjs (inclui Auth quando presente localmente).
+design/canvas.json

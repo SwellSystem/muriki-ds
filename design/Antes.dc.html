@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Direção do botão</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">Três gerações lado a lado, sendo que a do meio é minha errada. Gradiente, brilho no topo e sombra em botão não são profundidade — são textura, e textura é o que faz uma interface parecer velha. O caminho é chapado, com o filete e a proporção certos.</div>
+  </div>
+
+<div style="display:flex;flex-direction:column;margin-top:-10px;">
+  
+<div style="display:flex;flex-direction:column;gap:14px;padding:26px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <div style="display:flex;align-items:baseline;gap:12px;">
+    <span style="font-size:16px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.01em;">Botão</span>
+    <span style="font-size:13px;color:oklch(45% 0.03 257.7);">tamanho real</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.03 257.7);background:oklch(97% 0.01 93.5);padding:3px 8px;border-radius:5px;">1 · genérico</span>
+      
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Nova tarefa</span><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:oklch(99.3% 0.002 85);color:oklch(32% 0.02 248.5);border:1px solid oklch(88% 0.012 98);">Cancelar</span><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:oklch(87.8% 0.18 93.9);color:oklch(26% 0.022 250);border:1px solid transparent;">Concluir</span></div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Chapado, raio 8 fixo, borda cinza dura. Não ofende e não assina nada.</span>
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(42% 0.17 27);background:oklch(93% 0.05 27);padding:3px 8px;border-radius:5px;">2 · texturizado</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(55% 0.20 27);">descartado</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:linear-gradient(180deg, oklch(51% 0.185 262.6), oklch(45% 0.185 262.6));color:#fff;box-shadow:inset 0 1px 0 oklch(100% 0 0 / 0.18), 0 0 0 1px oklch(41% 0.17 262.6), 0 1px 2px oklch(32% 0.02 248.5 / 0.20);">Nova tarefa</span><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:linear-gradient(180deg, oklch(100% 0 0), oklch(99.3% 0.002 85));color:oklch(32% 0.02 248.5);box-shadow:0 0 0 1px oklch(89% 0.009 96), 0 1px 2px oklch(32% 0.02 248.5 / 0.06);">Cancelar</span><span style="height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;box-sizing:border-box;background:linear-gradient(180deg, oklch(90% 0.175 95), oklch(87.8% 0.18 93.9));color:oklch(26% 0.022 250);box-shadow:inset 0 1px 0 oklch(100% 0 0 / 0.45), 0 0 0 1px oklch(78% 0.16 90), 0 1px 2px oklch(32% 0.02 248.5 / 0.16);">Concluir</span></div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Gradiente, brilho no topo, sombra. É a linguagem de 2013 — envelheceu e você viu na hora.</span>
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(33% 0.13 262.6);background:oklch(93.5% 0.035 262.6);padding:3px 8px;border-radius:5px;">3 · definido</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(47% 0.185 262.6);">é este</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Nova tarefa</span><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(99.3% 0.002 85);color:oklch(32% 0.02 248.5);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">Cancelar</span><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(87.8% 0.18 93.9);color:oklch(26% 0.022 250);">Concluir</span></div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Chapado de novo, mas com filete escolhido, raio proporcional à altura e foco com folga. Nada de textura.</span>
+  </div>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:14px;padding:26px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <div style="display:flex;align-items:baseline;gap:12px;">
+    <span style="font-size:16px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.01em;">Em 2×</span>
+    <span style="font-size:13px;color:oklch(45% 0.03 257.7);">é aqui que a textura se entrega</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.03 257.7);background:oklch(97% 0.01 93.5);padding:3px 8px;border-radius:5px;">1 · genérico</span>
+      
+    </div>
+    <div style="display:flex;align-items:center;min-height:88px;"><span style="height:88px;padding:0 36px;border-radius:16px;font-size:30px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;border:1px solid transparent;">Nova tarefa</span></div>
+    
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(42% 0.17 27);background:oklch(93% 0.05 27);padding:3px 8px;border-radius:5px;">2 · texturizado</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(55% 0.20 27);">descartado</span>
+    </div>
+    <div style="display:flex;align-items:center;min-height:88px;"><span style="height:88px;padding:0 36px;border-radius:16px;font-size:30px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;box-sizing:border-box;background:linear-gradient(180deg, oklch(51% 0.185 262.6), oklch(45% 0.185 262.6));color:#fff;box-shadow:inset 0 1px 0 oklch(100% 0 0 / 0.18), 0 0 0 1px oklch(41% 0.17 262.6), 0 1px 2px oklch(32% 0.02 248.5 / 0.20);">Nova tarefa</span></div>
+    
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(33% 0.13 262.6);background:oklch(93.5% 0.035 262.6);padding:3px 8px;border-radius:5px;">3 · definido</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(47% 0.185 262.6);">é este</span>
+    </div>
+    <div style="display:flex;align-items:center;min-height:88px;"><span style="height:88px;padding:0 36px;border-radius:18px;font-size:30px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:12px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Nova tarefa</span></div>
+    
+  </div>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:14px;padding:26px 0;border-bottom:1px solid oklch(94% 0.01 100);">
+  <div style="display:flex;align-items:baseline;gap:12px;">
+    <span style="font-size:16px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.01em;">Campo</span>
+    <span style="font-size:13px;color:oklch(45% 0.03 257.7);">sulco também é textura</span>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(45% 0.03 257.7);background:oklch(97% 0.01 93.5);padding:3px 8px;border-radius:5px;">1 · genérico</span>
+      
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><div style="height:32px;padding:0 11px;border-radius:8px;font-size:13px;display:flex;align-items:center;box-sizing:border-box;background:oklch(99.3% 0.002 85);border:1px solid oklch(92% 0.01 98);color:oklch(58% 0.025 255);">Buscar tarefa</div></div>
+    
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(42% 0.17 27);background:oklch(93% 0.05 27);padding:3px 8px;border-radius:5px;">2 · texturizado</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(55% 0.20 27);">descartado</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><div style="height:32px;padding:0 11px;border-radius:8px;font-size:13px;display:flex;align-items:center;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 1px 2px oklch(32% 0.02 248.5 / 0.055), 0 0 0 1px oklch(89% 0.009 96);color:oklch(58% 0.025 255);">Buscar tarefa</div></div>
+    
+  </div><div style="display:flex;flex-direction:column;gap:13px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(33% 0.13 262.6);background:oklch(93.5% 0.035 262.6);padding:3px 8px;border-radius:5px;">3 · definido</span>
+      <span style="font-size:11px;font-weight:600;color:oklch(47% 0.185 262.6);">é este</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:34px;"><div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);color:oklch(58% 0.025 255);">Buscar tarefa</div></div>
+    
+  </div>
+  </div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:16px;padding-top:26px;">
+  <span style="font-size:16px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.01em;">A regra que fecha o raio</span>
+  <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:28px;align-items:start;">
+    <div style="display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;align-items:flex-end;gap:14px;">
+        <span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="height:24px;padding:0 9px;border-radius:5px;font-size:12px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span class="cap">24 → 5px</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span class="cap">28 → 6px</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span class="cap">32 → 6px</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="height:36px;padding:0 14px;border-radius:7px;font-size:13.5px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span class="cap">36 → 7px</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="height:44px;padding:0 18px;border-radius:9px;font-size:15px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span class="cap">44 → 9px</span></span>
+      </div>
+      <span style="font-size:13px;line-height:19px;color:oklch(32% 0.02 248.5);max-width:520px;">Raio é <strong style="font-weight:600;">altura ÷ 5</strong>, não um número fixo. No 32px isso dá <span class="mono" style="font-size:12.5px;">6px</span> — arredondado, mas não muito, que foi exatamente o que você pediu. E como é razão e não constante, os cinco tamanhos parecem a mesma forma.</span>
+    </div>
+    <div style="background:oklch(99.3% 0.002 85);border-radius:14px;padding:18px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:flex;flex-direction:column;gap:11px;">
+      <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">Revisar contrato OpenAPI</span>
+      <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);color:oklch(58% 0.025 255);">Adicionar comentário</div>
+      <div style="display:flex;gap:7px;"><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;">Salvar</span><span style="height:28px;padding:0 10px;border-radius:6px;font-size:12.5px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;flex-shrink:0;box-sizing:border-box;background:transparent;color:oklch(32% 0.02 248.5);">Cancelar</span></div>
+      <span class="cap" style="padding-top:2px;">controle 6-6px · card 14px — o recipiente é mais macio que o controle</span>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>

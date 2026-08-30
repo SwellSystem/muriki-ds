@@ -1,0 +1,447 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Seleção e menus</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">Dropdown, select, listbox, combobox, checkbox, radio e switch — com o critério de qual usar no topo, porque trocar checkbox por radio é o erro que mais confunde usuário de verdade. Painel flutuante tem raio 12, filete por dentro e a sombra grande; item sob o cursor ganha fundo, nunca borda.</div>
+  </div>
+
+<div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Qual usar</p>
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:18px;">
+  
+  <div style="padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Dropdown</span>
+    <span style="font-size:12px;line-height:17px;color:oklch(45% 0.03 257.7);">Ações que acontecem ao clicar. Nunca guarda estado — quem guarda é o select.</span>
+  </div>
+  <div style="padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Select / Listbox</span>
+    <span style="font-size:12px;line-height:17px;color:oklch(45% 0.03 257.7);">Uma escolha entre poucas, com o valor visível no gatilho depois.</span>
+  </div>
+  <div style="padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Combobox</span>
+    <span style="font-size:12px;line-height:17px;color:oklch(45% 0.03 257.7);">A mesma coisa acima de ~8 opções, ou quando a lista vem da API.</span>
+  </div>
+  <div style="padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:flex;flex-direction:column;gap:4px;">
+    <span style="font-size:13px;font-weight:600;color:oklch(26% 0.022 250);">Checkbox</span>
+    <span style="font-size:12px;line-height:17px;color:oklch(45% 0.03 257.7);">Escolhas independentes. Se as opções se excluem, é radio — trocar isso confunde de verdade.</span>
+  </div>
+</div></div>
+<div style="display:flex;flex-direction:column;margin-top:-4px;">
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Dropdown</span>
+    <span class="cap" style="line-height:15px;">shadcn<br>DropdownMenu</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:24px;align-items:start;">
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:224px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1 1-4Z"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Editar</span></div>
+  
+  
+  <span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">E</span>
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5h-9a2 2 0 0 0-2 2v9"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Duplicar</span></div>
+  
+  
+  <span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">⌘D</span>
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Mover para…</span></div>
+  
+  <span style="display:flex;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+  
+</div><div style="height:1px;background:oklch(94% 0.01 100);margin:4px 6px;"></div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(42% 0.17 27);">
+  <span style="display:flex;color:oklch(55% 0.20 27);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4.8h5V6.5M6.5 6.5 7.4 20h9.2l.9-13.5"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Excluir</span></div>
+  
+  
+  <span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">⌫</span>
+</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Ações</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Ícone à esquerda, atalho à direita, destrutiva no fim e separada.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:224px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;"><div style="padding:6px 8px 3px;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.03 257.7);">Ordenar por</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Prazo</span></div>
+  <span style="display:flex;color:oklch(47% 0.185 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Prioridade</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Criação</span></div>
+  
+  
+  
+</div><div style="height:1px;background:oklch(94% 0.01 100);margin:4px 6px;"></div><div style="padding:6px 8px 3px;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.03 257.7);">Direção</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Crescente</span></div>
+  <span style="display:flex;color:oklch(47% 0.185 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Decrescente</span></div>
+  
+  
+  
+</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Com seção e escolha</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Rótulo de seção em caixa alta, item escolhido marcado com o check à direita.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:224px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:42px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5h-9a2 2 0 0 0-2 2v9"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Arquivar</span><span style="font-size:11.5px;color:oklch(45% 0.03 257.7);">Some da lista, fica na busca</span></div>
+  
+  
+  
+</div>
+<div style="height:42px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  background:oklch(97% 0.02 27);color:oklch(42% 0.17 27);">
+  <span style="display:flex;color:oklch(55% 0.20 27);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4.8h5V6.5M6.5 6.5 7.4 20h9.2l.9-13.5"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Excluir</span><span style="font-size:11.5px;color:oklch(45% 0.03 257.7);">Não dá para desfazer</span></div>
+  
+  
+  
+</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Com descrição</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Só quando o rótulo sozinho é ambíguo. Dois níveis, 42px de altura.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:224px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1 1-4Z"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Editar</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(58% 0.025 255);opacity:0.65;">
+  <span style="display:flex;color:oklch(58% 0.025 255);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 20c.9-3.4 3.8-5.4 7.2-5.4s6.3 2 7.2 5.4"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Compartilhar</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(42% 0.17 27);">
+  <span style="display:flex;color:oklch(55% 0.20 27);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4.8h5V6.5M6.5 6.5 7.4 20h9.2l.9-13.5"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Excluir</span></div>
+  
+  
+  
+</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Item desabilitado</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Cinza e sem hover — mas continua legível. Nunca some: sumir esconde a existência da ação.</span></div>
+</div>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Select</span>
+    <span class="cap" style="line-height:15px;">shadcn Select<br>Combobox</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:24px;align-items:start;">
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;flex-direction:column;gap:9px;">
+<div style="width:220px;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);color:oklch(58% 0.025 255);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <span style="flex-grow:1;">Selecione um status</span><span style="display:flex;color:oklch(45% 0.03 257.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
+<div style="width:220px;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);color:oklch(32% 0.02 248.5);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <span style="flex-grow:1;">Em andamento</span><span style="display:flex;color:oklch(45% 0.03 257.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
+<div style="width:220px;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);color:oklch(32% 0.02 248.5);box-shadow:inset 0 0 0 1px oklch(47% 0.185 262.6), 0 0 0 3px oklch(47% 0.185 262.6 / 0.16);">
+  <span style="flex-grow:1;">Em andamento</span><span style="display:flex;color:oklch(45% 0.03 257.7);transform:rotate(180deg);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Fechado</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Três estados: vazio com placeholder, preenchido, aberto com o anel de foco.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:220px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(58% 0.025 255);flex-shrink:0;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>A fazer</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(47% 0.185 262.6);flex-shrink:0;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Em andamento</span></div>
+  <span style="display:flex;color:oklch(47% 0.185 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(66% 0.17 55);flex-shrink:0;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Bloqueada</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(58% 0.13 150);flex-shrink:0;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Concluída</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(55% 0.20 27);flex-shrink:0;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Cancelada</span></div>
+  
+  
+  
+</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Listbox aberto</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Marcador de cor à esquerda, check à direita. Item sob o cursor com fundo, nunca com borda.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:236px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;"><div style="padding:3px 3px 6px;"><div style="height:30px;padding:0 9px;border-radius:7px;font-size:12.5px;display:flex;align-items:center;gap:8px;background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);"><span style="display:flex;color:oklch(58% 0.025 255);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>cont<span style="width:1px;height:14px;background:oklch(47% 0.185 262.6);margin-left:-6px;"></span></div></div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Contrato OpenAPI</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Contratos — jurídico</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>Refatorar contrato do Kubb</span></div>
+  
+  
+  
+</div><div style="padding:8px;font-size:12px;color:oklch(45% 0.03 257.7);text-align:center;">3 de 41 projetos</div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Combobox — com busca</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">A partir de ~8 opções a busca deixa de ser luxo. O campo fica dentro do painel, colado no topo.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="width:220px;min-height:32px;padding:4px 8px;border-radius:6px;display:flex;align-items:center;gap:5px;flex-wrap:wrap;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+        <span style="display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:4px;background:oklch(93.5% 0.045 205);color:oklch(42% 0.090 205);font-size:11px;font-weight:500;">backend<span style="opacity:0.55;display:flex;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span></span>
+        <span style="display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:4px;background:oklch(93.5% 0.045 300);color:oklch(43% 0.150 300);font-size:11px;font-weight:500;">contrato<span style="opacity:0.55;display:flex;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span></span>
+        <span style="font-size:12px;color:oklch(58% 0.025 255);">+2</span>
+        <span style="margin-left:auto;display:flex;color:oklch(45% 0.03 257.7);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      </div>
+      <div style="width:220px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:15px;height:15px;border-radius:4px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>backend</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:15px;height:15px;border-radius:4px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>contrato</span></div>
+  
+  
+  
+</div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;
+  background:oklch(97% 0.01 93.5);color:oklch(32% 0.02 248.5);">
+  <span style="display:flex;color:oklch(45% 0.03 257.7);flex-shrink:0;"><span style="width:15px;height:15px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(88% 0.012 98);display:inline-block;"></span></span>
+  <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;min-width:0;"><span>design</span></div>
+  
+  
+  
+</div></div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Múltipla escolha</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">O escolhido volta como chip removível no gatilho. Acima de três, vira “+N”.</span></div>
+</div>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Checkbox</span>
+    <span class="cap" style="line-height:15px;">Radio · Switch<br>e os tipos</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:grid;grid-template-columns:0.85fr 1fr 1.15fr;gap:26px;align-items:start;">
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;flex-direction:column;gap:11px;">
+      <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 12h12"/></svg></span>Alguns itens</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;box-shadow:0 0 0 2px oklch(98% 0.004 82), 0 0 0 4px oklch(47% 0.185 262.6 / 0.35);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(58% 0.025 255);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(89% 0.009 96);background:oklch(97% 0.01 93.5);opacity:0.7;"></span>Bloqueado pelo plano</span>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Estados</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Vazio, marcado, indeterminado, foco e inativo. O indeterminado é traço, nunca meio-check.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;flex-direction:column;gap:9px;">
+      <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;font-weight:500;color:oklch(26% 0.022 250);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 12h12"/></svg></span>Notificações</span>
+      <div style="display:flex;flex-direction:column;gap:9px;padding-left:25px;">
+        <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>Tarefa atribuída a mim</span>
+        <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>Comentário na minha tarefa</span>
+        <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span>Qualquer mudança no projeto</span>
+      </div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Grupo com pai indeterminado</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">O pai reflete os filhos. Marcar o pai marca todos; desmarcar limpa todos.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="width:244px;background:oklch(99.3% 0.002 85);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96), 0 10px 30px oklch(32% 0.02 248.5 / 0.10), 0 2px 6px oklch(32% 0.02 248.5 / 0.05);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;"><div style="padding:6px 8px 3px;font-size:10.5px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(45% 0.03 257.7);">Responsável</div>
+      
+      <div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;color:oklch(32% 0.02 248.5);background:oklch(97% 0.01 93.5);"><span style="width:15px;height:15px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><span style="flex-grow:1;">Guilherme Teodoro</span><span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">12</span></div>
+      <div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;color:oklch(32% 0.02 248.5);"><span style="width:15px;height:15px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span><span style="flex-grow:1;">Rafael Souza</span><span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">8</span></div>
+      <div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;color:oklch(32% 0.02 248.5);"><span style="width:15px;height:15px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span><span style="flex-grow:1;">Ana Lima</span><span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">5</span></div>
+      <div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;color:oklch(32% 0.02 248.5);"><span style="width:15px;height:15px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span><span style="flex-grow:1;">Sem responsável</span><span class="mono" style="font-size:11px;color:oklch(58% 0.025 255);">3</span></div></div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Lista de filtro — com contagem</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Dentro de um popover de filtro. Linha inteira clicável, contagem alinhada à direita.</span></div>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:26px;align-items:start;">
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;gap:12px;">
+      
+      <div style="flex:1;padding:13px;border-radius:12px;display:flex;gap:10px;align-items:flex-start;box-sizing:border-box;background:oklch(97% 0.015 262.6);box-shadow:inset 0 0 0 1px oklch(85% 0.06 262.6);">
+        <span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Somente eu</span><span style="font-size:11.5px;line-height:16px;color:oklch(45% 0.03 257.7);">Ninguém mais vê este quadro</span></div>
+      </div>
+      <div style="flex:1;padding:13px;border-radius:12px;display:flex;gap:10px;align-items:flex-start;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+        <span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:13px;font-weight:500;color:oklch(26% 0.022 250);">Todo o workspace</span><span style="font-size:11.5px;line-height:16px;color:oklch(45% 0.03 257.7);">Qualquer membro pode abrir</span></div>
+      </div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Cartão selecionável</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Quando a escolha tem consequência e precisa de explicação. A caixa fica, o cartão inteiro é o alvo.</span></div>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="min-height:30px;"><div style="display:flex;gap:34px;align-items:flex-start;">
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span>Baixa</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;box-sizing:border-box;background:oklch(47% 0.185 262.6);display:inline-flex;align-items:center;justify-content:center;"><span style="width:6px;height:6px;border-radius:999px;background:#fff;"></span></span>Alta</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:oklch(99.3% 0.002 85);"></span>Urgente</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        
+        <span style="display:inline-flex;align-items:center;gap:10px;font-size:13.5px;color:oklch(32% 0.02 248.5);">
+          <span style="width:34px;height:20px;border-radius:999px;display:inline-flex;align-items:center;padding:2px;box-sizing:border-box;flex-shrink:0;background:oklch(47% 0.185 262.6);justify-content:flex-end;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px oklch(32% 0.02 248.5 / 0.22);"></span></span>Notificar por e-mail</span>
+        <span style="display:inline-flex;align-items:center;gap:10px;font-size:13.5px;color:oklch(32% 0.02 248.5);">
+          <span style="width:34px;height:20px;border-radius:999px;display:inline-flex;align-items:center;padding:2px;box-sizing:border-box;flex-shrink:0;background:oklch(97% 0.01 93.5);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);"><span style="width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px oklch(32% 0.02 248.5 / 0.22);"></span></span>Resumo semanal</span>
+      </div>
+    </div></div>
+  <div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:oklch(26% 0.022 250);">Radio e switch</span><span style="font-size:12px;line-height:16px;color:oklch(45% 0.03 257.7);">Radio quando as opções se excluem e cabem na tela. Switch quando o efeito é imediato — sem botão de salvar.</span></div>
+</div>
+</div></div>
+</div>
+</div>
+
+<div style="background:oklch(19% 0.008 250);border-radius:18px;padding:30px 32px;display:flex;flex-direction:column;gap:24px;margin-top:8px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="width:8px;height:8px;border-radius:999px;background:oklch(70% 0.145 262.6);"></span>
+      <span style="font-size:18px;font-weight:600;letter-spacing:-0.015em;color:oklch(96% 0.004 250);">No escuro</span>
+    </div>
+    <span style="font-size:13px;line-height:18px;color:oklch(70% 0.012 250);max-width:680px;">O painel flutuante é a peça que mais sofre no dark: sem sombra visível contra fundo escuro, ele precisa de um degrau de superfície — o card sobe para L 22,5% contra o fundo de 19% — e de um filete. Sombra sozinha não separa nada aqui.</span>
+  </div>
+  
+  <div style="display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;">
+    <div style="width:224px;background:oklch(22.5% 0.009 250);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(31% 0.010 250), 0 12px 32px oklch(0% 0 0 / 0.45);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1 1-4Z"/></svg></span><span style="flex-grow:1;">Editar</span>
+  <span style="font-family:'Geist Mono',monospace;font-size:11px;color:oklch(56% 0.014 250);">E</span></div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;background:oklch(26.5% 0.010 250);color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 5.5h-9a2 2 0 0 0-2 2v9"/></svg></span><span style="flex-grow:1;">Duplicar</span>
+  <span style="font-family:'Geist Mono',monospace;font-size:11px;color:oklch(56% 0.014 250);">⌘D</span></div><div style="height:1px;background:oklch(31% 0.010 250);margin:4px 6px;"></div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;color:oklch(83% 0.100 27);">
+  <span style="display:flex;color:oklch(68% 0.180 27);flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5h16M9.5 6.5V4.8h5V6.5M6.5 6.5 7.4 20h9.2l.9-13.5"/></svg></span><span style="flex-grow:1;">Excluir</span>
+  </div></div>
+    <div style="width:224px;background:oklch(22.5% 0.009 250);border-radius:12px;box-shadow:inset 0 0 0 1px oklch(31% 0.010 250), 0 12px 32px oklch(0% 0 0 / 0.45);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(56% 0.014 250);"></span></span><span style="flex-grow:1;">A fazer</span>
+  </div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;background:oklch(26.5% 0.010 250);color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(70% 0.145 262.6);"></span></span><span style="flex-grow:1;">Em andamento</span>
+  <span style="display:flex;color:oklch(70% 0.145 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span></div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(74% 0.15 58);"></span></span><span style="flex-grow:1;">Bloqueada</span>
+  </div>
+<div style="height:30px;padding:0 8px;border-radius:7px;display:flex;align-items:center;gap:9px;font-size:13px;box-sizing:border-box;color:oklch(90% 0.006 250);">
+  <span style="display:flex;color:oklch(70% 0.012 250);flex-shrink:0;"><span style="width:8px;height:8px;border-radius:999px;background:oklch(72% 0.130 150);"></span></span><span style="flex-grow:1;">Concluída</span>
+  </div></div>
+    <div style="display:flex;flex-direction:column;gap:11px;">
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:oklch(70% 0.012 250);">gatilho e seleção</span>
+      <div style="width:220px;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(16.5% 0.007 250);box-shadow:inset 0 0 0 1px oklch(31% 0.010 250);color:oklch(90% 0.006 250);"><span style="flex-grow:1;">Em andamento</span><span style="display:flex;color:oklch(70% 0.012 250);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(90% 0.006 250);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(40% 0.012 250);"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(90% 0.006 250);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(70% 0.145 262.6);color:oklch(17% 0.03 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(90% 0.006 250);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(70% 0.145 262.6);color:oklch(17% 0.03 262.6);"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M6 12h12"/></svg></span>Alguns itens</span><span style="display:inline-flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(56% 0.014 250);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;box-shadow:inset 0 0 0 1.5px oklch(31% 0.010 250);background:oklch(26.5% 0.010 250);opacity:0.7;"></span>Bloqueado</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:11px;">
+      <span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:oklch(70% 0.012 250);">cartão selecionável e switch</span>
+      <div style="width:230px;padding:13px;border-radius:12px;display:flex;gap:10px;align-items:flex-start;box-sizing:border-box;background:oklch(28% 0.060 262.6);box-shadow:inset 0 0 0 1px oklch(38% 0.090 262.6);">
+        <span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;background:oklch(70% 0.145 262.6);color:oklch(17% 0.03 262.6);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:13px;font-weight:500;color:oklch(96% 0.004 250);">Somente eu</span><span style="font-size:11.5px;line-height:16px;color:oklch(70% 0.012 250);">Ninguém mais vê este quadro</span></div>
+      </div>
+      <span style="display:inline-flex;align-items:center;gap:10px;font-size:13.5px;color:oklch(90% 0.006 250);"><span style="width:34px;height:20px;border-radius:999px;background:oklch(70% 0.145 262.6);display:inline-flex;align-items:center;justify-content:flex-end;padding:2px;box-sizing:border-box;"><span style="width:16px;height:16px;border-radius:999px;background:oklch(17% 0.03 262.6);"></span></span>Notificar por e-mail</span>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+</body>
+</html>

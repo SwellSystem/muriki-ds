@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+/* Muriki DS — papel quente, tinta fria.
+   Superfície em hue 82-100; tinta em hue ~250. As duas famílias de neutro
+   são o que faz a tela descansar — não invente um cinza puro no meio. */
+:root {
+  --background: oklch(0.98 0.004 82);
+  --foreground: oklch(0.32 0.02 248.5);
+  --foreground-strong: oklch(0.26 0.022 250);
+  --card: oklch(0.993 0.002 85);
+  --card-foreground: oklch(0.32 0.02 248.5);
+  --popover: oklch(0.993 0.002 85);
+  --popover-foreground: oklch(0.32 0.02 248.5);
+
+  --primary: oklch(0.47 0.185 262.6);
+  --primary-foreground: oklch(0.99 0.005 262.6);
+  --primary-subtle: oklch(0.97 0.015 262.6);
+  --primary-subtle-foreground: oklch(0.33 0.13 262.6);
+  --primary-subtle-border: oklch(0.87 0.055 262.6);
+
+  --secondary: oklch(0.97 0.01 93.5);
+  --secondary-foreground: oklch(0.32 0.02 248.5);
+  --muted: oklch(0.97 0.01 93.5);
+  --muted-foreground: oklch(0.45 0.03 257.7);
+  --accent: oklch(0.878 0.18 93.9);
+  --accent-foreground: oklch(0.26 0.022 250);
+
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.99 0.01 27);
+  --destructive-subtle: oklch(0.97 0.02 27);
+  --destructive-subtle-foreground: oklch(0.42 0.17 27);
+  --destructive-subtle-border: oklch(0.89 0.045 27);
+  --success: oklch(0.58 0.13 150);
+  --warning: oklch(0.66 0.17 55);
+
+  --border: oklch(0.94 0.01 100);
+  --input: oklch(0.89 0.009 96);
+  --ring: oklch(0.47 0.185 262.6);
+
+  /* Recipiente macio, controle seco. O controle não usa --radius:
+     ele usa a razão altura ÷ 5, class por tamanho no cva. */
+  --radius: 14px;
+
+  /* Nove matizes de badge. Fundo sempre L 93,5%, tinta sempre L 43%.
+     Só a matiz muda — é isso que separa uma paleta de um punhado de cores. */
+  --tone-gray: oklch(0.945 0.008 96);        --tone-gray-foreground: oklch(0.42 0.02 250);      --tone-gray-dot: oklch(0.62 0.012 250);
+  --tone-blue: oklch(0.935 0.045 262);       --tone-blue-foreground: oklch(0.42 0.14 262);      --tone-blue-dot: oklch(0.55 0.17 262);
+  --tone-cyan: oklch(0.935 0.045 205);       --tone-cyan-foreground: oklch(0.42 0.09 205);      --tone-cyan-dot: oklch(0.58 0.105 205);
+  --tone-green: oklch(0.935 0.05 150);       --tone-green-foreground: oklch(0.42 0.11 150);     --tone-green-dot: oklch(0.58 0.13 150);
+  --tone-yellow: oklch(0.94 0.075 95);       --tone-yellow-foreground: oklch(0.44 0.1 82);      --tone-yellow-dot: oklch(0.76 0.15 90);
+  --tone-orange: oklch(0.935 0.06 62);       --tone-orange-foreground: oklch(0.44 0.13 52);     --tone-orange-dot: oklch(0.66 0.17 55);
+  --tone-red: oklch(0.935 0.045 27);         --tone-red-foreground: oklch(0.43 0.16 27);        --tone-red-dot: oklch(0.58 0.2 27);
+  --tone-pink: oklch(0.935 0.04 350);        --tone-pink-foreground: oklch(0.43 0.15 350);      --tone-pink-dot: oklch(0.58 0.19 350);
+  --tone-purple: oklch(0.935 0.045 300);     --tone-purple-foreground: oklch(0.43 0.15 300);    --tone-purple-dot: oklch(0.56 0.185 300);
+}
+
+.dark {
+  --background: oklch(0.19 0.008 250);
+  --foreground: oklch(0.9 0.006 250);
+  --foreground-strong: oklch(0.96 0.004 250);
+  --card: oklch(0.225 0.009 250);
+  --card-foreground: oklch(0.9 0.006 250);
+  --popover: oklch(0.225 0.009 250);
+  --popover-foreground: oklch(0.9 0.006 250);
+
+  /* O sólido inverte: fundo claro, texto escuro. Um azul de 47% sobre
+     fundo de 19% não tem contraste nenhum. */
+  --primary: oklch(0.7 0.145 262.6);
+  --primary-foreground: oklch(0.17 0.03 262.6);
+  --primary-subtle: oklch(0.28 0.06 262.6);
+  --primary-subtle-foreground: oklch(0.84 0.1 262.6);
+  --primary-subtle-border: oklch(0.38 0.09 262.6);
+
+  --secondary: oklch(0.265 0.01 250);
+  --secondary-foreground: oklch(0.9 0.006 250);
+  --muted: oklch(0.265 0.01 250);
+  --muted-foreground: oklch(0.7 0.012 250);
+  --accent: oklch(0.83 0.165 93);
+  --accent-foreground: oklch(0.2 0.02 100);
+
+  --destructive: oklch(0.68 0.18 27);
+  --destructive-foreground: oklch(0.16 0.03 27);
+  --destructive-subtle: oklch(0.27 0.06 27);
+  --destructive-subtle-foreground: oklch(0.83 0.1 27);
+  --destructive-subtle-border: oklch(0.37 0.09 27);
+  --success: oklch(0.72 0.13 150);
+  --warning: oklch(0.75 0.15 60);
+
+  --border: oklch(0.31 0.01 250);
+  --input: oklch(0.4 0.012 250);
+  --ring: oklch(0.7 0.145 262.6);
+
+  /* Espelho: fundo vai para L 29%, tinta para L 85%. Matiz não muda —
+     é o que faz o amarelo continuar sendo "bloqueada" ao trocar de tema. */
+  --tone-gray: oklch(0.29 0.01 250);         --tone-gray-foreground: oklch(0.85 0.012 250);     --tone-gray-dot: oklch(0.62 0.012 250);
+  --tone-blue: oklch(0.29 0.055 262);        --tone-blue-foreground: oklch(0.85 0.075 262);     --tone-blue-dot: oklch(0.68 0.14 262);
+  --tone-cyan: oklch(0.29 0.05 205);         --tone-cyan-foreground: oklch(0.85 0.065 205);     --tone-cyan-dot: oklch(0.7 0.095 205);
+  --tone-green: oklch(0.29 0.055 150);       --tone-green-foreground: oklch(0.85 0.075 150);    --tone-green-dot: oklch(0.7 0.12 150);
+  --tone-yellow: oklch(0.3 0.055 88);        --tone-yellow-foreground: oklch(0.87 0.09 90);     --tone-yellow-dot: oklch(0.8 0.14 90);
+  --tone-orange: oklch(0.29 0.06 55);        --tone-orange-foreground: oklch(0.86 0.085 60);    --tone-orange-dot: oklch(0.74 0.15 58);
+  --tone-red: oklch(0.29 0.06 27);           --tone-red-foreground: oklch(0.85 0.08 27);        --tone-red-dot: oklch(0.68 0.18 27);
+  --tone-pink: oklch(0.29 0.055 350);        --tone-pink-foreground: oklch(0.85 0.075 350);     --tone-pink-dot: oklch(0.7 0.16 350);
+  --tone-purple: oklch(0.29 0.055 300);      --tone-purple-foreground: oklch(0.85 0.075 300);   --tone-purple-dot: oklch(0.68 0.16 300);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-foreground-strong: var(--foreground-strong);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-subtle-foreground: var(--primary-subtle-foreground);
+  --color-primary-subtle-border: var(--primary-subtle-border);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-subtle: var(--destructive-subtle);
+  --color-destructive-subtle-foreground: var(--destructive-subtle-foreground);
+  --color-destructive-subtle-border: var(--destructive-subtle-border);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 6px);
+}

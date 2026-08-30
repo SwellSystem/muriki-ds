@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Badges</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">Aqui mora o preenchimento. Nove matizes abafados — fundo sempre em L 93,5% e tinta sempre em L 43%, variando só o tom — para que três badges caibam na mesma linha sem nenhum roubar a cena do título da tarefa.</div>
+  </div>
+
+<div style="display:flex;gap:26px;align-items:center;padding:18px 20px;border-radius:14px;background:oklch(97% 0.015 262.6);box-shadow:inset 0 0 0 1px oklch(88% 0.05 262.6);">
+  <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);">Badge é estado. Botão é ação.</span>
+    <span style="font-size:12.5px;line-height:18px;color:oklch(32% 0.02 248.5);max-width:660px;">Por isso o fill vive aqui e não lá: cor cheia comunica <em>o que uma coisa é</em>, não <em>o que você pode fazer com ela</em>. Badge não é clicável — a única exceção é o de filtro, que carrega o × para se remover.</span>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(55% 0.170 262);flex-shrink:0;"></span>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.060 62);color:oklch(44% 0.130 52);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    Alta</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 205);color:oklch(42% 0.090 205);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    backend<span style="display:flex;opacity:0.55;margin-left:1px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span></span></div>
+</div>
+<div style="display:flex;flex-direction:column;margin-top:-4px;">
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Paleta</span>
+    <span class="cap" style="line-height:15px;">nove matizes<br>uma luz só</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(9, minmax(0, 1fr));gap:10px;">
+  
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(94.5% 0.008 96);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(42% 0.020 250);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">cinza</span>
+      <span class="cap" style="font-size:9.5px;">h 96</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.045 262);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(42% 0.140 262);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">azul</span>
+      <span class="cap" style="font-size:9.5px;">h 262</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.045 205);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(42% 0.090 205);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">ciano</span>
+      <span class="cap" style="font-size:9.5px;">h 205</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.050 150);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(42% 0.110 150);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">verde</span>
+      <span class="cap" style="font-size:9.5px;">h 150</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(94.0% 0.075 95);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(44% 0.100 82);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">amarelo</span>
+      <span class="cap" style="font-size:9.5px;">h 95</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.060 62);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(44% 0.130 52);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">laranja</span>
+      <span class="cap" style="font-size:9.5px;">h 62</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.045 27);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(43% 0.160 27);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">vermelho</span>
+      <span class="cap" style="font-size:9.5px;">h 27</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.040 350);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(43% 0.150 350);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">rosa</span>
+      <span class="cap" style="font-size:9.5px;">h 350</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <div style="height:46px;border-radius:9px;background:oklch(93.5% 0.045 300);display:flex;align-items:center;justify-content:center;">
+      <span style="font-size:12px;font-weight:600;color:oklch(43% 0.150 300);">Aa</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:1px;">
+      <span style="font-size:12px;font-weight:500;color:oklch(26% 0.022 250);">roxo</span>
+      <span class="cap" style="font-size:9.5px;">h 300</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:14px;padding:14px 16px;border-radius:12px;background:oklch(97% 0.01 93.5);">
+  <span style="font-size:12.5px;line-height:18px;color:oklch(32% 0.02 248.5);max-width:820px;">Os nove fundos estão todos em <span class="mono" style="font-size:12px;">L 93,5%</span> e todas as tintas em <span class="mono" style="font-size:12px;">L 43%</span>. Só a matiz muda. É por isso que nenhum grita mais alto que o outro numa lista — e é o que separa uma paleta de um punhado de cores.</span>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Semântica</span>
+    <span class="cap" style="line-height:15px;">status, prioridade<br>label</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">status da tarefa</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(94.5% 0.008 96);color:oklch(42% 0.020 250);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(62% 0.012 250);flex-shrink:0;"></span>A fazer</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(55% 0.170 262);flex-shrink:0;"></span>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(94.0% 0.075 95);color:oklch(44% 0.100 82);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(76% 0.150 90);flex-shrink:0;"></span>Bloqueada</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.130 150);flex-shrink:0;"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 27);color:oklch(43% 0.160 27);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.200 27);flex-shrink:0;"></span>Cancelada</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 300);color:oklch(43% 0.150 300);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(56% 0.185 300);flex-shrink:0;"></span>Em revisão</span></div></div>
+<div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">prioridade — forma junto da cor, nunca cor sozinha</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(94.5% 0.008 96);color:oklch(42% 0.020 250);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 19V6M6 13l6 6 6-6"/></svg>Baixa</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M5 12h14"/></svg>Média</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.060 62);color:oklch(44% 0.130 52);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v13M6 11l6-6 6 6"/></svg>Alta</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 27);color:oklch(43% 0.160 27);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 4v10M12 19.4h.01"/></svg>Urgente</span></div></div>
+<div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">label do usuário — a cor vem do label, não do sistema</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 205);color:oklch(42% 0.090 205);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    backend</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 300);color:oklch(43% 0.150 300);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    contrato</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.040 350);color:oklch(43% 0.150 350);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    design</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    quick-win</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.060 62);color:oklch(44% 0.130 52);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    cliente</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(94.5% 0.008 96);color:oklch(42% 0.020 250);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    sem label</span></div></div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Forma</span>
+    <span class="cap" style="line-height:15px;">dot, ícone, contador<br>removível</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">forma — soft é o padrão</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(55% 0.170 262);flex-shrink:0;"></span>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    backend<span style="display:flex;opacity:0.55;margin-left:1px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></span></span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;min-width:22px;justify-content:center;padding:0 6px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:600;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    12</span><span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:transparent;color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">outline</span></div></div>
+<div style="display:flex;gap:26px;">
+  <div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">tamanho</span><div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;"><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.130 150);flex-shrink:0;"></span>Concluída</span><span class="cap">sm 18 — dentro de linha</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.130 150);flex-shrink:0;"></span>Concluída</span><span class="cap">md 22 — padrão</span></span></div></div>
+  <div style="width:1px;background:oklch(94% 0.01 100);align-self:stretch;"></div>
+  <div style="display:flex;flex-direction:column;gap:9px;"><span class="cap">contador</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:4px;height:18px;min-width:18px;justify-content:center;padding:0 5px;border-radius:4px;background:oklch(94.5% 0.008 96);color:oklch(42% 0.020 250);font-size:11px;font-weight:600;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    3</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;min-width:22px;justify-content:center;padding:0 6px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:600;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    12</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;min-width:22px;justify-content:center;padding:0 6px;border-radius:4px;background:oklch(93.5% 0.045 27);color:oklch(43% 0.160 27);font-size:11.5px;font-weight:600;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    99+</span></div></div>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Sólido x abafado</span>
+    <span class="cap" style="line-height:15px;">por que abafado</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;">
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+      <span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:oklch(55% 0.20 27);color:#fff;font-size:11.5px;font-weight:500;">Urgente</span>
+      <span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:oklch(58% 0.13 150);color:#fff;font-size:11.5px;font-weight:500;">Concluída</span>
+      <span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:oklch(47% 0.185 262.6);color:#fff;font-size:11.5px;font-weight:500;">Em andamento</span>
+      <span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:oklch(87.8% 0.18 93.9);color:oklch(26% 0.022 250);font-size:11.5px;font-weight:500;">Bloqueada</span>
+    </div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);"><strong style="color:oklch(42% 0.17 27);font-weight:600;">Sólido:</strong> numa lista de quarenta linhas isso vira uma árvore de natal. Cada badge disputa atenção com o título da tarefa, que é o que interessa.</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px;border-radius:12px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 27);color:oklch(43% 0.160 27);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.200 27);flex-shrink:0;"></span>Urgente</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.130 150);flex-shrink:0;"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(55% 0.170 262);flex-shrink:0;"></span>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(94.0% 0.075 95);color:oklch(44% 0.100 82);font-size:11.5px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(76% 0.150 90);flex-shrink:0;"></span>Bloqueada</span>
+    </div>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);"><strong style="color:oklch(42% 0.11 150);font-weight:600;">Abafado:</strong> a cor continua legível e informando, o texto da tarefa continua sendo o mais forte da linha. O ponto colorido devolve a saturação onde ela custa barato.</span>
+  </div>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:158px 1fr;gap:28px;padding:24px 0;align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Na linha</span>
+    <span class="cap" style="line-height:15px;">em tamanho real</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px;min-width:0;">
+<div style="background:oklch(99.3% 0.002 85);border-radius:14px;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);overflow:hidden;">
+  
+  <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(85% 0.011 96);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;color:oklch(32% 0.02 248.5);flex-grow:1;">Revisar contrato OpenAPI do módulo focus</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.060 62);color:oklch(44% 0.130 52);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    Alta</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.045 205);color:oklch(42% 0.090 205);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    backend</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.045 262);color:oklch(42% 0.140 262);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(55% 0.170 262);flex-shrink:0;"></span>Em andamento</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+    <span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(85% 0.011 96);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;color:oklch(32% 0.02 248.5);flex-grow:1;">Regenerar client Kubb no platform</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.045 27);color:oklch(43% 0.160 27);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    Urgente</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.045 300);color:oklch(43% 0.150 300);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    contrato</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(94.0% 0.075 95);color:oklch(44% 0.100 82);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(76% 0.150 90);flex-shrink:0;"></span>Bloqueada</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;">
+    <span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(85% 0.011 96);flex-shrink:0;"></span>
+    <span style="font-size:13.5px;color:oklch(32% 0.02 248.5);flex-grow:1;">Subir migration de focus_task_labels</span>
+    <span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(94.5% 0.008 96);color:oklch(42% 0.020 250);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    Baixa</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.045 205);color:oklch(42% 0.090 205);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    backend</span><span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 7px;border-radius:4px;background:oklch(93.5% 0.050 150);color:oklch(42% 0.110 150);font-size:11px;font-weight:500;letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
+    <span style="width:5px;height:5px;border-radius:999px;background:oklch(58% 0.130 150);flex-shrink:0;"></span>Concluída</span>
+  </div>
+</div>
+<span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Três badges na mesma linha e o título continua ganhando. Era isso ou nada.</span></div>
+</div>
+</div>
+
+<div style="background:oklch(19% 0.008 250);border-radius:18px;padding:30px 32px;display:flex;flex-direction:column;gap:24px;margin-top:8px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="width:8px;height:8px;border-radius:999px;background:oklch(70% 0.145 262.6);"></span>
+      <span style="font-size:18px;font-weight:600;letter-spacing:-0.015em;color:oklch(96% 0.004 250);">No escuro</span>
+    </div>
+    <span style="font-size:13px;line-height:18px;color:oklch(70% 0.012 250);max-width:680px;">A matiz nunca muda entre os temas — só a luz inverte: o fundo sai de L 93,5% para L 29% e a tinta de L 43% para L 85%. É por isso que o amarelo continua significando "bloqueada" quando alguém troca o tema no meio do dia.</span>
+  </div>
+  
+  <div style="display:grid;grid-template-columns:repeat(9, minmax(0, 1fr));gap:10px;">
+    <div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.010 250);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.012 250);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">cinza</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.055 262);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.075 262);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">azul</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.050 205);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.065 205);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">ciano</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.055 150);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.075 150);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">verde</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(30% 0.055 88);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(87% 0.090 90);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">amarelo</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.060 55);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(86% 0.085 60);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">laranja</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.060 27);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.080 27);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">vermelho</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.055 350);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.075 350);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">rosa</span></div><div style="display:flex;flex-direction:column;gap:8px;"><div style="height:44px;border-radius:9px;background:oklch(29% 0.055 300);display:flex;align-items:center;justify-content:center;"><span style="font-size:12px;font-weight:600;color:oklch(85% 0.075 300);">Aa</span></div><span style="font-size:12px;font-weight:500;color:oklch(96% 0.004 250);">roxo</span></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:oklch(70% 0.012 250);">status</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.010 250);color:oklch(85% 0.012 250);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(62% 0.012 250);flex-shrink:0;"></span>A fazer</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 262);color:oklch(85% 0.075 262);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(68% 0.140 262);flex-shrink:0;"></span>Em andamento</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(30% 0.055 88);color:oklch(87% 0.090 90);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(80% 0.140 90);flex-shrink:0;"></span>Bloqueada</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 150);color:oklch(85% 0.075 150);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(70% 0.120 150);flex-shrink:0;"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.060 27);color:oklch(85% 0.080 27);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(68% 0.180 27);flex-shrink:0;"></span>Cancelada</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 300);color:oklch(85% 0.075 300);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(68% 0.160 300);flex-shrink:0;"></span>Em revisão</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:9px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:oklch(70% 0.012 250);">prioridade e label</span><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.010 250);color:oklch(85% 0.012 250);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Baixa</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 262);color:oklch(85% 0.075 262);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Média</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.060 55);color:oklch(86% 0.085 60);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Alta</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.060 27);color:oklch(85% 0.080 27);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Urgente</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.050 205);color:oklch(85% 0.065 205);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">backend</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 300);color:oklch(85% 0.075 300);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">contrato</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 350);color:oklch(85% 0.075 350);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">design</span></div></div>
+  <div style="display:flex;flex-direction:column;gap:9px;"><span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;color:oklch(70% 0.012 250);">tamanho e contador</span><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.055 150);color:oklch(85% 0.075 150);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(70% 0.120 150);flex-shrink:0;"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 150);color:oklch(85% 0.075 150);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(70% 0.120 150);flex-shrink:0;"></span>Concluída</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.010 250);color:oklch(85% 0.012 250);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">3</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.055 262);color:oklch(85% 0.075 262);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">12</span><span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:4px;background:oklch(29% 0.060 27);color:oklch(85% 0.080 27);font-size:11.5px;font-weight:500;white-space:nowrap;box-sizing:border-box;">99+</span></div></div>
+  <div style="background:oklch(22.5% 0.009 250);border-radius:14px;box-shadow:inset 0 0 0 1px oklch(31% 0.010 250);overflow:hidden;">
+    <div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-bottom:1px solid oklch(31% 0.010 250);"><span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(40% 0.012 250);flex-shrink:0;"></span><span style="font-size:13.5px;color:oklch(90% 0.006 250);flex-grow:1;">Revisar contrato OpenAPI do módulo focus</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.060 55);color:oklch(86% 0.085 60);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Alta</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.050 205);color:oklch(85% 0.065 205);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">backend</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.055 262);color:oklch(85% 0.075 262);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(68% 0.140 262);flex-shrink:0;"></span>Em andamento</span></div><div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;border-bottom:1px solid oklch(31% 0.010 250);"><span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(40% 0.012 250);flex-shrink:0;"></span><span style="font-size:13.5px;color:oklch(90% 0.006 250);flex-grow:1;">Regenerar client Kubb no platform</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.060 27);color:oklch(85% 0.080 27);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Urgente</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.055 300);color:oklch(85% 0.075 300);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">contrato</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(30% 0.055 88);color:oklch(87% 0.090 90);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(80% 0.140 90);flex-shrink:0;"></span>Bloqueada</span></div><div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;"><span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px oklch(40% 0.012 250);flex-shrink:0;"></span><span style="font-size:13.5px;color:oklch(90% 0.006 250);flex-grow:1;">Subir migration de focus_task_labels</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.010 250);color:oklch(85% 0.012 250);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">Baixa</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.050 205);color:oklch(85% 0.065 205);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;">backend</span><span style="display:inline-flex;align-items:center;gap:5px;height:18px;padding:0 7px;border-radius:4px;background:oklch(29% 0.055 150);color:oklch(85% 0.075 150);font-size:11px;font-weight:500;white-space:nowrap;box-sizing:border-box;"><span style="width:5px;height:5px;border-radius:999px;background:oklch(70% 0.120 150);flex-shrink:0;"></span>Concluída</span></div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+</body>
+</html>

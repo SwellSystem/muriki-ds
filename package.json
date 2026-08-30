@@ -1,0 +1,12 @@
+{
+  "name": "@muriki/registry",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "registry:build": "shadcn build --output public/r",
+    "design:build": "cd design && bun run build.mjs"
+  },
+  "devDependencies": {
+    "shadcn": "^4.19.0"
+  }
+}

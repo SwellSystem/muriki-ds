@@ -1,0 +1,278 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;">Dados e feedback</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:660px;">Badge, Avatar, Tabs, Tooltip, Progress, Alert, Toast, Card e Skeleton. Os exemplos usam o vocabulário real do produto — tarefa, label, contrato, board — porque componente medido com texto genérico esconde onde a linha quebra.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:22px;">
+    <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Badge, tag e prioridade</p><div class="card" style="flex-grow:1;">
+<div style="display:flex;flex-direction:column;gap:18px;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">status · subtle — o padrão em lista e board</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:oklch(58% 0.025 255);flex-shrink:0;"></span>A fazer</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93.5% 0.035 262.6);color:oklch(33% 0.13 262.6);font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:oklch(47% 0.185 262.6);flex-shrink:0;"></span>Em andamento</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93% 0.06 60);color:oklch(50% 0.13 52);font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:oklch(66% 0.17 55);flex-shrink:0;"></span>Bloqueada</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93% 0.05 150);color:oklch(42% 0.11 150);font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:oklch(58% 0.13 150);flex-shrink:0;"></span>Concluída</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93% 0.05 27);color:oklch(42% 0.17 27);font-size:11.5px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:oklch(55% 0.20 27);flex-shrink:0;"></span>Cancelada</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">solid — só onde o status é a informação principal</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(94.5% 0.011 96);color:oklch(32% 0.02 248.5);font-size:11.5px;font-weight:500;">A fazer</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(47% 0.185 262.6);color:#fff;font-size:11.5px;font-weight:500;">Em andamento</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(87.8% 0.18 93.9);color:oklch(32% 0.02 248.5);font-size:11.5px;font-weight:500;">Bloqueada</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(58% 0.13 150);color:#fff;font-size:11.5px;font-weight:500;">Concluída</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(55% 0.20 27);color:#fff;font-size:11.5px;font-weight:500;">Cancelada</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">outline · tag de label — cor vem do label, não do sistema</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);">backend</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);">contrato</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);">urgente-cliente</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);"><span style="font-family:'Geist Mono',monospace;font-size:11px;">MRK-1284</span></span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">prioridade — forma + cor, nunca cor sozinha</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(58% 0.025 255);font-size:11.5px;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.5"/><path d="M5 5.2h10.5l-1.6 3.4 1.6 3.4H5"/></svg>Baixa</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93.5% 0.035 262.6);color:oklch(33% 0.13 262.6);font-size:11.5px;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.5"/><path d="M5 5.2h10.5l-1.6 3.4 1.6 3.4H5"/></svg>Média</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93% 0.06 60);color:oklch(50% 0.13 52);font-size:11.5px;font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.5"/><path d="M5 5.2h10.5l-1.6 3.4 1.6 3.4H5"/></svg>Alta</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(93% 0.05 27);color:oklch(42% 0.17 27);font-size:11.5px;font-weight:600;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.5"/><path d="M5 5.2h10.5l-1.6 3.4 1.6 3.4H5"/></svg>Urgente</span>
+    </div>
+  </div>
+</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Avatar</p><div class="card" style="flex-grow:1;">
+<div style="display:flex;flex-direction:column;gap:18px;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">tamanhos · 20 / 24 / 32 / 40</span>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span style="width:20px;height:20px;border-radius:999px;background:oklch(88% 0.06 262.6);color:oklch(27% 0.09 262.6);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span>
+      <span style="width:24px;height:24px;border-radius:999px;background:oklch(88% 0.06 262.6);color:oklch(27% 0.09 262.6);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;">GT</span>
+      <span style="width:32px;height:32px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;">GT</span>
+      <span style="width:40px;height:40px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;">GT</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">grupo empilhado · overflow numérico</span>
+    <div style="display:flex;align-items:center;">
+      <span style="display:flex;">
+        <span style="box-shadow:0 0 0 2px oklch(99.3% 0.002 85);border-radius:999px;"><span style="width:28px;height:28px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">GT</span></span>
+        <span style="box-shadow:0 0 0 2px oklch(99.3% 0.002 85);border-radius:999px;margin-left:-9px;"><span style="width:28px;height:28px;border-radius:999px;background:oklch(58% 0.12 82);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">RS</span></span>
+        <span style="box-shadow:0 0 0 2px oklch(99.3% 0.002 85);border-radius:999px;margin-left:-9px;"><span style="width:28px;height:28px;border-radius:999px;background:oklch(58% 0.13 150);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;">AL</span></span>
+        <span style="box-shadow:0 0 0 2px oklch(99.3% 0.002 85);border-radius:999px;margin-left:-9px;"><span style="width:28px;height:28px;border-radius:999px;background:oklch(94.5% 0.011 96);color:oklch(45% 0.03 257.7);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;">+4</span></span>
+      </span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">com presença</span>
+    <div style="display:flex;gap:14px;align-items:center;">
+      <span style="position:relative;display:inline-flex;"><span style="width:32px;height:32px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;">GT</span><span style="position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:999px;background:oklch(58% 0.13 150);box-shadow:0 0 0 2px oklch(99.3% 0.002 85);"></span></span>
+      <span style="position:relative;display:inline-flex;"><span style="width:32px;height:32px;border-radius:999px;background:oklch(58% 0.12 82);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;">RS</span><span style="position:absolute;right:-1px;bottom:-1px;width:10px;height:10px;border-radius:999px;background:oklch(58% 0.025 255);box-shadow:0 0 0 2px oklch(99.3% 0.002 85);"></span></span>
+    </div>
+  </div>
+</div></div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1.25fr;gap:22px;">
+    <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Navegação e progresso</p><div class="card" style="flex-grow:1;">
+<div style="display:flex;flex-direction:column;gap:20px;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">tabs · sublinhado</span>
+    <div style="display:flex;gap:2px;border-bottom:1px solid oklch(94% 0.01 100);">
+      <span style="padding:0 12px;height:34px;display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;color:oklch(32% 0.02 248.5);box-shadow:inset 0 -2px 0 oklch(47% 0.185 262.6);">Lista</span>
+      <span style="padding:0 12px;height:34px;display:inline-flex;align-items:center;font-size:13.5px;color:oklch(45% 0.03 257.7);">Board</span>
+      <span style="padding:0 12px;height:34px;display:inline-flex;align-items:center;font-size:13.5px;color:oklch(45% 0.03 257.7);">Timeline</span>
+      <span style="padding:0 12px;height:34px;display:inline-flex;align-items:center;font-size:13.5px;color:oklch(45% 0.03 257.7);gap:6px;">Calendário<span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;">3</span></span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">segmented · troca de densidade</span>
+    <div style="display:inline-flex;background:oklch(97% 0.01 93.5);border-radius:9px;padding:3px;gap:2px;align-self:flex-start;">
+      <span style="padding:0 12px;height:26px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:500;background:oklch(99.3% 0.002 85);border-radius:7px;box-shadow:0 1px 2px oklch(32% 0.02 248.5 / 0.06), 0 1px 1px oklch(32% 0.02 248.5 / 0.04);">Compacto</span>
+      <span style="padding:0 12px;height:26px;display:inline-flex;align-items:center;font-size:12.5px;color:oklch(45% 0.03 257.7);">Confortável</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">breadcrumb de árvore · docs e canvas</span>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:oklch(45% 0.03 257.7);">
+      <span>Muriki</span><span style="display:flex;color:oklch(58% 0.025 255);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+      <span>Engenharia</span><span style="display:flex;color:oklch(58% 0.025 255);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg></span>
+      <span style="display:inline-flex;align-items:center;gap:5px;color:oklch(32% 0.02 248.5);font-weight:500;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/></svg>Contrato OpenAPI</span>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">tooltip</span>
+    <div style="display:inline-flex;align-self:flex-start;background:oklch(24% 0.02 250);color:oklch(96.5% 0.004 107);font-size:12px;padding:6px 9px;border-radius:7px;box-shadow:0 4px 10px oklch(32% 0.02 248.5 / 0.07), 0 1px 2px oklch(32% 0.02 248.5 / 0.05);">Atalho: <span style="font-family:'Geist Mono',monospace;font-size:11.5px;opacity:0.85;">⌘K</span></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">progresso · meta do dia</span>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="flex-grow:1;height:6px;border-radius:999px;background:oklch(94.5% 0.011 96);overflow:hidden;"><div style="width:62%;height:100%;border-radius:999px;background:oklch(47% 0.185 262.6);"></div></div>
+      <span style="font-family:'Geist Mono',monospace;font-size:11.5px;color:oklch(45% 0.03 257.7);">8/13</span>
+    </div>
+  </div>
+</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Alerta e toast</p><div class="card" style="flex-grow:1;display:flex;flex-direction:column;gap:14px;">
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px;">
+  
+<div style="background:oklch(97% 0.015 262.6);border:1px solid oklch(88% 0.06 262.6);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(47% 0.185 262.6);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="0.7" fill="currentColor"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:13px;font-weight:600;line-height:18px;">Contrato dessincronizado</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O spec da API mudou. Rode o sync antes de mexer na tela.</span>
+  </div>
+</div>
+  
+<div style="background:oklch(97% 0.02 150);border:1px solid oklch(93% 0.05 150);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(58% 0.13 150);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.2 12.3 2.6 2.6 5-5.2"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:13px;font-weight:600;line-height:18px;">Tudo sincronizado</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O client foi regenerado há 2 minutos.</span>
+  </div>
+</div>
+  
+<div style="background:oklch(97.5% 0.02 60);border:1px solid oklch(93% 0.06 60);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(66% 0.17 55);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.7" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:13px;font-weight:600;line-height:18px;">Tarefa bloqueada há 3 dias</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Ninguém foi notificado do bloqueio ainda.</span>
+  </div>
+</div>
+  
+<div style="background:oklch(97% 0.02 27);border:1px solid oklch(93% 0.05 27);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(55% 0.20 27);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.7" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:13px;font-weight:600;line-height:18px;">Falha ao salvar</span>
+    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">A conexão caiu. Suas alterações estão guardadas localmente.</span>
+  </div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
+  <span class="cap">toast</span>
+  <div style="align-self:flex-start;background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:11px;padding:12px 14px;display:flex;gap:11px;align-items:center;box-shadow:0 12px 28px oklch(32% 0.02 248.5 / 0.11), 0 2px 6px oklch(32% 0.02 248.5 / 0.06);min-width:320px;">
+    <span style="color:oklch(58% 0.13 150);display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.2 12.3 2.6 2.6 5-5.2"/></svg></span>
+    <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;">
+      <span style="font-size:13px;font-weight:500;">Tarefa movida para Concluída</span>
+      <span style="font-size:12px;color:oklch(45% 0.03 257.7);">MRK-1284 · Revisar contrato OpenAPI</span>
+    </div>
+    <span style="font-size:12.5px;font-weight:500;color:oklch(47% 0.185 262.6);">Desfazer</span>
+  </div>
+</div></div></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Compostos — onde os primitivos se encontram</p>
+    <div class="card">
+<div style="display:grid;grid-template-columns:1.45fr 1fr;gap:24px;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">linha de tarefa · densidade compacta 44px</span>
+    <div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:11px;overflow:hidden;">
+      
+<div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+  <span style="color:oklch(88% 0.012 98);display:flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span>
+  <span style="width:16px;height:16px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid oklch(88% 0.012 98);background:oklch(99.3% 0.002 85);"></span>
+  <span style="font-size:13.5px;flex-grow:1;">Revisar contrato OpenAPI do módulo focus</span>
+  <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;">backend</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 1.8"/></svg>4h</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-3.5H6.5A2.5 2.5 0 0 1 4 14.5v-8A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5Z"/></svg>2</span>
+  <span style="width:22px;height:22px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span>
+</div>
+      
+<div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);background:oklch(97% 0.015 262.6);">
+  <span style="color:oklch(88% 0.012 98);display:flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span>
+  <span style="width:16px;height:16px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid oklch(88% 0.012 98);background:oklch(99.3% 0.002 85);"></span>
+  <span style="font-size:13.5px;flex-grow:1;">Regenerar client Kubb no platform</span>
+  <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;">backend</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 1.8"/></svg>4h</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-3.5H6.5A2.5 2.5 0 0 1 4 14.5v-8A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5Z"/></svg>2</span>
+  <span style="width:22px;height:22px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span>
+</div>
+      
+<div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);">
+  <span style="color:oklch(88% 0.012 98);display:flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span>
+  <span style="width:16px;height:16px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:oklch(47% 0.185 262.6);color:#fff;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span>
+  <span style="font-size:13.5px;flex-grow:1;color:oklch(58% 0.025 255);text-decoration:line-through;">Subir migration de focus_task_labels</span>
+  <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;">backend</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 1.8"/></svg>4h</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-3.5H6.5A2.5 2.5 0 0 1 4 14.5v-8A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5Z"/></svg>2</span>
+  <span style="width:22px;height:22px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span>
+</div>
+      
+<div style="display:flex;align-items:center;gap:11px;height:44px;padding:0 12px;border-bottom:1px solid oklch(97% 0.01 93.5);border-bottom:none;">
+  <span style="color:oklch(88% 0.012 98);display:flex;flex-shrink:0;"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg></span>
+  <span style="width:16px;height:16px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid oklch(88% 0.012 98);background:oklch(99.3% 0.002 85);"></span>
+  <span style="font-size:13.5px;flex-grow:1;">Escrever teste do webhook de subscriptions</span>
+  <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;">backend</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 1.8"/></svg>4h</span>
+  <span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-3.5H6.5A2.5 2.5 0 0 1 4 14.5v-8A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5Z"/></svg>2</span>
+  <span style="width:22px;height:22px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span>
+</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+      <span class="cap">skeleton · carregando</span>
+      <div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:11px;">
+        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:oklch(94.5% 0.011 96);"></span><span style="height:9px;border-radius:5px;background:oklch(94.5% 0.011 96);flex-grow:1;max-width:280px;"></span><span style="height:9px;width:48px;border-radius:5px;background:oklch(97% 0.01 93.5);"></span></div>
+        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:oklch(94.5% 0.011 96);"></span><span style="height:9px;border-radius:5px;background:oklch(94.5% 0.011 96);flex-grow:1;max-width:200px;"></span><span style="height:9px;width:48px;border-radius:5px;background:oklch(97% 0.01 93.5);"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">card de board</span>
+    <div style="background:oklch(99.3% 0.002 85);border:1px solid oklch(94% 0.01 100);border-radius:11px;padding:13px;display:flex;flex-direction:column;gap:10px;box-shadow:0 1px 2px oklch(32% 0.02 248.5 / 0.06), 0 1px 1px oklch(32% 0.02 248.5 / 0.04);">
+      <div style="display:flex;align-items:flex-start;gap:8px;">
+        <span style="font-size:13.5px;font-weight:500;line-height:19px;flex-grow:1;text-wrap:pretty;">Regenerar o client Kubb depois do sync do spec</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);">backend</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 9px;border-radius:6px;background:oklch(99.3% 0.002 85);color:oklch(45% 0.03 257.7);font-size:11.5px;font-weight:500;border:1px solid oklch(88% 0.012 98);">contrato</span>
+      </div>
+      <div style="height:1px;background:oklch(97% 0.01 93.5);"></div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:oklch(50% 0.13 52);font-weight:500;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4.5"/><path d="M5 5.2h10.5l-1.6 3.4 1.6 3.4H5"/></svg>Alta</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;font-size:11.5px;color:oklch(45% 0.03 257.7);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 1.8"/></svg>4h</span>
+        <span style="margin-left:auto;"><span style="width:22px;height:22px;border-radius:999px;background:oklch(47% 0.185 262.6);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;">GT</span></span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+      <span class="cap">estado vazio</span>
+      <div style="background:oklch(99.3% 0.002 85);border:1px dashed oklch(88% 0.012 98);border-radius:11px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;">
+        <span style="color:oklch(58% 0.025 255);display:flex;"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h4l1.6 2.6h6.8L17 13h4"/><path d="M4.6 5.6 3 13v4.5A1.5 1.5 0 0 0 4.5 19h15a1.5 1.5 0 0 0 1.5-1.5V13l-1.6-7.4A1.5 1.5 0 0 0 17.9 4.4H6.1a1.5 1.5 0 0 0-1.5 1.2Z"/></svg></span>
+        <span style="font-size:13.5px;font-weight:600;">Nada para hoje</span>
+        <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);max-width:230px;">Quando alguém te atribuir uma tarefa com data de hoje, ela aparece aqui.</span>
+        <span style="height:30px;padding:0 13px;border-radius:9px;background:oklch(47% 0.185 262.6);color:#fff;font-size:13px;font-weight:500;display:inline-flex;align-items:center;margin-top:2px;">Criar tarefa</span>
+      </div>
+    </div>
+  </div>
+</div></div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

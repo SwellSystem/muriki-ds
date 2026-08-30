@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Campos e seleção</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">Input, Textarea, Select, Checkbox, RadioGroup e Switch. O campo é chapado com filete de 1px por dentro — sem sulco, sem sombra. Botão tem prancha própria.</div>
+  </div>
+
+<div style="display:flex;flex-direction:column;margin-top:-8px;">
+  
+<div style="display:grid;grid-template-columns:150px 1fr;gap:28px;padding:22px 0;border-bottom:1px solid oklch(94% 0.01 100);align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Input</span>
+    <span class="cap" style="line-height:15px;">shadcn Input<br>Textarea · Select</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:16px 20px;">
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);color:oklch(58% 0.025 255);">Descreva a tarefa</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">repouso</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(84% 0.011 96);color:oklch(32% 0.02 248.5);">Revisar contrato</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">hover</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(47% 0.185 262.6), 0 0 0 3px oklch(47% 0.185 262.6 / 0.16);color:oklch(32% 0.02 248.5);">Revisar contrato<span style="width:1px;height:15px;background:oklch(47% 0.185 262.6);margin-left:-6px;"></span></div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">foco</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(55% 0.20 27), 0 0 0 3px oklch(55% 0.20 27 / 0.13);color:oklch(32% 0.02 248.5);">Re</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(55% 0.20 27);display:flex;align-items:center;gap:5px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.6" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg>Mínimo de 3 caracteres</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Título</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(97% 0.01 93.5);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);opacity:0.7;color:oklch(58% 0.025 255);">Bloqueado pelo plano</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">inativo</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Busca</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);color:oklch(58% 0.025 255);"><span style="color:oklch(58% 0.025 255);display:flex;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>Buscar tarefa ou doc</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">com ícone</span>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:16px 20px;">
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Estimativa</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);padding:0;gap:0;overflow:hidden;color:oklch(32% 0.02 248.5);"><span style="padding:0 10px;align-self:stretch;display:flex;align-items:center;background:oklch(97% 0.01 93.5);color:oklch(45% 0.03 257.7);font-size:12.5px;border-right:1px solid oklch(89% 0.009 96);">h</span><span style="padding:0 11px;">4,5</span></div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">com prefixo</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Status</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);justify-content:space-between;color:oklch(32% 0.02 248.5);"><span>Em andamento</span><span style="color:oklch(45% 0.03 257.7);display:flex;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">select · gatilho</span>
+</div>
+  
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  <span style="font-size:14px;font-weight:500;line-height:1;color:oklch(26% 0.022 250);">Descrição</span>
+  <div style="height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);height:74px;align-items:flex-start;padding-top:9px;line-height:19px;color:oklch(32% 0.02 248.5);">Sincronizar o spec e regenerar o client.</div>
+  <span style="font-size:11.5px;line-height:15px;color:oklch(45% 0.03 257.7);display:flex;align-items:center;gap:5px;">textarea</span>
+</div>
+</div></div>
+</div>
+  
+<div style="display:grid;grid-template-columns:150px 1fr;gap:28px;padding:22px 0;align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:3px;position:relative;top:2px;">
+    <span style="font-size:14px;font-weight:600;color:oklch(26% 0.022 250);letter-spacing:-0.008em;">Checkbox<br>Radio · Switch</span>
+    <span class="cap" style="line-height:15px;">shadcn<br>seleção</span>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:16px;min-width:0;">
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:16px 20px;">
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);background:oklch(99.3% 0.002 85);"></span><span>Concluída</span></div><span class="cap">checkbox · vazio</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:oklch(47% 0.185 262.6);box-shadow:none;color:#fff;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><span>Concluída</span></div><span class="cap">marcado</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:oklch(47% 0.185 262.6);box-shadow:0 0 0 1px oklch(47% 0.185 262.6), 0 0 0 3px oklch(47% 0.185 262.6 / 0.22);color:#fff;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg></span><span>Concluída</span></div><span class="cap">foco</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:oklch(97% 0.01 93.5);box-shadow:0 0 0 1px oklch(89% 0.009 96);"></span><span>Concluída</span></div><span class="cap">inativo</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);background:oklch(99.3% 0.002 85);"></span><span>Alta</span></div><span class="cap">radio · vazio</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;background:oklch(47% 0.185 262.6);box-shadow:none;color:#fff;"><span style="width:6px;height:6px;border-radius:999px;background:#fff;"></span></span><span>Alta</span></div><span class="cap">marcado</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:34px;height:20px;border-radius:999px;background:oklch(97% 0.01 93.5);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);display:inline-flex;align-items:center;padding:2px;box-sizing:border-box;flex-shrink:0;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;"></span></span><span>Notificar</span></div><span class="cap">switch · desligado</span></div>
+  <div style="display:flex;flex-direction:column;gap:7px;"><div style="display:flex;align-items:center;gap:9px;font-size:13.5px;color:oklch(32% 0.02 248.5);"><span style="width:34px;height:20px;border-radius:999px;background:oklch(47% 0.185 262.6);box-shadow:none;display:inline-flex;align-items:center;justify-content:flex-end;padding:2px;box-sizing:border-box;flex-shrink:0;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px oklch(25% 0.12 262.6 / 0.2);"></span></span><span>Notificar</span></div><span class="cap">ligado</span></div>
+</div></div>
+</div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>
