@@ -82,10 +82,10 @@ const selects = `
 
 // ── Checkbox
 const cbx = (st, sz = 16) => {
-  const S = { vazio:`box-shadow:inset 0 0 0 1.5px oklch(84% 0.011 96);background:${N.surface};`,
+  const S = { vazio:`background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};`,
     marcado:`background:${N.brand};color:#fff;`, meio:`background:${N.brand};color:#fff;`,
     foco:`background:${N.brand};color:#fff;box-shadow:0 0 0 2px ${N.bg}, 0 0 0 4px oklch(47% 0.185 262.6 / 0.35);`,
-    inativo:`box-shadow:inset 0 0 0 1.5px ${HAIR};background:${N.surface2};opacity:0.7;` }[st];
+    inativo:`background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};opacity:0.55;` }[st];
   const g = st === 'meio' ? I.minus : (st === 'marcado' || st === 'foco') ? I.check : '';
   return `<span style="width:${sz}px;height:${sz}px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;${S}">${g}</span>`;
 };
@@ -149,8 +149,8 @@ const ditem = (txt, { icon = '', sel = false, hl = false, danger = false, kb = '
   ${sel ? `<span style="display:flex;color:${D.brand};">${I.check}</span>` : ''}${kb ? `<span style="font-family:'Geist Mono',monospace;font-size:11px;color:${D.subtle};">${kb}</span>` : ''}</div>`;
 const dmenu = (inner, w = 224) => `<div style="width:${w}px;background:${D.surface};border-radius:12px;box-shadow:inset 0 0 0 1px ${D.hair}, 0 12px 32px oklch(0% 0 0 / 0.45);padding:5px;display:flex;flex-direction:column;gap:1px;box-sizing:border-box;">${inner}</div>`;
 const dcbx = (st, sz = 16) => {
-  const S = { vazio:`box-shadow:inset 0 0 0 1.5px ${D.hairStrong};`, marcado:`background:${D.brand};color:oklch(17% 0.03 262.6);`,
-    meio:`background:${D.brand};color:oklch(17% 0.03 262.6);`, inativo:`box-shadow:inset 0 0 0 1.5px ${D.hair};background:${D.surface2};opacity:0.7;` }[st];
+  const S = { vazio:`background:oklch(14% 0.004 107);box-shadow:inset 0 1px 0 rgba(255,255,255,0.045), inset 0 0 0 1px oklch(0.325 0.006 107);`, marcado:`background:${D.brand};color:oklch(17% 0.03 262.6);`,
+    meio:`background:${D.brand};color:oklch(17% 0.03 262.6);`, inativo:`background:oklch(14% 0.004 107);box-shadow:inset 0 1px 0 rgba(255,255,255,0.045), inset 0 0 0 1px oklch(0.325 0.006 107);opacity:0.55;` }[st];
   return `<span style="width:${sz}px;height:${sz}px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;${S}">${st === 'meio' ? I.minus : st === 'marcado' ? I.check : ''}</span>`;
 };
 const meiaDark = darkHalf('No escuro', 'O painel flutuante é a peça que mais sofre no dark: sem sombra visível contra fundo escuro, ele precisa de um degrau de superfície — o card sobe para L 22,5% contra o fundo de 19% — e de um filete. Sombra sozinha não separa nada aqui.', `

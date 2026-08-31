@@ -143,7 +143,7 @@ const nav = `
   <div style="display:flex;flex-direction:column;gap:8px;">
     ${cap('progresso · meta do dia')}
     <div style="display:flex;align-items:center;gap:10px;">
-      <div style="flex-grow:1;height:6px;border-radius:999px;background:${N.b200};overflow:hidden;"><div style="width:62%;height:100%;border-radius:999px;background:${N.brand};"></div></div>
+      <div style="flex-grow:1;height:6px;border-radius:999px;background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};overflow:hidden;"><div style="width:62%;height:100%;border-radius:999px;background:${N.brand};"></div></div>
       <span style="font-family:'Geist Mono',monospace;font-size:11.5px;color:${N.muted};">8/13</span>
     </div>
   </div>

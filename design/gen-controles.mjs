@@ -66,7 +66,7 @@ const inputVariacoes = `
 
 // ---- Seleção
 const cb = (st) => ({
-  vazio:`box-shadow:inset 0 0 0 1px ${HAIR};background:${N.surface};`,
+  vazio:`background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};`,
   marcado:`background:${N.brand};box-shadow:none;color:#fff;`,
   foco:`background:${N.brand};box-shadow:0 0 0 1px ${N.brand}, 0 0 0 3px oklch(47% 0.185 262.6 / 0.22);color:#fff;`,
   inativo:`background:${N.surface2};box-shadow:0 0 0 1px ${HAIR};`,
@@ -80,7 +80,7 @@ const selecao = `
   ${selRow(`<span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;${cb('inativo')}"></span>`, 'Concluída', 'inativo')}
   ${selRow(`<span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;${cb('vazio')}"></span>`, 'Alta', 'radio · vazio')}
   ${selRow(`<span style="width:16px;height:16px;border-radius:999px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;${cb('marcado')}"><span style="width:6px;height:6px;border-radius:999px;background:#fff;"></span></span>`, 'Alta', 'marcado')}
-  ${selRow(`<span style="width:34px;height:20px;border-radius:999px;background:${N.surface2};box-shadow:inset 0 0 0 1px ${HAIR};display:inline-flex;align-items:center;padding:2px;box-sizing:border-box;flex-shrink:0;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;"></span></span>`, 'Notificar', 'switch · desligado')}
+  ${selRow(`<span style="width:34px;height:20px;border-radius:999px;background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};display:inline-flex;align-items:center;padding:2px;box-sizing:border-box;flex-shrink:0;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;"></span></span>`, 'Notificar', 'switch · desligado')}
   ${selRow(`<span style="width:34px;height:20px;border-radius:999px;background:${N.brand};box-shadow:none;display:inline-flex;align-items:center;justify-content:flex-end;padding:2px;box-sizing:border-box;flex-shrink:0;"><span style="width:16px;height:16px;border-radius:999px;background:#fff;box-shadow:0 1px 2px oklch(25% 0.12 262.6 / 0.2);"></span></span>`, 'Notificar', 'ligado')}
 </div>`;
 
