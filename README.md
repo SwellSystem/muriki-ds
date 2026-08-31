@@ -1,12 +1,23 @@
-# muriki-ds
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="design/logo-dark.svg">
+    <img src="design/logo.svg" alt="Muriki" width="140">
+  </picture>
+</p>
 
-O design system da Muriki, em duas metades que se alimentam:
+<h1 align="center">muriki-ds</h1>
+
+<p align="center">Papel quente, tinta fria — o design system da Muriki.</p>
+
+---
+
+Duas metades que se alimentam:
 
 | pasta | o que é |
 | --- | --- |
 | `design/` | as pranchas do canvas (`.dc.html`) e os generators que as produzem. É onde a decisão visual nasce e fica documentada. |
 | `registry/` | os componentes de verdade, distribuídos como **registry do shadcn**. É o que entra no código. |
-| `public/r/` | a saída do build — um `.json` por item, é isso que o `shadcn add` consome. |
+| `public/r/` | a saída do build — um `.json` por item, gerado pela Action e servido pelo Pages. É isso que o `shadcn add` consome. |
 
 ## Consumir
 
@@ -15,7 +26,7 @@ No projeto que vai instalar (ex.: `muriki-platform`), declare o registry em `com
 ```json
 {
   "registries": {
-    "@muriki": "https://<host-do-registry>/r/{name}.json"
+    "@muriki": "https://swellsystem.github.io/muriki-ds/r/{name}.json"
   }
 }
 ```
@@ -35,8 +46,13 @@ no CSS do projeto e gera os mapeamentos `--color-*`, então `bg-tone-blue` e
 | item | tipo | o que traz |
 | --- | --- | --- |
 | `@muriki/theme` | `registry:theme` | papel quente + tinta fria, azul e amarelo da logo, nove matizes de badge, claro e escuro |
-| `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 5 |
+| `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 5; `solid` é exceção declarada — uma por tela |
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
+| `@muriki/view-toggle` | `registry:ui` | controle segmentado com pill animada, genérico sobre o tipo do valor |
+| `@muriki/switch` | `registry:ui` | trilho como encaixe, thumb como objeto elevado — não inverte no escuro, sobe por luz |
+| `@muriki/checkbox` | `registry:ui` | vazio é encaixe, marcado é chapado — numa caixa de 16px, relevo vira sujeira |
+| `@muriki/progress` | `registry:ui` | trilho como encaixe, preenchimento da marca dentro do sulco — sem sombra |
+| `@muriki/sonner` | `registry:ui` | toaster vestido com a paleta: info neutro, success e warning tingidos, error sólido |
 | `@muriki/row-actions` | `registry:block` | barra de ferramentas de linha, só ícone, com tooltip e `aria-label` obrigatórios na API |
 
 ## Desenvolver
@@ -69,5 +85,12 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
   (hue ~250). Não existe cinza puro no sistema.
 - **Dark não é o claro invertido.** O sólido troca de polaridade, o tingido troca
   de andar (fundo L 28%, tinta L 84%) e o campo fica mais escuro que o card.
+- **A luz vem de cima nos dois temas.** O que muda é o lado do plano: no claro a
+  peça está por cima e desce sombra; no escuro ela assenta como encaixe, com o
+  fio de luz no topo. E a peça selecionada é sempre a cor da própria página —
+  papel no claro, grafite no escuro.
+- **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
+  encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
+  elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
 - **Ícone sem rótulo é adivinhação.** `RowAction.label` é obrigatório no tipo:
   vira tooltip e `aria-label` ao mesmo tempo.
