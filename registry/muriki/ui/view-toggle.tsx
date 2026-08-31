@@ -21,6 +21,13 @@
  * O trilho usa --sunken, que é mais escuro que o fundo no claro E no
  * escuro — esse lado é simétrico de verdade.
  *
+ * O relevo das ARESTAS segue a mesma luz nos dois: ela vem de cima. No
+ * claro a pastilha está por cima, então projeta sombra para baixo. No
+ * escuro ela é um encaixe, então a aresta de cima POR DENTRO fica na
+ * sombra e a de baixo por dentro pega luz — e o trilho, que passou a
+ * estar por cima, ganha um fio de luz no topo. É a mesma física, lida do
+ * outro lado.
+ *
  * O cursor não. No claro ele sobe por SOMBRA. No escuro, sombra sozinha
  * não basta — preto sobre quase-preto quase não aparece. O que carrega a
  * elevação ali é um BRILHO na aresta de cima (`inset 0 1px 0` branco a
@@ -114,7 +121,7 @@ export function ViewToggle<V extends string>({
               // No escuro o relevo INVERTE: o trilho sobe e o cursor vira uma
               // janela de volta ao fundo da página. Sombra interna e brilho
               // branco não funcionam bem no escuro; degrau de luz funciona.
-              "dark:bg-[oklch(0.26_0.005_107)] dark:shadow-[inset_0_0_0_1px_oklch(0.325_0.006_107)]",
+              "dark:bg-[oklch(0.26_0.005_107)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.045),inset_0_0_0_1px_oklch(0.325_0.006_107)]",
             ].join(" ")
           // plain NÃO tem trilho. É para flutuar sobre conteúdo — um
           // calendário, um board — onde o trilho competiria com o que está
@@ -136,7 +143,7 @@ export function ViewToggle<V extends string>({
               "absolute top-0.5 bottom-0.5 rounded-full",
               "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
               "dark:bg-[oklch(0.172_0.004_107)]",
-              "dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),inset_0_0_0_1px_oklch(0.13_0.004_107)]"
+              "dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)]"
             )}
             initial={false}
             animate={{
