@@ -9,6 +9,13 @@
 
 <p align="center">Papel quente, tinta fria — o design system da Muriki.</p>
 
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/readme/vitrine-escura.png">
+    <img src=".github/readme/vitrine-clara.png" alt="Botões, badges e controles do muriki-ds" width="840">
+  </picture>
+</p>
+
 ---
 
 Duas metades que se alimentam:
