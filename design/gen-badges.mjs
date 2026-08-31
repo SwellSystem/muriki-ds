@@ -16,6 +16,11 @@ export const C = {
   roxo:     { bg:'oklch(93.5% 0.045 300)', fg:'oklch(43% 0.150 300)', dot:'oklch(56% 0.185 300)', h:300 },
 };
 const H = { sm:18, md:22 };
+// Ausência: contorno tracejado, sempre neutro. Ausência não tem cor.
+const tracejado = (txt, size = 'md') => {
+  const h = H[size];
+  return `<span style="display:inline-flex;align-items:center;gap:${size === 'sm' ? 4 : 5}px;height:${h}px;padding:0 ${size === 'sm' ? 7 : 9}px;border-radius:${Math.round(h/5)}px;border:1px dashed ${N.borderStrong};color:${N.muted};font-size:${size === 'sm' ? 11 : 11.5}px;font-weight:500;white-space:nowrap;box-sizing:border-box;">${txt}</span>`;
+};
 const bg = (cor, txt, { size = 'md', dot = false, icon = '', close = false, num = false } = {}) => {
   const c = C[cor], h = H[size], fs = size === 'sm' ? 11 : 11.5, px = num ? (size === 'sm' ? 5 : 6) : (size === 'sm' ? 7 : 9);
   return `<span style="display:inline-flex;align-items:center;gap:${size === 'sm' ? 4 : 5}px;height:${h}px;${num ? `min-width:${h}px;justify-content:center;` : ''}padding:0 ${px}px;border-radius:${Math.round(h/5)}px;background:${c.bg};color:${c.fg};font-size:${fs}px;font-weight:${num ? 600 : 500};letter-spacing:-0.002em;white-space:nowrap;box-sizing:border-box;">
@@ -74,6 +79,7 @@ ${grp('forma — soft é o padrão', [
   bg('azul', 'backend', { close:true }),
   bg('azul', '12', { num:true }),
   `<span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;background:transparent;color:${N.muted};font-size:11.5px;font-weight:500;box-shadow:inset 0 0 0 1px ${HAIR};">outline</span>`,
+  tracejado('dashed'),
 ].join(''))}
 <div style="display:flex;gap:26px;">
   ${grp('tamanho', [
@@ -126,10 +132,54 @@ const meiaDark = darkHalf('No escuro', 'A matiz nunca muda entre os temas — s�
   ${dgrp('status', [dbg('cinza','A fazer',{dot:true}), dbg('azul','Em andamento',{dot:true}), dbg('amarelo','Bloqueada',{dot:true}), dbg('verde','Concluída',{dot:true}), dbg('vermelho','Cancelada',{dot:true}), dbg('roxo','Em revisão',{dot:true})].join(''), 8)}
   ${dgrp('prioridade e label', [dbg('cinza','Baixa'), dbg('azul','Média'), dbg('laranja','Alta'), dbg('vermelho','Urgente'), dbg('ciano','backend'), dbg('roxo','contrato'), dbg('rosa','design')].join(''), 8)}
   ${dgrp('tamanho e contador', [dbg('verde','Concluída',{size:'sm',dot:true}), dbg('verde','Concluída',{dot:true}), dbg('cinza','3',{size:'sm'}), dbg('azul','12'), dbg('vermelho','99+')].join(''), 10)}
+  ${dgrp('ausência — tracejado, sempre neutro', [
+    dbg('ciano','backend'),
+    `<span style="display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:4px;border:1px dashed ${D.hairStrong};color:${D.muted};font-size:11.5px;font-weight:500;">sem label</span>`,
+    `<span style="display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:${D.muted};"><span style="width:22px;height:22px;border-radius:999px;border:1px dashed ${D.hairStrong};"></span>Sem responsável</span>`,
+  ].join(''), 12)}
   <div style="background:${D.surface};border-radius:14px;box-shadow:inset 0 0 0 1px ${D.hair};overflow:hidden;">
     ${[['Revisar contrato OpenAPI do módulo focus','laranja','Alta','ciano','backend','azul','Em andamento'],['Regenerar client Kubb no platform','vermelho','Urgente','roxo','contrato','amarelo','Bloqueada'],['Subir migration de focus_task_labels','cinza','Baixa','ciano','backend','verde','Concluída']].map(([t,pc,pt,lc,lt,sc,st], i) => `<div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 14px;${i < 2 ? `border-bottom:1px solid ${D.hair};` : ''}"><span style="width:16px;height:16px;border-radius:4px;box-shadow:inset 0 0 0 1.5px ${D.hairStrong};flex-shrink:0;"></span><span style="font-size:13.5px;color:${D.body};flex-grow:1;">${t}</span>${dbg(pc,pt,{size:'sm'})}${dbg(lc,lt,{size:'sm'})}${dbg(sc,st,{size:'sm',dot:true})}</div>`).join('')}
   </div>
 `);
+
+
+// Contínuo x tracejado — a regra que vale para a ferramenta toda
+const dash = `1px dashed ${N.borderStrong}`;
+const parDemo = (titulo, existe, ausente, nota) => `
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div style="background:${N.surface};border-radius:12px;box-shadow:inset 0 0 0 1px ${HAIR};padding:16px;display:flex;flex-direction:column;gap:12px;min-height:96px;justify-content:center;">
+    <div style="display:flex;align-items:center;gap:10px;">${existe}</div>
+    <div style="display:flex;align-items:center;gap:10px;">${ausente}</div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:2px;">
+    <span style="font-size:12.5px;font-weight:600;color:${N.fg};">${titulo}</span>
+    <span style="font-size:12px;line-height:16px;color:${N.muted};">${nota}</span>
+  </div>
+</div>`;
+
+const regraTracejado = `
+<div style="display:flex;gap:26px;align-items:center;padding:18px 20px;border-radius:14px;background:${N.surface2};">
+  <div style="display:flex;flex-direction:column;gap:4px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;color:${N.fg};">Contínuo é o que existe. Tracejado é o que falta.</span>
+    <span style="font-size:12.5px;line-height:18px;color:${N.body};max-width:680px;">Um contorno tracejado não é um estilo alternativo — é uma palavra. Ele diz “aqui caberia algo e ainda não cabe nada”, e por isso é sempre neutro: ausência não tem cor. Vale no badge, na célula da tabela, no avatar, no botão de adicionar e no estado vazio.</span>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0;">${bg('ciano','backend')}${tracejado('sem label')}</div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:20px;">
+  ${parDemo('Badge', bg('ciano','backend'), tracejado('sem label'), 'O label que existe tem cor. A falta dele não tem.')}
+  ${parDemo('Célula de tabela',
+    `<span style="width:22px;height:22px;border-radius:999px;background:${N.brand};color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;">GT</span><span style="font-size:12.5px;color:${N.body};">Guilherme</span>`,
+    `<span style="width:22px;height:22px;border-radius:999px;border:${dash};"></span><span style="font-size:12.5px;color:${N.muted};">Sem responsável</span>`,
+    'O avatar vazio é o mesmo círculo, tracejado.')}
+  ${parDemo('Adicionar',
+    `<span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:5px;background:${N.surface2};color:${N.body};font-size:12px;font-weight:500;">Prazo: 12 set</span>`,
+    `<span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 9px;border-radius:5px;border:${dash};color:${N.muted};font-size:12px;font-weight:500;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Definir prazo</span>`,
+    'O botão de preencher usa a mesma linguagem do vazio que ele preenche.')}
+  ${parDemo('Área e estado vazio',
+    `<span style="width:100%;height:30px;border-radius:8px;background:${N.surface2};display:flex;align-items:center;padding:0 10px;font-size:12px;color:${N.body};">3 tarefas nesta coluna</span>`,
+    `<span style="width:100%;height:30px;border-radius:8px;border:${dash};display:flex;align-items:center;justify-content:center;font-size:12px;color:${N.muted};">Solte aqui</span>`,
+    'Já é assim no estado vazio — agora tem nome e regra.')}
+</div>`;
 
 const body = `
 <div style="display:flex;gap:26px;align-items:center;padding:18px 20px;border-radius:14px;background:${N.brand50};box-shadow:inset 0 0 0 1px oklch(88% 0.05 262.6);">
@@ -144,6 +194,7 @@ const body = `
   ${rail('Semântica', 'status, prioridade<br>label', semantica)}
   ${rail('Forma', 'dot, ícone, contador<br>removível', formas)}
   ${rail('Sólido x abafado', 'por que abafado', evitar)}
+  ${rail('Ausência', 'contínuo x<br>tracejado', regraTracejado)}
   ${rail('Na linha', 'em tamanho real', naLinha, true)}
 </div>
 ${meiaDark}`;
