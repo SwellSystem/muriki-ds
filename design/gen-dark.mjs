@@ -37,10 +37,22 @@ const regras = `
     `<div style="display:flex;gap:10px;align-items:center;">${dbtn('primary')}Nova tarefa</span>${dbtn('danger')}Excluir</span></div>`)}
   ${regra('03', 'O campo fica mais escuro que o card', 'Ao contrário do claro, onde ele é mais claro. No escuro o buraco vai para baixo — L 16,5% dentro de um card de 22,5%.',
     `<div style="width:100%;"><div style="${dinput('rest')}color:${D.subtle};">Descreva a tarefa</div></div>`)}
-  ${regra('04', 'Sombra é linguagem de tema claro', 'Preto sobre quase-preto é invisível: no escuro a sombra não faz nada. Elevação aqui vem de LUZ — a superfície sobe de luminosidade e ganha um filete mais claro. É a única exceção legítima a uma classe <span class="mono" style="font-size:12px;">dark:</span> num componente; nos outros casos, precisar dela quer dizer que falta um token.',
-    `<div style="display:flex;gap:14px;align-items:center;">
-       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:${D.surface};box-shadow:0 2px 6px rgba(0,0,0,0.5);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.subtle};">só sombra</span></span>
-       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:oklch(0.315 0.006 107);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px oklch(0.435 0.008 107), 0 2px 5px rgba(0,0,0,0.55);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">luz + filete</span></span>
+  ${regra('04', 'A luz vem de cima nos dois temas', 'O que muda é de que lado do plano a peça está. No claro a pastilha fica <em>por cima</em>: projeta sombra para baixo. No escuro ela é um <em>encaixe</em>: a aresta de cima por dentro fica na sombra, a de baixo por dentro pega luz, e o trilho — que passou a estar por cima — ganha um fio de luz no topo. Mesma física, lida do outro lado. E vale a regra que a une: <strong style="font-weight:600;">a peça selecionada é sempre a cor da própria página</strong>.',
+    `<div style="display:flex;gap:16px;align-items:center;">
+       <span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;">
+         <span style="display:inline-flex;align-items:center;border-radius:999px;padding:2px;background:oklch(0.955 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(0.94 0.01 100);">
+           <span style="width:42px;height:24px;border-radius:999px;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(0.89 0.009 96);"></span>
+           <span style="width:42px;height:24px;"></span>
+         </span>
+         <span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">claro — por cima</span>
+       </span>
+       <span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;">
+         <span style="display:inline-flex;align-items:center;border-radius:999px;padding:2px;background:oklch(0.26 0.005 107);box-shadow:inset 0 1px 0 rgba(255,255,255,0.045), inset 0 0 0 1px oklch(0.325 0.006 107);">
+           <span style="width:42px;height:24px;border-radius:999px;background:oklch(0.172 0.004 107);box-shadow:inset 0 1px 3px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px oklch(0.135 0.004 107);"></span>
+           <span style="width:42px;height:24px;"></span>
+         </span>
+         <span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">escuro — encaixe</span>
+       </span>
      </div>`)}
 </div>`;
 
