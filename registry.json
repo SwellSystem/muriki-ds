@@ -67,7 +67,8 @@
           "tone-pink-dot": "oklch(0.58 0.19 350)",
           "tone-purple": "oklch(0.935 0.045 300)",
           "tone-purple-foreground": "oklch(0.43 0.15 300)",
-          "tone-purple-dot": "oklch(0.56 0.185 300)"
+          "tone-purple-dot": "oklch(0.56 0.185 300)",
+          "sunken": "oklch(0.955 0.012 95)"
         },
         "dark": {
           "background": "oklch(0.19 0.008 250)",
@@ -124,7 +125,8 @@
           "tone-pink-dot": "oklch(0.7 0.16 350)",
           "tone-purple": "oklch(0.29 0.055 300)",
           "tone-purple-foreground": "oklch(0.85 0.075 300)",
-          "tone-purple-dot": "oklch(0.68 0.16 300)"
+          "tone-purple-dot": "oklch(0.68 0.16 300)",
+          "sunken": "oklch(0.155 0.007 250)"
         }
       }
     },

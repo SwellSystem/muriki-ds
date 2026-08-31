@@ -33,6 +33,10 @@
   --success: oklch(0.58 0.13 150);
   --warning: oklch(0.66 0.17 55);
 
+  /* Superfície afundada — trilho de toggle, campo de busca, cabeçalho de tabela.
+     Mais escura que o fundo nos DOIS temas: no dark o --muted é mais CLARO que
+     o card, então reaproveitá-lo inverteria o relevo. */
+  --sunken: oklch(0.955 0.012 95);
   --border: oklch(0.94 0.01 100);
   --input: oklch(0.89 0.009 96);
   --ring: oklch(0.47 0.185 262.6);
@@ -86,6 +90,7 @@
   --success: oklch(0.72 0.13 150);
   --warning: oklch(0.75 0.15 60);
 
+  --sunken: oklch(0.155 0.007 250);
   --border: oklch(0.31 0.01 250);
   --input: oklch(0.4 0.012 250);
   --ring: oklch(0.7 0.145 262.6);
@@ -129,6 +134,7 @@
   --color-destructive-subtle-border: var(--destructive-subtle-border);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-sunken: var(--sunken);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

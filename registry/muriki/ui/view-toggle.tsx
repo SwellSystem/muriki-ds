@@ -11,6 +11,11 @@
  * no tipo. Opção sem `label` visível exige `ariaLabel` próprio — ícone
  * sozinho é adivinhação, a mesma regra do RowActions.
  *
+ * O relevo é simétrico entre os temas: o trilho usa --sunken (mais escuro
+ * que o fundo no claro E no escuro) e o cursor usa --card com filete e
+ * sombra. Nenhuma classe `dark:` — se um tema precisar de tratamento
+ * próprio aqui, é sinal de que o token está errado, não o componente.
+ *
  * A pill é medida por `getBoundingClientRect` e reposicionada por
  * `ResizeObserver`, então ela acompanha mudança de largura (fullWidth no
  * mobile, label que troca por i18n) sem recalculo manual.
@@ -86,9 +91,13 @@ export function ViewToggle<V extends string>({
       aria-label={ariaLabel}
       className={cn(
         "relative inline-flex items-center rounded-full p-0.5",
+        // Trilho AFUNDADO — a sombra interna é a mesma nos dois temas porque
+        // --sunken já é mais escuro que o fundo em ambos. Sem dark: aqui.
         appearance === "default"
-          ? "border border-border/60 bg-muted/60 shadow-xs"
-          : "gap-1 border border-border/60 bg-background/70 shadow-xs backdrop-blur-md dark:border-border/50 dark:bg-background/25 dark:shadow-lg dark:shadow-background/20",
+          ? "bg-sunken shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)]"
+          // plain flutua sobre conteúdo — aí o vidro rende. Translúcido e
+          // desfocado nos DOIS temas, com o mesmo anel.
+          : "gap-1 bg-sunken/70 shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)] backdrop-blur-md",
         className
       )}
     >
@@ -98,9 +107,11 @@ export function ViewToggle<V extends string>({
             aria-hidden="true"
             layout
             className={cn(
-              "absolute top-0.5 bottom-0.5 rounded-full bg-background shadow-sm",
-              appearance === "plain" &&
-                "dark:bg-card/70 dark:shadow-md dark:ring-1 dark:shadow-background/30 dark:ring-border/50"
+              // Cursor ELEVADO: superfície de card, filete de 1px e sombra de
+              // apoio — idêntico nos dois temas. O contraste com o trilho
+              // afundado é o que faz o relevo, não uma cor especial de tema.
+              "absolute top-0.5 bottom-0.5 rounded-full bg-card",
+              "shadow-[0_1px_2px_rgba(0,0,0,0.12),0_2px_6px_rgba(0,0,0,0.06),inset_0_0_0_1px_var(--input)]"
             )}
             initial={false}
             animate={{
