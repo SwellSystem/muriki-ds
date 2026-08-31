@@ -5,14 +5,14 @@
   </picture>
 </p>
 
-<h1 align="center">muriki-ds</h1>
+<h1 align="center">Muriki Design System</h1>
 
 <p align="center">Papel quente, tinta fria — o design system da Muriki.</p>
 
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset=".github/readme/vitrine-escura.png">
-    <img src=".github/readme/vitrine-clara.png" alt="Botões, badges e controles do muriki-ds" width="840">
+    <img src=".github/readme/vitrine-clara.png" alt="Botões, badges, campos e controles do Muriki Design System" width="840">
   </picture>
 </p>
 
