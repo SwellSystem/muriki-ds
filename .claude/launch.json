@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "muriki-poc",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd /Users/guilherme/swell-system/muriki-poc && exec bun run dev"],
+      "port": 3000
+    }
+  ]
+}

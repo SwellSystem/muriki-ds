@@ -29,6 +29,12 @@ export const badgeVariants = cva(
         soft: "",
         /** Para label do usuário, onde o fundo cheio competiria com o status. */
         outline: "bg-transparent text-muted-foreground shadow-[inset_0_0_0_1px_var(--input)]",
+        /**
+         * AUSÊNCIA. Contorno tracejado é o sinal do sistema para "não existe
+         * ainda" — sem label, sem responsável, sem prazo, campo por preencher.
+         * Sempre neutro: ausência não tem cor, então `tone` é ignorado aqui.
+         */
+        dashed: "border border-dashed border-input bg-transparent text-muted-foreground",
       },
       size: {
         /** Dentro de linha de tabela. */
