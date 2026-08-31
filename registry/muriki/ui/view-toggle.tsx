@@ -21,10 +21,15 @@
  * O trilho usa --sunken, que é mais escuro que o fundo no claro E no
  * escuro — esse lado é simétrico de verdade.
  *
- * O cursor não: no claro ele sobe por SOMBRA, no escuro por LUZ. Sombra
- * preta sobre fundo quase preto não existe. É a única exceção legítima a
- * uma classe `dark:` no sistema — nos outros casos, precisar de `dark:`
- * quer dizer que falta um token.
+ * O cursor não. No claro ele sobe por SOMBRA. No escuro, sombra sozinha
+ * não basta — preto sobre quase-preto quase não aparece. O que carrega a
+ * elevação ali é um BRILHO na aresta de cima (`inset 0 1px 0` branco a
+ * 10%), simulando luz vinda de cima; a sombra entra como apoio, e o corpo
+ * sobe de luminosidade. Os três juntos dão a sobreposição que a sombra
+ * dá sozinha no claro.
+ *
+ * É a única exceção legítima a uma classe `dark:` no sistema — nos outros
+ * casos, precisar de `dark:` quer dizer que falta um token.
  *
  * A pill é medida por `getBoundingClientRect` e reposicionada por
  * `ResizeObserver`, então ela acompanha mudança de largura (fullWidth no
@@ -124,7 +129,8 @@ export function ViewToggle<V extends string>({
               // pastilha sobe de luminosidade e ganha um filete mais claro.
               "absolute top-0.5 bottom-0.5 rounded-full",
               "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
-              "dark:bg-[oklch(0.30_0.011_250)] dark:shadow-[inset_0_0_0_1px_oklch(0.42_0.014_250)]"
+              "dark:bg-[oklch(0.325_0.013_250)]",
+              "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10),inset_0_0_0_1px_oklch(0.44_0.016_250),0_2px_5px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.45)]"
             )}
             initial={false}
             animate={{
