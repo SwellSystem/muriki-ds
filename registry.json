@@ -145,6 +145,7 @@
         "class-variance-authority"
       ],
       "registryDependencies": [
+        "utils",
         "@muriki/theme"
       ],
       "files": [
@@ -167,6 +168,7 @@
         "class-variance-authority"
       ],
       "registryDependencies": [
+        "utils",
         "@muriki/theme"
       ],
       "files": [
@@ -189,6 +191,7 @@
         "@phosphor-icons/react"
       ],
       "registryDependencies": [
+        "utils",
         "tooltip",
         "dropdown-menu",
         "@muriki/button"
