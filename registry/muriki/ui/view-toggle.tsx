@@ -129,8 +129,8 @@ export function ViewToggle<V extends string>({
               // pastilha sobe de luminosidade e ganha um filete mais claro.
               "absolute top-0.5 bottom-0.5 rounded-full",
               "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
-              "dark:bg-[oklch(0.325_0.013_250)]",
-              "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10),inset_0_0_0_1px_oklch(0.44_0.016_250),0_2px_5px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.45)]"
+              "dark:bg-[oklch(0.315_0.006_107)]",
+              "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10),inset_0_0_0_1px_oklch(0.435_0.008_107),0_2px_5px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.45)]"
             )}
             initial={false}
             animate={{
