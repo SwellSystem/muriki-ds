@@ -100,7 +100,7 @@
 
   /* Espelho: fundo vai para L 29%, tinta para L 85%. Matiz não muda —
      é o que faz o amarelo continuar sendo "bloqueada" ao trocar de tema. */
-  --tone-gray: oklch(0.29 0.01 250);         --tone-gray-foreground: oklch(0.85 0.012 250);     --tone-gray-dot: oklch(0.62 0.012 250);
+  --tone-gray: oklch(0.29 0.006 107);         --tone-gray-foreground: oklch(0.85 0.006 100);     --tone-gray-dot: oklch(0.62 0.008 107);
   --tone-blue: oklch(0.29 0.055 262);        --tone-blue-foreground: oklch(0.85 0.075 262);     --tone-blue-dot: oklch(0.68 0.14 262);
   --tone-cyan: oklch(0.29 0.05 205);         --tone-cyan-foreground: oklch(0.85 0.065 205);     --tone-cyan-dot: oklch(0.7 0.095 205);
   --tone-green: oklch(0.29 0.055 150);       --tone-green-foreground: oklch(0.85 0.075 150);    --tone-green-dot: oklch(0.7 0.12 150);
