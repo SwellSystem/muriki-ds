@@ -196,6 +196,26 @@
         }
       ],
       "docs": "A linha que contém o RowActions precisa da classe `group/row` — a barra usa `group-hover/row` para aparecer. Em telas de toque passe `alwaysVisible` e `inlineCount={0}`."
+    },
+    {
+      "name": "view-toggle",
+      "type": "registry:ui",
+      "title": "View Toggle",
+      "description": "Controle segmentado com pill animada — calendário/kanban, lista/board, densidade. Genérico sobre o tipo do valor, com tablist e aria-selected.",
+      "dependencies": [
+        "framer-motion"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/view-toggle.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio."
     }
   ]
 }

@@ -6,6 +6,12 @@
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "cd /Users/guilherme/swell-system/muriki-poc && exec bun run dev"],
       "port": 3000
+    },
+    {
+      "name": "platform-ds-tokens",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "cd /Users/guilherme/swell-system/muriki-platform-worktrees/ds-tokens && exec bun run dev --port 5199"],
+      "port": 5199
     }
   ]
 }
