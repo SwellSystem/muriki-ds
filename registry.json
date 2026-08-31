@@ -218,6 +218,27 @@
         }
       ],
       "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio."
+    },
+    {
+      "name": "sonner",
+      "type": "registry:ui",
+      "title": "Toaster",
+      "description": "Sonner vestido com a paleta: info neutro, success e warning tingidos como badge, error sólido porque precisa interromper.",
+      "dependencies": [
+        "sonner",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/sonner.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Passe `theme` como prop do seu provider — o componente não conhece a infraestrutura do app."
     }
   ]
 }
