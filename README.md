@@ -41,6 +41,93 @@ O `@muriki/theme` vem junto como dependência — ele injeta os tokens claro e e
 no CSS do projeto e gera os mapeamentos `--color-*`, então `bg-tone-blue` e
 `text-primary-subtle-foreground` passam a existir como classe do Tailwind.
 
+## Exemplos
+
+Botão — `outline` é o padrão; Base UI por baixo, então troca de elemento é
+`render`, não `asChild`:
+
+```tsx
+import { Button } from "@/components/ui/button"
+
+<Button>Salvar rascunho</Button>
+<Button variant="primary">Adicionar linha</Button>
+<Button variant="solid">Publicar</Button>              {/* exceção: uma por tela */}
+<Button variant="ghost" size="icon" aria-label="Copiar"><Copy /></Button>
+<Button variant="link" render={<a href="/planos" />}>Ver planos</Button>
+```
+
+Badge — nove tons, e os três acessórios: ponto, contador e remoção. O
+tracejado é o sinal de ausência do sistema:
+
+```tsx
+import { Badge } from "@/components/ui/badge"
+
+<Badge tone="green" dot>Ativo</Badge>
+<Badge tone="blue" count>12</Badge>
+<Badge variant="dashed">Sem responsável</Badge>
+<Badge tone="purple" onRemove={tirarFiltro} removeLabel="Remover filtro Design">Design</Badge>
+```
+
+ViewToggle — controlado, genérico sobre o tipo do valor, `ariaLabel`
+obrigatório no tipo:
+
+```tsx
+import { ViewToggle } from "@/components/ui/view-toggle"
+
+const [view, setView] = useState<"lista" | "board">("lista")
+
+<ViewToggle
+  value={view}
+  onChange={setView}
+  ariaLabel="Modo de visualização"
+  options={[
+    { value: "lista", label: "Lista" },
+    { value: "board", label: "Board" },
+  ]}
+/>
+```
+
+RowActions — a linha precisa da classe `group/row` (é o hover dela que
+revela a barra), e `label` é obrigatório em cada ação:
+
+```tsx
+import { RowActions } from "@/components/row-actions"
+
+<tr className="group/row">
+  {/* ...células... */}
+  <td>
+    <RowActions
+      actions={[
+        { id: "editar", label: "Editar", icon: PencilSimple, onSelect: editar, shortcut: "E" },
+        { id: "duplicar", label: "Duplicar", icon: Copy, onSelect: duplicar },
+        { id: "excluir", label: "Excluir", icon: Trash, onSelect: excluir, destructive: true },
+      ]}
+    />
+  </td>
+</tr>
+```
+
+Controles de formulário — Base UI, API controlada:
+
+```tsx
+<Switch checked={ativo} onCheckedChange={setAtivo} />
+<Checkbox checked={selecionado} onCheckedChange={setSelecionado} indeterminate={parcial} />
+<Progress value={62} />
+```
+
+Toaster — monte uma vez no layout e dispare com o `toast` do sonner; o tema
+vem do seu provider, o componente não adivinha:
+
+```tsx
+import { Toaster } from "@/components/ui/sonner"
+import { toast } from "sonner"
+
+<Toaster theme={theme} />
+
+toast.success("Linha publicada")
+toast.error("Sem conexão — nada foi salvo")
+```
+
 ## Itens
 
 | item | tipo | o que traz |
