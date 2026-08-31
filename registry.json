@@ -8,13 +8,6 @@
       "type": "registry:theme",
       "title": "Tema Muriki",
       "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250.",
-      "files": [
-        {
-          "path": "registry/muriki/theme/muriki.css",
-          "type": "registry:file",
-          "target": "styles/muriki.css"
-        }
-      ],
       "cssVars": {
         "theme": {
           "radius": "14px"
