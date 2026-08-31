@@ -11,10 +11,14 @@
  * no tipo. Opção sem `label` visível exige `ariaLabel` próprio — ícone
  * sozinho é adivinhação, a mesma regra do RowActions.
  *
- * O relevo é simétrico entre os temas: o trilho usa --sunken (mais escuro
- * que o fundo no claro E no escuro) e o cursor usa --card com filete e
- * sombra. Nenhuma classe `dark:` — se um tema precisar de tratamento
- * próprio aqui, é sinal de que o token está errado, não o componente.
+ * O relevo é o mesmo nos dois temas; o MEIO de produzi-lo não é.
+ * O trilho usa --sunken, que é mais escuro que o fundo no claro E no
+ * escuro — esse lado é simétrico de verdade.
+ *
+ * O cursor não: no claro ele sobe por SOMBRA, no escuro por LUZ. Sombra
+ * preta sobre fundo quase preto não existe. É a única exceção legítima a
+ * uma classe `dark:` no sistema — nos outros casos, precisar de `dark:`
+ * quer dizer que falta um token.
  *
  * A pill é medida por `getBoundingClientRect` e reposicionada por
  * `ResizeObserver`, então ela acompanha mudança de largura (fullWidth no
@@ -107,11 +111,13 @@ export function ViewToggle<V extends string>({
             aria-hidden="true"
             layout
             className={cn(
-              // Cursor ELEVADO: superfície de card, filete de 1px e sombra de
-              // apoio — idêntico nos dois temas. O contraste com o trilho
-              // afundado é o que faz o relevo, não uma cor especial de tema.
-              "absolute top-0.5 bottom-0.5 rounded-full bg-card",
-              "shadow-[0_1px_2px_rgba(0,0,0,0.12),0_2px_6px_rgba(0,0,0,0.06),inset_0_0_0_1px_var(--input)]"
+              // Cursor ELEVADO — e aqui a exceção que vale para todo o sistema:
+              // sombra é uma linguagem de tema CLARO. Preto sobre quase-preto
+              // é invisível. No escuro a elevação se expressa por LUZ: a
+              // pastilha sobe de luminosidade e ganha um filete mais claro.
+              "absolute top-0.5 bottom-0.5 rounded-full",
+              "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
+              "dark:bg-[oklch(0.30_0.011_250)] dark:shadow-[inset_0_0_0_1px_oklch(0.42_0.014_250)]"
             )}
             initial={false}
             animate={{
