@@ -149,6 +149,18 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/sonner` | `registry:ui` | toaster vestido com a paleta: info neutro, success e warning tingidos, error sólido |
 | `@muriki/row-actions` | `registry:block` | barra de ferramentas de linha, só ícone, com tooltip e `aria-label` obrigatórios na API |
 
+## Tipografia
+
+**Geist** para a interface, **Geist Mono** para código, IDs e números que
+precisam se alinhar (`MRK-1284 · 4h 12m · R$ 1.240,00`). O corpo é **14/20** —
+a tela é densa e cheia de lista, dezesseis empurra linha demais para fora da
+dobra. Nos extremos: display 32/36 · 600 e caption 11/14 · 600 em caixa alta;
+a escala completa está desenhada na prancha de Fundações, em `design/`.
+
+O `@muriki/theme` **não** injeta a fonte, de propósito: quem carrega é o app
+que consome (ex.: `next/font/google`) — o tema cuida de cor, raio e tom, não
+da infraestrutura de fonte.
+
 ## Desenvolver
 
 ```bash
