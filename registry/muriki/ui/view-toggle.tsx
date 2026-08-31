@@ -31,9 +31,10 @@
  * É a única exceção legítima a uma classe `dark:` no sistema — nos outros
  * casos, precisar de `dark:` quer dizer que falta um token.
  *
- * A pill é medida por `getBoundingClientRect` e reposicionada por
- * `ResizeObserver`, então ela acompanha mudança de largura (fullWidth no
- * mobile, label que troca por i18n) sem recalculo manual.
+ * A pill é medida por `offsetLeft`/`offsetWidth` e reposicionada por
+ * `ResizeObserver`, então acompanha mudança de largura (fullWidth no
+ * mobile, label que troca por i18n) sem recálculo manual — e continua
+ * alinhada dentro de containers com `transform: scale` ou `zoom`.
  */
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
 import { AnimatePresence, motion } from "framer-motion"
@@ -78,14 +79,13 @@ export function ViewToggle<V extends string>({
 
   const updatePill = useCallback(() => {
     const btn = buttonRefs.current.get(value)
-    const container = containerRef.current
-    if (!btn || !container) return
-    const cRect = container.getBoundingClientRect()
-    const bRect = btn.getBoundingClientRect()
-    setPillStyle({
-      left: bRect.left - cRect.left - container.clientLeft,
-      width: bRect.width,
-    })
+    if (!btn) return
+    // offsetLeft/offsetWidth, e não getBoundingClientRect: o rect é medido
+    // DEPOIS de qualquer `transform: scale` ou `zoom` de um ancestral, mas o
+    // left/width que aplicamos são px sem transformação — os dois não se
+    // cancelam e a pill desalinha. offsetLeft já é relativo ao container
+    // posicionado e ignora transform.
+    setPillStyle({ left: btn.offsetLeft, width: btn.offsetWidth })
   }, [value])
 
   useEffect(updatePill, [updatePill, options])
