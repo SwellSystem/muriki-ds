@@ -40,7 +40,7 @@ const regras = `
   ${regra('04', 'Sombra é linguagem de tema claro', 'Preto sobre quase-preto é invisível: no escuro a sombra não faz nada. Elevação aqui vem de LUZ — a superfície sobe de luminosidade e ganha um filete mais claro. É a única exceção legítima a uma classe <span class="mono" style="font-size:12px;">dark:</span> num componente; nos outros casos, precisar dela quer dizer que falta um token.',
     `<div style="display:flex;gap:14px;align-items:center;">
        <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:${D.surface};box-shadow:0 2px 6px rgba(0,0,0,0.5);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.subtle};">só sombra</span></span>
-       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:oklch(0.30 0.011 250);box-shadow:inset 0 0 0 1px oklch(0.42 0.014 250);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">luz + filete</span></span>
+       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:oklch(0.315 0.006 107);box-shadow:inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 1px oklch(0.435 0.008 107), 0 2px 5px rgba(0,0,0,0.55);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">luz + filete</span></span>
      </div>`)}
 </div>`;
 
@@ -134,7 +134,7 @@ const body = `
 </div>`;
 
 const html = page('Dark',
-  'Paridade com o claro, não um retoque. Toda decisão nova — família de botão sem fill, nove badges abafados, raio proporcional — chega aqui na mesma entrega. As três regras de tradução estão no topo para que a próxima cor não precise de palpite.',
+  'O escuro sai do grafite da logo (#242421, hue 107) — quente, não slate azul. Dark azulado é o default de tudo que se gera por aí e não diz nada da marca. Paridade com o claro, não um retoque. Toda decisão nova — família de botão sem fill, nove badges abafados, raio proporcional — chega aqui na mesma entrega. As três regras de tradução estão no topo para que a próxima cor não precise de palpite.',
   body, D.bg, D.body);
 await Bun.write('Dark.dc.html', html);
 console.log('Dark.dc.html', html.length, 'bytes');

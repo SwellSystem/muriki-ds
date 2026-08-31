@@ -68,7 +68,7 @@ const papelTinta = `
 </div>`;
 
 // papéis semânticos
-const rowTok = (c, name, val, fg) => `<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;height:24px;border-radius:6px;background:${c};border:1px solid ${fg ? 'oklch(40% 0.006 250)' : N.border};flex-shrink:0;"></span><span style="font-size:12.5px;flex-grow:1;">${name}</span><span class="mono" style="font-size:10.5px;color:${fg || N.muted};">${val}</span></div>`;
+const rowTok = (c, name, val, fg) => `<div style="display:flex;align-items:center;gap:10px;"><span style="width:24px;height:24px;border-radius:6px;background:${c};border:1px solid ${fg ? 'oklch(38% 0.006 107)' : N.border};flex-shrink:0;"></span><span style="font-size:12.5px;flex-grow:1;">${name}</span><span class="mono" style="font-size:10.5px;color:${fg || N.muted};">${val}</span></div>`;
 const semantica = `
 <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:20px;">
   <div style="background:${N.surface};border:1px solid ${N.border};border-radius:${R.card};padding:20px;display:flex;flex-direction:column;gap:12px;">
@@ -89,22 +89,22 @@ const semantica = `
       ${rowTok(N.danger, 'destructive', '55% .20 27')}
     </div>
   </div>
-  <div style="background:oklch(19% 0.008 250);border:1px solid oklch(30% 0.008 250);border-radius:${R.card};padding:20px;display:flex;flex-direction:column;gap:12px;color:oklch(95% 0.005 250);">
+  <div style="background:oklch(17.5% 0.004 107);border:1px solid oklch(30% 0.005 107);border-radius:${R.card};padding:20px;display:flex;flex-direction:column;gap:12px;color:oklch(92.5% 0.004 100);">
     <div style="font-size:13px;font-weight:600;">Dark — o papel esfria junto</div>
     <div style="display:flex;flex-direction:column;gap:7px;">
-      ${rowTok('oklch(19% 0.008 250)', 'background', '19% .008 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(22.5% 0.009 250)', 'card', '22.5% .009 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(26.5% 0.01 250)', 'muted · preenchido', '26.5% .01 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(15.5% 0.007 250)', 'sunken · afundado', '15.5% .007 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(32% 0.01 250)', 'border', '32% .01 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(96% 0.004 250)', 'foreground · título', '96% .004 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(90% 0.006 250)', 'foreground · corpo', '90% .006 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(70% 0.012 250)', 'muted-foreground', '70% .012 250', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(66% 0.155 262.6)', 'primary', 'clareado', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(83% 0.165 93)', 'accent', 'abafado', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(70% 0.13 150)', 'success', '70% .13 150', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(75% 0.15 60)', 'warning', '75% .15 60', 'oklch(72% 0.01 250)')}
-      ${rowTok('oklch(66% 0.18 27)', 'destructive', '66% .18 27', 'oklch(72% 0.01 250)')}
+      ${rowTok('oklch(17.5% 0.004 107)', 'background', '#161613', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(21% 0.004 107)', 'card', '21% .004 107', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(25% 0.005 107)', 'muted · preenchido', '25% .005 107', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(14% 0.004 107)', 'sunken · afundado', '14% .004 107', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(30% 0.005 107)', 'border', '30% .005 107', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(97% 0.003 100)', 'foreground · título', '97% .003 100', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(92.5% 0.004 100)', 'foreground · corpo', '92.5% .004 100', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(70% 0.006 100)', 'muted-foreground', '70% .006 100', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(66% 0.155 262.6)', 'primary', 'clareado', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(83% 0.165 93)', 'accent', 'abafado', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(70% 0.13 150)', 'success', '70% .13 150', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(75% 0.15 60)', 'warning', '75% .15 60', 'oklch(72% 0.006 100)')}
+      ${rowTok('oklch(66% 0.18 27)', 'destructive', '66% .18 27', 'oklch(72% 0.006 100)')}
     </div>
   </div>
 </div>`;

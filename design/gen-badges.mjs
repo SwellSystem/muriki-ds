@@ -5,7 +5,7 @@ const cap = t => `<span class="cap">${t}</span>`;
 
 // Paleta abafada: fundo todo em L≈93.5, tinta toda em L≈43. Varia só a matiz.
 export const C = {
-  cinza:    { bg:'oklch(94.5% 0.008 96)',  fg:'oklch(42% 0.020 250)', dot:'oklch(62% 0.012 250)', h:96 },
+  cinza:    { bg:'oklch(94.5% 0.008 96)',  fg:'oklch(42% 0.020 250)', dot:'oklch(62% 0.010 100)', h:96 },
   azul:     { bg:'oklch(93.5% 0.045 262)', fg:'oklch(42% 0.140 262)', dot:'oklch(55% 0.170 262)', h:262 },
   ciano:    { bg:'oklch(93.5% 0.045 205)', fg:'oklch(42% 0.090 205)', dot:'oklch(58% 0.105 205)', h:205 },
   verde:    { bg:'oklch(93.5% 0.050 150)', fg:'oklch(42% 0.110 150)', dot:'oklch(58% 0.130 150)', h:150 },

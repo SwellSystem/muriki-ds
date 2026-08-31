@@ -52,7 +52,7 @@ const barra = (opts = {}) => `<span style="display:inline-flex;align-items:cente
   ${tool(I.dots, opts.hoverIdx === 4 ? { st:'hover' } : {})}
 </span>`;
 
-const tip = (txt, kb = '') => `<span style="display:inline-flex;align-items:center;gap:7px;background:oklch(24% 0.02 250);color:oklch(96% 0.004 250);font-size:12px;padding:5px 9px;border-radius:7px;box-shadow:0 4px 12px oklch(32% 0.02 248.5 / 0.18);white-space:nowrap;">${txt}${kb ? `<span class="mono" style="font-size:11px;opacity:0.65;">${kb}</span>` : ''}</span>`;
+const tip = (txt, kb = '') => `<span style="display:inline-flex;align-items:center;gap:7px;background:oklch(24% 0.02 250);color:oklch(97% 0.003 100);font-size:12px;padding:5px 9px;border-radius:7px;box-shadow:0 4px 12px oklch(32% 0.02 248.5 / 0.18);white-space:nowrap;">${txt}${kb ? `<span class="mono" style="font-size:11px;opacity:0.65;">${kb}</span>` : ''}</span>`;
 
 const linha = (t, { hover = false, sel = false, tools = null, prio, label, status, h = 44 } = {}) => `
 <div style="display:flex;align-items:center;gap:10px;height:${h}px;padding:0 12px;box-sizing:border-box;border-bottom:1px solid ${N.surface2};${sel ? `background:${N.brand50};` : hover ? `background:${N.surface2};` : ''}">
@@ -115,12 +115,12 @@ const bulk = `
       `)}
       <div style="display:flex;justify-content:center;margin-top:-12px;position:relative;">
         <span style="display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;border-radius:12px;background:oklch(24% 0.02 250);box-shadow:0 10px 28px oklch(32% 0.02 248.5 / 0.28);">
-          <span style="font-size:12.5px;font-weight:500;color:oklch(96% 0.004 250);">3 selecionadas</span>
+          <span style="font-size:12.5px;font-weight:500;color:oklch(97% 0.003 100);">3 selecionadas</span>
           <span style="width:1px;height:16px;background:oklch(38% 0.02 250);"></span>
-          ${['user','archive','move'].map(k => `<span style="width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:oklch(80% 0.01 250);">${I[k]}</span>`).join('')}
+          ${['user','archive','move'].map(k => `<span style="width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:oklch(80% 0.006 100);">${I[k]}</span>`).join('')}
           <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px;border-radius:5px;font-size:12.5px;font-weight:500;color:oklch(84% 0.09 27);background:oklch(30% 0.06 27);">${I.trash}Excluir</span>
           <span style="width:1px;height:16px;background:oklch(38% 0.02 250);"></span>
-          <span style="width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:oklch(70% 0.01 250);">${I.x}</span>
+          <span style="width:26px;height:26px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;color:oklch(70% 0.006 100);">${I.x}</span>
         </span>
       </div>
     </div>`)}
@@ -175,7 +175,7 @@ const meiaDark = darkHalf('No escuro', 'A ferramenta de linha é ghost nos dois 
     <div style="display:flex;flex-direction:column;gap:12px;">
       ${dcap('tooltip no escuro — inverte para claro')}
       <div style="display:flex;flex-direction:column;gap:9px;align-items:center;">
-        <span style="display:inline-flex;align-items:center;gap:7px;background:oklch(92% 0.006 250);color:oklch(22% 0.015 250);font-size:12px;padding:5px 9px;border-radius:7px;white-space:nowrap;">Editar<span style="font-family:'Geist Mono',monospace;font-size:11px;opacity:0.55;">E</span></span>
+        <span style="display:inline-flex;align-items:center;gap:7px;background:oklch(93% 0.005 100);color:oklch(21% 0.006 107);font-size:12px;padding:5px 9px;border-radius:7px;white-space:nowrap;">Editar<span style="font-family:'Geist Mono',monospace;font-size:11px;opacity:0.55;">E</span></span>
         <span style="width:1px;height:8px;background:${D.hairStrong};"></span>
         ${dtool(I.pencil, 'hover')}
       </div>

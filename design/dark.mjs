@@ -1,14 +1,14 @@
 // Espelho do sistema claro. Regra: superfície sobe de luz, tinta desce; fundo de badge
 // vai para L≈30% e a tinta para L≈85% — a mesma matiz, a luz invertida.
 export const D = {
-  bg:'oklch(19% 0.008 250)', surface:'oklch(22.5% 0.009 250)', surface2:'oklch(26.5% 0.010 250)',
-  surface3:'oklch(30% 0.011 250)',
-  fg:'oklch(96% 0.004 250)', body:'oklch(90% 0.006 250)', muted:'oklch(70% 0.012 250)', subtle:'oklch(56% 0.014 250)',
-  hair:'oklch(31% 0.010 250)', hairStrong:'oklch(40% 0.012 250)',
+  bg:'oklch(0.175 0.004 107)', surface:'oklch(0.21 0.004 107)', surface2:'oklch(0.25 0.005 107)',
+  surface3:'oklch(0.29 0.005 107)',
+  fg:'oklch(0.97 0.003 100)', body:'oklch(0.925 0.004 100)', muted:'oklch(0.70 0.006 100)', subtle:'oklch(0.555 0.007 100)',
+  hair:'oklch(0.30 0.005 107)', hairStrong:'oklch(0.385 0.006 107)',
   brand:'oklch(70% 0.145 262.6)', brandDim:'oklch(60% 0.16 262.6)',
-  brandSub:'oklch(28% 0.060 262.6)', brandSubLine:'oklch(38% 0.090 262.6)', brandInk:'oklch(84% 0.100 262.6)',
+  brandSub:'oklch(0.275 0.055 262.6)', brandSubLine:'oklch(0.375 0.085 262.6)', brandInk:'oklch(84% 0.100 262.6)',
   acc:'oklch(83% 0.165 93)', accInk:'oklch(20% 0.02 100)',
-  danger:'oklch(68% 0.180 27)', dangerSub:'oklch(27% 0.060 27)', dangerSubLine:'oklch(37% 0.090 27)', dangerInk:'oklch(83% 0.100 27)',
+  danger:'oklch(68% 0.180 27)', dangerSub:'oklch(0.265 0.055 27)', dangerSubLine:'oklch(0.365 0.085 27)', dangerInk:'oklch(83% 0.100 27)',
   success:'oklch(72% 0.130 150)',
 };
 export const rr = h => Math.round(h / 5);
@@ -22,8 +22,8 @@ const S = {
     disabled:`background:${D.brandSub};color:${D.brandInk};box-shadow:inset 0 0 0 1px ${D.brandSubLine};opacity:0.4;` },
   outline: {
     rest:`background:transparent;color:${D.body};box-shadow:inset 0 0 0 1px ${D.hairStrong};`,
-    hover:`background:${D.surface2};color:${D.fg};box-shadow:inset 0 0 0 1px oklch(46% 0.013 250);`,
-    active:`background:${D.surface};color:${D.fg};box-shadow:inset 0 0 0 1px oklch(44% 0.013 250);`,
+    hover:`background:${D.surface2};color:${D.fg};box-shadow:inset 0 0 0 1px oklch(46% 0.008 107);`,
+    active:`background:${D.surface};color:${D.fg};box-shadow:inset 0 0 0 1px oklch(44% 0.008 107);`,
     focus:`background:transparent;color:${D.body};box-shadow:inset 0 0 0 1px ${D.hairStrong}, 0 0 0 2px ${D.bg}, 0 0 0 4px oklch(70% 0.145 262.6 / 0.35);`,
     disabled:`background:transparent;color:${D.subtle};box-shadow:inset 0 0 0 1px ${D.hair};opacity:0.6;` },
   subtle: {
@@ -62,7 +62,7 @@ export const dibtn = (v, h = 32, state = 'rest', icon = '') =>
 
 // badges: mesma matiz do claro, luz invertida — fundo L 30%, tinta L 85%
 export const DC = {
-  cinza:    { bg:'oklch(29% 0.010 250)', fg:'oklch(85% 0.012 250)', dot:'oklch(62% 0.012 250)' },
+  cinza:    { bg:'oklch(29% 0.006 107)', fg:'oklch(85% 0.006 100)', dot:'oklch(62% 0.008 107)' },
   azul:     { bg:'oklch(29% 0.055 262)', fg:'oklch(85% 0.075 262)', dot:'oklch(68% 0.140 262)' },
   ciano:    { bg:'oklch(29% 0.050 205)', fg:'oklch(85% 0.065 205)', dot:'oklch(70% 0.095 205)' },
   verde:    { bg:'oklch(29% 0.055 150)', fg:'oklch(85% 0.075 150)', dot:'oklch(70% 0.120 150)' },
@@ -79,8 +79,8 @@ export const dbg = (cor, txt, { size = 'md', dot = false } = {}) => {
 export const dinput = (state = 'rest', h = 32) => {
   const [px, fs] = SZ[h];
   const V = {
-    rest:`background:oklch(16.5% 0.007 250);box-shadow:inset 0 0 0 1px ${D.hair};`,
-    focus:`background:oklch(16.5% 0.007 250);box-shadow:inset 0 0 0 1px ${D.brand}, 0 0 0 3px oklch(70% 0.145 262.6 / 0.22);`,
+    rest:`background:oklch(14% 0.004 107);box-shadow:inset 0 0 0 1px ${D.hair};`,
+    focus:`background:oklch(14% 0.004 107);box-shadow:inset 0 0 0 1px ${D.brand}, 0 0 0 3px oklch(70% 0.145 262.6 / 0.22);`,
     error:`background:oklch(18% 0.03 27);box-shadow:inset 0 0 0 1px ${D.danger}, 0 0 0 3px oklch(68% 0.18 27 / 0.18);`,
     disabled:`background:${D.surface2};box-shadow:inset 0 0 0 1px ${D.hair};opacity:0.6;`,
   }[state];
