@@ -109,7 +109,13 @@ export function ViewToggle<V extends string>({
         // Trilho AFUNDADO — a sombra interna é a mesma nos dois temas porque
         // --sunken já é mais escuro que o fundo em ambos. Sem dark: aqui.
         appearance === "default"
-          ? "bg-sunken shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)]"
+          ? [
+              "bg-sunken shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)]",
+              // No escuro o relevo INVERTE: o trilho sobe e o cursor vira uma
+              // janela de volta ao fundo da página. Sombra interna e brilho
+              // branco não funcionam bem no escuro; degrau de luz funciona.
+              "dark:bg-[oklch(0.26_0.005_107)] dark:shadow-[inset_0_0_0_1px_oklch(0.325_0.006_107)]",
+            ].join(" ")
           // plain NÃO tem trilho. É para flutuar sobre conteúdo — um
           // calendário, um board — onde o trilho competiria com o que está
           // atrás. Toda a presença fica no cursor.
@@ -129,8 +135,8 @@ export function ViewToggle<V extends string>({
               // pastilha sobe de luminosidade e ganha um filete mais claro.
               "absolute top-0.5 bottom-0.5 rounded-full",
               "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
-              "dark:bg-[oklch(0.315_0.006_107)]",
-              "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10),inset_0_0_0_1px_oklch(0.435_0.008_107),0_2px_5px_rgba(0,0,0,0.55),0_1px_2px_rgba(0,0,0,0.45)]"
+              "dark:bg-[oklch(0.172_0.004_107)]",
+              "dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.5),inset_0_0_0_1px_oklch(0.13_0.004_107)]"
             )}
             initial={false}
             animate={{
