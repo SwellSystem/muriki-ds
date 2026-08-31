@@ -1,6 +1,12 @@
 /**
  * Muriki ViewToggle — controle segmentado com pill animada.
  *
+ * Duas aparências, e a diferença é uma só: `default` tem trilho afundado
+ * e vive dentro de uma tela; `plain` não tem trilho nenhum e flutua sobre
+ * conteúdo, onde um fundo competiria com o que está atrás. Sem trilho, as
+ * opções NÃO selecionadas ficam direto sobre o conteúdo — por isso `plain`
+ * pede ícone sem rótulo, que aguenta fundo variado melhor que texto.
+ *
  * Uma exceção deliberada à regra do raio: o sistema reserva o pill para
  * badge e avatar, mas aqui ele é FUNCIONAL, não decorativo — o fundo é
  * um trilho e a pill é um cursor que desliza entre as opções. Quadrar
@@ -99,9 +105,10 @@ export function ViewToggle<V extends string>({
         // --sunken já é mais escuro que o fundo em ambos. Sem dark: aqui.
         appearance === "default"
           ? "bg-sunken shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)]"
-          // plain flutua sobre conteúdo — aí o vidro rende. Translúcido e
-          // desfocado nos DOIS temas, com o mesmo anel.
-          : "gap-1 bg-sunken/70 shadow-[inset_0_1px_2px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--border)] backdrop-blur-md",
+          // plain NÃO tem trilho. É para flutuar sobre conteúdo — um
+          // calendário, um board — onde o trilho competiria com o que está
+          // atrás. Toda a presença fica no cursor.
+          : "gap-1",
         className
       )}
     >
