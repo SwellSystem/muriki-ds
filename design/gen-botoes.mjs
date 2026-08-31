@@ -77,11 +77,8 @@ ${grp('carregando · desabilitado', [
   `${btn('primary', 32, 'rest')}<span style="display:flex;opacity:0.8;">${I.spin}</span>Salvando</span>`,
   `${btn('outline', 32, 'disabled')}Indisponível no plano</span>`,
 ].join(''))}
-${grp('grupo segmentado · split · barra de ferramentas', [
-  `<span style="display:inline-flex;background:${N.surface2};border-radius:${rr(32)+2}px;padding:3px;gap:2px;">
-     <span style="height:26px;padding:0 11px;border-radius:${rr(32)}px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;background:${N.surface};color:${N.fg};box-shadow:inset 0 0 0 1px ${HAIR};">${I.list}Lista</span>
-     <span style="height:26px;padding:0 11px;border-radius:${rr(32)}px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;color:${N.muted};">${I.board}Board</span>
-   </span>`,
+${grp('segmentado (ViewToggle — pill) · split · barra de ferramentas', [
+  `<span style="display:inline-flex;align-items:center;border-radius:999px;padding:2px;background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px ${N.border};"><span style="height:26px;padding:0 12px;border-radius:999px;font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;gap:6px;background:${N.surface};color:${N.brand};box-shadow:0 1px 2px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06), inset 0 0 0 1px ${N.borderInput};">${I.list}Lista</span><span style="height:26px;padding:0 12px;border-radius:999px;font-size:12.5px;display:inline-flex;align-items:center;gap:6px;color:${N.muted};">${I.board}Board</span></span>`,
   `<span style="display:inline-flex;border-radius:${rr(32)}px;box-shadow:inset 0 0 0 1px ${HAIR};overflow:hidden;background:${N.surface};">
      <span style="height:32px;padding:0 12px;font-size:13px;font-weight:500;display:inline-flex;align-items:center;color:${N.body};border-right:1px solid ${HAIR};">Criar</span>
      <span style="width:28px;height:32px;display:inline-flex;align-items:center;justify-content:center;color:${N.muted};">${I.chev}</span>

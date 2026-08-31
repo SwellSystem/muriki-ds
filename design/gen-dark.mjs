@@ -30,13 +30,18 @@ const regra = (n, titulo, texto, demo) => `
   <span style="font-size:12.5px;line-height:17px;color:${D.muted};">${texto}</span>
 </div>`;
 const regras = `
-<div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:18px;">
+<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:18px;">
   ${regra('01', 'O sólido inverte', 'No claro ele é fundo escuro com texto branco. No escuro vira fundo claro com texto escuro — porque um azul de 47% sobre fundo de 19% não tem contraste nenhum.',
     `<div style="display:flex;gap:10px;align-items:center;">${dbtn('solid')}Publicar</span>${dbtn('primary')}Nova tarefa</span></div>`)}
   ${regra('02', 'O tingido troca de andar', 'O fundo do <span style="font-weight:500;color:' + D.fg + '">primary</span> sai de L 97% para L 28%, e a tinta sai de L 33% para L 84%. Mesma matiz, andares trocados.',
     `<div style="display:flex;gap:10px;align-items:center;">${dbtn('primary')}Nova tarefa</span>${dbtn('danger')}Excluir</span></div>`)}
   ${regra('03', 'O campo fica mais escuro que o card', 'Ao contrário do claro, onde ele é mais claro. No escuro o buraco vai para baixo — L 16,5% dentro de um card de 22,5%.',
     `<div style="width:100%;"><div style="${dinput('rest')}color:${D.subtle};">Descreva a tarefa</div></div>`)}
+  ${regra('04', 'Sombra é linguagem de tema claro', 'Preto sobre quase-preto é invisível: no escuro a sombra não faz nada. Elevação aqui vem de LUZ — a superfície sobe de luminosidade e ganha um filete mais claro. É a única exceção legítima a uma classe <span class="mono" style="font-size:12px;">dark:</span> num componente; nos outros casos, precisar dela quer dizer que falta um token.',
+    `<div style="display:flex;gap:14px;align-items:center;">
+       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:${D.surface};box-shadow:0 2px 6px rgba(0,0,0,0.5);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.subtle};">só sombra</span></span>
+       <span style="display:inline-flex;flex-direction:column;gap:6px;align-items:center;"><span style="width:74px;height:30px;border-radius:999px;background:oklch(0.30 0.011 250);box-shadow:inset 0 0 0 1px oklch(0.42 0.014 250);"></span><span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">luz + filete</span></span>
+     </div>`)}
 </div>`;
 
 const ESTADOS = [['rest','repouso'],['hover','hover'],['active','pressionado'],['focus','foco'],['disabled','inativo']];

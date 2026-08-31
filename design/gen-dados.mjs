@@ -122,9 +122,9 @@ const nav = `
     </div>
   </div>
   <div style="display:flex;flex-direction:column;gap:8px;">
-    ${cap('segmented · troca de densidade')}
-    <div style="display:inline-flex;background:${N.b100};border-radius:9px;padding:3px;gap:2px;align-self:flex-start;">
-      <span style="padding:0 12px;height:26px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:500;background:${N.surface};border-radius:7px;box-shadow:${shadow.sm};">Compacto</span>
+    ${cap('segmented — trilho afundado, cursor elevado (ViewToggle)')}
+    <div style="display:inline-flex;align-items:center;border-radius:999px;padding:2px;align-self:flex-start;background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px ${N.border};">
+      <span style="padding:0 12px;height:26px;display:inline-flex;align-items:center;font-size:12.5px;font-weight:500;color:${N.brand};background:${N.surface};border-radius:999px;box-shadow:0 1px 2px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06), inset 0 0 0 1px ${N.borderInput};">Compacto</span>
       <span style="padding:0 12px;height:26px;display:inline-flex;align-items:center;font-size:12.5px;color:${N.muted};">Confortável</span>
     </div>
   </div>

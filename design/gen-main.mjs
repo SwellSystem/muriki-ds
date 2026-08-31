@@ -77,6 +77,7 @@ const semantica = `
       ${rowTok(N.bg, 'background', '#FAF8F5')}
       ${rowTok('oklch(99.3% 0.002 85)', 'card', 'quase branco')}
       ${rowTok(N.surface2, 'muted · preenchido', '#F7F5EE')}
+      ${rowTok('oklch(95.5% 0.012 95)', 'sunken · afundado', 'trilho, busca')}
       ${rowTok(N.border, 'border', '#ECEBE4')}
       ${rowTok(N.fg, 'foreground · título', '26% .022 250')}
       ${rowTok(N.body, 'foreground · corpo', '#2B343D')}
@@ -94,6 +95,7 @@ const semantica = `
       ${rowTok('oklch(19% 0.008 250)', 'background', '19% .008 250', 'oklch(72% 0.01 250)')}
       ${rowTok('oklch(22.5% 0.009 250)', 'card', '22.5% .009 250', 'oklch(72% 0.01 250)')}
       ${rowTok('oklch(26.5% 0.01 250)', 'muted · preenchido', '26.5% .01 250', 'oklch(72% 0.01 250)')}
+      ${rowTok('oklch(15.5% 0.007 250)', 'sunken · afundado', '15.5% .007 250', 'oklch(72% 0.01 250)')}
       ${rowTok('oklch(32% 0.01 250)', 'border', '32% .01 250', 'oklch(72% 0.01 250)')}
       ${rowTok('oklch(96% 0.004 250)', 'foreground · título', '96% .004 250', 'oklch(72% 0.01 250)')}
       ${rowTok('oklch(90% 0.006 250)', 'foreground · corpo', '90% .006 250', 'oklch(72% 0.01 250)')}
