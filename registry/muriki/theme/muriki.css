@@ -37,6 +37,10 @@
      Mais escura que o fundo nos DOIS temas: no dark o --muted é mais CLARO que
      o card, então reaproveitá-lo inverteria o relevo. */
   --sunken: oklch(0.955 0.012 95);
+
+  /* série de dados — avatares tintados e a cor de epic dos blocos */
+  --chart-1: oklch(0.79 0.17 70.25);
+  --chart-3: oklch(0.56 0.21 269.11);
   --border: oklch(0.94 0.01 100);
   --input: oklch(0.89 0.009 96);
   --ring: oklch(0.47 0.185 262.6);
@@ -94,6 +98,8 @@
   --warning: oklch(0.75 0.15 60);
 
   --sunken: oklch(0.14 0.004 107);
+  --chart-1: oklch(0.79 0.17 70.25);
+  --chart-3: oklch(0.56 0.21 269.11);
   --border: oklch(0.30 0.005 107);
   --input: oklch(0.385 0.006 107);
   --ring: oklch(0.7 0.145 262.6);
@@ -138,10 +144,22 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-sunken: var(--sunken);
+  --color-chart-1: var(--chart-1);
+  --color-chart-3: var(--chart-3);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 4px);
   --radius-sm: calc(var(--radius) - 6px);
+}
+
+/* Scroll lateral do sistema: a barra nativa some (overlay scrollbars de
+   sistema ignoram customização) — o indicador de encaixe é desenhado pelo
+   componente que usa a classe (ver o bloco kanban). */
+.muriki-scroll-x {
+  scrollbar-width: none;
+}
+.muriki-scroll-x::-webkit-scrollbar {
+  display: none;
 }

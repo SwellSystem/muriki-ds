@@ -28,7 +28,7 @@ jobs:
       - name: Conferir que os itens saíram
         run: |
           test -f public/r/registry.json
-          for item in theme button badge row-actions; do
+          for item in theme button badge switch checkbox progress sonner view-toggle row-actions task-table task-timeline kanban priority-flag i18n; do
             test -f "public/r/$item.json" || { echo "faltou $item.json"; exit 1; }
           done
           echo "itens gerados:"; ls -1 public/r

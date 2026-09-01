@@ -41,7 +41,7 @@ No projeto que vai instalar (ex.: `muriki-platform`), declare o registry em `com
 E instale:
 
 ```bash
-bunx shadcn@latest add @muriki/button @muriki/badge @muriki/row-actions
+bunx shadcn@latest add @muriki/button @muriki/badge @muriki/task-table @muriki/kanban
 ```
 
 O `@muriki/theme` vem junto como dependência — ele injeta os tokens claro e escuro
@@ -148,6 +148,11 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/progress` | `registry:ui` | trilho como encaixe, preenchimento da marca dentro do sulco — sem sombra |
 | `@muriki/sonner` | `registry:ui` | toaster vestido com a paleta: info neutro, success e warning tingidos, error sólido |
 | `@muriki/row-actions` | `registry:block` | barra de ferramentas de linha, só ícone, com tooltip e `aria-label` obrigatórios na API |
+| `@muriki/task-table` | `registry:block` | tabela hierárquica de tasks (epic → task → sub) com toolbar de filtros com menu, seleção em massa, colapso e slots de composição |
+| `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
+| `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
+| `@muriki/priority-flag` | `registry:block` | prioridade com ícone e cor por nível — urgent quebra a escala de propósito |
+| `@muriki/i18n` | `registry:lib` | labels dos blocos com defaults pt-BR embutidos; apps com i18n injetam o próprio `t` via provider |
 
 ## Tipografia
 

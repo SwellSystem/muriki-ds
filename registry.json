@@ -68,7 +68,9 @@
           "tone-purple": "oklch(0.935 0.045 300)",
           "tone-purple-foreground": "oklch(0.43 0.15 300)",
           "tone-purple-dot": "oklch(0.56 0.185 300)",
-          "sunken": "oklch(0.955 0.012 95)"
+          "sunken": "oklch(0.955 0.012 95)",
+          "chart-1": "oklch(0.79 0.17 70.25)",
+          "chart-3": "oklch(0.56 0.21 269.11)"
         },
         "dark": {
           "background": "oklch(0.175 0.004 107)",
@@ -126,7 +128,9 @@
           "tone-purple": "oklch(0.29 0.055 300)",
           "tone-purple-foreground": "oklch(0.85 0.075 300)",
           "tone-purple-dot": "oklch(0.68 0.16 300)",
-          "sunken": "oklch(0.14 0.004 107)"
+          "sunken": "oklch(0.14 0.004 107)",
+          "chart-1": "oklch(0.79 0.17 70.25)",
+          "chart-3": "oklch(0.56 0.21 269.11)"
         }
       }
     },
@@ -296,6 +300,169 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "i18n",
+      "type": "registry:lib",
+      "title": "Runtime de labels dos blocos",
+      "description": "Defaults pt-BR embutidos, sem dependência de i18next. Apps com i18n injetam o próprio t (assinatura react-i18next) via MurikiI18nProvider.",
+      "files": [
+        {
+          "path": "registry/muriki/lib/i18n.tsx",
+          "type": "registry:lib",
+          "target": "lib/i18n.tsx"
+        }
+      ]
+    },
+    {
+      "name": "priority-flag",
+      "type": "registry:block",
+      "title": "Priority Flag",
+      "description": "Prioridade com ícone e cor por nível — urgent quebra a escala de propósito (vira categoria). Variante pill com fundo tintado.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/priority-flag/priority-flag.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/priority-flag/priority-flag.tsx"
+        }
+      ]
+    },
+    {
+      "name": "task-table",
+      "type": "registry:block",
+      "title": "Task Table",
+      "description": "Tabela hierárquica de tasks (epic → task → sub) com toolbar de busca e filtros com menu, seleção em massa, colapso de grupos, slots de composição e paginação.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "dropdown-menu",
+        "@muriki/button",
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/task-table/task-table.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/task-table.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-table/task-table-row.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/task-table-row.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-table/task-table-toolbar.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/task-table-toolbar.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-table/types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/task-table/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/index.ts"
+        }
+      ],
+      "docs": "Agrupamento e ordenação são do caller: use renderGroupHeaderBefore + trailingRows para faixas de grupo (accordion), e o campo menu dos filtros da toolbar para as listagens. Agrupar por epic preserva a hierarquia; por status/responsável, achate a árvore."
+    },
+    {
+      "name": "task-timeline",
+      "type": "registry:block",
+      "title": "Task Timeline",
+      "description": "Gantt de tasks com sidebar sincronizada, marcos, setas de dependência, linha do hoje e zoom. Barras arrastáveis (mover e redimensionar, snap por dia) via onTaskDatesChange.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/button",
+        "@muriki/i18n",
+        "@muriki/task-table"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/task-timeline/task-timeline.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-timeline/task-timeline.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-timeline/task-timeline-toolbar.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-timeline/task-timeline-toolbar.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-timeline/types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-timeline/types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/task-timeline/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-timeline/index.ts"
+        }
+      ],
+      "docs": "Sem onTaskDatesChange as barras ficam estáticas. Abaixo de md o gantt vira lista vertical. As datas chegam como ISO inclusivo; a formatação do prazo é responsabilidade do caller."
+    },
+    {
+      "name": "kanban",
+      "type": "registry:block",
+      "title": "Kanban",
+      "description": "Board de colunas-bandeja com drag-drop (@dnd-kit): overlay rotacionado, fantasma físico, colunas não-alvo desbotadas e aria-live. Card editorial com checkbox circular, selo do slug e pill de prioridade. Scroll lateral com véus e trilho de encaixe sob demanda.",
+      "dependencies": [
+        "@phosphor-icons/react",
+        "framer-motion",
+        "@dnd-kit/core",
+        "@dnd-kit/sortable",
+        "@dnd-kit/utilities"
+      ],
+      "registryDependencies": [
+        "utils",
+        "tooltip",
+        "@muriki/theme",
+        "@muriki/priority-flag"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/kanban/kanban-board.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/kanban/kanban-board.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/kanban/kanban-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/kanban/kanban-card.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/kanban/kanban-drop.ts",
+          "type": "registry:component",
+          "target": "components/blocks/kanban/kanban-drop.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/kanban/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/kanban/index.ts"
+        }
+      ],
+      "docs": "O estado volta pro caller via onTasksChange (array flat com statusId atualizado). Colunas têm altura natural — a página cresce, sem scroll interno. O indicador de scroll usa a classe .muriki-scroll-x do tema.",
+      "css": {
+        ".muriki-scroll-x": {
+          "scrollbar-width": "none"
+        },
+        ".muriki-scroll-x::-webkit-scrollbar": {
+          "display": "none"
+        }
+      }
     }
   ]
 }
