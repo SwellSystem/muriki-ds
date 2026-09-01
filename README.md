@@ -1,8 +1,5 @@
 <p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="design/logo-dark.svg">
-    <img src="design/logo.svg" alt="Muriki" width="140">
-  </picture>
+  <img src="public/assets/muriki-logo-bg-new.png" alt="Muriki" width="150">
 </p>
 
 <h1 align="center">Muriki Design System</h1>
