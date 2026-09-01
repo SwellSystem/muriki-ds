@@ -154,6 +154,35 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/priority-flag` | `registry:block` | prioridade com ícone e cor por nível — urgent quebra a escala de propósito |
 | `@muriki/i18n` | `registry:lib` | labels dos blocos com defaults pt-BR embutidos; apps com i18n injetam o próprio `t` via provider |
 
+## Blocos ao vivo
+
+Capturas de um app consumidor real, montado só com `shadcn add @muriki/...`
+(as imagens trocam com o tema do GitHub):
+
+**Task Table** — árvore epic → task → sub, filtros com menu, agrupamento por
+faixas com accordion e ordenação que respeita a hierarquia:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/bloco-tabela-escura.png">
+  <img src=".github/readme/bloco-tabela-clara.png" alt="Task Table do Muriki Design System" width="840">
+</picture>
+
+**Task Timeline** — gantt com marcos, dependências, linha do hoje e barras
+arrastáveis (mover e redimensionar, com snap por dia):
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/bloco-timeline-escura.png">
+  <img src=".github/readme/bloco-timeline-clara.png" alt="Task Timeline do Muriki Design System" width="840">
+</picture>
+
+**Kanban** — colunas-bandeja com drag-drop, card editorial e o scroll de
+encaixe que só aparece enquanto rola:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/bloco-board-escura.png">
+  <img src=".github/readme/bloco-board-clara.png" alt="Kanban do Muriki Design System" width="840">
+</picture>
+
 ## Tipografia
 
 **Geist** para a interface, **Geist Mono** para código, IDs e números que
