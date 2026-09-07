@@ -49,15 +49,21 @@
  * mesma tinta do ativo com metade da força: passar o mouse prenuncia o
  * estado selecionado em vez de anunciar outro.
  *
- * O RAIL RECUA, E POR ISSO NÃO PROJETA. Enquanto ele era a superfície de
- * cima, carregava a elevação do cursor do view-toggle — sombra caindo no
- * claro, encaixe no escuro. Recuado, uma sombra para fora diria o
- * contrário do que a cor diz. Agora encostado ele tem só o filete na borda
- * livre: o degrau de valor entre `--rail` e `--background` faz o resto.
+ * O RAIL FICA DO LADO DE FORA DO CONTEÚDO. No claro é acima da página
+ * (0.998 contra 0.968), no escuro é abaixo (0.152 contra 0.175) — a
+ * moldura toma a borda da rampa e o palco fica no meio. Quem decide isso é
+ * o token `--rail`, não este arquivo.
  *
- * SOLTO, O RAIL DEIXA DE RECUAR. Nas variantes que descolam da borda —
- * `floating` e o rail desafixado — a superfície passa a ser a do cartão e
- * a sombra volta. É a mesma família de raciocínio de "encostado não tem
+ * ENCOSTADO, ELE NÃO PROJETA — em nenhum dos dois temas. O degrau de valor
+ * já faz o trabalho, e sobra o filete da borda livre. Antes ele carregava a
+ * elevação do cursor do view-toggle, sombra caindo no claro e encaixe no
+ * escuro; com a cor dizendo de que lado a peça está, a sombra virava uma
+ * segunda voz dizendo a mesma coisa — e, quando a direção mudou, dizendo o
+ * contrário.
+ *
+ * SOLTO, O RAIL DEIXA DE SER MOLDURA. Nas variantes que descolam da borda —
+ * `floating` e o rail desafixado — a superfície passa a ser a do cartão e a
+ * sombra volta. É a mesma família de raciocínio de "encostado não tem
  * raio": o que a peça é depende de estar ou não tocando a parede.
  *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só

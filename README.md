@@ -419,17 +419,23 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
-- **O rail recua, e por isso não projeta.** Encostado, ele fica um degrau
-  ABAIXO do conteúdo nos dois temas — 0,968 contra 0,980 no claro, 0,152
-  contra 0,175 no escuro — e o relevo é só o filete da borda livre: uma
-  sombra para fora diria o contrário do que a cor diz. Recuar também é a
-  única direção em que `--rail` cabe com valor próprio, porque para cima,
-  no claro, o cartão já está em 0,993 e o branco é 1,0. O teto do token no
-  claro é o `--muted` (0,97): acima dele o rail ficaria com a cor dos chips
-  que aparecem no conteúdo. Solto, o rail deixa
-  de recuar: vira superfície de cartão e a sombra volta, pela mesma lógica
-  de "encostado não tem raio". Os oito `--sidebar-*` do shadcn não existem
-  aqui, eram cópias das cores base.
+- **O conteúdo nunca é o extremo da rampa.** A página mora no meio, para
+  que o card tenha espaço acima e o sunken abaixo. No claro a rampa é
+  `sunken 0,943 · muted 0,958 · página 0,968 · card 0,993 · rail 0,998`:
+  cinco valores, cinco papéis, nenhum emprestado. Foi ao quebrar essa regra
+  que o rail passou a semana sem cor própria — com a página em 0,980 e o
+  card em 0,993 o topo estava ocupado, e sobrava para ele só o lugar
+  abaixo. Descer a página também quase dobrou o degrau do card até ela, de
+  0,013 para 0,025, que é o que faz cartão, campo e diálogo terem
+  superfície de verdade em vez de dependerem do filete.
+- **O rail fica do lado de fora do conteúdo**, e para qual lado depende de
+  onde há espaço. No claro é acima, em 0,998 — quase branco, mas com a
+  matiz quente da casa, porque branco puro ao lado de papel creme lê como
+  azulado. No escuro é abaixo, 0,152 contra 0,175. Encostado ele não
+  projeta em nenhum dos dois: o degrau de valor faz o trabalho e sobra o
+  filete da borda livre. Solto, vira superfície de cartão e a sombra volta,
+  pela mesma lógica de "encostado não tem raio". Os oito `--sidebar-*` do
+  shadcn não existem aqui, eram cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro

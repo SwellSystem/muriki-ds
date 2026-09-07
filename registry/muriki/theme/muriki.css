@@ -4,7 +4,10 @@
    Superfície em hue 82-100; tinta em hue ~250. As duas famílias de neutro
    são o que faz a tela descansar — não invente um cinza puro no meio. */
 :root {
-  --background: oklch(0.98 0.004 82);
+  /* 0.968, não 0.980. A página desceu um degrau para abrir espaço acima
+     dela: ver a nota do --rail. Tudo que ficava abaixo da página desceu
+     junto, para as relações não mudarem — muted, secondary e sunken. */
+  --background: oklch(0.968 0.009 93);
   --foreground: oklch(0.32 0.02 248.5);
   --foreground-strong: oklch(0.26 0.022 250);
   --card: oklch(0.993 0.002 85);
@@ -18,9 +21,9 @@
   --primary-subtle-foreground: oklch(0.33 0.13 262.6);
   --primary-subtle-border: oklch(0.87 0.055 262.6);
 
-  --secondary: oklch(0.97 0.01 93.5);
+  --secondary: oklch(0.958 0.010 94);
   --secondary-foreground: oklch(0.32 0.02 248.5);
-  --muted: oklch(0.97 0.01 93.5);
+  --muted: oklch(0.958 0.010 94);
   --muted-foreground: oklch(0.45 0.03 257.7);
   --accent: oklch(0.878 0.18 93.9);
   --accent-foreground: oklch(0.26 0.022 250);
@@ -36,32 +39,29 @@
   /* Superfície afundada — trilho de toggle, campo de busca, cabeçalho de tabela.
      Mais escura que o fundo nos DOIS temas: no dark o --muted é mais CLARO que
      o card, então reaproveitá-lo inverteria o relevo. */
-  --sunken: oklch(0.955 0.012 95);
+  --sunken: oklch(0.943 0.012 95);
 
-  /* Superfície do RAIL. No claro é a peça por cima: card branco sobre o
-     papel do conteúdo. Precisar de um oklch solto dentro do componente era
-     o sinal de que faltava este token.
+  /* Superfície do RAIL, e a razão de o conteúdo ter descido.
 
-     O RAIL RECUA NOS DOIS TEMAS. Ele chegou do platform mais claro que o
-     conteúdo no claro (0.99 contra 0.98) e mais escuro no escuro (0.16
-     contra 0.18) — a mesma peça avançando num tema e recuando no outro.
-     Agora recua sempre: o conteúdo é o palco iluminado e a navegação é a
-     moldura.
+     O CONTEÚDO NUNCA É O EXTREMO DA RAMPA. Ele mora no meio, para que o
+     card tenha espaço acima e o sunken abaixo. Foi por não respeitar isso
+     que o rail passou o dia sem cor própria: com a página em 0.980 e o card
+     em 0.993, o topo estava ocupado e o único lugar livre para o rail era
+     abaixo dela.
 
-     E recuar é a única direção em que este token cabe com valor PRÓPRIO.
-     Para cima, no claro, não há espaço: o card já está em 0.993 e o branco
-     é 1.0, então um rail acima do conteúdo teria que emprestar o valor do
-     card — que foi exatamente o que aconteceu enquanto a direção era outra.
-     Para baixo sobra: 0.980 do conteúdo, 0.962 aqui, 0.955 do sunken.
+     Com a página em 0.968, a rampa clara fica assim, de baixo para cima:
+     sunken 0.943 · muted 0.958 · página 0.968 · card 0.993 · rail 0.998.
+     Cinco valores, cinco papéis, nenhum emprestado. E o degrau do card até
+     a página quase dobrou — 0.025 contra os 0.013 de antes — que é o que
+     faz cartão, campo e diálogo terem superfície de verdade em vez de
+     dependerem do filete.
 
-     Fica entre o conteúdo e o sunken de propósito. O rail recua, mas menos
-     que um campo: campo é buraco, rail é plano.
-
-     No claro o teto deste token é o `--muted` (0.97): acima dele o rail
-     passaria a ter a cor dos chips e das faixas de hover que aparecem no
-     conteúdo. 0.968 é o mais claro que ele pode ser sem essa colisão, e
-     ainda guarda um degrau real de 0.012 até a página. */
-  --rail: oklch(0.968 0.009 93);
+     O RAIL FICA DO LADO DE FORA DO CONTEÚDO, e para qual lado depende de
+     onde há espaço. No claro é acima: 0.998, quase branco, mas ainda com a
+     matiz quente da casa — branco puro ao lado de papel creme lê como
+     azulado. No escuro é abaixo: 0.152 contra 0.175. A moldura toma a borda
+     da rampa; o palco fica no meio. */
+  --rail: oklch(0.998 0.002 85);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
      mais claro da página. No escuro é o sunken — o campo é um encaixe,
