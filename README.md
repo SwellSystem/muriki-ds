@@ -421,7 +421,9 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
   pastilha, e o pill fica reservado ao toggle.
 - **O conteúdo nunca é o extremo da rampa.** A página mora no meio, para
   que o card tenha espaço acima e o sunken abaixo. No claro a rampa é
-  `sunken 0,943 · muted 0,958 · página 0,968 · rail 0,984 · card 0,993`:
+  `sunken 0,943 · muted 0,958 · página 0,968 · rail 0,984 · card 0,993`, e
+  o filete recuou para 0,972 — quem separa é a superfície, o filete só
+  confirma onde ela termina:
   cinco valores, cinco papéis, nenhum emprestado. Foi ao quebrar essa regra
   que o rail passou a semana sem cor própria — com a página em 0,980 e o
   card em 0,993 o topo estava ocupado, e sobrava para ele só o lugar
@@ -431,9 +433,10 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **O rail cabe entre a página e o cartão**, no claro: 0,984, marfim. Em
   0,998 ele ficava 0,4 ACIMA do cartão — a mesma superfície de novo — e a
   passagem do quase branco para o papel era um corte, não um degrau. No
-  escuro é abaixo da página, 0,195 contra 0,175. Encostado ele não
-  projeta em nenhum dos dois: o degrau de valor faz o trabalho e sobra o
-  filete da borda livre. Solto, vira superfície de cartão e a sombra volta,
+  escuro é abaixo da página, 0,152 contra 0,175. Encostado ele não tem
+  linha nenhuma na borda livre, só uma elevação ambiente curta: uma linha
+  correndo a altura da tela é a régua mais marcante que existe, e não sobra
+  nada para ela dizer que o degrau de cor já não tenha dito. Solto, vira superfície de cartão e a sombra volta,
   pela mesma lógica de "encostado não tem raio". Os oito `--sidebar-*` do
   shadcn não existem aqui, eram cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,

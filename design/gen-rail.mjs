@@ -7,15 +7,15 @@ import { HAIR } from './recipes.mjs';
 
 const cap = t => `<span class="cap">${t}</span>`;
 
-// Encostado, o rail RECUA: só o filete na borda livre. Quem recua não
-// projeta. Escrito aqui igual ao do componente, para a prancha não divergir.
-const ELEV_CLARO = `box-shadow:inset -1px 0 0 ${N.border};`;
-const ELEV_ESCURO = 'box-shadow:inset -1px 0 0 oklch(0.28 0.005 107);';
+// Encostado, a borda livre NÃO TEM LINHA: só a elevação ambiente curta do
+// cursor do view-toggle. Escrito aqui igual ao do componente.
+const ELEV_CLARO = 'box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);';
+const ELEV_ESCURO = 'box-shadow:2px 0 12px -7px rgba(0,0,0,0.7);';
 // Solto, deixa de recuar: superfície de cartão e sombra de volta.
 const ELEV_SOLTO = 'box-shadow:0 18px 45px -32px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.08);';
 
 const RAIL_CLARO = 'oklch(0.984 0.005 90)';    // marfim, entre a página e o cartão
-const RAIL_ESCURO = 'oklch(0.195 0.004 107)';  // abaixo da página
+const RAIL_ESCURO = 'oklch(0.152 0.004 107)';  // abaixo da página
 
 const item = (txt, ativo = false, escuro = false) => `
 <div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
@@ -106,9 +106,9 @@ const body = `
       rotulado('certo — sem raio', tela({})) +
       rotulado('certo — flutuando, com raio', tela({ raio: '8px', margem: 8 })))}
 
-    ${regra('03', 'Encostado não projeta; solto, vira cartão',
-      'O rail recua, então uma sombra para fora diria o contrário do que a cor diz — encostado ele tem só o filete na borda livre, e o degrau de valor faz o resto. Quando descola da parede, deixa de recuar: a superfície passa a ser a do cartão e a sombra volta. É a mesma família de raciocínio da regra 02.',
-      rotulado('encostado — só o filete', tela({})) +
+    ${regra('03', 'Encostado não tem linha; solto, vira cartão',
+      'Uma linha correndo a altura inteira da tela é a régua mais marcante que uma interface pode ter, e não sobra nada para ela dizer que o degrau de cor já não tenha dito. Encostado, a borda livre tem só uma elevação ambiente curta. Quando descola da parede a peça muda de natureza: a superfície vira a do cartão e a sombra cresce. É a mesma família de raciocínio da regra 02.',
+      rotulado('encostado — sem linha', tela({})) +
       rotulado('errado — sombra em quem recua', tela({ raio: '0', margem: 0, solto: true })) +
       rotulado('flutuando — cartão e sombra', tela({ raio: '8px', margem: 8, solto: true })))}
 
@@ -127,12 +127,12 @@ const body = `
       'A página mora no MEIO da rampa, para o cartão ter espaço acima e o sunken abaixo. Foi ao quebrar isso que o rail passou a semana sem cor própria: com a página em 0,980 e o cartão em 0,993, o topo estava ocupado e sobrava para ele só o lugar abaixo. Com a página em 0,968 são cinco valores e cinco papéis — e o degrau do cartão até ela quase dobrou, de 0,013 para 0,025. No claro o rail cabe ENTRE a página e o cartão; em 0,998 ele ficava 0,4 acima do cartão, que é a mesma superfície de novo, e a quebra do branco para o papel era um corte.',
       rotulado('errado — rail quase branco', planos('oklch(0.998 0.002 85)', 'oklch(0.968 0.009 93)', false, 'rail 0,998 — acima do cartão')) +
       rotulado('certo — claro, rail entre os dois', planos(RAIL_CLARO, 'oklch(0.968 0.009 93)', false, 'rail 0,984 · página 0,968')) +
-      rotulado('certo — escuro, rail abaixo', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,195 · página 0,175')))}
+      rotulado('certo — escuro, rail abaixo', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,152 · página 0,175')))}
   </div>
 </div>`;
 
 const html = page('Rail',
-  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. A superfície é o token --rail: no claro fica entre a página e o cartão, no escuro abaixo da página. Encostado ele não projeta, só o filete da borda livre; solto, vira cartão e a sombra volta.',
+  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. A superfície é o token --rail: no claro fica entre a página e o cartão, no escuro abaixo da página. Encostado a borda livre não tem linha, só uma elevação ambiente curta; solto, vira cartão.',
   body);
 await Bun.write('Rail.dc.html', html);
 console.log('Rail.dc.html', html.length, 'bytes');

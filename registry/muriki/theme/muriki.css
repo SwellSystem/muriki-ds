@@ -61,7 +61,13 @@
      ficava 0,4 ACIMA do cartão — a mesma superfície de novo, e a quebra do
      branco para o papel era seca demais. Marfim guarda lugar próprio e
      mantém a matiz quente, então a passagem para o conteúdo é um degrau, não
-     um corte. No escuro é abaixo da página: 0.195 é o espelho disso. */
+     um corte.
+
+     NO ESCURO ELE VAI PARA BAIXO DA PÁGINA: 0.152 contra 0.175. Não é
+     simetria, é onde há espaço em cada tema. No claro o teto é o branco e o
+     cartão já ocupa 0.993, então o rail sobe pouco e fica entre os dois; no
+     escuro o piso é o preto e sobra folga embaixo, então ele desce. O que
+     não muda é o conteúdo ficar no meio da rampa. */
   --rail: oklch(0.984 0.005 90);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
@@ -91,7 +97,11 @@
   /* série de dados — avatares tintados e a cor de epic dos blocos */
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
-  --border: oklch(0.94 0.01 100);
+  /* O filete recua. Ele era 0.94, um traço presente em toda separação do
+     sistema, e é daí que vinha a cara de grade. Com a rampa clara aberta —
+     página 0.968, cartão 0.993 — quem separa passa a ser a superfície; o
+     filete só confirma onde ela termina. */
+  --border: oklch(0.972 0.007 93);
   --input: oklch(0.89 0.009 96);
   --ring: oklch(0.47 0.185 262.6);
 
@@ -155,9 +165,10 @@
 
   --sunken: oklch(0.14 0.004 107);
   --field: oklch(0.14 0.004 107);
-  /* Entre o conteúdo (0.175) e o sunken (0.14), como no claro. Ver a nota
-     lá: o rail recua nos dois temas e tem valor próprio nos dois. */
-  --rail: oklch(0.195 0.004 107);
+  /* Abaixo da página (0.175) e acima do sunken (0.14). Ver a nota no tema
+     claro. Esteve em 0.195, que é ACIMA da página — o comentário dizia
+     "abaixo" e o valor dizia o contrário. */
+  --rail: oklch(0.152 0.004 107);
 
   --float: 0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4),
     inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);
@@ -167,7 +178,8 @@
 
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
-  --border: oklch(0.30 0.005 107);
+  /* Espelho da nota no claro: o filete recua e a superfície separa. */
+  --border: oklch(0.215 0.004 107);
   --input: oklch(0.385 0.006 107);
   --ring: oklch(0.7 0.145 262.6);
 
