@@ -2,6 +2,18 @@
 /**
  * Muriki Sidebar.
  *
+ * DOIS EIXOS, e eles não são a mesma lista. POSIÇÃO diz onde o rail mora —
+ * encostado na borda ou flutuando como cartão; LARGURA diz quanto ele
+ * mostra — rótulos ou só ícones. Colapsar um rail flutuante é uma
+ * combinação legítima, e a mais útil em tela apertada: se os dois virassem
+ * valores de uma lista só, ela deixaria de existir.
+ *
+ * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
+ * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
+ * regra que o Sheet já declara — o painel perde o raio do lado encostado —
+ * e que este componente contradizia. Flutuando, o raio volta: aí a peça
+ * está solta de verdade.
+ *
  * O rail NÃO tem paleta própria. O shadcn traz oito tokens `--sidebar-*`
  * que são cópias quase iguais das cores base, e manter duas paletas é
  * garantir que uma hora elas divergem.
@@ -41,7 +53,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { SidebarIcon } from "@phosphor-icons/react"
+import {
+  PushPinIcon,
+  PushPinSimpleIcon,
+  SidebarIcon,
+  SidebarSimpleIcon,
+} from "@phosphor-icons/react"
 
 /**
  * O rail vira gaveta abaixo de 768px. O hook vive aqui e não num
@@ -83,6 +100,8 @@ type SidebarContextProps = {
   pinned: boolean
   setPinned: (pinned: boolean) => void
   togglePin: () => void
+  /** Se o eixo de POSIÇÃO está ligado. Desligado, o rail só encosta. */
+  enablePinning: boolean
   floating: boolean
   setFloating: (floating: boolean) => void
   flyoutOpen: boolean
@@ -228,6 +247,7 @@ function SidebarProvider({
       pinned,
       setPinned,
       togglePin,
+      enablePinning,
       floating,
       setFloating,
       flyoutOpen: flyoutCount > 0,
@@ -245,6 +265,7 @@ function SidebarProvider({
       pinned,
       setPinned,
       togglePin,
+      enablePinning,
       floating,
       flyoutCount,
       openFlyout,
@@ -337,7 +358,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-card shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:bg-[oklch(0.155_0.004_107)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)]",
           className
         )}
         {...props}
@@ -449,11 +470,11 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === "floating" || variant === "inset"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:rounded-r-xl group-data-[side=left]:border-r group-data-[side=left]:border-border/20 group-data-[side=right]:rounded-l-xl group-data-[side=right]:border-l group-data-[side=right]:border-border/20",
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-border/20 group-data-[side=right]:border-l group-data-[side=right]:border-border/20",
           // Eixo "pin": desafixada, vira um CARTÃO flutuante (margem, cantos
           // arredondados, sombra) — fiel ao mock. O reveal/hide (transform +
           // opacity + transição) é controlado inline via `floatStyle`.
-          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:rounded-[14px]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
+          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:rounded-[var(--radius-float)]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
           className
         )}
         {...props}
@@ -461,7 +482,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-card shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:bg-[oklch(0.155_0.004_107)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)] group-data-[side=left]:rounded-r-xl group-data-[side=right]:rounded-l-xl group-data-[variant=floating]:rounded-xl group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)] group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>
@@ -521,12 +542,66 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
   )
 }
 
+/**
+ * Os dois controles do rail, no cabeçalho dele — e não soltos na página.
+ * É onde o platform os põe, e faz sentido: quem comanda o rail mora no
+ * rail. O de colapsar troca a LARGURA; o de fixar troca a POSIÇÃO. Com o
+ * rail em ícones eles empilham, porque não cabem lado a lado.
+ */
+function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
+  const { toggleSidebar, togglePin, pinned, state, isMobile, enablePinning } =
+    useSidebar()
+
+  if (isMobile) return null
+  const colapsado = state === "collapsed"
+
+  return (
+    <div
+      data-slot="sidebar-controls"
+      className={cn(
+        "flex shrink-0 items-center gap-0.5",
+        "group-data-[collapsible=icon]:w-full group-data-[collapsible=icon]:flex-col",
+        className
+      )}
+      {...props}
+    >
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={toggleSidebar}
+        aria-label={colapsado ? "Expandir menu" : "Recolher menu"}
+        title={colapsado ? "Expandir menu" : "Recolher menu"}
+        className="text-muted-foreground"
+      >
+        <SidebarSimpleIcon aria-hidden size={16} />
+      </Button>
+      {/* Sem o eixo de posição ligado, o botão de fixar seria um botão morto. */}
+      {enablePinning ? (
+      <Button
+        variant="ghost"
+        size="icon-sm"
+        onClick={togglePin}
+        aria-label={pinned ? "Soltar menu" : "Fixar menu"}
+        title={pinned ? "Soltar menu" : "Fixar menu"}
+        className={cn("text-muted-foreground", !pinned && "text-primary")}
+      >
+        {pinned ? (
+          <PushPinSimpleIcon aria-hidden size={16} />
+        ) : (
+          <PushPinIcon aria-hidden size={16} weight="fill" />
+        )}
+      </Button>
+      ) : null}
+    </div>
+  )
+}
+
 function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
   return (
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[var(--radius-float)] md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
         className
       )}
       {...props}
@@ -947,6 +1022,7 @@ function SidebarMenuSubButton({
 export {
   Sidebar,
   SidebarContent,
+  SidebarControls,
   SidebarFooter,
   SidebarFlyoutContext,
   SidebarGroup,

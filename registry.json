@@ -70,6 +70,7 @@
           "tone-purple-dot": "oklch(0.56 0.185 300)",
           "sunken": "oklch(0.955 0.012 95)",
           "field": "oklch(0.993 0.002 85)",
+          "rail": "oklch(0.993 0.002 85)",
           "float": "0 10px 26px oklch(0.32 0.02 248.5 / 0.10), 0 2px 6px oklch(0.32 0.02 248.5 / 0.06), inset 0 0 0 1px oklch(0.90 0.008 96)",
           "float-strong": "0 24px 60px oklch(0.32 0.02 248.5 / 0.16), 0 6px 16px oklch(0.32 0.02 248.5 / 0.08), inset 0 0 0 1px oklch(0.90 0.008 96)",
           "scrim": "oklch(0.32 0.02 248.5 / 0.30)",
@@ -135,6 +136,7 @@
           "tone-purple-dot": "oklch(0.68 0.16 300)",
           "sunken": "oklch(0.14 0.004 107)",
           "field": "oklch(0.14 0.004 107)",
+          "rail": "oklch(0.155 0.004 107)",
           "float": "0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4), inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107)",
           "float-strong": "0 24px 60px oklch(0 0 0 / 0.7), 0 6px 16px oklch(0 0 0 / 0.5), inset 0 1px 0 oklch(1 0 0 / 0.07), inset 0 0 0 1px oklch(0.36 0.005 107)",
           "scrim": "oklch(0.09 0.003 107 / 0.62)",
@@ -672,7 +674,7 @@
       "name": "sidebar",
       "type": "registry:ui",
       "title": "Sidebar",
-      "description": "O rail do app: recolhe para ícones, vira gaveta no celular e lembra o estado por cookie. Sem paleta própria — é uma superfície do sistema (--sunken).",
+      "description": "O rail do app em DOIS eixos: posição (encostado ou flutuando) e largura (rótulos ou ícones). Encostado não tem raio; flutuando, tem. Traz os controles de recolher e fixar no próprio cabeçalho.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react",
@@ -694,7 +696,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "O shadcn traz oito tokens --sidebar-*, cópias quase iguais das cores base. Aqui eles não existem: manter duas paletas é garantir que uma hora divergem."
+      "docs": "Os dois eixos não são a mesma lista: colapsar um rail flutuante é a combinação mais útil em tela apertada. A superfície é o token --rail, e o tooltip aparece sozinho sempre que o rail está em ícones. Os oito tokens --sidebar-* do shadcn não existem aqui: eram cópias das cores base."
     },
     {
       "name": "plan-card",
