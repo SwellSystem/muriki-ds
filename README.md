@@ -147,13 +147,15 @@ mono em caixa alta:
 
 LoginPage — a tela inteira. Ela não conhece roteador, i18next nem API:
 `onSubmit` devolve um `LoginResult`, e o mascote entra por prop (o registry
-não carrega binário):
+não carrega binário). Com `brandHidden`, ele fecha os olhos enquanto a senha
+está visível — quem revela a senha é quem decide quem olha:
 
 ```tsx
 import { LoginPage, type LoginResult } from "@/components/blocks/login-page"
 
 <LoginPage
   brand={<img src="/assets/muriki.png" alt="Muriki" />}
+  brandHidden={<img src="/assets/muriki-olhos-fechados.png" alt="Muriki" />}   {/* senha à mostra */}
   onSubmit={async ({ email, password, rememberMe }): Promise<LoginResult> => {
     const r = await entrar({ email, password, rememberMe })
     if (r.status === 401) return { ok: false, reason: "credentials" }
