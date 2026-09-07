@@ -8,6 +8,10 @@
  * combinação legítima, e a mais útil em tela apertada: se os dois virassem
  * valores de uma lista só, ela deixaria de existir.
  *
+ * O corte: `inset` saiu (o conteúdo virava cartão dentro de uma moldura que
+ * não era superfície de nada) e o sistema de flyout de grupo saiu junto —
+ * era uma feature inteira, com contexto exportado, que nada acionava.
+ *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
  * regra que o Sheet já declara — o painel perde o raio do lado encostado —
@@ -104,20 +108,10 @@ type SidebarContextProps = {
   enablePinning: boolean
   floating: boolean
   setFloating: (floating: boolean) => void
-  flyoutOpen: boolean
-  openFlyout: () => void
-  closeFlyout: () => void
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
 
-// Onde um SidebarMenuButton está sendo renderizado no flyout de grupo (rail):
-// "trigger" = os ícones do trilho (focáveis, sem tooltip); "content" = os itens
-// do painel portalizado (visuais/mouse, fora do tab order, sem tooltip);
-// "off" = sidebar normal.
-const SidebarFlyoutContext = React.createContext<"off" | "trigger" | "content">(
-  "off"
-)
 
 function useSidebar() {
   const context = React.useContext(SidebarContext)
@@ -194,15 +188,6 @@ function SidebarProvider({
   // togglePin possa mantê-lo aberto no MESMO update que desafixa — senão há um
   // frame escondido e o mouse-leave dispara espúrio na troca de layout (rail).
   const [floating, setFloating] = React.useState(false)
-  // Conta flyouts de grupo abertos (rail). Enquanto >0, o overlay flutuante
-  // (desafixado) não esconde no mouse-leave — o flyout é portalizado e mover o
-  // mouse pra ele dispararia o leave do container, escondendo a sidebar.
-  const [flyoutCount, setFlyoutCount] = React.useState(0)
-  const openFlyout = React.useCallback(() => setFlyoutCount((c) => c + 1), [])
-  const closeFlyout = React.useCallback(
-    () => setFlyoutCount((c) => Math.max(0, c - 1)),
-    []
-  )
   const togglePin = React.useCallback(() => {
     if (!enablePinning) return
     _setPinned((previous) => {
@@ -250,9 +235,6 @@ function SidebarProvider({
       enablePinning,
       floating,
       setFloating,
-      flyoutOpen: flyoutCount > 0,
-      openFlyout,
-      closeFlyout,
     }),
     [
       state,
@@ -267,9 +249,6 @@ function SidebarProvider({
       togglePin,
       enablePinning,
       floating,
-      flyoutCount,
-      openFlyout,
-      closeFlyout,
     ]
   )
 
@@ -285,7 +264,7 @@ function SidebarProvider({
           } as React.CSSProperties
         }
         className={cn(
-          "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-card",
+          "group/sidebar-wrapper flex min-h-svh w-full ",
           className
         )}
         {...props}
@@ -307,7 +286,7 @@ function Sidebar({
   ...props
 }: React.ComponentProps<"div"> & {
   side?: "left" | "right"
-  variant?: "sidebar" | "floating" | "inset"
+  variant?: "sidebar" | "floating"
   collapsible?: "offcanvas" | "icon" | "none"
 }) {
   const {
@@ -318,22 +297,20 @@ function Sidebar({
     pinned,
     floating,
     setFloating,
-    flyoutOpen,
   } = useSidebar()
   const containerRef = React.useRef<HTMLDivElement>(null)
 
-  // Quando o último flyout de grupo fecha, re-avalia o hide do overlay
-  // (desafixado): se o mouse não voltou pra sidebar, esconde — o mouse-leave
-  // ficou suprimido enquanto o flyout estava aberto.
+  // Re-avalia o hide do overlay desafixado: se o mouse não voltou para a
+  // sidebar, esconde.
   React.useEffect(() => {
-    if (pinned || flyoutOpen) return
+    if (pinned) return
     const el = containerRef.current
     // Não esconde se o mouse ainda está sobre ela ou se há foco (teclado) dentro
     // — ex.: desafixar pelo botão via teclado mantém o contexto de navegação.
     if (el && !el.matches(":hover") && !el.contains(document.activeElement)) {
       setFloating(false)
     }
-  }, [pinned, flyoutOpen, setFloating])
+  }, [pinned, setFloating])
 
   // O reveal/hide do overlay flutuante vai inline: transform/opacity/transition
   // direto no elemento vencem qualquer utility/cascade do Tailwind, garantindo
@@ -358,7 +335,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)]",
           className
         )}
         {...props}
@@ -422,7 +399,7 @@ function Sidebar({
           "group-data-[collapsible=offcanvas]:w-0",
           "group-data-[pinned=false]:w-0",
           "group-data-[side=right]:rotate-180",
-          variant === "floating" || variant === "inset"
+          variant === "floating"
             ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
         )}
@@ -432,9 +409,7 @@ function Sidebar({
         data-side={side}
         ref={containerRef}
         onMouseLeave={(event) => {
-          // Não esconder enquanto um flyout de grupo estiver aberto — ele é
           // portalizado, então mover o mouse pra ele dispara este leave.
-          if (flyoutOpen) return
           // Esconder ao sair com o mouse — exceto quando há foco POR TECLADO
           // (focus-visible) dentro. Foco vindo de clique (ex.: clicar num item
           // de nav) NÃO segura o overlay aberto.
@@ -468,7 +443,7 @@ function Sidebar({
         className={cn(
           "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
           // Adjust the padding for floating and inset variants.
-          variant === "floating" || variant === "inset"
+          variant === "floating"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
             : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-border/20 group-data-[side=right]:border-l group-data-[side=right]:border-border/20",
           // Eixo "pin": desafixada, vira um CARTÃO flutuante (margem, cantos
@@ -482,7 +457,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-rail shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)] group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)] group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>
@@ -601,7 +576,7 @@ function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
     <main
       data-slot="sidebar-inset"
       className={cn(
-        "relative flex w-full flex-1 flex-col bg-background md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-[var(--radius-float)] md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2",
+        "relative flex w-full flex-1 flex-col bg-background",
         className
       )}
       {...props}
@@ -819,16 +794,13 @@ function SidebarMenuButton({
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
   const { isMobile, state } = useSidebar()
-  const flyout = React.useContext(SidebarFlyoutContext)
-  const noTooltip = !tooltip || flyout !== "off"
+  const noTooltip = !tooltip
   const comp = useRender({
     defaultTagName: "button",
     props: mergeProps<"button">(
       {
         className: cn(sidebarMenuButtonVariants({ variant, size }), className),
-        // Itens DENTRO do painel do flyout são visuais (mouse): saem do tab
         // order — o teclado navega pelos ícones do trilho (o trigger).
-        ...(flyout === "content" ? { tabIndex: -1 } : {}),
       },
       props
     ),
@@ -1024,7 +996,6 @@ export {
   SidebarContent,
   SidebarControls,
   SidebarFooter,
-  SidebarFlyoutContext,
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
