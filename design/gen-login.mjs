@@ -7,19 +7,14 @@
 //
 // Gera ../.github/readme/tela-login-{clara,escura}.png em 2x.
 // Requer o app consumidor de pé e o Chrome na máquina.
-import { existsSync, mkdirSync } from 'node:fs';
+import { mkdirSync } from 'node:fs';
+
+import { acharChrome } from './chrome.mjs';
 
 const BASE = process.argv[2] ?? 'http://localhost:3000';
 const W = 1180, H = 920;
 
-// O binário do Chrome não tem o mesmo nome nos dois sistemas.
-const CANDIDATOS = [
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome',
-  '/usr/bin/google-chrome-stable',
-];
-const chrome = CANDIDATOS.find(existsSync) ?? Bun.which('google-chrome');
-if (!chrome) { console.error('Chrome não encontrado.'); process.exit(1); }
+const chrome = acharChrome();
 
 const outDir = new URL('../.github/readme/', import.meta.url).pathname;
 mkdirSync(outDir, { recursive: true });

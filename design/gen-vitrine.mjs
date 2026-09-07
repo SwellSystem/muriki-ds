@@ -1,8 +1,7 @@
 // Vitrine do README — a foto dos componentes que abre o repositório.
 // Lê os tokens do registry.json (fonte única) e traduz as receitas visuais
 // dos componentes reais (button-variants, switch, checkbox, progress,
-// view-toggle) e das pranchas (campos e radio, que ainda não têm código)
-// para HTML estático, nos dois temas. Renderiza com o Chrome headless em
+// view-toggle, input, radio-group) para HTML estático, nos dois temas. Renderiza com o Chrome headless em
 // 2x e grava em ../.github/readme/.
 //
 //   cd design && bun gen-vitrine.mjs
@@ -11,6 +10,7 @@
 // O README continua sendo a doc — isto aqui é só a primeira impressão.
 
 import { mkdtempSync, mkdirSync } from 'node:fs';
+import { acharChrome } from './chrome.mjs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -116,6 +116,7 @@ const vitrine = (mode) => {
 
 // ── render
 const tmp = mkdtempSync(join(tmpdir(), 'vitrine-'));
+const CHROME = acharChrome();
 const outDir = new URL('../.github/readme/', import.meta.url).pathname;
 mkdirSync(outDir, { recursive: true });
 
@@ -123,7 +124,7 @@ for (const mode of ['light', 'dark']) {
   const html = join(tmp, `${mode}.html`);
   const png = join(outDir, `vitrine-${mode === 'light' ? 'clara' : 'escura'}.png`);
   await Bun.write(html, vitrine(mode));
-  const p = Bun.spawnSync(['google-chrome', '--headless=new', '--disable-gpu', '--hide-scrollbars',
+  const p = Bun.spawnSync([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
     '--force-device-scale-factor=2', '--default-background-color=00000000',
     '--virtual-time-budget=10000', `--window-size=${W},${H}`,
     `--screenshot=${png}`, `file://${html}`]);
