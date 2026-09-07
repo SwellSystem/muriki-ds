@@ -170,6 +170,51 @@ import { LoginPage, type LoginResult } from "@/components/blocks/login-page"
 />
 ```
 
+Superfícies — tudo que paira usa o mesmo token de luz. Monte o
+`TooltipProvider` uma vez no layout:
+
+```tsx
+<Tooltip>
+  <TooltipTrigger render={<Button variant="ghost" size="icon" aria-label="Duplicar" />}>
+    <Copy />
+  </TooltipTrigger>
+  <TooltipContent>Duplicar task</TooltipContent>
+</Tooltip>
+
+<Sheet>
+  <SheetTrigger render={<Button />}>Abrir task</SheetTrigger>
+  <SheetContent side="right">
+    <SheetHeader>
+      <SheetTitle>Regenerar client Kubb</SheetTitle>
+      <SheetDescription>MRK-1284</SheetDescription>
+    </SheetHeader>
+    <SheetBody>{/* só o miolo rola */}</SheetBody>
+    <SheetFooter>
+      <Button variant="outline" size="lg">Descartar</Button>
+      <Button variant="solid" size="lg">Salvar</Button>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>
+```
+
+Confirmação destrutiva — o único lugar do sistema onde o vermelho é cheio:
+
+```tsx
+<AlertDialog>
+  <AlertDialogTrigger render={<Button variant="destructive" />}>Excluir epic</AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Excluir “Contrato OpenAPI”?</AlertDialogTitle>
+      <AlertDialogDescription>O epic e as 14 tasks saem do board. Isso não volta.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+      <AlertDialogAction onClick={excluir}>Excluir mesmo assim</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
 Toaster — monte uma vez no layout e dispare com o `toast` do sonner; o tema
 vem do seu provider, o componente não adivinha:
 
@@ -192,6 +237,12 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
 | `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
 | `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
+| `@muriki/tooltip` | `registry:ui` | etiqueta que passa: inverte o tema, fundo de tinta e texto de papel, com seta |
+| `@muriki/popover` | `registry:ui` | superfície flutuante em `--float`, raio de recipiente |
+| `@muriki/dropdown-menu` | `registry:ui` | item de 28px, atalho em mono, destrutivo tingido |
+| `@muriki/dialog` | `registry:ui` | `--float-strong` sobre véu de tinta; rodapé empilha invertido no mobile |
+| `@muriki/alert-dialog` | `registry:ui` | o que interrompe: não fecha por Esc nem por clique fora, e é onde o vermelho é cheio |
+| `@muriki/sheet` | `registry:ui` | painel que entra pela borda — o dialog vestido de outro jeito |
 | `@muriki/view-toggle` | `registry:ui` | controle segmentado com pill animada, genérico sobre o tipo do valor |
 | `@muriki/switch` | `registry:ui` | trilho como encaixe, thumb como objeto elevado — não inverte no escuro, sobe por luz |
 | `@muriki/checkbox` | `registry:ui` | vazio é encaixe, marcado é chapado — numa caixa de 16px, relevo vira sujeira |
@@ -296,6 +347,12 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **O que paira nunca afunda.** Diálogo, popover, menu, tooltip e sheet
+  usam o token `--float`: no claro a elevação vem da sombra caindo, no
+  escuro de um fio de luz na aresta de cima somado ao corpo mais claro. São
+  seis superfícies e uma decisão só, então ela vive no tema — nenhuma delas
+  tem uma classe `dark:`. O véu do diálogo é `--scrim`, tinta do sistema:
+  preto puro sobre papel quente esverdeia.
 - **Tela de viewport inteiro não cresce embaixo do dedo.** No login, a
   força da senha reserva a altura desde o início e os requisitos são uma
   fileira só: digitar não pode empurrar o "Entrar" para fora da dobra. O

@@ -1,0 +1,105 @@
+"use client"
+
+/**
+ * Muriki Popover.
+ *
+ * Superfície flutuante: `--float` nos dois temas. Um popover nunca é
+ * encaixe — ele paira, e overlay que afunda desaparece. O token carrega a
+ * diferença entre os temas (sombra no claro, fio de luz no escuro), então
+ * aqui não existe uma classe `dark:` sequer.
+ *
+ * Raio de RECIPIENTE, não de controle: 14px vindo de --radius. É a mesma
+ * razão que separa o botão seco do card macio — o popover é onde se opera,
+ * não o que se aperta.
+ */
+import * as React from "react"
+import { Popover as PopoverPrimitive } from "@base-ui/react/popover"
+
+import { cn } from "@/lib/utils"
+
+function Popover(props: PopoverPrimitive.Root.Props) {
+  return <PopoverPrimitive.Root data-slot="popover" {...props} />
+}
+
+function PopoverTrigger(props: PopoverPrimitive.Trigger.Props) {
+  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
+}
+
+function PopoverContent({
+  className,
+  align = "center",
+  alignOffset = 0,
+  side = "bottom",
+  sideOffset = 6,
+  ...props
+}: PopoverPrimitive.Popup.Props &
+  Pick<PopoverPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset">) {
+  return (
+    <PopoverPrimitive.Portal>
+      <PopoverPrimitive.Positioner
+        align={align}
+        alignOffset={alignOffset}
+        side={side}
+        sideOffset={sideOffset}
+        className="isolate z-50"
+      >
+        <PopoverPrimitive.Popup
+          data-slot="popover-content"
+          className={cn(
+            "flex w-72 max-w-[calc(100vw-2rem)] origin-(--transform-origin) flex-col gap-2.5",
+            "rounded-lg bg-popover p-3 text-sm text-popover-foreground shadow-[var(--float)] outline-none",
+            "transition-[opacity,transform] duration-100 ease-out",
+            "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+            "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
+            className
+          )}
+          {...props}
+        />
+      </PopoverPrimitive.Positioner>
+    </PopoverPrimitive.Portal>
+  )
+}
+
+function PopoverHeader({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="popover-header"
+      className={cn("flex flex-col gap-0.5", className)}
+      {...props}
+    />
+  )
+}
+
+function PopoverTitle({ className, ...props }: PopoverPrimitive.Title.Props) {
+  return (
+    <PopoverPrimitive.Title
+      data-slot="popover-title"
+      className={cn("text-sm font-medium text-foreground-strong", className)}
+      {...props}
+    />
+  )
+}
+
+function PopoverDescription({ className, ...props }: PopoverPrimitive.Description.Props) {
+  return (
+    <PopoverPrimitive.Description
+      data-slot="popover-description"
+      className={cn("text-[13px] leading-[18px] text-muted-foreground", className)}
+      {...props}
+    />
+  )
+}
+
+function PopoverClose(props: PopoverPrimitive.Close.Props) {
+  return <PopoverPrimitive.Close data-slot="popover-close" {...props} />
+}
+
+export {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverDescription,
+  PopoverClose,
+}
