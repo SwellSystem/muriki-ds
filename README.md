@@ -38,7 +38,7 @@ No projeto que vai instalar (ex.: `muriki-platform`), declare o registry em `com
 E instale:
 
 ```bash
-bunx shadcn@latest add @muriki/button @muriki/badge @muriki/task-table @muriki/kanban
+bunx shadcn@latest add @muriki/button @muriki/badge @muriki/task-table @muriki/login-page
 ```
 
 O `@muriki/theme` vem junto como dependência — ele injeta os tokens claro e escuro
@@ -119,6 +119,55 @@ Controles de formulário — Base UI, API controlada:
 <Progress value={62} />
 ```
 
+Campo — o `Field` amarra label, controle, dica e erro por id e
+`aria-describedby`. Não existe `useId` na mão:
+
+```tsx
+import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+
+<Field invalid={!!erro}>
+  <FieldLabel>Título</FieldLabel>
+  <Input placeholder="Descreva a tarefa" value={titulo} onValueChange={setTitulo} />
+  <FieldDescription>Aparece na lista e no board.</FieldDescription>
+  {erro ? <FieldError>{erro}</FieldError> : null}
+</Field>
+```
+
+A variante `underline` do campo é a voz editorial — só o fio de baixo, para
+tela de entrada. `variant="editorial"` no Field troca o label por caption
+mono em caixa alta:
+
+```tsx
+<Field variant="editorial">
+  <FieldLabel>Email</FieldLabel>
+  <Input variant="underline" size="touch" type="email" placeholder="seu@email.com" />
+</Field>
+```
+
+LoginPage — a tela inteira. Ela não conhece roteador, i18next nem API:
+`onSubmit` devolve um `LoginResult`, e o mascote entra por prop (o registry
+não carrega binário):
+
+```tsx
+import { LoginPage, type LoginResult } from "@/components/blocks/login-page"
+
+<LoginPage
+  brand={<img src="/assets/muriki.png" alt="Muriki" />}
+  onSubmit={async ({ email, password, rememberMe }): Promise<LoginResult> => {
+    const r = await entrar({ email, password, rememberMe })
+    if (r.status === 401) return { ok: false, reason: "credentials" }
+    if (r.twoFactorRequired) return { ok: true, twoFactor: true }   // abre o painel de código
+    return { ok: true }
+  }}
+  onVerifyCode={async ({ code, trustDevice }) => { /* ... */ }}
+  onProvider={(id) => entrarCom(id)}
+  onForgotPassword={() => router.push("/recuperar")}
+  onCreateAccount={() => router.push("/cadastro")}
+  utilities={<ThemeToggle />}
+/>
+```
+
 Toaster — monte uma vez no layout e dispare com o `toast` do sonner; o tema
 vem do seu provider, o componente não adivinha:
 
@@ -139,6 +188,8 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/theme` | `registry:theme` | papel quente + tinta fria, azul e amarelo da logo, nove matizes de badge, claro e escuro |
 | `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 5; `solid` é exceção declarada — uma por tela |
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
+| `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
+| `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
 | `@muriki/view-toggle` | `registry:ui` | controle segmentado com pill animada, genérico sobre o tipo do valor |
 | `@muriki/switch` | `registry:ui` | trilho como encaixe, thumb como objeto elevado — não inverte no escuro, sobe por luz |
 | `@muriki/checkbox` | `registry:ui` | vazio é encaixe, marcado é chapado — numa caixa de 16px, relevo vira sujeira |
@@ -149,6 +200,8 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
 | `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
 | `@muriki/priority-flag` | `registry:block` | prioridade com ícone e cor por nível — urgent quebra a escala de propósito |
+| `@muriki/password-strength` | `registry:block` | régua de senha em quatro degraus e a barra de quatro segmentos, com a lista de requisitos |
+| `@muriki/login-page` | `registry:block` | a tela de entrada: painel editorial com o mascote, provedores em hierarquia, campos underline, força de senha e segundo fator inline |
 | `@muriki/i18n` | `registry:lib` | labels dos blocos com defaults pt-BR embutidos; apps com i18n injetam o próprio `t` via provider |
 
 ## Blocos ao vivo
@@ -178,6 +231,18 @@ encaixe que só aparece enquanto rola:
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/readme/bloco-board-escura.png">
   <img src=".github/readme/bloco-board-clara.png" alt="Kanban do Muriki Design System" width="840">
+</picture>
+
+## Telas ao vivo
+
+Bloco de tela é bloco: entra pelo `shadcn add`, roda no app consumidor e é de
+lá que sai a captura. **Login** — painel editorial com o mascote espiando,
+provedores em hierarquia (um largo, os outros numa fileira), campos
+`underline`, força de senha e o único botão sólido da tela:
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/readme/tela-login-escura.png">
+  <img src=".github/readme/tela-login-clara.png" alt="Tela de login do Muriki Design System" width="840">
 </picture>
 
 ## Tipografia
@@ -229,5 +294,8 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **O campo tem superfície própria.** O token `--field` é card no claro e
+  sunken no escuro: o campo é o objeto mais claro da página em um tema e um
+  encaixe no outro. A troca vive no token, não numa classe `dark:`.
 - **Ícone sem rótulo é adivinhação.** `RowAction.label` é obrigatório no tipo:
   vira tooltip e `aria-label` ao mesmo tempo.
