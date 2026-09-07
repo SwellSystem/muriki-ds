@@ -230,6 +230,7 @@ export function LoginForm({
               type="button"
               variant="outline"
               size="touch"
+              effect="wipe"
               disabled={submitting}
               onClick={() => onProvider?.(primaryProvider.id)}
               aria-label={`${t("login.section_signin_with")} ${primaryProvider.label}`}
@@ -248,6 +249,7 @@ export function LoginForm({
                   type="button"
                   variant="outline"
                   size="lg"
+                  effect="wipe"
                   disabled={submitting}
                   onClick={() => onProvider?.(id)}
                   aria-label={`${t("login.section_signin_with")} ${label}`}

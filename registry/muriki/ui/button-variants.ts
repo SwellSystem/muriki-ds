@@ -7,6 +7,13 @@ import { cva } from "class-variance-authority"
  * filete, tinta e fundo tênue. `solid` existe, mas é exceção declarada —
  * uma por tela. Se aparecem duas, nenhuma é a principal.
  *
+ * O EFEITO é um eixo à parte das variantes, e não uma oitava variante:
+ * `wipe` é como a peça reage ao ponteiro, não o que ela é. Vem da tela de
+ * entrada do platform, onde o provedor principal se preenche da esquerda
+ * para a direita no hover. É animação de background-size, não pseudo
+ * elemento — o texto não precisa de camada nem de z-index para continuar
+ * por cima.
+ *
  * Raio: altura ÷ 5, arredondado. Não é o `--radius` (esse é do recipiente,
  * 14px). O contraste entre controle seco e recipiente macio é o que o olho
  * lê como intenção.
@@ -41,6 +48,15 @@ export const buttonVariants = cva(
         /** EXCEÇÃO. Uma por tela — o "Entrar", o "Publicar" do diálogo. Nada mais. */
         solid: "bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary",
       },
+      /** Como reage ao ponteiro. Ortogonal à variante. */
+      effect: {
+        none: "",
+        wipe: [
+          "bg-no-repeat [background-image:linear-gradient(to_right,var(--primary-subtle),var(--primary-subtle))]",
+          "[background-size:0%_100%] transition-[background-size,box-shadow,color] duration-300",
+          "hover:[background-size:100%_100%]",
+        ].join(" "),
+      },
       size: {
         xs: "h-6 rounded-[5px] px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 rounded-[6px] px-2.5 text-[0.78rem] [&_svg:not([class*='size-'])]:size-3.5",
@@ -56,6 +72,6 @@ export const buttonVariants = cva(
       },
     },
     compoundVariants: [{ variant: "link", size: "default", class: "h-auto px-0" }],
-    defaultVariants: { variant: "outline", size: "default" },
+    defaultVariants: { variant: "outline", size: "default", effect: "none" },
   }
 )

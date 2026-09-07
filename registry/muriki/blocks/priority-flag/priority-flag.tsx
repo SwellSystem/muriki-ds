@@ -17,15 +17,14 @@ const priorityFlagVariants = cva(
   {
     variants: {
       level: {
-        // Cores semânticas por level. Urgent usa o token `destructive`
-        // da paleta; os demais usam escala Tailwind (sky/amber/orange)
-        // pra diferenciar a hierarquia de forma instantânea — a paleta
-        // taupe base-nova do projeto não tem equivalentes pra "info"
-        // e "warning" nesse grau.
-        low: "text-sky-600 dark:text-sky-400",
-        medium: "text-amber-600 dark:text-amber-400",
-        high: "text-orange-600 dark:text-orange-400",
-        urgent: "text-destructive",
+        // Os nove tons do sistema, não a escala crua do Tailwind. Cada tom
+        // já tem tinta e fundo calibrados nos dois temas (L 43% / L 93,5%,
+        // espelhados no escuro) — usar sky/amber/orange trazia uma segunda
+        // paleta para dentro da casa e quebrava no dark.
+        low: "text-tone-gray-foreground",
+        medium: "text-tone-blue-foreground",
+        high: "text-tone-orange-foreground",
+        urgent: "text-tone-red-foreground",
       },
       variant: {
         icon: "",
@@ -33,27 +32,11 @@ const priorityFlagVariants = cva(
       },
     },
     compoundVariants: [
-      // Fundos tintados pela cor do level + ring interno sutil.
-      {
-        variant: "pill",
-        level: "low",
-        class: "bg-sky-500/10 ring-sky-500/25",
-      },
-      {
-        variant: "pill",
-        level: "medium",
-        class: "bg-amber-500/10 ring-amber-500/25",
-      },
-      {
-        variant: "pill",
-        level: "high",
-        class: "bg-orange-500/12 ring-orange-500/30",
-      },
-      {
-        variant: "pill",
-        level: "urgent",
-        class: "bg-destructive/12 ring-destructive/30",
-      },
+      // Fundo do próprio tom + fio interno na cor do ponto daquele tom.
+      { variant: "pill", level: "low", class: "bg-tone-gray ring-tone-gray-dot/25" },
+      { variant: "pill", level: "medium", class: "bg-tone-blue ring-tone-blue-dot/25" },
+      { variant: "pill", level: "high", class: "bg-tone-orange ring-tone-orange-dot/25" },
+      { variant: "pill", level: "urgent", class: "bg-tone-red ring-tone-red-dot/30" },
     ],
     defaultVariants: { level: "medium", variant: "icon" },
   }

@@ -66,7 +66,7 @@ function DropdownMenuContent({
           data-slot="dropdown-menu-content"
           className={cn(
             "max-h-(--available-height) min-w-40 origin-(--transform-origin) overflow-x-hidden overflow-y-auto",
-            "rounded-lg bg-popover p-1 text-popover-foreground shadow-[var(--float)] outline-none",
+            "rounded-[var(--radius-float)] bg-popover p-1 text-popover-foreground shadow-[var(--float)] outline-none",
             "transition-[opacity,transform] duration-100 ease-out",
             "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
