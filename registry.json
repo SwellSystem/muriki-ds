@@ -400,7 +400,7 @@
       "name": "sheet",
       "type": "registry:ui",
       "title": "Sheet",
-      "description": "Painel que entra pela borda — o Dialog vestido de outro jeito, não outro primitivo. Perde o raio e a sombra do lado encostado na parede.",
+      "description": "Painel que entra pela borda — o dialog vestido de outro jeito, não outro primitivo. Duas anatomias, solta e estruturada com faixas e filete, iguais às do Dialog.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"
@@ -671,6 +671,9 @@
         "@muriki/avatar",
         "@muriki/status-pill",
         "@muriki/priority-flag",
+        "@muriki/checkbox",
+        "@muriki/progress",
+        "@muriki/view-toggle",
         "@muriki/i18n"
       ],
       "files": [
@@ -730,7 +733,7 @@
           "target": "components/blocks/task-modal/index.ts"
         }
       ],
-      "docs": "Portado do muriki-platform sem redesenhar. O seletor de três modos é peça do bloco, não do Modal do sistema. A locale das datas entra por prop (`localeTag`), padrão pt-BR."
+      "docs": "Portado do muriki-platform e adaptado à casa: a pele (superfície, sombra, raio, filete) vem do Dialog e do Sheet com anatomy=\"framed\"; os selos viram Badge, os controles viram Checkbox e Progress, e o seletor de três modos passa a ser o ViewToggle. A locale das datas entra por prop (localeTag), padrão pt-BR."
     },
     {
       "name": "task-table",

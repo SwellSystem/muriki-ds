@@ -292,7 +292,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/dropdown-menu` | `registry:ui` | item de 28px, atalho em mono, destrutivo tingido |
 | `@muriki/dialog` | `registry:ui` | `--float-strong` sobre véu de tinta; duas anatomias, solto e estruturado com faixas e filete |
 | `@muriki/alert-dialog` | `registry:ui` | o que interrompe: não fecha por Esc nem por clique fora, e é onde o vermelho é cheio |
-| `@muriki/sheet` | `registry:ui` | painel que entra pela borda — o dialog vestido de outro jeito |
+| `@muriki/sheet` | `registry:ui` | painel que entra pela borda; duas anatomias, solta e estruturada, iguais às do dialog |
 | `@muriki/modal` | `registry:ui` | a mesma conversa na forma que couber: diálogo no desktop, sheet no celular |
 | `@muriki/view-toggle` | `registry:ui` | controle segmentado com pill animada, genérico sobre o tipo do valor |
 | `@muriki/switch` | `registry:ui` | trilho como encaixe, thumb como objeto elevado — não inverte no escuro, sobe por luz |
@@ -405,6 +405,12 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **Bloco portado veste a pele da casa.** O modal de task veio do platform com
+  desenho pronto, mas trazia `shadow-2xl`, `bg-card`, `rounded-none` e uma
+  borda a mais por cima do filete do token. Superfície, sombra, raio e filete
+  vêm sempre do Dialog e do Sheet; o que o bloco decide é largura, altura e
+  estrutura. Selo vira Badge, caixa de marcar vira Checkbox, barra vira
+  Progress, segmentado vira ViewToggle.
 - **O que paira nunca afunda.** Diálogo, popover, menu, tooltip e sheet
   usam o token `--float`: no claro a elevação vem da sombra caindo, no
   escuro de um fio de luz na aresta de cima somado ao corpo mais claro. São

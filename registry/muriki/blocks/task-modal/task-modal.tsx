@@ -6,10 +6,12 @@
 // controlado: recebe `value`/`onChange` e dispara `onSubmit`. Reutilizável por
 // focus e projects — cada módulo passa as opções (statuses, pessoas, projetos,
 // tags) que possui e liga o submit ao seu data layer.
-import { CaretRight, Check, Plus } from "@phosphor-icons/react"
+import { CaretRight, Plus } from "@phosphor-icons/react"
 import { useState, type KeyboardEvent, type ReactNode } from "react"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -75,8 +77,14 @@ export interface TaskModalProps {
   onSubmit: (options: TaskModalSubmitOptions) => void | Promise<void>
 }
 
-const CARD_BASE =
-  "flex flex-col gap-0 overflow-hidden border-[0.5px] border-foreground/8 bg-card p-0 text-foreground shadow-2xl"
+// Nada de pele aqui. Superfície, sombra, raio e filete vêm do Dialog e do
+// Sheet da casa via `anatomy="framed"` — o que sobrou desta constante é só
+// largura e altura, que são decisão DESTE modal e de mais nenhum.
+//
+// A versão anterior trazia `border-[0.5px] border-foreground/8`, `bg-card`,
+// `shadow-2xl`, `p-0` e `rounded-none` do platform. O resultado é que o
+// painel lateral do modal de task saía com raio zero e uma borda a mais por
+// cima do filete do token: um Sheet que não parecia o Sheet.
 
 export function TaskModal({
   open,
@@ -124,11 +132,11 @@ export function TaskModal({
   }
 
   const header = (
-    <div className="flex items-center gap-2 border-b border-border/70 px-5 py-2.5 pr-12">
+    <div className="flex items-center gap-2 px-5 py-2.5 pr-12 shadow-[inset_0_-1px_0_var(--border)]">
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs font-medium text-muted-foreground">
-        <span className="inline-flex h-[22px] items-center gap-1.5 rounded-sm bg-primary/12 px-2 font-mono text-[11px] font-semibold text-primary">
+        <Badge tone="blue" className="font-mono">
           {contextLabel ?? t("task_modal.context_default")}
-        </span>
+        </Badge>
         <CaretRight
           size={11}
           aria-hidden
@@ -143,32 +151,19 @@ export function TaskModal({
   )
 
   const footer = (
-    <div className="flex items-center gap-2.5 border-t border-border/70 bg-muted/40 px-5 py-3">
+    <div className="flex items-center gap-2.5 bg-secondary/40 px-5 py-3 shadow-[inset_0_1px_0_var(--border)]">
       <label className="inline-flex cursor-pointer items-center gap-2 text-[11.5px] text-muted-foreground select-none">
-        <span
-          className={cn(
-            "inline-flex size-4 items-center justify-center rounded-[5px] border-[1.5px] transition-colors",
-            createMore
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-muted text-transparent"
-          )}
-        >
-          <Check size={10} weight="bold" aria-hidden />
-        </span>
-        <input
-          type="checkbox"
-          checked={createMore}
-          onChange={(event) => setCreateMore(event.currentTarget.checked)}
-          className="sr-only"
-        />
+        <Checkbox checked={createMore} onCheckedChange={setCreateMore} />
         {t("task_modal.create_more")}
       </label>
       <span className="flex-1" />
-      <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+      <Button type="button" variant="ghost" size="lg" onClick={() => onOpenChange(false)}>
         {t("task_modal.cancel")}
       </Button>
       <Button
         type="button"
+        variant="solid"
+        size="lg"
         onClick={submit}
         disabled={!canSubmit}
         data-testid="task-modal-submit"
@@ -265,7 +260,7 @@ export function TaskModal({
           />
         )}
       </div>
-      <aside className="min-h-0 overflow-y-auto border-t border-border/70 bg-muted/25 md:border-t-0 md:border-l">
+      <aside className="min-h-0 overflow-y-auto bg-sunken/60 shadow-[inset_0_1px_0_var(--border)] md:shadow-[inset_1px_0_0_var(--border)]">
         <p className="px-5 pt-4 pb-1 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase">
           {t("task_modal.properties")}
         </p>
@@ -295,10 +290,8 @@ export function TaskModal({
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="right"
-          className={cn(
-            CARD_BASE,
-            "w-full rounded-none data-[side=right]:w-full data-[side=right]:sm:max-w-[468px]"
-          )}
+          anatomy="framed"
+          className="w-full sm:max-w-[468px]"
           data-testid="task-modal-drawer"
         >
           <SheetTitle className="sr-only">{a11yTitle}</SheetTitle>
@@ -320,11 +313,12 @@ export function TaskModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
+        anatomy="framed"
         className={cn(
-          CARD_BASE,
           isFull
-            ? "h-screen max-h-none w-screen max-w-none rounded-none border-0 sm:max-w-none"
-            : "max-h-[86vh] w-full rounded-xl sm:max-w-[600px]"
+            // tela cheia encosta nas quatro bordas: aí o raio some de verdade
+            ? "h-dvh max-h-none w-screen max-w-none rounded-none sm:max-w-none"
+            : "max-h-[86vh] w-full sm:max-w-[600px]"
         )}
         data-testid={isFull ? "task-modal-full" : "task-modal-central"}
       >

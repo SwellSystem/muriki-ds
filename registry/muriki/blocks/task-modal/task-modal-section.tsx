@@ -2,6 +2,8 @@
 import type { Icon } from "@phosphor-icons/react"
 import type { ReactNode } from "react"
 
+import { Badge } from "@/components/ui/badge"
+
 export interface TaskModalSectionProps {
   icon: Icon
   title: string
@@ -21,13 +23,13 @@ export function TaskModalSection({
 }: TaskModalSectionProps) {
   return (
     <section className="px-5 pt-1.5 pb-5">
-      <header className="mb-3 flex items-center gap-2 border-b border-border/70 pb-2 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase">
+      <header className="mb-3 flex items-center gap-2 pb-2 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase shadow-[inset_0_-1px_0_var(--border)]">
         <IconComponent size={13} aria-hidden />
         <span>{title}</span>
         {count !== undefined && count > 0 && (
-          <span className="rounded-full bg-muted px-1.5 py-px font-mono text-[10px] text-foreground/80 normal-case">
+          <Badge size="sm" count className="normal-case">
             {count}
-          </span>
+          </Badge>
         )}
       </header>
       {children}

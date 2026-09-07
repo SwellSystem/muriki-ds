@@ -11,6 +11,7 @@ import {
 import { useEffect, useRef } from "react"
 
 import { useTranslate } from "@/lib/i18n"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const TOOLBAR = [
@@ -51,20 +52,22 @@ export function TaskModalDescription({
 
   return (
     <div className="px-5 pt-1.5 pb-5">
-      <div className="mb-1.5 flex w-max items-center gap-px rounded-sm border border-border/70 bg-card p-0.5">
+      <div className="mb-1.5 flex w-max items-center gap-px rounded-[8px] bg-card p-0.5 shadow-[inset_0_0_0_1px_var(--border)]">
         {TOOLBAR.map((item) =>
           "divider" in item ? (
             <span key={item.key} className="mx-1 h-4 w-px bg-border" />
           ) : (
-            <button
+            <Button
               key={item.key}
               type="button"
+              variant="ghost"
+              size="icon-sm"
               tabIndex={-1}
               aria-label={t(`task_modal.description.${item.key}`)}
-              className="inline-flex size-7 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className="text-muted-foreground"
             >
               <item.Icon size={14} aria-hidden />
-            </button>
+            </Button>
           )
         )}
       </div>
@@ -75,7 +78,7 @@ export function TaskModalDescription({
         placeholder={placeholder ?? t("task_modal.description.placeholder")}
         aria-label={t("task_modal.description.label")}
         className={cn(
-          "min-h-[74px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground/90 outline-none",
+          "min-h-[74px] w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-sm leading-relaxed text-foreground outline-none",
           "placeholder:text-muted-foreground/70"
         )}
       />

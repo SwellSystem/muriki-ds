@@ -56,7 +56,7 @@ const LOCALE_MAP: Record<string, Locale> = {
 }
 
 const chipTrigger =
-  "inline-flex h-7 w-fit items-center gap-1.5 rounded-sm border border-border bg-card px-2.5 text-xs font-medium text-muted-foreground shadow-none transition-colors hover:bg-muted hover:text-foreground"
+  "inline-flex h-7 w-fit items-center gap-1.5 rounded-sm border border-border bg-card px-2.5 text-xs font-medium text-muted-foreground shadow-none transition-colors hover:bg-secondary hover:text-foreground"
 
 export interface TaskQuickAddProps {
   value: TaskDraft
@@ -112,11 +112,11 @@ export function TaskQuickAdd({
 
   return (
     <div
-      className="flex flex-col overflow-hidden rounded-lg border-[0.5px] border-foreground/8 bg-card shadow-2xl"
+      className="flex flex-col overflow-hidden rounded-[var(--radius-float)] bg-popover shadow-[var(--float)]"
       data-testid="task-quick-add"
     >
       <div className="flex items-center gap-2.5 p-3.5">
-        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary/12 text-primary">
+        <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-sm bg-primary-subtle text-primary-subtle-foreground">
           <ListChecks size={17} aria-hidden />
         </span>
         <input
@@ -138,7 +138,7 @@ export function TaskQuickAdd({
             type="button"
             onClick={onClose}
             aria-label={t("task_modal.quick_add.close_aria")}
-            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="inline-flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
           >
             <X size={15} aria-hidden />
           </button>
@@ -251,7 +251,7 @@ export function TaskQuickAdd({
                     onChange({ dueDate: null })
                     setDatePickerOpen(false)
                   }}
-                  className="w-full rounded-sm px-2 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  className="w-full rounded-sm px-2 py-1 text-left text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
                   {t("task_modal.quick_add.clear_due")}
                 </button>
@@ -276,12 +276,12 @@ export function TaskQuickAdd({
         <span className="min-w-0 flex-1 truncate">
           {t("task_modal.quick_add.ai_split")}
         </span>
-        <kbd className="shrink-0 rounded border border-border bg-muted px-1.5 py-px font-mono text-[10px] text-muted-foreground">
+        <kbd className="shrink-0 rounded-[6px] bg-secondary px-1.5 py-px font-mono text-[10px] text-muted-foreground shadow-[inset_0_0_0_1px_var(--border)]">
           ⌘J
         </kbd>
       </button>
 
-      <div className="flex items-center gap-2 border-t border-border/70 bg-muted/40 px-3.5 py-2">
+      <div className="flex items-center gap-2 border-t border-border bg-secondary/40 px-3.5 py-2">
         <Button type="button" variant="ghost" size="sm" onClick={onExpand}>
           <ArrowsOutSimple data-icon="inline-start" aria-hidden />
           {t("task_modal.quick_add.add_details")}

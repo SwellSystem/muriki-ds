@@ -1,14 +1,12 @@
 // Portado do muriki-platform sem redesenhar.
-import {
-  ArrowUpRight,
-  Check,
-  Plus,
-  TreeStructure,
-  X,
-} from "@phosphor-icons/react"
+import { ArrowUpRight, Plus, TreeStructure, X } from "@phosphor-icons/react"
 import { useState } from "react"
 
 import { useTranslate } from "@/lib/i18n"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Progress } from "@/components/ui/progress"
 import { cn } from "@/lib/utils"
 
 import { TaskModalSection } from "./task-modal-section"
@@ -71,12 +69,7 @@ export function TaskModalSubtasks({
           className="mb-2.5 flex items-center gap-2 font-mono text-[11px] text-muted-foreground"
           data-testid="task-modal-subtasks-progress"
         >
-          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-            <span
-              className="block h-full rounded-full bg-success transition-[width] duration-300"
-              style={{ width: `${percent}%` }}
-            />
-          </span>
+          <Progress value={percent} className="flex-1" aria-label={t("task_modal.subtasks.title")} />
           <span>{percent}%</span>
         </div>
       )}
@@ -85,32 +78,23 @@ export function TaskModalSubtasks({
         {subtasks.map((subtask) => (
           <div
             key={subtask.id}
-            className="group/sub flex items-center gap-2.5 rounded-sm px-2 py-1.5 transition-colors hover:bg-muted/60"
+            className="group/sub flex items-center gap-2.5 rounded-sm px-2 py-1.5 transition-colors hover:bg-secondary"
           >
-            <button
-              type="button"
-              onClick={() => toggle(subtask.id)}
-              aria-pressed={subtask.done}
+            <Checkbox
+              checked={subtask.done}
+              onCheckedChange={() => toggle(subtask.id)}
               aria-label={
                 subtask.done
                   ? t("task_modal.subtasks.mark_undone")
                   : t("task_modal.subtasks.mark_done")
               }
-              className={cn(
-                "inline-flex size-[17px] shrink-0 items-center justify-center rounded-[5px] border-[1.5px] transition-colors",
-                subtask.done
-                  ? "border-success bg-success text-white"
-                  : "border-border bg-muted text-transparent"
-              )}
-            >
-              <Check size={11} weight="bold" aria-hidden />
-            </button>
+            />
 
             <span className="flex min-w-0 flex-1 items-center gap-2.5">
               {subtask.slug != null && subtask.slug.length > 0 && (
-                <span className="shrink-0 rounded-[5px] bg-muted px-1.5 py-0.5 font-mono text-[10.5px] font-semibold tracking-tight whitespace-nowrap text-muted-foreground">
+                <Badge size="sm" className="shrink-0 font-mono tracking-tight">
                   {subtask.slug}
-                </span>
+                </Badge>
               )}
               <span
                 className={cn(
@@ -127,18 +111,20 @@ export function TaskModalSubtasks({
               />
             </span>
 
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon-xs"
               onClick={() => remove(subtask.id)}
               aria-label={t("task_modal.subtasks.remove")}
-              className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground opacity-0 transition-opacity group-hover/sub:opacity-100 hover:bg-destructive/12 hover:text-destructive"
+              className="shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/sub:opacity-100 hover:bg-destructive-subtle hover:text-destructive-subtle-foreground"
             >
               <X size={13} aria-hidden />
-            </button>
+            </Button>
           </div>
         ))}
 
-        <div className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-muted-foreground focus-within:bg-muted/60">
+        <div className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-muted-foreground focus-within:bg-secondary">
           <Plus size={15} aria-hidden className="shrink-0" />
           <input
             value={draft}

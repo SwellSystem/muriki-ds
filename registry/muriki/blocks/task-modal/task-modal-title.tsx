@@ -1,5 +1,7 @@
 // Portado do muriki-platform sem redesenhar.
 import { Hash } from "@phosphor-icons/react"
+
+import { Badge } from "@/components/ui/badge"
 import { useEffect, useRef } from "react"
 
 import { useTranslate } from "@/lib/i18n"
@@ -45,22 +47,14 @@ export function TaskModalTitle({
 
   return (
     <div className="flex flex-col gap-2.5 px-5 pt-5 pb-1.5">
-      <span
-        title={
-          pending
-            ? t("task_modal.slug.pending_hint")
-            : t("task_modal.slug.hint")
-        }
-        className={cn(
-          "inline-flex h-6 w-fit items-center gap-1 rounded-sm border px-2 font-mono text-[11.5px] font-semibold tracking-tight whitespace-nowrap",
-          pending
-            ? "border-dashed border-border bg-transparent text-muted-foreground"
-            : "border-border bg-muted text-foreground/80"
-        )}
+      <Badge
+        variant={pending ? "dashed" : "soft"}
+        className="w-fit font-mono tracking-tight"
+        title={pending ? t("task_modal.slug.pending_hint") : t("task_modal.slug.hint")}
       >
         <Hash size={12} aria-hidden className="text-muted-foreground" />
         {pending ? t("task_modal.slug.pending") : slug}
-      </span>
+      </Badge>
       <textarea
         ref={ref}
         rows={1}

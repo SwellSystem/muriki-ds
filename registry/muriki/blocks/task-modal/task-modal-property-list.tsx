@@ -53,7 +53,7 @@ const PRIORITY_ORDER: TaskModalPriority[] = [
 ]
 
 const cellClass =
-  "inline-flex min-h-[26px] max-w-full items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+  "inline-flex min-h-[26px] max-w-full items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
 
 const ghostTriggerClass = cn(
   cellClass,
@@ -70,7 +70,7 @@ function PropRow({
   children: ReactNode
 }) {
   return (
-    <div className="grid min-h-[30px] grid-cols-[128px_1fr] items-start gap-2 rounded-sm transition-colors hover:bg-muted/55 md:grid-cols-[148px_1fr]">
+    <div className="grid min-h-[30px] grid-cols-[128px_1fr] items-start gap-2 rounded-sm transition-colors hover:bg-secondary/60 md:grid-cols-[148px_1fr]">
       <div className="flex h-[30px] items-center gap-2 pl-1.5 text-[12.5px] font-medium text-muted-foreground select-none">
         <span className="flex w-[17px] shrink-0 justify-center text-muted-foreground">
           {icon}
@@ -281,7 +281,7 @@ export function TaskModalPropertyList({
                     {selectedPeople.slice(0, 4).map((person) => (
                       <Avatar
                         key={person.id}
-                        className="-ml-1.5 size-5 ring-2 ring-card first:ml-0"
+                        className="-ml-1.5 size-5 ring-2 ring-popover first:ml-0"
                       >
                         <AvatarFallback className="bg-primary text-[9px] text-primary-foreground">
                           {person.initials}
@@ -308,7 +308,7 @@ export function TaskModalPropertyList({
                     key={person.id}
                     type="button"
                     onClick={() => toggleAssignee(person.id)}
-                    className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-muted"
+                    className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-secondary"
                   >
                     <Avatar className="size-5">
                       <AvatarFallback className="bg-primary text-[9px] text-primary-foreground">
@@ -489,7 +489,7 @@ export function TaskModalPropertyList({
                     key={tag.id}
                     type="button"
                     onClick={() => toggleTag(tag.id)}
-                    className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-muted"
+                    className="flex items-center gap-2.5 rounded-sm px-2 py-1.5 text-left text-[13px] hover:bg-secondary"
                   >
                     {tag.color !== undefined && (
                       <span

@@ -3,6 +3,7 @@ import { CloudArrowUp, File as FileIcon, Trash } from "@phosphor-icons/react"
 import { useRef, useState } from "react"
 
 import { useTranslate } from "@/lib/i18n"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 import { TaskModalSection } from "./task-modal-section"
@@ -44,7 +45,7 @@ export function TaskModalAttachments({
           {attachments.map((attachment) => (
             <li
               key={attachment.id}
-              className="flex items-center gap-2.5 rounded-md border border-border/70 bg-card px-2.5 py-2"
+              className="flex items-center gap-2.5 rounded-md border border-border bg-card px-2.5 py-2"
             >
               <FileIcon
                 size={19}
@@ -59,14 +60,16 @@ export function TaskModalAttachments({
                   {attachment.size}
                 </span>
               )}
-              <button
+              <Button
                 type="button"
+                variant="ghost"
+                size="icon-xs"
                 onClick={() => onRemove(attachment.id)}
                 aria-label={t("task_modal.attachments.remove")}
-                className="inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-destructive/12 hover:text-destructive"
+                className="shrink-0 text-muted-foreground hover:bg-destructive-subtle hover:text-destructive-subtle-foreground"
               >
                 <Trash size={13} aria-hidden />
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -86,9 +89,9 @@ export function TaskModalAttachments({
           emit(event.dataTransfer.files)
         }}
         className={cn(
-          "flex w-full flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-muted/40 px-4 py-3.5 text-center transition-colors",
-          "hover:border-primary hover:bg-muted",
-          over && "border-primary bg-muted"
+          "flex w-full flex-col items-center gap-1.5 rounded-md border border-dashed border-border bg-secondary/40 px-4 py-3.5 text-center transition-colors",
+          "hover:border-primary-subtle-border hover:bg-secondary",
+          over && "border-primary bg-primary-subtle"
         )}
       >
         <CloudArrowUp size={20} aria-hidden className="text-muted-foreground" />
