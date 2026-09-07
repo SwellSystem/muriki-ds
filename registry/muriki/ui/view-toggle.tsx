@@ -12,6 +12,14 @@
  * um trilho e a pill é um cursor que desliza entre as opções. Quadrar
  * isso mataria a leitura do movimento.
  *
+ * A exceção tem um limite, e o limite é a FORMA DO CURSOR. Com rótulo, o
+ * cursor é um estádio largo e lê como cursor. Só com ícone, ele vira um
+ * círculo perfeito dentro de um trilho oval — que é exatamente o desenho
+ * de um switch, a peça de que este componente precisa se distinguir. Então
+ * quando NENHUMA opção tem rótulo, o controle volta para o raio de
+ * controle (altura ÷ 4): ícones num segmentado de cantos secos lêem como
+ * barra de opções, e nunca como interruptor.
+ *
  * Acessibilidade não é opcional aqui: `role="tablist"` no container,
  * `role="tab"` + `aria-selected` em cada opção, e `ariaLabel` obrigatório
  * no tipo. Opção sem `label` visível exige `ariaLabel` próprio — ícone
@@ -77,6 +85,10 @@ export function ViewToggle<V extends string>({
   className,
   iconClassName,
 }: ViewToggleProps<V>) {
+  // Sem nenhum rótulo, o cursor circular imitaria um switch — ver o
+  // cabeçalho. A forma inteira troca junto, trilho e opções.
+  const soIcone = options.every((option) => option.icon && !option.label)
+
   const containerRef = useRef<HTMLDivElement>(null)
   const buttonRefs = useRef<Map<V, HTMLButtonElement>>(new Map())
   const [pillStyle, setPillStyle] = useState<{
@@ -112,7 +124,12 @@ export function ViewToggle<V extends string>({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "relative inline-flex items-center rounded-full p-0.5",
+        "relative inline-flex items-center p-0.5",
+        soIcone
+          ? size === "sm"
+            ? "rounded-[9px]"
+            : "rounded-[9px] md:rounded-[10px]"
+          : "rounded-full",
         // Trilho AFUNDADO — a sombra interna é a mesma nos dois temas porque
         // --sunken já é mais escuro que o fundo em ambos. Sem dark: aqui.
         appearance === "default"
@@ -140,7 +157,12 @@ export function ViewToggle<V extends string>({
               // sombra é uma linguagem de tema CLARO. Preto sobre quase-preto
               // é invisível. No escuro a elevação se expressa por LUZ: a
               // pastilha sobe de luminosidade e ganha um filete mais claro.
-              "absolute top-0.5 bottom-0.5 rounded-full",
+              "absolute top-0.5 bottom-0.5",
+              soIcone
+                ? size === "sm"
+                  ? "rounded-[8px]"
+                  : "rounded-[8px] md:rounded-[9px]"
+                : "rounded-full",
               "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)]",
               "dark:bg-[oklch(0.172_0.004_107)]",
               "dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)]"
@@ -171,7 +193,12 @@ export function ViewToggle<V extends string>({
             data-state={selected ? "active" : "inactive"}
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap transition-colors",
+              "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 font-medium whitespace-nowrap transition-colors",
+              soIcone
+                ? size === "sm"
+                  ? "rounded-[8px]"
+                  : "rounded-[8px] md:rounded-[9px]"
+                : "rounded-full",
               "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-0 focus-visible:outline-none",
               size === "sm"
                 ? iconOnly
