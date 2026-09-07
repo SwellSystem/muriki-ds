@@ -43,6 +43,25 @@
      mais escuro que o card. A troca vive aqui, não numa classe dark:. */
   --field: oklch(0.993 0.002 85);
 
+
+  /* SUPERFÍCIE FLUTUANTE — a peça que paira sobre a página: diálogo,
+     popover, menu, tooltip, sheet. Ela nunca é encaixe, nos dois temas:
+     um overlay que afunda some. A luz continua vindo de cima, mas o MEIO
+     de mostrar isso muda de tema. No claro basta a sombra caindo; no
+     escuro, preto sobre quase-preto não aparece, então a elevação vem de
+     um fio de luz na aresta de cima somado ao corpo mais claro — a mesma
+     física do cursor do view-toggle.
+     Vive em token, e não numa classe `dark:` repetida seis vezes: são
+     seis superfícies e uma decisão só. */
+  --float: 0 10px 26px oklch(0.32 0.02 248.5 / 0.10), 0 2px 6px oklch(0.32 0.02 248.5 / 0.06),
+    inset 0 0 0 1px oklch(0.90 0.008 96);
+  --float-strong: 0 24px 60px oklch(0.32 0.02 248.5 / 0.16), 0 6px 16px oklch(0.32 0.02 248.5 / 0.08),
+    inset 0 0 0 1px oklch(0.90 0.008 96);
+
+  /* O véu do diálogo. Tinta do sistema, não preto puro: preto sobre papel
+     quente esverdeia. */
+  --scrim: oklch(0.32 0.02 248.5 / 0.30);
+
   /* série de dados — avatares tintados e a cor de epic dos blocos */
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
@@ -104,6 +123,13 @@
 
   --sunken: oklch(0.14 0.004 107);
   --field: oklch(0.14 0.004 107);
+
+  --float: 0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4),
+    inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);
+  --float-strong: 0 24px 60px oklch(0 0 0 / 0.7), 0 6px 16px oklch(0 0 0 / 0.5),
+    inset 0 1px 0 oklch(1 0 0 / 0.07), inset 0 0 0 1px oklch(0.36 0.005 107);
+  --scrim: oklch(0.09 0.003 107 / 0.62);
+
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
   --border: oklch(0.30 0.005 107);
@@ -151,6 +177,9 @@
   --color-warning: var(--warning);
   --color-sunken: var(--sunken);
   --color-field: var(--field);
+  --color-scrim: var(--scrim);
+  --shadow-float: var(--float);
+  --shadow-float-strong: var(--float-strong);
   --color-chart-1: var(--chart-1);
   --color-chart-3: var(--chart-3);
   --color-border: var(--border);

@@ -7,7 +7,7 @@
       "name": "theme",
       "type": "registry:theme",
       "title": "Tema Muriki",
-      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250.",
+      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim).",
       "cssVars": {
         "theme": {
           "radius": "14px"
@@ -70,6 +70,9 @@
           "tone-purple-dot": "oklch(0.56 0.185 300)",
           "sunken": "oklch(0.955 0.012 95)",
           "field": "oklch(0.993 0.002 85)",
+          "float": "0 10px 26px oklch(0.32 0.02 248.5 / 0.10), 0 2px 6px oklch(0.32 0.02 248.5 / 0.06), inset 0 0 0 1px oklch(0.90 0.008 96)",
+          "float-strong": "0 24px 60px oklch(0.32 0.02 248.5 / 0.16), 0 6px 16px oklch(0.32 0.02 248.5 / 0.08), inset 0 0 0 1px oklch(0.90 0.008 96)",
+          "scrim": "oklch(0.32 0.02 248.5 / 0.30)",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         },
@@ -131,6 +134,9 @@
           "tone-purple-dot": "oklch(0.68 0.16 300)",
           "sunken": "oklch(0.14 0.004 107)",
           "field": "oklch(0.14 0.004 107)",
+          "float": "0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4), inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107)",
+          "float-strong": "0 24px 60px oklch(0 0 0 / 0.7), 0 6px 16px oklch(0 0 0 / 0.5), inset 0 1px 0 oklch(1 0 0 / 0.07), inset 0 0 0 1px oklch(0.36 0.005 107)",
+          "scrim": "oklch(0.09 0.003 107 / 0.62)",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         }
@@ -225,6 +231,129 @@
       "docs": "Erro controlado de fora: `invalid` no Field e um <FieldError> renderizado só quando há mensagem. FieldHeader põe uma ação à direita do label."
     },
     {
+      "name": "tooltip",
+      "type": "registry:ui",
+      "title": "Tooltip",
+      "description": "Etiqueta que passa: inverte o tema — fundo de tinta, texto de papel — porque contraste alto é o que faz 12px ser lido de relance. Seta obrigatória.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/tooltip.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Monte o TooltipProvider uma vez no layout. O delay padrão é 400ms."
+    },
+    {
+      "name": "popover",
+      "type": "registry:ui",
+      "title": "Popover",
+      "description": "Superfície flutuante com o token --float: sombra no claro, fio de luz no escuro, e nenhuma classe dark: no componente. Raio de recipiente.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/popover.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "dropdown-menu",
+      "type": "registry:ui",
+      "title": "Dropdown Menu",
+      "description": "Menu na mesma superfície flutuante, com item de 28px e atalho em mono. O item destrutivo é tingido — vermelho cheio dentro de lista é bloco gritando.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/dropdown-menu.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Nomes compatíveis com o shadcn: os blocos do sistema importam DropdownMenuContent e companhia."
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "title": "Dialog",
+      "description": "A superfície mais alta: --float-strong sobre um véu de tinta (--scrim), não preto puro. Raio de recipiente, e o rodapé empilha invertido no mobile.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/dialog.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "alert-dialog",
+      "type": "registry:ui",
+      "title": "Alert Dialog",
+      "description": "O diálogo que interrompe: não fecha por Esc nem por clique fora. É onde o vermelho CHEIO mora — a exceção declarada da regra do botão sem fill.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/alert-dialog.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "AlertDialogAction já vem sólido e destrutivo; passe destructive={false} para uma confirmação que não estraga nada."
+    },
+    {
+      "name": "sheet",
+      "type": "registry:ui",
+      "title": "Sheet",
+      "description": "Painel que entra pela borda — o Dialog vestido de outro jeito, não outro primitivo. Perde o raio e a sombra do lado encostado na parede.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/sheet.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "side: right (padrão), left ou bottom. SheetBody rola; cabeçalho e rodapé ficam."
+    },
+    {
       "name": "row-actions",
       "type": "registry:block",
       "title": "Row Actions",
@@ -234,8 +363,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "tooltip",
-        "dropdown-menu",
+        "@muriki/tooltip",
+        "@muriki/dropdown-menu",
         "@muriki/button"
       ],
       "files": [
@@ -386,7 +515,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "dropdown-menu",
+        "@muriki/dropdown-menu",
         "@muriki/button",
         "@muriki/i18n"
       ],
@@ -471,7 +600,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "tooltip",
+        "@muriki/tooltip",
         "@muriki/theme",
         "@muriki/priority-flag"
       ],
