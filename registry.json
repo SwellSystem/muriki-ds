@@ -372,7 +372,8 @@
           "path": "registry/muriki/ui/dialog.tsx",
           "type": "registry:ui"
         }
-      ]
+      ],
+      "docs": "Duas anatomias: `padded` (solto) e `framed` (título em faixa, seções com filete, rodapé preso). `fullscreen` cobre a janela e tira raio, sombra e filete — o que cobre a tela deixa de pairar."
     },
     {
       "name": "alert-dialog",

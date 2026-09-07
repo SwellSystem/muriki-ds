@@ -405,6 +405,11 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
+  sombra e filete. O filete do `--float` é desenhado por dentro, então numa
+  peça do tamanho exato da janela ele vira um contorno correndo pelas quatro
+  bordas — e uma superfície que É a página não precisa se anunciar como peça
+  sobre a página.
 - **Bloco portado veste a pele da casa.** O modal de task veio do platform com
   desenho pronto, mas trazia `shadow-2xl`, `bg-card`, `rounded-none` e uma
   borda a mais por cima do filete do token. Superfície, sombra, raio e filete
