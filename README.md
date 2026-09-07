@@ -170,6 +170,30 @@ import { LoginPage, type LoginResult } from "@/components/blocks/login-page"
 />
 ```
 
+Select — o gatilho é campo e a lista é superfície flutuante. Passe `items`,
+um mapa de valor para rótulo: a lista vive num portal que só monta ao abrir,
+então sem ele o gatilho mostra o valor cru antes da primeira abertura.
+
+```tsx
+const STATUS = { aberta: "A fazer", progresso: "Em progresso" }
+
+<Select items={STATUS} value={status} onValueChange={setStatus}>
+  <SelectTrigger><SelectValue placeholder="Escolha um status" /></SelectTrigger>
+  <SelectContent>
+    <SelectItem value="aberta">{STATUS.aberta}</SelectItem>
+    <SelectItem value="progresso">{STATUS.progresso}</SelectItem>
+  </SelectContent>
+</Select>
+
+<Textarea autoResize placeholder="Descreva a tarefa" />
+
+<RadioGroup value={visibilidade} onValueChange={setVisibilidade}>
+  <label className="flex items-center gap-2.5">
+    <RadioGroupItem value="time" /> Só o time do projeto
+  </label>
+</RadioGroup>
+```
+
 Superfícies — tudo que paira usa o mesmo token de luz. Monte o
 `TooltipProvider` uma vez no layout:
 
@@ -237,6 +261,9 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
 | `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
 | `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
+| `@muriki/textarea` | `registry:ui` | o campo do Input, só que alto; divide as variantes com ele e cresce com o texto |
+| `@muriki/radio-group` | `registry:ui` | o checkbox redondo: vazio é encaixe, marcado é chapado |
+| `@muriki/select` | `registry:ui` | gatilho é campo, lista é superfície flutuante; o caret não gira |
 | `@muriki/tooltip` | `registry:ui` | etiqueta que passa: inverte o tema, fundo de tinta e texto de papel, com seta |
 | `@muriki/popover` | `registry:ui` | superfície flutuante em `--float`, raio de recipiente |
 | `@muriki/dropdown-menu` | `registry:ui` | item de 28px, atalho em mono, destrutivo tingido |

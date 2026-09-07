@@ -231,6 +231,68 @@
       "docs": "Erro controlado de fora: `invalid` no Field e um <FieldError> renderizado só quando há mensagem. FieldHeader põe uma ação à direita do label."
     },
     {
+      "name": "textarea",
+      "type": "registry:ui",
+      "title": "Textarea",
+      "description": "O mesmo campo do Input, só que alto: divide as variantes e os estados por inputVariants, então os dois nunca divergem. autoResize cresce com o texto.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/input"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/textarea.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro."
+    },
+    {
+      "name": "radio-group",
+      "type": "registry:ui",
+      "title": "Radio Group",
+      "description": "O checkbox redondo: vazio é encaixe, marcado é chapado. A diferença que importa é de contrato — checkbox é independente, radio é excludente.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/radio-group.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "select",
+      "type": "registry:ui",
+      "title": "Select",
+      "description": "Duas metades com dois donos: o gatilho é CAMPO (superfície --field, altura e raio do Input) e a lista é SUPERFÍCIE FLUTUANTE (--float, item de 28px). O caret não gira — quem diz que abriu é a lista.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/select.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Base UI: o valor é do tipo que você passar, não a string que o <select> nativo obriga. Passe `items` (um mapa valor→rótulo) no Select: a lista vive num portal que só monta ao abrir, então sem esse mapa o gatilho mostra o valor cru antes da primeira abertura."
+    },
+    {
       "name": "tooltip",
       "type": "registry:ui",
       "title": "Tooltip",
