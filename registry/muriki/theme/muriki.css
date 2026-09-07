@@ -39,11 +39,17 @@
   --sunken: oklch(0.955 0.012 95);
 
   /* Superfície do RAIL. No claro é a peça por cima: card branco sobre o
-     papel do conteúdo. No escuro ela assenta como encaixe, mais escura que
-     a página — a mesma física do cursor do view-toggle, no tamanho de uma
-     tela. Precisar de um oklch solto dentro do componente era o sinal de
-     que faltava este token. */
-  --rail: oklch(0.993 0.002 85);
+     papel do conteúdo. Precisar de um oklch solto dentro do componente era
+     o sinal de que faltava este token.
+
+     O RAIL ESTÁ NO NÍVEL DO CARTÃO, NOS DOIS TEMAS. Ele vinha do platform
+     mais claro que o conteúdo no claro (0.99 contra 0.98) e mais escuro no
+     escuro (0.16 contra 0.18) — a mesma peça pairando num tema e afundando
+     no outro. A casa já tem a regra escrita: o que paira nunca afunda. Um
+     token que muda de lado entre os temas não é uma decisão, é um descuido
+     herdado, e é por isso que aqui ele aponta para o card em vez de trazer
+     um valor próprio: se o nível do que paira mudar, o rail vai junto. */
+  --rail: var(--card);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
      mais claro da página. No escuro é o sunken — o campo é um encaixe,
@@ -136,7 +142,9 @@
 
   --sunken: oklch(0.14 0.004 107);
   --field: oklch(0.14 0.004 107);
-  --rail: oklch(0.155 0.004 107);
+  /* 0.21 (o card), não 0.155. Ver a nota no tema claro: o rail paira nos
+     dois temas, e antes ele afundava aqui. */
+  --rail: var(--card);
 
   --float: 0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4),
     inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);

@@ -12,8 +12,8 @@ const cap = t => `<span class="cap">${t}</span>`;
 const ELEV_CLARO = `box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px ${N.borderInput};`;
 const ELEV_ESCURO = 'box-shadow:inset 0 1px 3px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px oklch(0.135 0.004 107);';
 
-const RAIL_CLARO = 'oklch(0.993 0.002 85)';
-const RAIL_ESCURO = 'oklch(0.155 0.004 107)';
+const RAIL_CLARO = 'oklch(0.993 0.002 85)';    // = --card no claro
+const RAIL_ESCURO = 'oklch(0.21 0.004 107)';   // = --card no escuro
 
 const item = (txt, ativo = false, escuro = false) => `
 <div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
@@ -37,6 +37,18 @@ const regua = (altura, fonte, raio, icone, rotulo) => `
     <span style="width:${icone}px;height:${icone}px;border-radius:4px;background:${N.brand};opacity:0.75;flex-shrink:0;"></span>
     Perfil
   </span>
+  </span>
+  ${cap(rotulo)}
+</span>`;
+
+
+// dois planos lado a lado, para comparar valor
+const planos = (railBg, contBg, escuro, rotulo) => `
+<span style="display:inline-flex;flex-direction:column;gap:7px;">
+  <span style="display:flex;width:250px;height:78px;border-radius:10px;overflow:hidden;
+    box-shadow:inset 0 0 0 1px ${escuro ? 'oklch(0.30 0.005 107)' : N.border};">
+    <span style="width:96px;background:${railBg};"></span>
+    <span style="flex:1;background:${contBg};"></span>
   </span>
   ${cap(rotulo)}
 </span>`;
@@ -106,6 +118,12 @@ const body = `
       rotulado('errado — o que veio portado', regua(40, 16, 8.4, 18, '40 · 16 · 8,4 · 18')) +
       rotulado('certo — a régua da casa', regua(36, 13, 9, 16, '36 · 13 · 9 · 16')) +
       rotulado('sub-item', regua(28, 12.5, 7, 16, '28 · 12,5 · 7 · 16')))}
+
+    ${regra('06', 'O rail PAIRA nos dois temas',
+      'Ele chegou do platform mais claro que o conteúdo no claro e mais escuro no escuro — a mesma peça pairando num tema e afundando no outro, o que contradiz a regra que a casa já tinha escrita. Agora o token aponta para o do cartão: o rail está no nível do que paira, e se esse nível mudar ele vai junto.',
+      rotulado('errado — escuro invertido', planos('oklch(0.155 0.004 107)', 'oklch(0.175 0.004 107)', true, 'rail 0,155 · conteúdo 0,175')) +
+      rotulado('certo — escuro', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,21 · conteúdo 0,175')) +
+      rotulado('certo — claro', planos(RAIL_CLARO, N.bg, false, 'rail 0,993 · conteúdo 0,98')))}
   </div>
 </div>`;
 

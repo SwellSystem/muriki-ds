@@ -43,6 +43,12 @@
  * um caret cortado ao meio pela borda do rail. Agora todo filho que não é o
  * primeiro some no modo ícone, que é o que "recolhido" quer dizer.
  *
+ * HOVER E ATIVO SÃO A MESMA FAMÍLIA. O hover vinha `bg-muted`, um neutro
+ * amarelado, sobre um rail que está no nível do cartão — dava uma mancha
+ * cinza que não conversava com o azul do item ativo. Agora o hover é a
+ * mesma tinta do ativo com metade da força: passar o mouse prenuncia o
+ * estado selecionado em vez de anunciar outro.
+ *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
  * regra que o Sheet já declara — o painel perde o raio do lado encostado —
@@ -119,7 +125,11 @@ function useIsMobile() {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_PINNED_COOKIE_NAME = "sidebar_pinned"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+// 13.75rem = 220px. Eram 256 (o padrão do shadcn, e o mesmo do platform)
+// para 92px de conteúdo: ícone 16, respiro 10 e o rótulo mais largo com 66.
+// Sobravam 163px de coluna vazia, e o fundo do item ativo era uma laje de
+// 235px ao lado de 66px de texto.
+const SIDEBAR_WIDTH = "13.75rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -759,7 +769,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-[9px] px-2.5 text-left text-[13px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-[9px] group-data-[collapsible=icon]:px-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>*:not(:first-child)]:hidden",
+  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-[9px] px-2.5 text-left text-[13px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-[9px] group-data-[collapsible=icon]:px-0! hover:bg-primary-subtle/50 group-data-[collapsible=icon]:hover:bg-primary-subtle/50 focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>*:not(:first-child)]:hidden",
   {
     variants: {
       variant: {
