@@ -38,6 +38,11 @@
      o card, então reaproveitá-lo inverteria o relevo. */
   --sunken: oklch(0.955 0.012 95);
 
+  /* Superfície do campo de texto. No claro é o card — o campo é o objeto
+     mais claro da página. No escuro é o sunken — o campo é um encaixe,
+     mais escuro que o card. A troca vive aqui, não numa classe dark:. */
+  --field: oklch(0.993 0.002 85);
+
   /* série de dados — avatares tintados e a cor de epic dos blocos */
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
@@ -98,6 +103,7 @@
   --warning: oklch(0.75 0.15 60);
 
   --sunken: oklch(0.14 0.004 107);
+  --field: oklch(0.14 0.004 107);
   --chart-1: oklch(0.79 0.17 70.25);
   --chart-3: oklch(0.56 0.21 269.11);
   --border: oklch(0.30 0.005 107);
@@ -144,6 +150,7 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-sunken: var(--sunken);
+  --color-field: var(--field);
   --color-chart-1: var(--chart-1);
   --color-chart-3: var(--chart-3);
   --color-border: var(--border);

@@ -1,0 +1,35 @@
+// Captura da tela de login para o README — feita de um app consumidor REAL
+// rodando o item do registry (por padrão o muriki-poc em localhost:3000,
+// na rota /login). Mesma honestidade de amostra dos blocos: o que aparece
+// no README é o que o `shadcn add` entrega.
+//
+//   cd design && bun gen-login.mjs [url-do-consumidor]
+//
+// Gera ../.github/readme/tela-login-{clara,escura}.png em 2x.
+// Requer o app consumidor de pé e o Chrome na máquina.
+import { existsSync, mkdirSync } from 'node:fs';
+
+const BASE = process.argv[2] ?? 'http://localhost:3000';
+const W = 1180, H = 920;
+
+// O binário do Chrome não tem o mesmo nome nos dois sistemas.
+const CANDIDATOS = [
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
+];
+const chrome = CANDIDATOS.find(existsSync) ?? Bun.which('google-chrome');
+if (!chrome) { console.error('Chrome não encontrado.'); process.exit(1); }
+
+const outDir = new URL('../.github/readme/', import.meta.url).pathname;
+mkdirSync(outDir, { recursive: true });
+
+for (const escuro of [false, true]) {
+  const png = `${outDir}tela-login-${escuro ? 'escura' : 'clara'}.png`;
+  const url = `${BASE}/login${escuro ? '?dark=1' : ''}`;
+  const p = Bun.spawnSync([chrome, '--headless=new', '--disable-gpu', '--hide-scrollbars',
+    '--force-device-scale-factor=2', '--virtual-time-budget=15000',
+    `--window-size=${W},${H}`, `--screenshot=${png}`, url]);
+  if (p.exitCode !== 0) { console.error(p.stderr.toString()); process.exit(1); }
+  console.log(`login ${escuro ? 'escura' : 'clara'} → ${png}`);
+}

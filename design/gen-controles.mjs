@@ -8,6 +8,7 @@ const ico = {
   search:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>`,
   check:`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4.5 4.5L19 7"/></svg>`,
   alert:`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.6" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg>`,
+  mail:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>`,
   spin:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9" opacity="0.9"/><path d="M21 12a9 9 0 0 0-9-9" opacity="0.25"/></svg>`,
 };
 
@@ -64,6 +65,28 @@ const inputVariacoes = `
   ${field('Descrição', `<div style="${input('rest')}height:74px;align-items:flex-start;padding-top:9px;line-height:19px;color:${N.body};">Sincronizar o spec e regenerar o client.</div>`, 'textarea')}
 </div>`;
 
+// A voz editorial do campo: só o fio de baixo, sem fundo. Vive nas telas de
+// entrada (login, onboarding), onde o campo fica ao lado de um título grande
+// e um retângulo fechado competiria com ele. O label vira caption mono.
+const under = (state = 'rest') => {
+  const fio = { rest: HAIR, hover: 'oklch(84% 0.011 96)', focus: N.brand, error: N.danger }[state];
+  return `height:44px;padding:0 0 0 26px;font-size:15px;display:flex;align-items:center;gap:8px;box-sizing:border-box;background:transparent;box-shadow:inset 0 -1px 0 ${fio};`;
+};
+const capMono = (t) => `<span style="font-family:'Geist Mono',ui-monospace,monospace;font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:${N.muted};">${t}</span>`;
+const fieldUnder = (lbl, inner, hint, hintColor) => `
+<div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+  ${capMono(lbl)}
+  <div style="position:relative;">${inner}</div>
+  ${hint ? `<span style="font-size:11.5px;line-height:15px;color:${hintColor || N.muted};display:flex;align-items:center;gap:5px;">${hint}</span>` : ''}
+</div>`;
+const mail = `<span style="position:absolute;left:0;top:50%;transform:translateY(-50%);color:${N.subtle};display:flex;">${ico.mail}</span>`;
+const inputEditorial = `
+<div style="display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:16px 20px;">
+  ${fieldUnder('Email', `${mail}<div style="${under('rest')}color:${N.subtle};">seu@email.com</div>`, 'underline · repouso')}
+  ${fieldUnder('Email', `${mail}<div style="${under('focus')}color:${N.body};">guilherme@muriki.app<span style="width:1px;height:17px;background:${N.brand};margin-left:-7px;"></span></div>`, 'foco')}
+  ${fieldUnder('Email', `${mail}<div style="${under('error')}color:${N.body};">guilherme@</div>`, `${ico.alert}Digite um email válido`, N.danger)}
+</div>`;
+
 // ---- Seleção
 const cb = (st) => ({
   vazio:`background:oklch(95.5% 0.012 95);box-shadow:inset 0 1px 2px rgba(0,0,0,0.09), inset 0 0 0 1px ${N.borderInput};`,
@@ -86,12 +109,12 @@ const selecao = `
 
 const body = `
 <div style="display:flex;flex-direction:column;margin-top:-8px;">
-  ${rail('Input', 'shadcn Input<br>Textarea · Select', [inputEstados, inputVariacoes].join(''))}
+  ${rail('Input', 'shadcn Input<br>Textarea · Select', [inputEstados, inputVariacoes, inputEditorial].join(''))}
   ${rail('Checkbox<br>Radio · Switch', 'shadcn<br>seleção', selecao, true)}
 </div>`;
 
 const html = page('Campos e seleção',
-  'Input, Textarea, Select, Checkbox, RadioGroup e Switch. O campo é chapado com filete de 1px por dentro — sem sulco, sem sombra. Botão tem prancha própria.',
+  'Input, Textarea, Select, Checkbox, RadioGroup e Switch. O campo é chapado com filete de 1px por dentro — sem sulco, sem sombra. A variante underline é a exceção editorial: só o fio de baixo, para tela de entrada. Botão tem prancha própria.',
   body);
 await Bun.write('Controles.dc.html', html);
 console.log('Controles.dc.html', html.length, 'bytes');
