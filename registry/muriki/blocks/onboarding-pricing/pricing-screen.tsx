@@ -201,7 +201,12 @@ export function PricingScreen({
                     <PlanFeatures
                       items={plan.features}
                       title={plan.featuresTitle}
-                      accent={plan.badge ? "sparkle" : "check"}
+                      // A faísca marca o que o plano ACRESCENTA em relação
+                      // ao anterior, e é isso que o título "Tudo do X, mais"
+                      // anuncia. Amarrada ao `badge`, o Empresa mostrava
+                      // check com o mesmo título que o Time mostrava faísca:
+                      // dois sinais para o mesmo significado, na mesma grade.
+                      accent={plan.featuresTitle ? "sparkle" : "check"}
                     />
                   }
                   extraSlots={plan.extra}
