@@ -25,7 +25,6 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { useTranslate } from "@/lib/i18n"
-import { cn } from "@/lib/utils"
 
 import { TaskModalAttachments } from "./task-modal-attachments"
 import { TaskModalDescription } from "./task-modal-description"
@@ -314,12 +313,8 @@ export function TaskModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         anatomy="framed"
-        className={cn(
-          isFull
-            // tela cheia encosta nas quatro bordas: aí o raio some de verdade
-            ? "h-dvh max-h-none w-screen max-w-none rounded-none sm:max-w-none"
-            : "max-h-[86vh] w-full sm:max-w-[600px]"
-        )}
+        fullscreen={isFull}
+        className={isFull ? undefined : "max-h-[86vh] sm:max-w-[600px]"}
         data-testid={isFull ? "task-modal-full" : "task-modal-central"}
       >
         <DialogTitle className="sr-only">{a11yTitle}</DialogTitle>

@@ -77,6 +77,14 @@ interface DialogContentProps extends DialogPrimitive.Popup.Props {
   closeLabel?: string
   /** `padded` (padrão) é solto; `framed` divide em faixas com filete. */
   anatomy?: DialogAnatomy
+  /**
+   * Cobre a janela inteira. Quando cobre, DEIXA DE PAIRAR: sai o raio, sai a
+   * sombra e sai o filete do `--float`. Aquele filete é desenhado por dentro,
+   * então numa peça do tamanho exato da tela ele vira um contorno correndo
+   * pelas quatro bordas — e uma superfície que é a página não precisa se
+   * anunciar como peça sobre a página.
+   */
+  fullscreen?: boolean
 }
 
 function DialogContent({
@@ -85,6 +93,7 @@ function DialogContent({
   showClose = true,
   closeLabel = "Fechar",
   anatomy = "padded",
+  fullscreen = false,
   ...props
 }: DialogContentProps) {
   const framed = anatomy === "framed"
@@ -95,11 +104,14 @@ function DialogContent({
       <DialogPrimitive.Popup
         data-slot="dialog-content"
         data-anatomy={anatomy}
+        data-fullscreen={fullscreen || undefined}
         className={cn(
-          "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
-          "max-h-[calc(100dvh-2rem)] flex-col sm:max-w-lg",
+          "fixed top-1/2 left-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 flex-col",
+          fullscreen
+            ? "h-dvh max-h-none w-screen max-w-none rounded-none shadow-none"
+            : "max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100vw-2rem)] rounded-[var(--radius-float)] shadow-[var(--float-strong)] sm:max-w-lg",
           framed ? "gap-0 overflow-hidden" : "gap-4 overflow-y-auto p-5",
-          "rounded-[var(--radius-float)] bg-popover text-popover-foreground shadow-[var(--float-strong)] outline-none",
+          "bg-popover text-popover-foreground outline-none",
           "transition-[opacity,transform] duration-150 ease-out",
           "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
           "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
