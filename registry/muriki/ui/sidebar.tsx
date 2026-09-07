@@ -54,10 +54,17 @@
  * moldura toma a borda da rampa e o palco fica no meio. Quem decide isso é
  * o token `--rail`, não este arquivo.
  *
- * A BORDA LIVRE É A DO CURSOR DO VIEW-TOGGLE: filete desenhado POR DENTRO,
- * no `--input`, mais uma elevação ambiente curta. Desenhar por dentro é o
- * que faz a linha abraçar o raio e não somar ao tamanho da caixa, e é a
+ * A BORDA LIVRE É UMA SÓ, e é a do cursor do view-toggle: filete desenhado
+ * POR DENTRO mais uma elevação ambiente curta. Desenhar por dentro é o que
+ * faz a linha abraçar o raio e não somar ao tamanho da caixa, e é a
  * diferença entre uma aresta e um contorno.
+ *
+ * ERAM DUAS. O container trazia um `border-r` de verdade e o interno trazia
+ * o filete por dentro, empilhados no mesmo pixel — o mesmo defeito que o
+ * Sheet já tinha mostrado quando o modal de task chegou. Só se percebia
+ * medindo: apagar uma das duas não mudava nada na tela. Ficou a de dentro,
+ * e no `--border`, não no `--input`: o filete do cursor é forte porque a
+ * peça é pequena; correndo a altura inteira da tela ele vira régua.
  *
  * Só na borda LIVRE. O filete do cursor é `inset 0 0 0 1px`, que corre pelos
  * quatro lados; numa peça que toca três bordas da tela isso vira um
@@ -396,7 +403,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--input)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--input)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--border)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--border)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)]",
           className
         )}
         {...props}
@@ -506,7 +513,7 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === "floating"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-border/20 group-data-[side=right]:border-l group-data-[side=right]:border-border/20",
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
           // Eixo "pin": desafixada, vira um CARTÃO flutuante (margem, cantos
           // arredondados, sombra) — fiel ao mock. O reveal/hide (transform +
           // opacity + transição) é controlado inline via `floatStyle`.
@@ -518,7 +525,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--input)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--input)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--border)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--border)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>
