@@ -178,12 +178,19 @@ export function LoginForm({
       ? t("login.totp.verify_submit")
       : t("login.submit")
 
+  // No passo do código, a credencial já foi aceita: manter e-mail, senha e
+  // provedores na tela só empurra o botão para fora da dobra.
+  const credenciais = step === "credentials"
+
   const PasswordIcon = showPassword ? LockOpen : Lock
   const EyeIcon = showPassword ? EyeSlash : Eye
   const PrimaryIcon = primaryProvider?.icon
 
   return (
-    <div className={cn("flex flex-col gap-8 md:gap-10", className)}>
+    // O ritmo responde à ALTURA da janela, não só à largura: esta é uma
+    // tela de viewport inteiro, e numa janela baixa a folga que sobra em
+    // cima é o botão de entrar que falta embaixo.
+    <div className={cn("flex flex-col gap-7 md:gap-8 [@media(min-height:781px)_and_(max-height:900px)]:gap-5 [@media(max-height:780px)]:gap-4", className)}>
       {/* rótulo de seção */}
       <div className="flex items-center gap-3">
         <span className={CAPTION}>{t("login.submit")}</span>
@@ -192,12 +199,13 @@ export function LoginForm({
       </div>
 
       {/* título */}
-      <div className="flex flex-col gap-4">
-        <h1 className="text-[clamp(2.5rem,9vw,3.75rem)] leading-none font-semibold tracking-[-0.03em] text-foreground-strong md:text-5xl">
+      <div className="flex flex-col gap-4 [@media(max-height:900px)]:gap-3">
+        <h1 className="text-[clamp(2.5rem,9vw,3.75rem)] leading-none font-semibold tracking-[-0.03em] text-foreground-strong md:text-5xl [@media(max-height:900px)]:text-4xl">
           {t("login.hero_line1")}
           <br />
           <span className="text-primary">{t("login.hero_line2")}</span>
         </h1>
+        {credenciais ? (
         <p className="text-sm text-muted-foreground md:text-base">
           {t("login.subtitle")}{" "}
           <Button
@@ -208,10 +216,12 @@ export function LoginForm({
             {t("login.create_account_link")}
           </Button>
         </p>
+        ) : null}
       </div>
 
-      {/* provedores — um primário largo, os outros numa fileira */}
-      {primaryProvider || providers.length > 0 ? (
+      {/* provedores — um primário largo, os outros numa fileira.
+          No passo do código eles somem: credencial já foi. */}
+      {credenciais && (primaryProvider || providers.length > 0) ? (
         <div className="flex flex-col gap-2.5">
           <span className={CAPTION}>{t("login.section_signin_with")}</span>
 
@@ -253,14 +263,18 @@ export function LoginForm({
       ) : null}
 
       {/* divisor */}
-      <div className="flex items-center gap-3">
-        <span className="h-px flex-1 bg-border" />
-        <span className={CAPTION}>{t("login.section_or")}</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
+      {credenciais ? (
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-border" />
+          <span className={CAPTION}>{t("login.section_or")}</span>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+      ) : null}
 
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
-        {/* email */}
+        {/* email + senha: só enquanto a credencial é o assunto */}
+        {credenciais ? (
+        <>
         <Field variant="editorial" invalid={!!errors.email}>
           <FieldLabel>{t("login.email_label")}</FieldLabel>
           <div className="relative">
@@ -331,6 +345,8 @@ export function LoginForm({
           {errors.password ? <FieldError>{errors.password}</FieldError> : null}
           <PasswordStrengthBar password={password} requirements className="pt-1" />
         </Field>
+        </>
+        ) : null}
 
         {/* segundo fator */}
         {step === "code" ? (
@@ -340,6 +356,9 @@ export function LoginForm({
               <div>
                 <p className="text-sm font-medium text-foreground-strong">{t("login.totp.title")}</p>
                 <p className="mt-1 text-xs text-muted-foreground">{t("login.totp.description")}</p>
+                {email.trim() ? (
+                  <p className="mt-1 font-mono text-[11px] text-muted-foreground">{email.trim()}</p>
+                ) : null}
               </div>
               <Field variant="editorial" invalid={!!errors.code}>
                 <FieldLabel>{t("login.totp.code_label")}</FieldLabel>
@@ -373,12 +392,14 @@ export function LoginForm({
         ) : null}
 
         {/* lembrar de mim */}
+        {credenciais ? (
         <Field className="flex-row items-center gap-2.5">
           <Checkbox checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked)} />
           <FieldLabel className="cursor-pointer text-sm font-normal text-muted-foreground">
             {t("login.remember_me")}
           </FieldLabel>
         </Field>
+        ) : null}
 
         {errors.form ? (
           <p role="alert" className="text-[11.5px] leading-[15px] text-destructive">

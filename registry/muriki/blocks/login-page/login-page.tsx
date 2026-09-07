@@ -108,7 +108,7 @@ export function LoginPage({
           <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[360px] bg-linear-to-b from-primary/[0.05] via-primary/[0.02] to-transparent lg:hidden" />
           <div aria-hidden className="pointer-events-none absolute -top-24 left-1/2 h-[280px] w-full max-w-[700px] -translate-x-1/2 rounded-full bg-primary/[0.07] blur-[120px] lg:hidden" />
 
-          <div className="relative z-10 flex flex-1 flex-col justify-center px-5 py-8 md:px-10 md:py-12 lg:grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,440px)_minmax(0,1fr)] lg:content-center lg:px-12 xl:px-20">
+          <div className="relative z-10 flex flex-1 flex-col justify-center px-5 py-8 md:px-10 md:py-12 [@media(min-height:781px)_and_(max-height:900px)]:py-6 [@media(max-height:780px)]:py-4 lg:grid lg:grid-cols-[minmax(0,0.8fr)_minmax(0,440px)_minmax(0,1fr)] lg:content-center lg:px-12 xl:px-20">
             <LoginForm
               {...form}
               onPasswordVisibilityChange={setPasswordVisible}

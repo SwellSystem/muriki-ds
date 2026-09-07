@@ -113,11 +113,13 @@ const STRINGS: Record<string, unknown> = {
     medium: "Média",
     strong: "Forte",
     "very-strong": "Muito forte",
+    // Rótulos curtos: os requisitos são uma fileira só embaixo da barra,
+    // e a frase inteira ("Pelo menos 1 número") quebraria em duas linhas.
     requirement: {
-      length: "Pelo menos 8 caracteres",
-      number: "Pelo menos 1 número",
-      lowercase: "Pelo menos 1 letra minúscula",
-      uppercase: "Pelo menos 1 letra maiúscula",
+      length: "8 caracteres",
+      number: "1 número",
+      lowercase: "1 minúscula",
+      uppercase: "1 maiúscula",
     },
   },
   login: {

@@ -296,6 +296,11 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **Tela de viewport inteiro não cresce embaixo do dedo.** No login, a
+  força da senha reserva a altura desde o início e os requisitos são uma
+  fileira só: digitar não pode empurrar o "Entrar" para fora da dobra. O
+  ritmo também responde à ALTURA da janela, e o passo do segundo fator
+  esconde a credencial que já passou.
 - **O campo tem superfície própria.** O token `--field` é card no claro e
   sunken no escuro: o campo é o objeto mais claro da página em um tema e um
   encaixe no outro. A troca vive no token, não numa classe `dark:`.
