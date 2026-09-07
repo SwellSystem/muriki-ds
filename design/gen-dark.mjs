@@ -54,6 +54,23 @@ const regras = `
          <span style="font-family:'Geist Mono',monospace;font-size:9.5px;color:${D.muted};">escuro — encaixe</span>
        </span>
      </div>`)}
+  ${regra('05', 'O que paira nunca afunda', 'Diálogo, popover, menu e sheet são as únicas peças que sobem nos DOIS temas — overlay que afunda desaparece. No claro a elevação vem da sombra caindo; no escuro, de um fio de luz na aresta de cima somado ao corpo mais claro. Vive em token (<span class="mono" style="color:' + D.brandInk + '">--float</span>), não em classe <span class="mono" style="color:' + D.brandInk + '">dark:</span>: são seis superfícies e uma decisão só. O véu é <span class="mono" style="color:' + D.brandInk + '">--scrim</span>, tinta do sistema — preto puro sobre papel quente esverdeia.',
+    `<div style="display:flex;gap:16px;align-items:center;">
+       <span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;">
+         <span style="position:relative;width:126px;height:46px;border-radius:10px;background:oklch(0.98 0.004 82);box-shadow:inset 0 0 0 1px oklch(0.94 0.01 100);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+           <span style="position:absolute;inset:0;background:oklch(0.32 0.02 248.5 / 0.30);"></span>
+           <span style="position:relative;width:86px;height:26px;border-radius:8px;background:oklch(0.993 0.002 85);box-shadow:0 10px 26px oklch(0.32 0.02 248.5 / 0.10), 0 2px 6px oklch(0.32 0.02 248.5 / 0.06), inset 0 0 0 1px oklch(0.90 0.008 96);"></span>
+         </span>
+         <span class="mono" style="font-size:9.5px;color:${D.muted};">claro — sombra caindo</span>
+       </span>
+       <span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;">
+         <span style="position:relative;width:126px;height:46px;border-radius:10px;background:oklch(0.175 0.004 107);box-shadow:inset 0 0 0 1px oklch(0.30 0.005 107);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+           <span style="position:absolute;inset:0;background:oklch(0.09 0.003 107 / 0.62);"></span>
+           <span style="position:relative;width:86px;height:26px;border-radius:8px;background:oklch(0.21 0.004 107);box-shadow:0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4), inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);"></span>
+         </span>
+         <span class="mono" style="font-size:9.5px;color:${D.muted};">escuro — fio de luz no topo</span>
+       </span>
+     </div>`)}
 </div>`;
 
 const ESTADOS = [['rest','repouso'],['hover','hover'],['active','pressionado'],['focus','foco'],['disabled','inativo']];
@@ -135,7 +152,7 @@ const login = `
 
 const body = `
 <div style="display:flex;flex-direction:column;gap:14px;">
-  <p class="sec-title" style="color:${D.muted};">As três regras da tradução</p>
+  <p class="sec-title" style="color:${D.muted};">As cinco regras da tradução</p>
   ${regras}
 </div>
 <div style="display:flex;flex-direction:column;margin-top:-4px;">
@@ -146,7 +163,7 @@ const body = `
 </div>`;
 
 const html = page('Dark',
-  'O escuro sai do grafite da logo (#242421, hue 107) — quente, não slate azul. Dark azulado é o default de tudo que se gera por aí e não diz nada da marca. Paridade com o claro, não um retoque. Toda decisão nova — família de botão sem fill, nove badges abafados, raio proporcional — chega aqui na mesma entrega. As três regras de tradução estão no topo para que a próxima cor não precise de palpite.',
+  'O escuro sai do grafite da logo (#242421, hue 107) — quente, não slate azul. Dark azulado é o default de tudo que se gera por aí e não diz nada da marca. Paridade com o claro, não um retoque. Toda decisão nova — família de botão sem fill, nove badges abafados, raio proporcional — chega aqui na mesma entrega. As cinco regras de tradução estão no topo para que a próxima cor não precise de palpite.',
   body, D.bg, D.body);
 await Bun.write('Dark.dc.html', html);
 console.log('Dark.dc.html', html.length, 'bytes');
