@@ -69,6 +69,7 @@
           "tone-purple-foreground": "oklch(0.43 0.15 300)",
           "tone-purple-dot": "oklch(0.56 0.185 300)",
           "sunken": "oklch(0.955 0.012 95)",
+          "field": "oklch(0.993 0.002 85)",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         },
@@ -129,6 +130,7 @@
           "tone-purple-foreground": "oklch(0.85 0.075 300)",
           "tone-purple-dot": "oklch(0.68 0.16 300)",
           "sunken": "oklch(0.14 0.004 107)",
+          "field": "oklch(0.14 0.004 107)",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         }
@@ -180,6 +182,47 @@
           "type": "registry:ui"
         }
       ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "title": "Input",
+      "description": "Chapado, filete de 1px por dentro — sem sulco, sem sombra. Superfície é o token --field: card no claro, sunken no escuro. Raio = altura ÷ 5. `underline` é a variante editorial, só o fio de baixo, para login e onboarding.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/input.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos."
+    },
+    {
+      "name": "field",
+      "type": "registry:ui",
+      "title": "Field",
+      "description": "Label, controle, dica e erro amarrados por id e aria-describedby (Base UI Field). Duas vozes de label: `default` 14/500 para formulário, `editorial` caption mono para as telas de entrada.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/field.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Erro controlado de fora: `invalid` no Field e um <FieldError> renderizado só quando há mensagem. FieldHeader põe uma ação à direita do label."
     },
     {
       "name": "row-actions",
@@ -463,6 +506,77 @@
           "display": "none"
         }
       }
+    },
+    {
+      "name": "password-strength",
+      "type": "registry:block",
+      "title": "Password Strength",
+      "description": "Régua de senha em quatro degraus (8+ caracteres, número, minúscula, maiúscula) e a barra de quatro segmentos num trilho afundado, com a lista de requisitos opcional.",
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/password-strength/password-strength.ts",
+          "type": "registry:component",
+          "target": "components/blocks/password-strength/password-strength.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/password-strength/password-strength-bar.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/password-strength/password-strength-bar.tsx"
+        }
+      ],
+      "docs": "A mesma régua serve login, cadastro e troca de senha — mantenha o backend com o mesmo checklist."
+    },
+    {
+      "name": "login-page",
+      "type": "registry:block",
+      "title": "Login Page",
+      "description": "Tela de entrada em duas metades: painel-encaixe com a atmosfera da marca, pitch e mascote espiando; formulário editorial com provedores em hierarquia, campos underline, força de senha, segundo fator inline e o único botão sólido da tela.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button",
+        "@muriki/checkbox",
+        "@muriki/input",
+        "@muriki/field",
+        "@muriki/password-strength",
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/login-page/login-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/login-page/login-page.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/login-page/login-form.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/login-page/login-form.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/login-page/microsoft-logo.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/login-page/microsoft-logo.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/login-page/types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/login-page/types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/login-page/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/login-page/index.ts"
+        }
+      ],
+      "docs": "O bloco não conhece roteador, i18next nem API: onSubmit e onVerifyCode devolvem um LoginResult. O mascote vem por prop (brand / brandHidden) — o registry não carrega binário."
     }
   ]
 }
