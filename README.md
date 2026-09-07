@@ -420,11 +420,13 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
 - **O rail recua, e por isso não projeta.** Encostado, ele fica um degrau
-  ABAIXO do conteúdo nos dois temas — 0,962 contra 0,980 no claro, 0,152
+  ABAIXO do conteúdo nos dois temas — 0,968 contra 0,980 no claro, 0,152
   contra 0,175 no escuro — e o relevo é só o filete da borda livre: uma
   sombra para fora diria o contrário do que a cor diz. Recuar também é a
   única direção em que `--rail` cabe com valor próprio, porque para cima,
-  no claro, o cartão já está em 0,993 e o branco é 1,0. Solto, o rail deixa
+  no claro, o cartão já está em 0,993 e o branco é 1,0. O teto do token no
+  claro é o `--muted` (0,97): acima dele o rail ficaria com a cor dos chips
+  que aparecem no conteúdo. Solto, o rail deixa
   de recuar: vira superfície de cartão e a sombra volta, pela mesma lógica
   de "encostado não tem raio". Os oito `--sidebar-*` do shadcn não existem
   aqui, eram cópias das cores base.

@@ -14,7 +14,7 @@ const ELEV_ESCURO = 'box-shadow:inset -1px 0 0 oklch(0.28 0.005 107);';
 // Solto, deixa de recuar: superfície de cartão e sombra de volta.
 const ELEV_SOLTO = 'box-shadow:0 18px 45px -32px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.08);';
 
-const RAIL_CLARO = 'oklch(0.962 0.010 94)';    // entre o conteúdo e o sunken
+const RAIL_CLARO = 'oklch(0.968 0.009 93)';    // entre o conteúdo e o muted
 const RAIL_ESCURO = 'oklch(0.152 0.004 107)';  // entre o conteúdo e o sunken
 
 const item = (txt, ativo = false, escuro = false) => `
@@ -126,7 +126,7 @@ const body = `
     ${regra('06', 'O rail RECUA nos dois temas',
       'Ele chegou do platform mais claro que o conteúdo no claro e mais escuro no escuro — a mesma peça avançando num tema e recuando no outro. Agora recua sempre: o conteúdo é o palco e a navegação é a moldura. E recuar é a única direção em que este token cabe com valor próprio: para cima, no claro, o cartão já está em 0,993 e o branco é 1,0, então um rail acima do conteúdo teria que emprestar a cor do cartão.',
       rotulado('errado — claro acima', planos('oklch(0.993 0.002 85)', N.bg, false, 'rail 0,993 — a cor é a do cartão')) +
-      rotulado('certo — claro', planos(RAIL_CLARO, N.bg, false, 'rail 0,962 · conteúdo 0,98')) +
+      rotulado('certo — claro', planos(RAIL_CLARO, N.bg, false, 'rail 0,968 · conteúdo 0,98')) +
       rotulado('certo — escuro', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,152 · conteúdo 0,175')))}
   </div>
 </div>`;

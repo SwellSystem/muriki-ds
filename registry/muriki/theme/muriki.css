@@ -55,8 +55,13 @@
      Para baixo sobra: 0.980 do conteúdo, 0.962 aqui, 0.955 do sunken.
 
      Fica entre o conteúdo e o sunken de propósito. O rail recua, mas menos
-     que um campo: campo é buraco, rail é plano. */
-  --rail: oklch(0.962 0.010 94);
+     que um campo: campo é buraco, rail é plano.
+
+     No claro o teto deste token é o `--muted` (0.97): acima dele o rail
+     passaria a ter a cor dos chips e das faixas de hover que aparecem no
+     conteúdo. 0.968 é o mais claro que ele pode ser sem essa colisão, e
+     ainda guarda um degrau real de 0.012 até a página. */
+  --rail: oklch(0.968 0.009 93);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
      mais claro da página. No escuro é o sunken — o campo é um encaixe,
