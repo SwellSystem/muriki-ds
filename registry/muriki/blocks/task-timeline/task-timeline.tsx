@@ -57,7 +57,7 @@ const statusBarBg: Record<TaskTableStatus, string> = {
   active: "bg-success",
   progress: "bg-primary",
   blocked: "bg-destructive",
-  done: "bg-[color-mix(in_oklch,var(--muted-foreground)_70%,var(--card))]",
+  done: "bg-[color-mix(in_oklab,var(--muted-foreground)_70%,var(--card))]",
 }
 
 const statusBorderClass: Record<TaskTableStatus, string> = {
@@ -71,11 +71,11 @@ const railClass: Record<TaskTableStatus, string> = {
   active: "bg-success",
   progress: "bg-primary",
   blocked: "bg-destructive",
-  done: "bg-[color-mix(in_oklch,var(--muted-foreground)_40%,transparent)]",
+  done: "bg-[color-mix(in_oklab,var(--muted-foreground)_40%,transparent)]",
 }
 
 const kindIconWrapperClass: Record<TaskTableKind, string> = {
-  epic: "bg-[color-mix(in_oklch,var(--chart-3)_14%,transparent)] text-[var(--chart-3)]",
+  epic: "bg-[color-mix(in_oklab,var(--chart-3)_14%,transparent)] text-[var(--chart-3)]",
   task: "bg-primary/14 text-primary",
   sub: "bg-muted text-muted-foreground",
 }
@@ -440,7 +440,7 @@ export function TaskTimeline({
               className={cn(
                 "relative flex w-full items-center gap-2 overflow-hidden rounded-md border border-border bg-card py-2.5 pr-3 pl-3.5 text-left transition-colors",
                 onTaskSelect &&
-                  "hover:bg-[color-mix(in_oklch,var(--primary)_4%,var(--card))]",
+                  "hover:bg-[color-mix(in_oklab,var(--primary)_4%,var(--card))]",
                 "disabled:cursor-default",
                 task.depth === 1 && "ml-3",
                 task.depth >= 2 && "ml-8"
@@ -496,7 +496,7 @@ export function TaskTimeline({
         {/* Sidebar */}
         <aside className="z-10 flex flex-col overflow-hidden border-r border-border bg-card">
           <header
-            className="flex shrink-0 items-end justify-between border-b border-border bg-[color-mix(in_oklch,var(--muted)_40%,var(--card))] px-3 pb-2 text-[10.5px] font-medium tracking-widest text-muted-foreground uppercase"
+            className="flex shrink-0 items-end justify-between border-b border-border bg-[color-mix(in_oklab,var(--muted)_40%,var(--card))] px-3 pb-2 text-[10.5px] font-medium tracking-widest text-muted-foreground uppercase"
             style={{ height: HEADER_HEIGHT }}
           >
             <span>{t("task_timeline.column_task")}</span>
@@ -530,11 +530,11 @@ export function TaskTimeline({
                       "[height:36px]",
                       onTaskSelect && "cursor-pointer",
                       isParent
-                        ? "bg-[color-mix(in_oklch,var(--muted)_45%,var(--card))]"
+                        ? "bg-[color-mix(in_oklab,var(--muted)_45%,var(--card))]"
                         : "bg-card",
                       task.selected
-                        ? "bg-[color-mix(in_oklch,var(--accent)_22%,var(--card))]"
-                        : "hover:bg-[color-mix(in_oklch,var(--primary)_4%,var(--card))]"
+                        ? "bg-[color-mix(in_oklab,var(--accent)_22%,var(--card))]"
+                        : "hover:bg-[color-mix(in_oklab,var(--primary)_4%,var(--card))]"
                     )}
                     style={{ paddingLeft: 12 + indentPx }}
                   >
@@ -611,7 +611,7 @@ export function TaskTimeline({
           <div style={{ width: gridWidth, minWidth: gridWidth }}>
             {/* Sticky header (months + days) */}
             <div
-              className="sticky top-0 z-20 flex flex-col border-b border-border bg-[color-mix(in_oklch,var(--muted)_40%,var(--card))]"
+              className="sticky top-0 z-20 flex flex-col border-b border-border bg-[color-mix(in_oklab,var(--muted)_40%,var(--card))]"
               style={{ height: HEADER_HEIGHT }}
             >
               <div className="flex h-[22px] items-center border-b border-border/50 text-[10.5px] font-medium tracking-widest text-muted-foreground uppercase">
@@ -632,7 +632,7 @@ export function TaskTimeline({
                     className={cn(
                       "flex h-full shrink-0 flex-col items-center justify-center border-r border-border/35 text-center font-mono text-[11px] leading-tight",
                       day.isWeekend &&
-                        "bg-[color-mix(in_oklch,var(--muted)_35%,transparent)]",
+                        "bg-[color-mix(in_oklab,var(--muted)_35%,transparent)]",
                       day.isToday
                         ? "font-semibold text-primary"
                         : "text-muted-foreground"
@@ -711,7 +711,7 @@ export function TaskTimeline({
               {/* Today vertical line */}
               {todayCol >= 0 && (
                 <div
-                  className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[color-mix(in_oklch,var(--primary)_60%,transparent)]"
+                  className="pointer-events-none absolute top-0 bottom-0 z-[1] w-px bg-[color-mix(in_oklab,var(--primary)_60%,transparent)]"
                   style={{ left: todayCol * DAY_WIDTH + 18 }}
                 >
                   <span className="absolute -top-1 -left-[3px] size-[7px] rounded-full bg-primary" />
@@ -752,7 +752,7 @@ export function TaskTimeline({
                     className={cn(
                       "absolute left-0 flex border-b border-border/60",
                       isParent &&
-                        "bg-[color-mix(in_oklch,var(--muted)_45%,var(--card))]"
+                        "bg-[color-mix(in_oklab,var(--muted)_45%,var(--card))]"
                     )}
                     style={{
                       top,
@@ -767,7 +767,7 @@ export function TaskTimeline({
                         className={cn(
                           "shrink-0 border-r border-border/25",
                           day.isWeekend &&
-                            "bg-[color-mix(in_oklch,var(--muted)_35%,transparent)]"
+                            "bg-[color-mix(in_oklab,var(--muted)_35%,transparent)]"
                         )}
                         style={{ width: DAY_WIDTH }}
                       />

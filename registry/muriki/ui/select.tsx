@@ -28,7 +28,7 @@ const triggerVariants = cva(
     "data-[placeholder]:text-muted-foreground/70",
     "data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:bg-secondary data-disabled:opacity-70",
     "shadow-[inset_0_0_0_1px_var(--input)]",
-    "hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--input)_86%,var(--foreground))]",
+    "hover:shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--input)_86%,var(--foreground))]",
     "focus-visible:shadow-[inset_0_0_0_1px_var(--primary)] focus-visible:ring-[3px] focus-visible:ring-ring/20",
     "data-invalid:shadow-[inset_0_0_0_1px_var(--destructive)] data-invalid:ring-[3px] data-invalid:ring-destructive/15",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",

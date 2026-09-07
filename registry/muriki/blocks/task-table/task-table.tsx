@@ -263,11 +263,18 @@ export function TaskTable({
 
       <div className="relative w-full overflow-x-auto">
         <table className="w-full min-w-[680px] border-collapse">
-          <thead>
+          {/* O cabeçalho separa por SUPERFÍCIE, não por linha. Ele tinha um
+              `border-b` em `--border` em cada célula — nove linhas desenhadas
+              lado a lado para formar uma só, e com o filete recuado na rampa
+              nova ela ficou a 0,45 de brilho da página, ou seja, invisível.
+              Agora é uma faixa um degrau abaixo da fileira mais escura da
+              tabela: o cabeçalho é o topo da superfície, não um rótulo com
+              um traço embaixo. */}
+          <thead className="[&_th]:bg-[color-mix(in_oklab,var(--muted)_85%,var(--card))]">
             <tr>
               <th
                 scope="col"
-                className="w-[22px] border-b border-border px-2.5 py-2 pl-3 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="w-[22px] px-2.5 py-2 pl-3 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {/* No modo done (onToggleDone presente), seleção em massa não se aplica */}
                 {!isDoneMode && (
@@ -290,45 +297,45 @@ export function TaskTable({
               </th>
               <th
                 scope="col"
-                className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {t("task_table.column.task")}
               </th>
               {showOwnerColumn && (
                 <th
                   scope="col"
-                  className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                  className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
                 >
                   {t("task_table.column.owner")}
                 </th>
               )}
               <th
                 scope="col"
-                className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {t("task_table.column.status")}
               </th>
               <th
                 scope="col"
-                className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {t("task_table.column.priority")}
               </th>
               <th
                 scope="col"
-                className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {t("task_table.column.subtasks")}
               </th>
               <th
                 scope="col"
-                className="border-b border-border px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
+                className="px-2.5 py-2 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
                 {t("task_table.column.due")}
               </th>
               <th
                 scope="col"
-                className="w-0 border-b border-border px-1 py-2"
+                className="w-0 px-1 py-2"
               />
             </tr>
           </thead>

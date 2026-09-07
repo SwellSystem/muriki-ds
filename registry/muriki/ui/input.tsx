@@ -45,7 +45,7 @@ export const inputVariants = cva(
          * resposta, e resposta pode ser forte.
          */
         default: [
-          "shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--input)_45%,var(--field))]",
+          "shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--input)_45%,var(--field))]",
           "hover:shadow-[inset_0_0_0_1px_var(--input)]",
           "focus-visible:shadow-[inset_0_0_0_1px_var(--primary)] focus-visible:ring-[3px] focus-visible:ring-ring/20",
           "aria-invalid:shadow-[inset_0_0_0_1px_var(--destructive)] aria-invalid:ring-[3px] aria-invalid:ring-destructive/15",
@@ -55,7 +55,7 @@ export const inputVariants = cva(
         underline: [
           "bg-transparent",
           "shadow-[inset_0_-1px_0_var(--input)]",
-          "hover:shadow-[inset_0_-1px_0_color-mix(in_oklch,var(--input)_86%,var(--foreground))]",
+          "hover:shadow-[inset_0_-1px_0_color-mix(in_oklab,var(--input)_86%,var(--foreground))]",
           "focus-visible:shadow-[inset_0_-1px_0_var(--primary)]",
           "aria-invalid:shadow-[inset_0_-1px_0_var(--destructive)]",
           "data-invalid:shadow-[inset_0_-1px_0_var(--destructive)]",

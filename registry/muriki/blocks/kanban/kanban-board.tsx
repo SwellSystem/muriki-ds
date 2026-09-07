@@ -600,7 +600,7 @@ function DragPreviewCard({ task }: { task: KanbanTask }) {
         "pointer-events-none w-72",
         "scale-[1.04] -rotate-2",
         "rounded-md ring-2 ring-primary/40 ring-offset-4 ring-offset-background/60",
-        "shadow-[0_20px_60px_-12px_color-mix(in_oklch,var(--foreground)_30%,transparent)]"
+        "shadow-[0_20px_60px_-12px_color-mix(in_oklab,var(--foreground)_30%,transparent)]"
       )}
     >
       <KanbanCard task={task} />

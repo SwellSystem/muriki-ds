@@ -32,8 +32,8 @@ import type {
 
 const avatarToneClass: Record<TaskTableAvatarTone, string> = {
   a1: "bg-primary/14 text-primary",
-  a2: "bg-[color-mix(in_oklch,var(--chart-3)_14%,var(--card))] text-[var(--chart-3)]",
-  a3: "bg-[color-mix(in_oklch,var(--chart-1)_24%,var(--card))] text-[oklch(0.42_0.1_70)]",
+  a2: "bg-[color-mix(in_oklab,var(--chart-3)_14%,var(--card))] text-[var(--chart-3)]",
+  a3: "bg-[color-mix(in_oklab,var(--chart-1)_24%,var(--card))] text-[oklch(0.42_0.1_70)]",
   a4: "bg-muted text-muted-foreground",
 }
 
@@ -41,7 +41,7 @@ const statusRailClass: Record<TaskTableStatus, string> = {
   active: "bg-success",
   progress: "bg-primary",
   blocked: "bg-destructive",
-  done: "bg-[color-mix(in_oklch,var(--muted-foreground)_40%,transparent)]",
+  done: "bg-[color-mix(in_oklab,var(--muted-foreground)_40%,transparent)]",
 }
 
 const statusTextClass: Record<TaskTableStatus, string> = {
@@ -59,7 +59,7 @@ const statusDotClass: Record<TaskTableStatus, string> = {
 }
 
 const kindIconWrapperClass: Record<TaskTableKind, string> = {
-  epic: "bg-[color-mix(in_oklch,var(--chart-3)_14%,transparent)] text-[var(--chart-3)]",
+  epic: "bg-[color-mix(in_oklab,var(--chart-3)_14%,transparent)] text-[var(--chart-3)]",
   task: "bg-primary/14 text-primary",
   sub: "bg-muted text-muted-foreground",
 }
@@ -158,18 +158,34 @@ function ProgressCell({ done, total }: { done: number; total: number }) {
   )
 }
 
+/**
+ * O tingimento da fileira é a ÚNICA coisa que separa uma linha da outra —
+ * a tabela não tem régua entre fileiras, de propósito.
+ *
+ * As três misturas partem todas do CARD, que é a superfície da tabela.
+ * A de profundidade 0 partia de `--background`, e quando a página desceu na
+ * rampa a fileira desceu junto: as tasks de topo ficaram na mesma cor do
+ * papel atrás da tabela, que passou a não ter superfície. Amarrado ao card,
+ * o degrau interno não depende de onde a página está.
+ *
+ * E a ordem passou a ser monótona. Era 0,962 → 0,993 → 0,982 do topo para o
+ * fundo da árvore: subia e voltava, então a cor não dizia profundidade
+ * nenhuma. Agora cada nível se aproxima do card, e o mais fundo É o card. A
+ * direção do brilho troca entre os temas porque no escuro o card é mais
+ * escuro que o muted, mas a regra é a mesma: mais fundo, mais perto do card.
+ */
 function getRowBgClass(task: TaskTableTask): string {
   if (task.selected)
-    return "bg-[color-mix(in_oklch,var(--accent)_22%,var(--card))]"
+    return "bg-[color-mix(in_oklab,var(--accent)_22%,var(--card))]"
   if (task.depth === 0)
-    return "bg-[color-mix(in_oklch,var(--muted)_55%,var(--background))]"
-  if (task.depth === 2)
-    return "bg-[color-mix(in_oklch,var(--muted)_30%,var(--card))]"
+    return "bg-[color-mix(in_oklab,var(--muted)_60%,var(--card))]"
+  if (task.depth === 1)
+    return "bg-[color-mix(in_oklab,var(--muted)_25%,var(--card))]"
   return "bg-card"
 }
 
 const hoverBgClass =
-  "group-hover/row:bg-[color-mix(in_oklch,var(--primary)_5%,var(--card))]"
+  "group-hover/row:bg-[color-mix(in_oklab,var(--primary)_5%,var(--card))]"
 
 export interface TaskTableRowProps {
   task: TaskTableTask
@@ -376,7 +392,7 @@ export function TaskTableRow({
             className={cn(
               "size-[7px] shrink-0 rounded-full",
               statusDotClass[task.status],
-              "shadow-[0_0_0_3px_color-mix(in_oklch,currentColor_15%,transparent)]"
+              "shadow-[0_0_0_3px_color-mix(in_oklab,currentColor_15%,transparent)]"
             )}
           />
           {t(`task_table.status.${task.status}`)}
