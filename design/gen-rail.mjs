@@ -14,8 +14,8 @@ const ELEV_ESCURO = 'box-shadow:inset -1px 0 0 oklch(0.28 0.005 107);';
 // Solto, deixa de recuar: superfície de cartão e sombra de volta.
 const ELEV_SOLTO = 'box-shadow:0 18px 45px -32px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.08);';
 
-const RAIL_CLARO = 'oklch(0.998 0.002 85)';    // acima da página, quase branco e quente
-const RAIL_ESCURO = 'oklch(0.152 0.004 107)';  // entre o conteúdo e o sunken
+const RAIL_CLARO = 'oklch(0.984 0.005 90)';    // marfim, entre a página e o cartão
+const RAIL_ESCURO = 'oklch(0.195 0.004 107)';  // abaixo da página
 
 const item = (txt, ativo = false, escuro = false) => `
 <div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
@@ -124,15 +124,15 @@ const body = `
       rotulado('sub-item', regua(28, 12.5, 7, 16, '28 · 12,5 · 7 · 16')))}
 
     ${regra('06', 'O conteúdo nunca é o extremo; o rail fica de fora',
-      'A página mora no MEIO da rampa, para o cartão ter espaço acima e o sunken abaixo. Foi ao quebrar isso que o rail passou a semana sem cor própria: com a página em 0,980 e o cartão em 0,993, o topo estava ocupado e sobrava para ele só o lugar abaixo. Com a página em 0,968 são cinco valores e cinco papéis — e o degrau do cartão até ela quase dobrou, de 0,013 para 0,025. O rail toma a borda: acima no claro, abaixo no escuro, sempre do lado de fora do conteúdo.',
-      rotulado('errado — página no topo, rail sem lugar', planos('oklch(0.993 0.002 85)', 'oklch(0.98 0.004 82)', false, 'rail 0,993 = a cor do cartão')) +
-      rotulado('certo — claro, rail acima', planos(RAIL_CLARO, 'oklch(0.968 0.009 93)', false, 'rail 0,998 · página 0,968')) +
-      rotulado('certo — escuro, rail abaixo', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,152 · página 0,175')))}
+      'A página mora no MEIO da rampa, para o cartão ter espaço acima e o sunken abaixo. Foi ao quebrar isso que o rail passou a semana sem cor própria: com a página em 0,980 e o cartão em 0,993, o topo estava ocupado e sobrava para ele só o lugar abaixo. Com a página em 0,968 são cinco valores e cinco papéis — e o degrau do cartão até ela quase dobrou, de 0,013 para 0,025. No claro o rail cabe ENTRE a página e o cartão; em 0,998 ele ficava 0,4 acima do cartão, que é a mesma superfície de novo, e a quebra do branco para o papel era um corte.',
+      rotulado('errado — rail quase branco', planos('oklch(0.998 0.002 85)', 'oklch(0.968 0.009 93)', false, 'rail 0,998 — acima do cartão')) +
+      rotulado('certo — claro, rail entre os dois', planos(RAIL_CLARO, 'oklch(0.968 0.009 93)', false, 'rail 0,984 · página 0,968')) +
+      rotulado('certo — escuro, rail abaixo', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,195 · página 0,175')))}
   </div>
 </div>`;
 
 const html = page('Rail',
-  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. A superfície é o token --rail, que fica do lado de fora do conteúdo: acima da página no claro, abaixo no escuro. Encostado ele não projeta, só o filete da borda livre; solto, vira cartão e a sombra volta.',
+  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. A superfície é o token --rail: no claro fica entre a página e o cartão, no escuro abaixo da página. Encostado ele não projeta, só o filete da borda livre; solto, vira cartão e a sombra volta.',
   body);
 await Bun.write('Rail.dc.html', html);
 console.log('Rail.dc.html', html.length, 'bytes');
