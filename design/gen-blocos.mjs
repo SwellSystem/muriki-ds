@@ -30,11 +30,22 @@ for (const [view, h] of VIEWS) {
     // `--run-all-compositor-stages-before-draw` não é firula: sem ele o
     // board sai em branco de vez em quando — a foto é tirada antes do
     // primeiro paint e o PNG vira só o fundo.
-    const p = Bun.spawnSync([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
-      '--run-all-compositor-stages-before-draw',
-      '--force-device-scale-factor=2', '--virtual-time-budget=15000',
-      `--window-size=1180,${h}`, `--screenshot=${png}`, url]);
-    if (p.exitCode !== 0) { console.error(p.stderr.toString()); process.exit(1); }
+    // Uma tentativa às vezes sai em branco mesmo com o compositor forçado:
+    // o PNG vem com o tamanho de um fundo liso. Em vez de confiar, MEDE — e
+    // repete até a foto ter conteúdo. Foi assim que o board escuro passou
+    // duas vezes despercebido.
+    let ok = false;
+    for (let tentativa = 1; tentativa <= 4 && !ok; tentativa++) {
+      const p = Bun.spawnSync([CHROME, '--headless=new', '--disable-gpu', '--hide-scrollbars',
+        '--run-all-compositor-stages-before-draw',
+        '--force-device-scale-factor=2', '--virtual-time-budget=20000',
+        `--window-size=1180,${h}`, `--screenshot=${png}`, url]);
+      if (p.exitCode !== 0) { console.error(p.stderr.toString()); process.exit(1); }
+      const bytes = Bun.file(png).size;
+      ok = bytes > 100_000;
+      if (!ok) console.log(`  · ${view} ${escuro ? 'escura' : 'clara'} saiu com ${bytes} bytes, repetindo`);
+    }
+    if (!ok) { console.error(`bloco ${view} não renderizou em 4 tentativas`); process.exit(1); }
     console.log(`bloco ${view} ${escuro ? 'escura' : 'clara'} → ${png}`);
   }
 }
