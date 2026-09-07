@@ -4,6 +4,7 @@ import { useId, type ReactNode } from "react"
 import { ArrowRight, SpinnerGap } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
 export interface PlanCardCta {
@@ -110,12 +111,18 @@ export function PlanCard({
           ) : null}
         </header>
 
-        <div className="space-y-2 border-t border-border/60 pt-3">
+        {/* Régua `soft` porque estamos DENTRO de uma peça que já tem
+            contorno. Uma linha inteira aqui desenharia duas caixas dentro
+            do cartão — era o que tinha antes, com border-t de ponta a
+            ponta. Ver a nota no Separator. */}
+        <Separator shape="soft" />
+        <div className="space-y-2">
           {trialBadgeSlot}
           {priceSlot}
         </div>
 
-        <div className="flex-1 space-y-4 border-t border-border/60 pt-3">
+        <Separator shape="soft" />
+        <div className="flex-1 space-y-4">
           {featuresSlot}
           {extraSlots}
         </div>

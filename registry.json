@@ -710,7 +710,8 @@
         "utils",
         "@muriki/theme",
         "@muriki/button",
-        "@muriki/skeleton"
+        "@muriki/skeleton",
+        "@muriki/separator"
       ],
       "files": [
         {
