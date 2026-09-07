@@ -63,7 +63,11 @@ export function TaskModalTitle({
         placeholder={t("task_modal.title_placeholder")}
         aria-label={t("task_modal.title_label")}
         className={cn(
-          "w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-serif font-semibold tracking-tight text-foreground outline-none",
+          // Sem `font-serif`: no platform essa variável apontava para a
+          // Geist, então a classe pedia a fonte da INTERFACE. Aqui ela não
+          // existe e cairia no serifado do navegador — um Times no meio de
+          // uma tela de Geist. O título é a mesma família, no grau display.
+          "w-full resize-none overflow-hidden border-0 bg-transparent p-0 font-semibold tracking-[-0.02em] text-foreground outline-none",
           "placeholder:text-muted-foreground/70",
           SIZE_CLASS[size]
         )}
