@@ -46,7 +46,7 @@ const linha = (label, fn, nota) => `
 const proporcional = `
 <div style="display:flex;flex-direction:column;gap:26px;">
   ${linha('Constante', () => 8, '8px em toda altura — o que quase todo design system faz')}
-  ${linha('Proporcional', rr, 'r = altura ÷ 5 — a curva acompanha o corpo')}
+  ${linha('Proporcional', rr, 'r = altura ÷ 4 — a curva acompanha o corpo')}
   <div style="display:flex;gap:16px;padding:16px 18px;border-radius:${CARD_R}px;background:${N.acc100};box-shadow:inset 0 0 0 1px ${N.acc};">
     <div style="display:flex;flex-direction:column;gap:4px;">
       <span style="font-size:13.5px;font-weight:600;color:${N.fg};">Compare o 24 e o 44 nas duas linhas.</span>
@@ -78,7 +78,7 @@ const decisao = `
 <div style="${card(22)}display:flex;gap:30px;align-items:center;">
   <div style="display:flex;flex-direction:column;gap:5px;flex-grow:1;">
     <span style="font-size:15px;font-weight:600;color:${N.fg};letter-spacing:-0.01em;">Fechado</span>
-    <span style="font-size:13px;line-height:19px;color:${N.body};max-width:560px;">Controle com <strong style="font-weight:600;">raio = altura ÷ 5</strong> (6px no padrão de 32), recipiente fixo em <strong style="font-weight:600;">${CARD_R}px</strong>, pill reservado para badge e avatar. Já está aplicado nas sete pranchas.</span>
+    <span style="font-size:13px;line-height:19px;color:${N.body};max-width:560px;">Controle com <strong style="font-weight:600;">raio = altura ÷ 4</strong> (8px no padrão de 32), recipiente fixo em <strong style="font-weight:600;">${CARD_R}px</strong>, pill reservado para badge e avatar. Já está aplicado nas sete pranchas.</span>
   </div>
   <div style="display:flex;gap:10px;flex-shrink:0;">
     ${btn('primary', 32)}Nova tarefa</span>${btn('neutral', 32)}Cancelar</span>${btn('accent', 32)}Concluir</span>

@@ -148,7 +148,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "Sete variantes, seis sem preenchimento. Raio proporcional à altura (÷5). A variante solid é exceção declarada: uma por tela. O eixo `effect` é ortogonal — wipe preenche da esquerda no hover.",
+      "description": "Sete variantes, seis sem preenchimento. Raio proporcional à altura (÷4). A variante solid é exceção declarada: uma por tela. O eixo `effect` é ortogonal — wipe preenche da esquerda no hover.",
       "dependencies": [
         "@base-ui/react",
         "class-variance-authority"
@@ -195,7 +195,7 @@
       "name": "input",
       "type": "registry:ui",
       "title": "Input",
-      "description": "Chapado, filete de 1px por dentro — sem sulco, sem sombra. Superfície é o token --field: card no claro, sunken no escuro. Raio = altura ÷ 5. `underline` é a variante editorial, só o fio de baixo, para login e onboarding.",
+      "description": "Chapado, filete de 1px por dentro — sem sulco, sem sombra. Superfície é o token --field: card no claro, sunken no escuro. Raio = altura ÷ 4. `underline` é a variante editorial, só o fio de baixo, para login e onboarding.",
       "dependencies": [
         "@base-ui/react",
         "class-variance-authority"
@@ -358,7 +358,7 @@
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "A superfície mais alta: --float-strong sobre um véu de tinta (--scrim), não preto puro. DialogBody rola sozinho — cabeçalho e rodapé ficam. Rodapé empilha invertido no mobile.",
+      "description": "A superfície mais alta: --float-strong sobre um véu de tinta. Duas anatomias: padded (solto) e framed (título em faixa, seções com filete, rodapé preso). DialogBody rola sozinho.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"

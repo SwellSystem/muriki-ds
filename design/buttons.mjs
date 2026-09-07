@@ -1,5 +1,5 @@
 import { N } from './tokens.mjs';
-export const rr = h => Math.round(h / 5);
+export const rr = h => Math.round(h / 4);
 export const HAIR = 'oklch(89% 0.009 96)';
 const SZ = { 24:[9,12,13], 28:[10,12.5,14], 32:[12,13,15], 36:[14,13.5,16], 44:[18,15,18] };
 

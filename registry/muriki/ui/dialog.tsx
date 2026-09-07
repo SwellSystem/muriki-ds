@@ -19,6 +19,26 @@ import { XIcon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * Duas anatomias, e a diferença é onde mora o respiro.
+ *
+ * `padded` é o diálogo solto: uma pergunta curta com dois botões, padding
+ * na caixa inteira e nada de divisórias. É o padrão.
+ *
+ * `framed` é o diálogo ESTRUTURADO, do modal de criar evento e do detalhe
+ * de task: a caixa não tem padding próprio, o título vive numa faixa com
+ * filete embaixo, o miolo rola entre seções separadas por filete e o
+ * rodapé fica preso lá embaixo. Quando o conteúdo é longo e tem partes, a
+ * divisória faz o trabalho que o espaço em branco não dá conta.
+ */
+type DialogAnatomy = "padded" | "framed"
+
+const AnatomyCtx = React.createContext<DialogAnatomy>("padded")
+
+function useAnatomy() {
+  return React.useContext(AnatomyCtx)
+}
+
 function Dialog(props: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
 }
@@ -55,6 +75,8 @@ interface DialogContentProps extends DialogPrimitive.Popup.Props {
   /** Esconde o X do canto — para diálogos que só saem por decisão. */
   showClose?: boolean
   closeLabel?: string
+  /** `padded` (padrão) é solto; `framed` divide em faixas com filete. */
+  anatomy?: DialogAnatomy
 }
 
 function DialogContent({
@@ -62,17 +84,22 @@ function DialogContent({
   children,
   showClose = true,
   closeLabel = "Fechar",
+  anatomy = "padded",
   ...props
 }: DialogContentProps) {
+  const framed = anatomy === "framed"
   return (
     <DialogPortal>
       <DialogBackdrop />
+      <AnatomyCtx.Provider value={anatomy}>
       <DialogPrimitive.Popup
         data-slot="dialog-content"
+        data-anatomy={anatomy}
         className={cn(
           "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
-          "max-h-[calc(100dvh-2rem)] flex-col gap-4 overflow-y-auto sm:max-w-lg",
-          "rounded-[var(--radius-float)] bg-popover p-5 text-popover-foreground shadow-[var(--float-strong)] outline-none",
+          "max-h-[calc(100dvh-2rem)] flex-col sm:max-w-lg",
+          framed ? "gap-0 overflow-hidden" : "gap-4 overflow-y-auto p-5",
+          "rounded-[var(--radius-float)] bg-popover text-popover-foreground shadow-[var(--float-strong)] outline-none",
           "transition-[opacity,transform] duration-150 ease-out",
           "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
           "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",
@@ -85,7 +112,7 @@ function DialogContent({
           <DialogPrimitive.Close
             aria-label={closeLabel}
             className={cn(
-              "absolute top-3.5 right-3.5 inline-flex size-7 items-center justify-center rounded-[6px]",
+              "absolute top-3.5 right-3.5 inline-flex size-7 items-center justify-center rounded-[7px]",
               "text-muted-foreground outline-none transition-colors",
               "hover:bg-secondary hover:text-foreground-strong",
               "focus-visible:ring-[3px] focus-visible:ring-ring/35"
@@ -95,15 +122,39 @@ function DialogContent({
           </DialogPrimitive.Close>
         ) : null}
       </DialogPrimitive.Popup>
+      </AnatomyCtx.Provider>
     </DialogPortal>
   )
 }
 
 function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+  const framed = useAnatomy() === "framed"
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-1.5 pr-8", className)}
+      className={cn(
+        "flex flex-col gap-1.5 pr-8",
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)]",
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+/**
+ * Uma seção do miolo estruturado. O filete embaixo separa uma parte da
+ * outra; a última não leva filete, senão o corpo termina com uma linha
+ * solta antes do rodapé.
+ */
+function DialogSection({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="dialog-section"
+      className={cn(
+        "flex flex-col gap-3 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)] last:shadow-none",
+        className
+      )}
       {...props}
     />
   )
@@ -115,10 +166,17 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
  * em cada tela, com p-0 no content e fundo próprio no cabeçalho.
  */
 function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
+  const framed = useAnatomy() === "framed"
   return (
     <div
       data-slot="dialog-body"
-      className={cn("-mx-5 min-h-0 flex-1 overflow-y-auto px-5", className)}
+      className={cn(
+        "min-h-0 flex-1 overflow-y-auto",
+        // no solto o corpo precisa vazar o padding da caixa para a barra de
+        // rolagem encostar na borda; no estruturado a caixa não tem padding
+        framed ? "" : "-mx-5 px-5",
+        className
+      )}
       {...props}
     />
   )
@@ -129,10 +187,15 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
  * alcance do polegar, e no desktop volta para a direita.
  */
 function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
+  const framed = useAnatomy() === "framed"
   return (
     <div
       data-slot="dialog-footer"
-      className={cn("flex flex-col-reverse gap-2 sm:flex-row sm:justify-end", className)}
+      className={cn(
+        "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_1px_0_var(--border)]",
+        className
+      )}
       {...props}
     />
   )
@@ -169,6 +232,7 @@ export {
   DialogBackdrop,
   DialogContent,
   DialogHeader,
+  DialogSection,
   DialogBody,
   DialogFooter,
   DialogTitle,

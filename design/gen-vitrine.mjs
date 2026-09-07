@@ -17,7 +17,8 @@ import { join } from 'node:path';
 const reg = await Bun.file(new URL('../registry.json', import.meta.url)).json();
 const theme = reg.items.find(i => i.type === 'registry:theme');
 
-// ── geometria (a mesma dos componentes: h32 r6, badge h22 r4, card r14)
+// ── geometria (a mesma dos componentes: h32 r8 pela razão ÷ 4,
+//    badge h22 r4, card r14)
 const W = 840, PAD = 32, CAP = 22, GAP = 26;
 const ROWS = [32, 22, 32, 36]; // botões · badges · campos · controles
 const H = PAD * 2 + ROWS.reduce((s, r) => s + CAP + r, 0) + GAP * (ROWS.length - 1);
@@ -47,7 +48,7 @@ const vitrine = (mode) => {
     placeholder: 'oklch(0.58 0.025 255)',
   };
 
-  const btnBase = `height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;box-sizing:border-box;white-space:nowrap;`;
+  const btnBase = `height:32px;padding:0 12px;border-radius:8px;font-size:13px;font-weight:500;letter-spacing:-0.005em;display:inline-flex;align-items:center;box-sizing:border-box;white-space:nowrap;`;
   const btn = {
     primary: (l) => `<span style="${btnBase}background:${t['primary-subtle']};color:${t['primary-subtle-foreground']};box-shadow:inset 0 0 0 1px ${t['primary-subtle-border']};">${l}</span>`,
     outline: (l) => `<span style="${btnBase}background:${t['card']};color:${t['foreground']};box-shadow:inset 0 0 0 1px ${t['input']};">${l}</span>`,
@@ -67,7 +68,7 @@ const vitrine = (mode) => {
     `<span style="${badgeBase}padding:0 8px;border:1px dashed ${t['input']};background:transparent;color:${t['muted-foreground']};">${label}</span>`;
 
   const chevron = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="${t['muted-foreground']}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
-  const campoBase = `width:230px;height:32px;padding:0 11px;border-radius:6px;font-size:13px;display:inline-flex;align-items:center;gap:8px;box-sizing:border-box;white-space:nowrap;`;
+  const campoBase = `width:230px;height:32px;padding:0 11px;border-radius:8px;font-size:13px;display:inline-flex;align-items:center;gap:8px;box-sizing:border-box;white-space:nowrap;`;
   const campos =
     `<span style="${campoBase}${fx.campo}color:${fx.placeholder};">Descreva a tarefa</span>` +
     `<span style="${campoBase}${fx.campoFoco}color:${t['foreground']};">Revisar contrato<span style="width:1px;height:15px;background:${t['primary']};margin-left:-6px;"></span></span>` +

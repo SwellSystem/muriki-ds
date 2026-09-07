@@ -90,7 +90,7 @@ function SheetContent({
           <DialogPrimitive.Close
             aria-label={closeLabel}
             className={cn(
-              "absolute top-3.5 right-3.5 inline-flex size-7 items-center justify-center rounded-[6px]",
+              "absolute top-3.5 right-3.5 inline-flex size-7 items-center justify-center rounded-[7px]",
               "text-muted-foreground outline-none transition-colors",
               "hover:bg-secondary hover:text-foreground-strong",
               "focus-visible:ring-[3px] focus-visible:ring-ring/35"

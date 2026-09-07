@@ -66,7 +66,7 @@ const regra = `
       <div style="display:flex;align-items:flex-end;gap:14px;">
         ${[24,28,32,36,44].map(h => `<span style="display:inline-flex;flex-direction:column;gap:7px;align-items:center;">${btn('primary', h)}Salvar</span>${cap(`${h} → ${rr(h)}px`)}</span>`).join('')}
       </div>
-      <span style="font-size:13px;line-height:19px;color:${N.body};max-width:520px;">Raio é <strong style="font-weight:600;">altura ÷ 5</strong>, não um número fixo. No 32px isso dá <span class="mono" style="font-size:12.5px;">6px</span> — arredondado, mas não muito, que foi exatamente o que você pediu. E como é razão e não constante, os cinco tamanhos parecem a mesma forma.</span>
+      <span style="font-size:13px;line-height:19px;color:${N.body};max-width:520px;">Raio é <strong style="font-weight:600;">altura ÷ 4</strong>, não um número fixo. No 32px isso dá <span class="mono" style="font-size:12.5px;">8px</span> — arredondado, mas não muito, que foi exatamente o que você pediu. E como é razão e não constante, os cinco tamanhos parecem a mesma forma.</span>
     </div>
     <div style="${card(18)}display:flex;flex-direction:column;gap:11px;">
       <span style="font-size:13.5px;font-weight:600;color:${N.fg};">Revisar contrato OpenAPI</span>

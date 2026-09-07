@@ -11,7 +11,7 @@ export const D = {
   danger:'oklch(68% 0.180 27)', dangerSub:'oklch(0.265 0.055 27)', dangerSubLine:'oklch(0.365 0.085 27)', dangerInk:'oklch(83% 0.100 27)',
   success:'oklch(72% 0.130 150)',
 };
-export const rr = h => Math.round(h / 5);
+export const rr = h => Math.round(h / 4);
 const SZ = { 24:[9,12], 28:[10,12.5], 32:[12,13], 36:[14,13.5], 44:[18,15] };
 const S = {
   primary: {

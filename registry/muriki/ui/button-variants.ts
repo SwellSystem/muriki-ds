@@ -14,9 +14,13 @@ import { cva } from "class-variance-authority"
  * elemento — o texto não precisa de camada nem de z-index para continuar
  * por cima.
  *
- * Raio: altura ÷ 5, arredondado. Não é o `--radius` (esse é do recipiente,
- * 14px). O contraste entre controle seco e recipiente macio é o que o olho
- * lê como intenção.
+ * Raio: altura ÷ 4, arredondado. Não é o `--radius` (esse é do recipiente,
+ * 14px, e 12 quando ele flutua). O contraste entre controle seco e
+ * recipiente macio continua sendo o que o olho lê como intenção — o que
+ * mudou foi o divisor: em ÷ 5 o controle ficava seco DEMAIS ao lado do
+ * recipiente, e a diferença aparecia justo dentro do diálogo, onde as duas
+ * formas se encostam. Continua sendo razão e não constante: os cinco
+ * tamanhos seguem parecendo a mesma forma.
  */
 export const buttonVariants = cva(
   [
@@ -58,17 +62,17 @@ export const buttonVariants = cva(
         ].join(" "),
       },
       size: {
-        xs: "h-6 rounded-[5px] px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
-        sm: "h-7 rounded-[6px] px-2.5 text-[0.78rem] [&_svg:not([class*='size-'])]:size-3.5",
-        default: "h-8 rounded-[6px] px-3 text-[0.8125rem] [&_svg:not([class*='size-'])]:size-4",
-        lg: "h-9 rounded-[7px] px-3.5 text-sm [&_svg:not([class*='size-'])]:size-4",
+        xs: "h-6 rounded-[6px] px-2 text-xs [&_svg:not([class*='size-'])]:size-3",
+        sm: "h-7 rounded-[7px] px-2.5 text-[0.78rem] [&_svg:not([class*='size-'])]:size-3.5",
+        default: "h-8 rounded-[8px] px-3 text-[0.8125rem] [&_svg:not([class*='size-'])]:size-4",
+        lg: "h-9 rounded-[9px] px-3.5 text-sm [&_svg:not([class*='size-'])]:size-4",
         /** Piso de toque. No mobile é este, para tudo. */
-        touch: "h-11 rounded-[9px] px-[1.125rem] text-[0.9375rem] [&_svg:not([class*='size-'])]:size-5",
-        "icon-xs": "size-6 rounded-[5px] [&_svg:not([class*='size-'])]:size-3",
-        "icon-sm": "size-7 rounded-[6px] [&_svg:not([class*='size-'])]:size-3.5",
-        icon: "size-8 rounded-[6px] [&_svg:not([class*='size-'])]:size-4",
-        "icon-lg": "size-9 rounded-[7px] [&_svg:not([class*='size-'])]:size-4",
-        "icon-touch": "size-11 rounded-[9px] [&_svg:not([class*='size-'])]:size-5",
+        touch: "h-11 rounded-[11px] px-[1.125rem] text-[0.9375rem] [&_svg:not([class*='size-'])]:size-5",
+        "icon-xs": "size-6 rounded-[6px] [&_svg:not([class*='size-'])]:size-3",
+        "icon-sm": "size-7 rounded-[7px] [&_svg:not([class*='size-'])]:size-3.5",
+        icon: "size-8 rounded-[8px] [&_svg:not([class*='size-'])]:size-4",
+        "icon-lg": "size-9 rounded-[9px] [&_svg:not([class*='size-'])]:size-4",
+        "icon-touch": "size-11 rounded-[11px] [&_svg:not([class*='size-'])]:size-5",
       },
     },
     compoundVariants: [{ variant: "link", size: "default", class: "h-auto px-0" }],
