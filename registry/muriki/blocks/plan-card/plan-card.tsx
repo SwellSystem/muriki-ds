@@ -62,10 +62,13 @@ export function PlanCard({
     <article
       aria-labelledby={nameId}
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-lg bg-card p-4 transition-[box-shadow,transform] duration-200 hover:-translate-y-0.5",
+        // O card segue o skeleton, e não o contrário: mesma borda, mesmo
+        // raio, mesma sombra. Se a silhueta da espera não bate com a da
+        // chegada, o carregamento pisca.
+        "group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5",
         emphasized
-          ? "shadow-[var(--float),inset_0_0_0_1px_var(--primary-subtle-border)] hover:shadow-[var(--float-strong),inset_0_0_0_1px_var(--primary-subtle-border)] md:scale-[1.03]"
-          : "shadow-[inset_0_0_0_1px_var(--border)] hover:shadow-[var(--float)]",
+          ? "border-primary shadow-md ring-1 ring-primary/20 hover:shadow-lg md:scale-[1.03]"
+          : "border-border shadow-sm hover:shadow-md",
         selected &&
           "border-primary ring-2 ring-primary/25 hover:ring-primary/35",
         className

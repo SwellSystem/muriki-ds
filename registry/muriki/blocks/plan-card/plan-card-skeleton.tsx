@@ -19,15 +19,16 @@ export function PlanCardSkeleton({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        "relative flex flex-col gap-4 rounded-lg bg-card p-4 md:p-6",
-        emphasized
-          ? "shadow-[var(--float),inset_0_0_0_1px_var(--primary-subtle-border)]"
-          : "shadow-[inset_0_0_0_1px_var(--border)]",
+        // Igual ao do platform, na letra. A única mudança é a cor da borda
+        // ser explícita: lá ela vinha de uma regra base do shadcn que a casa
+        // não tem, e `border` sozinho pintaria com a cor do texto.
+        "relative flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6",
+        emphasized ? "border-primary ring-1 ring-primary/20" : "border-border",
         className
       )}
     >
       {emphasized ? (
-        <Skeleton className="absolute top-3 right-3 h-[22px] w-24 rounded-full bg-primary-subtle" />
+        <Skeleton className="absolute top-3 right-3 h-5 w-24 rounded-full bg-primary/25" />
       ) : null}
 
       <div className="space-y-2">
@@ -49,7 +50,7 @@ export function PlanCardSkeleton({
         <Skeleton className="h-3 w-[60%]" />
       </div>
 
-      <Skeleton className={cn("h-10 w-full", emphasized && "bg-primary-subtle")} />
+      <Skeleton className={cn("h-10 w-full", emphasized && "bg-primary/25")} />
     </div>
   )
 }

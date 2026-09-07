@@ -1,4 +1,6 @@
 export { PlanCard } from "./plan-card"
 export type { PlanCardProps, PlanCardCta } from "./plan-card"
+export { PlanGrid } from "./plan-grid"
+export type { PlanGridProps } from "./plan-grid"
 export { PlanCardSkeleton } from "./plan-card-skeleton"
 export type { PlanCardSkeletonProps } from "./plan-card-skeleton"

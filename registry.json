@@ -700,7 +700,7 @@
       "name": "plan-card",
       "type": "registry:block",
       "title": "Plan Card",
-      "description": "Card de plano composto por slots — preço, features e selos são do consumidor. Vem com o PlanCardSkeleton, que tem a anatomia do card em vez de blocos genéricos.",
+      "description": "Card de plano por slots, com o PlanGrid responsivo por contagem e o PlanCardSkeleton — este igual ao do onboarding do platform, na letra.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
@@ -720,6 +720,11 @@
           "path": "registry/muriki/blocks/plan-card/plan-card-skeleton.tsx",
           "type": "registry:component",
           "target": "components/blocks/plan-card/plan-card-skeleton.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/plan-card/plan-grid.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plan-card/plan-grid.tsx"
         },
         {
           "path": "registry/muriki/blocks/plan-card/index.ts",
