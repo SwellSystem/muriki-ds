@@ -8,9 +8,73 @@
  * combinação legítima, e a mais útil em tela apertada: se os dois virassem
  * valores de uma lista só, ela deixaria de existir.
  *
+ * TRÊS COISAS, não duas, e vale nomear direito: POSIÇÃO (encostado ou
+ * flutuando) e LARGURA (rótulos ou ícones) são os eixos; `enablePinning` é
+ * um COMPORTAMENTO em cima deles — desafixado, o rail some e volta quando o
+ * mouse encosta na borda. Por isso ele é opt-in: um rail que se esconde
+ * sozinho não serve a toda tela.
+ *
  * O corte: `inset` saiu (o conteúdo virava cartão dentro de uma moldura que
  * não era superfície de nada) e o sistema de flyout de grupo saiu junto —
- * era uma feature inteira, com contexto exportado, que nada acionava.
+ * era uma feature inteira, com contexto exportado, que nada acionava. E o
+ * `SidebarRail` saiu — uma segunda faixa invisível na borda que recolhia o
+ * menu, sem rótulo e fora do tab order, ocupando as MESMAS coordenadas da
+ * faixa que revela o rail desafixado. Recolher agora tem um botão visível.
+ *
+ * O RAIL USA A ESCALA DA CASA, e essa foi a última coisa portada sem
+ * conferir. O item de nav vinha do platform com 40px de altura, 16px de
+ * texto (17px acima de 1536px), ícone de 18px (20px acima de 1536px) e raio
+ * de 8,4px; o seletor de workspace vinha com 64px, virando 80px em tela
+ * larga. Nenhum desses números existe no sistema — as alturas são
+ * 24/28/32/36/44, o raio é altura ÷ 4 e o texto de controle é 13px. O rail
+ * era a única superfície da casa fora da régua, e por isso parecia grande
+ * demais ao lado de qualquer outra coisa na mesma tela.
+ *
+ * Agora o item é 36px/raio 9/13px/ícone 16 (o `lg` da casa, porque item de
+ * nav é alvo frequente), o sub-item é 28px/raio 7, e o seletor de workspace
+ * é 44px/raio 11 — o piso de toque, que é o que uma linha dupla pede. As
+ * regras `2xl:` saíram: nav que cresce com a janela não é uma decisão do
+ * sistema, é um resto de outro projeto.
+ *
+ * RECOLHIDO, SÓ O ÍCONE DA FRENTE SOBREVIVE. A regra antiga escondia
+ * apenas spans de texto puro, então qualquer coisa depois do rótulo — o
+ * caret do seletor de workspace, um contador, uma seta — continuava no
+ * fluxo e só sumia por causa do `overflow-hidden` do botão. O resultado era
+ * um caret cortado ao meio pela borda do rail. Agora todo filho que não é o
+ * primeiro some no modo ícone, que é o que "recolhido" quer dizer.
+ *
+ * HOVER E ATIVO SÃO A MESMA FAMÍLIA. O hover vinha `bg-muted`, um neutro
+ * amarelado, sobre um rail que está no nível do cartão — dava uma mancha
+ * cinza que não conversava com o azul do item ativo. Agora o hover é a
+ * mesma tinta do ativo com metade da força: passar o mouse prenuncia o
+ * estado selecionado em vez de anunciar outro.
+ *
+ * O RAIL FICA DO LADO DE FORA DO CONTEÚDO. No claro é acima da página
+ * (0.998 contra 0.968), no escuro é abaixo (0.152 contra 0.175) — a
+ * moldura toma a borda da rampa e o palco fica no meio. Quem decide isso é
+ * o token `--rail`, não este arquivo.
+ *
+ * A BORDA LIVRE NÃO TEM LINHA. Só a elevação ambiente do cursor do
+ * view-toggle, curta, projetando no conteúdo. O degrau entre `--rail` e
+ * `--background` faz o resto: uma linha correndo a altura inteira da tela é
+ * a régua mais marcante que uma interface pode ter, e não sobra nada para
+ * ela dizer que a cor já não tenha dito.
+ *
+ * ERAM DUAS LINHAS, antes de virar nenhuma. O container trazia um `border-r`
+ * de verdade e o interno trazia o filete desenhado por dentro, empilhados no
+ * mesmo pixel — o mesmo defeito que o Sheet já tinha mostrado quando o modal
+ * de task chegou. Só se percebia medindo: apagar uma das duas não mudava
+ * nada na tela, porque a outra continuava desenhando.
+ *
+ * Só na borda LIVRE. O filete do cursor é `inset 0 0 0 1px`, que corre pelos
+ * quatro lados; numa peça que toca três bordas da tela isso vira um
+ * contorno de janela. É a mesma armadilha que o diálogo em tela cheia já
+ * tinha mostrado.
+ *
+ * SOLTO, O RAIL DEIXA DE SER MOLDURA. Nas variantes que descolam da borda —
+ * `floating` e o rail desafixado — a superfície passa a ser a do cartão e a
+ * sombra volta. É a mesma família de raciocínio de "encostado não tem
+ * raio": o que a peça é depende de estar ou não tocando a parede.
  *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
@@ -88,7 +152,11 @@ function useIsMobile() {
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_PINNED_COOKIE_NAME = "sidebar_pinned"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+// 13.75rem = 220px. Eram 256 (o padrão do shadcn, e o mesmo do platform)
+// para 92px de conteúdo: ícone 16, respiro 10 e o rótulo mais largo com 66.
+// Sobravam 163px de coluna vazia, e o fundo do item ativo era uma laje de
+// 235px ao lado de 66px de texto.
+const SIDEBAR_WIDTH = "13.75rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -335,7 +403,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7)]",
           className
         )}
         {...props}
@@ -362,8 +430,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>Navegação principal.</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -445,11 +513,11 @@ function Sidebar({
           // Adjust the padding for floating and inset variants.
           variant === "floating"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon) group-data-[side=left]:border-r group-data-[side=left]:border-border/20 group-data-[side=right]:border-l group-data-[side=right]:border-border/20",
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
           // Eixo "pin": desafixada, vira um CARTÃO flutuante (margem, cantos
           // arredondados, sombra) — fiel ao mock. O reveal/hide (transform +
           // opacity + transição) é controlado inline via `floatStyle`.
-          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:rounded-[var(--radius-float)]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
+          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:bg-card! group-data-[pinned=false]:rounded-[var(--radius-float)]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
           className
         )}
         {...props}
@@ -457,7 +525,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)] group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>
@@ -487,42 +555,11 @@ function SidebarTrigger({
       {...props}
     >
       <SidebarIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Recolher menu</span>
     </Button>
   )
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
-  const { toggleSidebar } = useSidebar()
-
-  return (
-    <button
-      data-sidebar="rail"
-      data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
-      tabIndex={-1}
-      onClick={toggleSidebar}
-      title="Toggle Sidebar"
-      className={cn(
-        "absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
-        "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
-        "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
-        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-card",
-        "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
-        "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-/**
- * Os dois controles do rail, no cabeçalho dele — e não soltos na página.
- * É onde o platform os põe, e faz sentido: quem comanda o rail mora no
- * rail. O de colapsar troca a LARGURA; o de fixar troca a POSIÇÃO. Com o
- * rail em ícones eles empilham, porque não cabem lado a lado.
- */
 function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
   const { toggleSidebar, togglePin, pinned, state, isMobile, enablePinning } =
     useSidebar()
@@ -759,7 +796,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-sm p-2 text-left text-[16px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-md group-data-[collapsible=icon]:p-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 2xl:text-[17px] data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-[18px] [&_svg]:shrink-0 2xl:[&_svg]:size-5 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>span:not(:has(*))]:hidden",
+  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-[9px] px-2.5 text-left text-[13px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-[9px] group-data-[collapsible=icon]:px-0! hover:bg-primary-subtle/50 group-data-[collapsible=icon]:hover:bg-primary-subtle/50 focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>*:not(:first-child)]:hidden",
   {
     variants: {
       variant: {
@@ -768,9 +805,16 @@ const sidebarMenuButtonVariants = cva(
           "border border-border bg-card hover:border-primary/40",
       },
       size: {
-        default: "h-10",
-        sm: "h-7 text-xs",
-        lg: "h-16 text-sm group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0! 2xl:h-20",
+        /** 36px, raio 9 — o `lg` da casa. Item de nav é alvo frequente. */
+        default: "h-9",
+        /** 28px, raio 7 — o `sm` da casa. */
+        sm: "h-7 rounded-[7px] text-[12.5px]",
+        /**
+         * 44px, raio 11 — o piso de toque da casa, usado pelo seletor de
+         * workspace, que empilha duas linhas. Era `h-16` (64px) crescendo
+         * para 80px no 2xl: um controle maior que qualquer outro do sistema.
+         */
+        lg: "h-11 rounded-[11px] text-[13px] group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:px-0!",
       },
     },
     defaultVariants: {
@@ -975,7 +1019,7 @@ function SidebarMenuSubButton({
     props: mergeProps<"a">(
       {
         className: cn(
-          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-sm px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs 2xl:data-[size=md]:text-[15px] data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 2xl:[&>svg]:size-[18px]",
+          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-[7px] px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-[12.5px] data-[size=sm]:text-[12px] data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
           className
         ),
       },
@@ -1013,7 +1057,6 @@ export {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,

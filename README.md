@@ -307,7 +307,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/separator` | `registry:ui` | o filete do sistema, horizontal ou vertical |
 | `@muriki/tabs` | `registry:ui` | filete embaixo da ativa; `enclosed` para o caso denso |
 | `@muriki/breadcrumb` | `registry:ui` | trilha com caret e reticências no meio que não cabe |
-| `@muriki/sidebar` | `registry:ui` | rail que recolhe para ícones e vira gaveta no celular; sem paleta própria |
+| `@muriki/sidebar` | `registry:ui` | rail que recua um degrau abaixo do conteúdo, recolhe para ícones e vira gaveta no celular |
 | `@muriki/plan-card` | `registry:block` | card de plano por slots, com o skeleton que tem a anatomia dele |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
@@ -419,11 +419,26 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
-- **O rail usa a MESMA receita de elevação do cursor do toggle**, não uma
-  parecida. Sombra caindo com o filete por dentro no claro; encaixe com o fio
-  de luz no escuro. Inventar uma sombra lateral para o rail dava uma aresta
-  dura, que é outra linguagem. A superfície é o token `--rail`; os oito
-  `--sidebar-*` do shadcn não existem aqui, eram cópias das cores base.
+- **O conteúdo nunca é o extremo da rampa.** A página mora no meio, para
+  que o card tenha espaço acima e o sunken abaixo. No claro a rampa é
+  `sunken 0,943 · muted 0,958 · página 0,968 · rail 0,984 · card 0,993`, e
+  o filete recuou para 0,972 — quem separa é a superfície, o filete só
+  confirma onde ela termina:
+  cinco valores, cinco papéis, nenhum emprestado. Foi ao quebrar essa regra
+  que o rail passou a semana sem cor própria — com a página em 0,980 e o
+  card em 0,993 o topo estava ocupado, e sobrava para ele só o lugar
+  abaixo. Descer a página também quase dobrou o degrau do card até ela, de
+  0,013 para 0,025, que é o que faz cartão, campo e diálogo terem
+  superfície de verdade em vez de dependerem do filete.
+- **O rail cabe entre a página e o cartão**, no claro: 0,984, marfim. Em
+  0,998 ele ficava 0,4 ACIMA do cartão — a mesma superfície de novo — e a
+  passagem do quase branco para o papel era um corte, não um degrau. No
+  escuro é abaixo da página, 0,152 contra 0,175. Encostado ele não tem
+  linha nenhuma na borda livre, só uma elevação ambiente curta: uma linha
+  correndo a altura da tela é a régua mais marcante que existe, e não sobra
+  nada para ela dizer que o degrau de cor já não tenha dito. Solto, vira superfície de cartão e a sombra volta,
+  pela mesma lógica de "encostado não tem raio". Os oito `--sidebar-*` do
+  shadcn não existem aqui, eram cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro

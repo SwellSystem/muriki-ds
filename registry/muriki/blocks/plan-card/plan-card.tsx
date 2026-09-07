@@ -4,6 +4,7 @@ import { useId, type ReactNode } from "react"
 import { ArrowRight, SpinnerGap } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
 export interface PlanCardCta {
@@ -67,36 +68,28 @@ export function PlanCard({
         // chegada, o carregamento pisca.
         "group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5",
         emphasized
-          ? "border-primary shadow-md ring-1 ring-primary/20 hover:shadow-lg md:scale-[1.03]"
+          ? "border-primary shadow-md hover:shadow-lg md:scale-[1.03]"
           : "border-border shadow-sm hover:shadow-md",
         selected &&
           "border-primary ring-2 ring-primary/25 hover:ring-primary/35",
         className
       )}
     >
-      {emphasized ? (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
-        />
-      ) : null}
-      {emphasized ? (
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-primary/[0.08] blur-3xl"
-        />
-      ) : null}
-
-      {/* Aba grudada no contorno top-right do card */}
-      {badgeSlot ? (
-        // Sem fundo próprio: o slot recebe um Badge, que já traz o dele. A
-        // faixa azul de antes empilhava dois fundos e ainda era cortada pelo
-        // overflow do card.
-        <div className="absolute top-3 right-3 z-10">{badgeSlot}</div>
-      ) : null}
+      {/* O destaque dizia a mesma coisa CINCO vezes: escala, borda, anel,
+          um fio em gradiente no topo e um brilho circular no canto. Os dois
+          últimos são invisíveis no tamanho real e ainda custavam pintura.
+          Ficaram a escala e a borda. */}
 
       <div className="relative flex flex-1 flex-col gap-3">
         <header className="space-y-1.5">
+          {/* O selo abre o cartão, dentro do fluxo. Antes era absoluto no
+              canto superior direito: encostava no nome, e um nome mais longo
+              passava por baixo dele.
+              A linha é RESERVADA mesmo sem selo — 22px, a altura do Badge.
+              Sem isso o cartão com selo empurra o próprio nome para baixo e
+              os títulos da grade deixam de alinhar, que é o preço de tirar o
+              selo da posição absoluta. */}
+          <div className="flex h-[22px] items-center">{badgeSlot}</div>
           <h3
             id={nameId}
             className="text-2xl leading-[1.05] font-semibold tracking-[-0.02em] text-foreground-strong md:text-[28px]"
@@ -110,12 +103,18 @@ export function PlanCard({
           ) : null}
         </header>
 
-        <div className="space-y-2 border-t border-border/60 pt-3">
+        {/* Régua `soft` porque estamos DENTRO de uma peça que já tem
+            contorno. Uma linha inteira aqui desenharia duas caixas dentro
+            do cartão — era o que tinha antes, com border-t de ponta a
+            ponta. Ver a nota no Separator. */}
+        <Separator shape="soft" />
+        <div className="space-y-2">
           {trialBadgeSlot}
           {priceSlot}
         </div>
 
-        <div className="flex-1 space-y-4 border-t border-border/60 pt-3">
+        <Separator shape="soft" />
+        <div className="flex-1 space-y-4">
           {featuresSlot}
           {extraSlots}
         </div>

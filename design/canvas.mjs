@@ -13,6 +13,7 @@ const P2 = [
   ['Raio.dc.html', 1240, 1400, 'Raio'],
   ['Antes.dc.html', 1240, 1080, 'Direção do botão'],
   ['Contorno.dc.html', 1280, 2050, 'Contorno e altura'],
+  ['Rail.dc.html', 1180, 2100, 'Rail'],
 ];
 const P1b = [
   ['Controles.dc.html', 1180, 820, 'Campos e seleção'],
@@ -49,7 +50,7 @@ const canvas = {
     { id: 'note-2', page: 'page-1', x: 4360, y: -300, w: 320,
       text: 'A barra de ferramentas da linha: cinco ícones, zero palavra.\n\nO preço de não escrever nada é tooltip em todas e aria-label em todas. E no toque não existe hover: lá vira um único botão de 44px.' },
     { id: 'note-3', page: 'page-2', x: -360, y: 40, w: 300,
-      text: 'As decisões que sustentam a página de Componentes: papel quente e tinta fria, raio por razão (÷5), fill fora do botão, e as três regras de tradução para o escuro.' },
+      text: 'As decisões que sustentam a página de Componentes: papel quente e tinta fria, raio por razão (altura ÷ 4), fill fora do botão, as três regras de tradução para o escuro, e os dois eixos do rail.' },
   ],
   launch: { view: 'canvas', page: 'page-1' },
 };

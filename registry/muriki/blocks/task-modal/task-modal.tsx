@@ -283,7 +283,7 @@ export function TaskModal({
   const a11yTitle = t("task_modal.a11y_title")
   const a11yDescription = t("task_modal.a11y_description")
 
-  // ── drawer (lateral) → base-ui Sheet ─────────────────────────────────────
+  // ── drawer (lateral) → Sheet da casa (Base UI) ──────────────────────────
   if (mode === "drawer") {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
@@ -307,7 +307,7 @@ export function TaskModal({
     )
   }
 
-  // ── central / full → radix Dialog ────────────────────────────────────────
+  // ── central / full → Dialog da casa (Base UI) ───────────────────────────
   const isFull = mode === "full"
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

@@ -33,10 +33,20 @@ export const inputVariants = cva(
   {
     variants: {
       variant: {
-        /** Prancha de Campos: chapado, filete por dentro. Hover escurece o filete, foco troca por tinta da marca. */
+        /**
+         * Prancha de Campos: chapado, filete por dentro. Hover escurece o
+         * filete, foco troca por tinta da marca.
+         *
+         * EM REPOUSO O FILETE É LEVE. Ele era `--input` cheio, que é o mesmo
+         * peso do foco — a caixa gritava antes de alguém chegar perto. Com a
+         * página em 0.968 e o campo em 0.993 o degrau de superfície já diz
+         * onde se escreve, então o filete em repouso só confirma o contorno.
+         * No hover e no foco ele volta ao peso cheio: aí o contorno é
+         * resposta, e resposta pode ser forte.
+         */
         default: [
-          "shadow-[inset_0_0_0_1px_var(--input)]",
-          "hover:shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--input)_86%,var(--foreground))]",
+          "shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--input)_45%,var(--field))]",
+          "hover:shadow-[inset_0_0_0_1px_var(--input)]",
           "focus-visible:shadow-[inset_0_0_0_1px_var(--primary)] focus-visible:ring-[3px] focus-visible:ring-ring/20",
           "aria-invalid:shadow-[inset_0_0_0_1px_var(--destructive)] aria-invalid:ring-[3px] aria-invalid:ring-destructive/15",
           "data-invalid:shadow-[inset_0_0_0_1px_var(--destructive)] data-invalid:ring-[3px] data-invalid:ring-destructive/15",
