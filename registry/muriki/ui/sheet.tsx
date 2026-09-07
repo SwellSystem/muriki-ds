@@ -24,15 +24,15 @@ type SheetSide = "right" | "left" | "bottom"
 
 const SIDE: Record<SheetSide, string> = {
   right: [
-    "inset-y-0 right-0 h-dvh w-full max-w-md rounded-l-lg",
+    "inset-y-0 right-0 h-dvh w-full max-w-md rounded-l-[var(--radius-float)]",
     "data-[starting-style]:translate-x-full data-[ending-style]:translate-x-full",
   ].join(" "),
   left: [
-    "inset-y-0 left-0 h-dvh w-full max-w-md rounded-r-lg",
+    "inset-y-0 left-0 h-dvh w-full max-w-md rounded-r-[var(--radius-float)]",
     "data-[starting-style]:-translate-x-full data-[ending-style]:-translate-x-full",
   ].join(" "),
   bottom: [
-    "inset-x-0 bottom-0 max-h-[85dvh] w-full rounded-t-lg",
+    "inset-x-0 bottom-0 max-h-[85dvh] w-full rounded-t-[var(--radius-float)]",
     "data-[starting-style]:translate-y-full data-[ending-style]:translate-y-full",
   ].join(" "),
 }

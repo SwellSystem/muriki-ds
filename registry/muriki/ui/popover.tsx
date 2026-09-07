@@ -47,7 +47,7 @@ function PopoverContent({
           data-slot="popover-content"
           className={cn(
             "flex w-72 max-w-[calc(100vw-2rem)] origin-(--transform-origin) flex-col gap-2.5",
-            "rounded-lg bg-popover p-3 text-sm text-popover-foreground shadow-[var(--float)] outline-none",
+            "rounded-[var(--radius-float)] bg-popover p-3 text-sm text-popover-foreground shadow-[var(--float)] outline-none",
             "transition-[opacity,transform] duration-100 ease-out",
             "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",

@@ -73,6 +73,12 @@
      ele usa a razão altura ÷ 5, class por tamanho no cva. */
   --radius: 14px;
 
+  /* O recipiente que FLUTUA é um degrau mais seco que o que fica parado
+     na página. Dentro de um diálogo os controles têm 6-7px, e 14 deixava
+     os dois raios a 20px de distância — contraste no volume máximo, no
+     lugar em que as duas formas se encostam. Card e blocos seguem em 14. */
+  --radius-float: 12px;
+
   /* Nove matizes de badge. Fundo sempre L 93,5%, tinta sempre L 43%.
      Só a matiz muda — é isso que separa uma paleta de um punhado de cores. */
   --tone-gray: oklch(0.945 0.008 96);        --tone-gray-foreground: oklch(0.42 0.02 250);      --tone-gray-dot: oklch(0.62 0.012 250);
@@ -185,7 +191,39 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Os nove tons também viram classe: bg-tone-blue, text-tone-red-foreground,
+     ring-tone-orange-dot. Sem isto o badge e a prioridade não pintam. */
+  --color-tone-gray: var(--tone-gray);
+  --color-tone-gray-foreground: var(--tone-gray-foreground);
+  --color-tone-gray-dot: var(--tone-gray-dot);
+  --color-tone-blue: var(--tone-blue);
+  --color-tone-blue-foreground: var(--tone-blue-foreground);
+  --color-tone-blue-dot: var(--tone-blue-dot);
+  --color-tone-cyan: var(--tone-cyan);
+  --color-tone-cyan-foreground: var(--tone-cyan-foreground);
+  --color-tone-cyan-dot: var(--tone-cyan-dot);
+  --color-tone-green: var(--tone-green);
+  --color-tone-green-foreground: var(--tone-green-foreground);
+  --color-tone-green-dot: var(--tone-green-dot);
+  --color-tone-yellow: var(--tone-yellow);
+  --color-tone-yellow-foreground: var(--tone-yellow-foreground);
+  --color-tone-yellow-dot: var(--tone-yellow-dot);
+  --color-tone-orange: var(--tone-orange);
+  --color-tone-orange-foreground: var(--tone-orange-foreground);
+  --color-tone-orange-dot: var(--tone-orange-dot);
+  --color-tone-red: var(--tone-red);
+  --color-tone-red-foreground: var(--tone-red-foreground);
+  --color-tone-red-dot: var(--tone-red-dot);
+  --color-tone-pink: var(--tone-pink);
+  --color-tone-pink-foreground: var(--tone-pink-foreground);
+  --color-tone-pink-dot: var(--tone-pink-dot);
+  --color-tone-purple: var(--tone-purple);
+  --color-tone-purple-foreground: var(--tone-purple-foreground);
+  --color-tone-purple-dot: var(--tone-purple-dot);
+
   --radius-lg: var(--radius);
+  --radius-float: var(--radius-float);
   --radius-md: calc(var(--radius) - 4px);
   --radius-sm: calc(var(--radius) - 6px);
 }

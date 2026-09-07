@@ -58,7 +58,11 @@ import { Button } from "@/components/ui/button"
 <Button variant="solid">Publicar</Button>              {/* exceção: uma por tela */}
 <Button variant="ghost" size="icon" aria-label="Copiar"><Copy /></Button>
 <Button variant="link" render={<a href="/planos" />}>Ver planos</Button>
+<Button effect="wipe">Entrar com Google</Button>     {/* preenche da esquerda no hover */}
 ```
+
+`effect` é um eixo à parte de `variant`: é como a peça reage ao ponteiro,
+não o que ela é.
 
 Badge — nove tons, e os três acessórios: ponto, contador e remoção. O
 tracejado é o sinal de ausência do sistema:
@@ -194,6 +198,25 @@ const STATUS = { aberta: "A fazer", progresso: "Em progresso" }
 </RadioGroup>
 ```
 
+Modal — diálogo e sheet não são duas decisões, são a mesma em duas
+larguras. Uma árvore só, sem duplicar conteúdo:
+
+```tsx
+<Modal>
+  <ModalTrigger render={<Button variant="primary" />}>Detalhe da task</ModalTrigger>
+  <ModalContent>
+    <ModalHeader>
+      <ModalTitle>Regenerar client Kubb</ModalTitle>
+    </ModalHeader>
+    <ModalBody>{/* só o miolo rola */}</ModalBody>
+    <ModalFooter>
+      <Button variant="outline" size="lg">Fechar</Button>
+      <Button variant="solid" size="lg">Salvar</Button>
+    </ModalFooter>
+  </ModalContent>
+</Modal>
+```
+
 Superfícies — tudo que paira usa o mesmo token de luz. Monte o
 `TooltipProvider` uma vez no layout:
 
@@ -270,6 +293,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/dialog` | `registry:ui` | `--float-strong` sobre véu de tinta; rodapé empilha invertido no mobile |
 | `@muriki/alert-dialog` | `registry:ui` | o que interrompe: não fecha por Esc nem por clique fora, e é onde o vermelho é cheio |
 | `@muriki/sheet` | `registry:ui` | painel que entra pela borda — o dialog vestido de outro jeito |
+| `@muriki/modal` | `registry:ui` | a mesma conversa na forma que couber: diálogo no desktop, sheet no celular |
 | `@muriki/view-toggle` | `registry:ui` | controle segmentado com pill animada, genérico sobre o tipo do valor |
 | `@muriki/switch` | `registry:ui` | trilho como encaixe, thumb como objeto elevado — não inverte no escuro, sobe por luz |
 | `@muriki/checkbox` | `registry:ui` | vazio é encaixe, marcado é chapado — numa caixa de 16px, relevo vira sujeira |
@@ -363,6 +387,8 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
   (badge), não de ação.
 - **Raio é razão, não constante.** Controle usa altura ÷ 5 (6px no padrão de 32);
   recipiente fica em 14px. O contraste entre os dois é o que lê como intenção.
+  O recipiente que FLUTUA é um degrau mais seco (`--radius-float`, 12px): dentro
+  de um diálogo os dois raios se encostam, e 14 contra 6 gritava.
 - **Duas famílias de neutro.** Superfície quente (hue 82-100), tinta fria
   (hue ~250). Não existe cinza puro no sistema.
 - **Dark não é o claro invertido.** O sólido troca de polaridade, o tingido troca

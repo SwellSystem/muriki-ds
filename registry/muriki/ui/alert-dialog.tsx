@@ -52,7 +52,7 @@ function AlertDialogContent({
         className={cn(
           "fixed top-1/2 left-1/2 z-50 flex w-full max-w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
           "flex-col gap-4 sm:max-w-md",
-          "rounded-lg bg-popover p-5 text-popover-foreground shadow-[var(--float-strong)] outline-none",
+          "rounded-[var(--radius-float)] bg-popover p-5 text-popover-foreground shadow-[var(--float-strong)] outline-none",
           "transition-[opacity,transform] duration-150 ease-out",
           "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
           "data-[ending-style]:scale-95 data-[ending-style]:opacity-0",

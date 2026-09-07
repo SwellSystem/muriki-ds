@@ -7,7 +7,7 @@
       "name": "theme",
       "type": "registry:theme",
       "title": "Tema Muriki",
-      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim).",
+      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px).",
       "cssVars": {
         "theme": {
           "radius": "14px"
@@ -73,6 +73,7 @@
           "float": "0 10px 26px oklch(0.32 0.02 248.5 / 0.10), 0 2px 6px oklch(0.32 0.02 248.5 / 0.06), inset 0 0 0 1px oklch(0.90 0.008 96)",
           "float-strong": "0 24px 60px oklch(0.32 0.02 248.5 / 0.16), 0 6px 16px oklch(0.32 0.02 248.5 / 0.08), inset 0 0 0 1px oklch(0.90 0.008 96)",
           "scrim": "oklch(0.32 0.02 248.5 / 0.30)",
+          "radius-float": "12px",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         },
@@ -137,6 +138,7 @@
           "float": "0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4), inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107)",
           "float-strong": "0 24px 60px oklch(0 0 0 / 0.7), 0 6px 16px oklch(0 0 0 / 0.5), inset 0 1px 0 oklch(1 0 0 / 0.07), inset 0 0 0 1px oklch(0.36 0.005 107)",
           "scrim": "oklch(0.09 0.003 107 / 0.62)",
+          "radius-float": "12px",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
         }
@@ -146,7 +148,7 @@
       "name": "button",
       "type": "registry:ui",
       "title": "Button",
-      "description": "Sete variantes, seis sem preenchimento. Raio proporcional à altura (÷5). A variante solid é exceção declarada: uma por tela.",
+      "description": "Sete variantes, seis sem preenchimento. Raio proporcional à altura (÷5). A variante solid é exceção declarada: uma por tela. O eixo `effect` é ortogonal — wipe preenche da esquerda no hover.",
       "dependencies": [
         "@base-ui/react",
         "class-variance-authority"
@@ -356,7 +358,7 @@
       "name": "dialog",
       "type": "registry:ui",
       "title": "Dialog",
-      "description": "A superfície mais alta: --float-strong sobre um véu de tinta (--scrim), não preto puro. Raio de recipiente, e o rodapé empilha invertido no mobile.",
+      "description": "A superfície mais alta: --float-strong sobre um véu de tinta (--scrim), não preto puro. DialogBody rola sozinho — cabeçalho e rodapé ficam. Rodapé empilha invertido no mobile.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"
@@ -414,6 +416,26 @@
         }
       ],
       "docs": "side: right (padrão), left ou bottom. SheetBody rola; cabeçalho e rodapé ficam."
+    },
+    {
+      "name": "modal",
+      "type": "registry:ui",
+      "title": "Modal",
+      "description": "A mesma conversa na forma que couber: diálogo no desktop, sheet de baixo no celular. Uma árvore só, sem duplicar conteúdo em dois ramos.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/dialog",
+        "@muriki/sheet"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/modal.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Troca por largura de viewport (padrão 640px, o `sm` do Tailwind). Dialog e Sheet seguem existindo para quem precisa forçar uma das formas — painel de filtro é sheet no desktop também."
     },
     {
       "name": "row-actions",
@@ -552,7 +574,7 @@
       "name": "priority-flag",
       "type": "registry:block",
       "title": "Priority Flag",
-      "description": "Prioridade com ícone e cor por nível — urgent quebra a escala de propósito (vira categoria). Variante pill com fundo tintado.",
+      "description": "Prioridade com ícone e cor por nível, nos nove tons do sistema — urgent quebra a escala de propósito.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
