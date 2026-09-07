@@ -27,6 +27,20 @@ const item = (txt, ativo = false, escuro = false) => `
   ${txt}
 </div>`;
 
+
+// linha da régua: um item desenhado na escala pedida
+const regua = (altura, fonte, raio, icone, rotulo) => `
+<span style="display:inline-flex;flex-direction:column;gap:7px;align-items:flex-start;">
+  <span style="display:flex;align-items:center;height:44px;">
+  <span style="display:flex;align-items:center;gap:10px;height:${altura}px;padding:0 10px;border-radius:${raio}px;
+    background:${N.brand50};color:${N.brand800};font-size:${fonte}px;box-sizing:border-box;">
+    <span style="width:${icone}px;height:${icone}px;border-radius:4px;background:${N.brand};opacity:0.75;flex-shrink:0;"></span>
+    Perfil
+  </span>
+  </span>
+  ${cap(rotulo)}
+</span>`;
+
 // um rail em miniatura, dentro de uma "tela"
 const tela = ({ escuro = false, largura = 128, raio = '0', margem = 0, rotulos = true }) => {
   const bg = escuro ? 'oklch(0.175 0.004 107)' : N.bg;
@@ -86,6 +100,12 @@ const body = `
       'Fundo do par tingido e a tinta correspondente — nunca fundo sólido, que roubaria o único sólido da tela. O filete de 3px encostado na borda é o que dá a leitura de "você está aqui" mesmo quando o rail recolhe e o rótulo some.',
       rotulado('aberto', tela({})) +
       rotulado('em ícones — o filete some, o fundo fica', tela({ largura: 46, rotulos: false })))}
+
+    ${regra('05', 'O rail está na MESMA régua dos outros controles',
+      'Altura 36, raio 9 (altura ÷ 4), texto 13, ícone 16 — o mesmo <em>lg</em> que a aba e o botão usam. O rail chegou portado com 40/8,4/16/18 e crescendo para 17 e 20 acima de 1536px: números que não existem em nenhum outro lugar da casa. Era a única superfície fora da régua, e por isso parecia grande demais ao lado de qualquer coisa na mesma tela.',
+      rotulado('errado — o que veio portado', regua(40, 16, 8.4, 18, '40 · 16 · 8,4 · 18')) +
+      rotulado('certo — a régua da casa', regua(36, 13, 9, 16, '36 · 13 · 9 · 16')) +
+      rotulado('sub-item', regua(28, 12.5, 7, 16, '28 · 12,5 · 7 · 16')))}
   </div>
 </div>`;
 

@@ -21,6 +21,28 @@
  * menu, sem rótulo e fora do tab order, ocupando as MESMAS coordenadas da
  * faixa que revela o rail desafixado. Recolher agora tem um botão visível.
  *
+ * O RAIL USA A ESCALA DA CASA, e essa foi a última coisa portada sem
+ * conferir. O item de nav vinha do platform com 40px de altura, 16px de
+ * texto (17px acima de 1536px), ícone de 18px (20px acima de 1536px) e raio
+ * de 8,4px; o seletor de workspace vinha com 64px, virando 80px em tela
+ * larga. Nenhum desses números existe no sistema — as alturas são
+ * 24/28/32/36/44, o raio é altura ÷ 4 e o texto de controle é 13px. O rail
+ * era a única superfície da casa fora da régua, e por isso parecia grande
+ * demais ao lado de qualquer outra coisa na mesma tela.
+ *
+ * Agora o item é 36px/raio 9/13px/ícone 16 (o `lg` da casa, porque item de
+ * nav é alvo frequente), o sub-item é 28px/raio 7, e o seletor de workspace
+ * é 44px/raio 11 — o piso de toque, que é o que uma linha dupla pede. As
+ * regras `2xl:` saíram: nav que cresce com a janela não é uma decisão do
+ * sistema, é um resto de outro projeto.
+ *
+ * RECOLHIDO, SÓ O ÍCONE DA FRENTE SOBREVIVE. A regra antiga escondia
+ * apenas spans de texto puro, então qualquer coisa depois do rótulo — o
+ * caret do seletor de workspace, um contador, uma seta — continuava no
+ * fluxo e só sumia por causa do `overflow-hidden` do botão. O resultado era
+ * um caret cortado ao meio pela borda do rail. Agora todo filho que não é o
+ * primeiro some no modo ícone, que é o que "recolhido" quer dizer.
+ *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
  * regra que o Sheet já declara — o painel perde o raio do lado encostado —
@@ -737,7 +759,7 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-sm p-2 text-left text-[16px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-md group-data-[collapsible=icon]:p-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 2xl:text-[17px] data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-[18px] [&_svg]:shrink-0 2xl:[&_svg]:size-5 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>span:not(:has(*))]:hidden",
+  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-[9px] px-2.5 text-left text-[13px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-[9px] group-data-[collapsible=icon]:px-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>*:not(:first-child)]:hidden",
   {
     variants: {
       variant: {
@@ -746,9 +768,16 @@ const sidebarMenuButtonVariants = cva(
           "border border-border bg-card hover:border-primary/40",
       },
       size: {
-        default: "h-10",
-        sm: "h-7 text-xs",
-        lg: "h-16 text-sm group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:p-0! 2xl:h-20",
+        /** 36px, raio 9 — o `lg` da casa. Item de nav é alvo frequente. */
+        default: "h-9",
+        /** 28px, raio 7 — o `sm` da casa. */
+        sm: "h-7 rounded-[7px] text-[12.5px]",
+        /**
+         * 44px, raio 11 — o piso de toque da casa, usado pelo seletor de
+         * workspace, que empilha duas linhas. Era `h-16` (64px) crescendo
+         * para 80px no 2xl: um controle maior que qualquer outro do sistema.
+         */
+        lg: "h-11 rounded-[11px] text-[13px] group-data-[collapsible=icon]:size-9! group-data-[collapsible=icon]:px-0!",
       },
     },
     defaultVariants: {
@@ -953,7 +982,7 @@ function SidebarMenuSubButton({
     props: mergeProps<"a">(
       {
         className: cn(
-          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-sm px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs 2xl:data-[size=md]:text-[15px] data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 2xl:[&>svg]:size-[18px]",
+          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-[7px] px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-[12.5px] data-[size=sm]:text-[12px] data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
           className
         ),
       },
