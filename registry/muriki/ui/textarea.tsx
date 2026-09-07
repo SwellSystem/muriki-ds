@@ -56,7 +56,7 @@ function Textarea({
       }}
       className={cn(
         inputVariants({ variant }),
-        "min-h-16 rounded-[6px] px-[11px] py-2 text-[0.8125rem] leading-5",
+        "min-h-16 rounded-[8px] px-[11px] py-2 text-[0.8125rem] leading-5",
         autoResize ? "resize-none overflow-hidden" : "resize-y",
         variant === "underline" && "rounded-none px-0",
         className

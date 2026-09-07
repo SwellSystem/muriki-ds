@@ -155,7 +155,7 @@ const metricas = `
       <div style="display:flex;flex-direction:column;gap:6px;align-items:center;"><div style="width:44px;height:44px;background:${N.brand200};border-radius:14px;"></div><span class="mono" style="font-size:10px;color:${N.fg};font-weight:500;">14 ★</span></div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:center;"><div style="width:44px;height:44px;background:${N.brand100};border-radius:16px;"></div><span class="mono" style="font-size:10px;color:${N.muted};">16</span></div>
     </div>
-    <div style="font-size:12.5px;line-height:1.5;color:${N.muted};">Raio de controle é <strong style="font-weight:600;">altura ÷ 5</strong>, não constante: 6px no padrão de 32. Recipiente fixo em <span class="mono" style="font-size:11.5px;">14px</span> — mais macio que o controle de propósito.</div>
+    <div style="font-size:12.5px;line-height:1.5;color:${N.muted};">Raio de controle é <strong style="font-weight:600;">altura ÷ 4</strong>, não constante: 8px no padrão de 32. Recipiente fixo em <span class="mono" style="font-size:11.5px;">14px</span> — mais macio que o controle de propósito.</div>
   </div>
 
   <div class="card" style="padding:20px;display:flex;flex-direction:column;gap:14px;">
@@ -173,7 +173,7 @@ const metricas = `
     </div>
     <div style="display:flex;flex-direction:column;gap:9px;">
       ${[[24, 'xs', 'toolbar de canvas'], [28, 'sm', 'linha de tabela, filtro'], [32, 'md', 'padrão do sistema'], [36, 'lg', 'ação principal da página'], [44, 'touch', 'piso no mobile']].map(([h, n, t]) =>
-        `<div style="display:flex;align-items:center;gap:12px;"><div style="height:${h}px;padding:0 ${h < 30 ? 9 : 13}px;border-radius:${Math.round(h / 5)}px;border:1px solid ${N.borderInput};background:${N.surface};display:flex;align-items:center;font-size:${h < 30 ? 12 : 13.5}px;color:${N.body};">${n}</div><span class="mono" style="font-size:10.5px;color:${N.muted};">${h}px · ${t}</span></div>`).join('')}
+        `<div style="display:flex;align-items:center;gap:12px;"><div style="height:${h}px;padding:0 ${h < 30 ? 9 : 13}px;border-radius:${Math.round(h / 4)}px;border:1px solid ${N.borderInput};background:${N.surface};display:flex;align-items:center;font-size:${h < 30 ? 12 : 13.5}px;color:${N.body};">${n}</div><span class="mono" style="font-size:10.5px;color:${N.muted};">${h}px · ${t}</span></div>`).join('')}
     </div>
   </div>
 </div>

@@ -13,7 +13,7 @@
  * de um título grande e um retângulo competiria com ele. Não é para
  * formulário denso — ali o filete fechado é o que separa campo de texto.
  *
- * Raio pela mesma razão do botão: altura ÷ 5. Base UI por baixo: dentro
+ * Raio pela mesma razão do botão: altura ÷ 4. Base UI por baixo: dentro
  * de um <Field> o id, o label e o aria-describedby vêm de graça.
  */
 import * as React from "react"
@@ -52,11 +52,11 @@ export const inputVariants = cva(
         ].join(" "),
       },
       size: {
-        sm: "h-7 rounded-[6px] px-2.5 text-[0.78rem]",
-        default: "h-8 rounded-[6px] px-[11px] text-[0.8125rem]",
-        lg: "h-9 rounded-[7px] px-3 text-sm",
+        sm: "h-7 rounded-[7px] px-2.5 text-[0.78rem]",
+        default: "h-8 rounded-[8px] px-[11px] text-[0.8125rem]",
+        lg: "h-9 rounded-[9px] px-3 text-sm",
         /** Piso de toque. `text-base` no mobile evita o zoom do iOS ao focar. */
-        touch: "h-11 rounded-[9px] px-3.5 text-base md:text-[0.9375rem]",
+        touch: "h-11 rounded-[11px] px-3.5 text-base md:text-[0.9375rem]",
       },
     },
     compoundVariants: [{ variant: "underline", class: "rounded-none px-0" }],

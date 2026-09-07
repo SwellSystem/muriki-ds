@@ -280,7 +280,7 @@ toast.error("Sem conexão — nada foi salvo")
 | item | tipo | o que traz |
 | --- | --- | --- |
 | `@muriki/theme` | `registry:theme` | papel quente + tinta fria, azul e amarelo da logo, nove matizes de badge, claro e escuro |
-| `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 5; `solid` é exceção declarada — uma por tela |
+| `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 4; `solid` é exceção declarada — uma por tela |
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
 | `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
 | `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
@@ -290,7 +290,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/tooltip` | `registry:ui` | etiqueta que passa: inverte o tema, fundo de tinta e texto de papel, com seta |
 | `@muriki/popover` | `registry:ui` | superfície flutuante em `--float`, raio de recipiente |
 | `@muriki/dropdown-menu` | `registry:ui` | item de 28px, atalho em mono, destrutivo tingido |
-| `@muriki/dialog` | `registry:ui` | `--float-strong` sobre véu de tinta; rodapé empilha invertido no mobile |
+| `@muriki/dialog` | `registry:ui` | `--float-strong` sobre véu de tinta; duas anatomias, solto e estruturado com faixas e filete |
 | `@muriki/alert-dialog` | `registry:ui` | o que interrompe: não fecha por Esc nem por clique fora, e é onde o vermelho é cheio |
 | `@muriki/sheet` | `registry:ui` | painel que entra pela borda — o dialog vestido de outro jeito |
 | `@muriki/modal` | `registry:ui` | a mesma conversa na forma que couber: diálogo no desktop, sheet no celular |
@@ -385,10 +385,11 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Botão não tem fill.** Seis variantes vivem de filete, tinta e fundo tênue.
   `solid` é exceção declarada — uma por tela. Cor cheia é linguagem de estado
   (badge), não de ação.
-- **Raio é razão, não constante.** Controle usa altura ÷ 5 (6px no padrão de 32);
-  recipiente fica em 14px. O contraste entre os dois é o que lê como intenção.
-  O recipiente que FLUTUA é um degrau mais seco (`--radius-float`, 12px): dentro
-  de um diálogo os dois raios se encostam, e 14 contra 6 gritava.
+- **Raio é razão, não constante.** Controle usa altura ÷ 4 (8px no padrão de 32,
+  9 no botão de 36); recipiente fica em 14px, e 12 quando flutua. O contraste
+  entre os dois é o que lê como intenção — o divisor saiu de 5 para 4 porque em
+  ÷ 5 o controle ficava seco demais ao lado do recipiente, e isso aparecia
+  justo dentro do diálogo, onde as duas formas se encostam.
 - **Duas famílias de neutro.** Superfície quente (hue 82-100), tinta fria
   (hue ~250). Não existe cinza puro no sistema.
 - **Dark não é o claro invertido.** O sólido troca de polaridade, o tingido troca

@@ -3,7 +3,7 @@ const INK = 'oklch(32% 0.02 248.5';
 export const HAIR = 'oklch(89% 0.009 96)';
 
 // ── A REGRA: raio proporcional à altura. r = round(h/5)
-export const rr = h => Math.round(h / 5);          // 24→5 28→6 32→6 36→7 44→9
+export const rr = h => Math.round(h / 4);          // 24→6 28→7 32→8 36→9 44→11
 export const CARD_R = 14;                           // recipiente mais macio que o controle
 
 const SZ = { 24:[9,12], 28:[10,12.5], 32:[12,13], 36:[14,13.5], 44:[18,15] };
