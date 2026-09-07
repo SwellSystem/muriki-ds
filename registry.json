@@ -590,6 +590,149 @@
       ]
     },
     {
+      "name": "avatar",
+      "type": "registry:ui",
+      "title": "Avatar",
+      "description": "Retrato ou iniciais em círculo, com fio por fora que não some em fundo claro nem escuro (mix-blend). Três tamanhos.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/avatar.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "calendar",
+      "type": "registry:ui",
+      "title": "Calendar",
+      "description": "Calendário de mês para escolher data, vestido com a paleta e o raio da casa. react-day-picker por baixo.",
+      "dependencies": [
+        "react-day-picker",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/calendar.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Usa `buttonVariants` para as setas de navegação — instalar traz o @muriki/button junto."
+    },
+    {
+      "name": "status-pill",
+      "type": "registry:block",
+      "title": "Status Pill",
+      "description": "Camada semântica sobre o Badge: cinco famílias de status e o mapa de família para tom, num lugar só.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/badge"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/status-pill/status-pill.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/status-pill/status-pill.tsx"
+        }
+      ]
+    },
+    {
+      "name": "task-modal",
+      "type": "registry:block",
+      "title": "Task Modal",
+      "description": "O modal de criar task em três modos — central, lateral e tela cheia — com o seletor embutido no topo. Apresentacional e controlado: recebe value/onChange e as opções de status, pessoas, projetos e tags. Traz junto o TaskQuickAdd, a caixa pequena de criação rápida.",
+      "dependencies": [
+        "@phosphor-icons/react",
+        "date-fns"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button",
+        "@muriki/badge",
+        "@muriki/dialog",
+        "@muriki/sheet",
+        "@muriki/popover",
+        "@muriki/select",
+        "@muriki/calendar",
+        "@muriki/avatar",
+        "@muriki/status-pill",
+        "@muriki/priority-flag",
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-quick-add.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-quick-add.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-property-list.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-property-list.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-title.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-title.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-description.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-description.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-subtasks.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-subtasks.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-attachments.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-attachments.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-section.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-section.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-mode-switch.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-mode-switch.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/task-modal-types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/task-modal-types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/task-modal/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-modal/index.ts"
+        }
+      ],
+      "docs": "Portado do muriki-platform sem redesenhar. O seletor de três modos é peça do bloco, não do Modal do sistema. A locale das datas entra por prop (`localeTag`), padrão pt-BR."
+    },
+    {
       "name": "task-table",
       "type": "registry:block",
       "title": "Task Table",

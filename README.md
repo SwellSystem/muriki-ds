@@ -303,6 +303,10 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/task-table` | `registry:block` | tabela hierárquica de tasks (epic → task → sub) com toolbar de filtros com menu, seleção em massa, colapso e slots de composição |
 | `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
 | `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
+| `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
+| `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
+| `@muriki/status-pill` | `registry:block` | camada semântica sobre o Badge: cinco famílias de status, um mapa só |
+| `@muriki/task-modal` | `registry:block` | o modal de criar task em três modos — central, lateral e tela cheia — com o seletor no topo, mais a criação rápida |
 | `@muriki/priority-flag` | `registry:block` | prioridade com ícone e cor por nível — urgent quebra a escala de propósito |
 | `@muriki/password-strength` | `registry:block` | régua de senha em quatro degraus e a barra de quatro segmentos, com a lista de requisitos |
 | `@muriki/login-page` | `registry:block` | a tela de entrada: painel editorial com o mascote, provedores em hierarquia, campos underline, força de senha e segundo fator inline |
