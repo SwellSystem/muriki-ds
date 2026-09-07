@@ -523,7 +523,10 @@ function KanbanColumn({
         >
           <p
             className={cn(
-              "text-center font-serif text-sm italic transition-colors",
+              // Sem `font-serif`: o sistema não tem serifada, e a classe
+              // cairia no serifado do navegador. O sussurro fica em itálico
+              // na mesma família da interface.
+              "text-center text-sm italic transition-colors",
               isDropTarget ? "text-primary/80" : "text-muted-foreground/40"
             )}
           >
