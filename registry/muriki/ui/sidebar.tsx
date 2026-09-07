@@ -54,12 +54,15 @@
  * moldura toma a borda da rampa e o palco fica no meio. Quem decide isso é
  * o token `--rail`, não este arquivo.
  *
- * ENCOSTADO, ELE NÃO PROJETA — em nenhum dos dois temas. O degrau de valor
- * já faz o trabalho, e sobra o filete da borda livre. Antes ele carregava a
- * elevação do cursor do view-toggle, sombra caindo no claro e encaixe no
- * escuro; com a cor dizendo de que lado a peça está, a sombra virava uma
- * segunda voz dizendo a mesma coisa — e, quando a direção mudou, dizendo o
- * contrário.
+ * A BORDA LIVRE É A DO CURSOR DO VIEW-TOGGLE: filete desenhado POR DENTRO,
+ * no `--input`, mais uma elevação ambiente curta. Desenhar por dentro é o
+ * que faz a linha abraçar o raio e não somar ao tamanho da caixa, e é a
+ * diferença entre uma aresta e um contorno.
+ *
+ * Só na borda LIVRE. O filete do cursor é `inset 0 0 0 1px`, que corre pelos
+ * quatro lados; numa peça que toca três bordas da tela isso vira um
+ * contorno de janela. É a mesma armadilha que o diálogo em tela cheia já
+ * tinha mostrado.
  *
  * SOLTO, O RAIL DEIXA DE SER MOLDURA. Nas variantes que descolam da borda —
  * `floating` e o rail desafixado — a superfície passa a ser a do cartão e a
@@ -393,7 +396,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[inset_-1px_0_0_var(--border)] data-[side=right]:shadow-[inset_1px_0_0_var(--border)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--input)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--input)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)]",
           className
         )}
         {...props}
@@ -515,7 +518,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-rail shadow-[inset_-1px_0_0_var(--border)] data-[side=right]:shadow-[inset_1px_0_0_var(--border)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[2px_0_10px_-7px_rgba(0,0,0,0.30),inset_-1px_0_0_var(--input)] dark:shadow-[2px_0_12px_-7px_rgba(0,0,0,0.7),inset_-1px_0_0_oklch(0.285_0.005_107)] data-[side=right]:shadow-[-2px_0_10px_-7px_rgba(0,0,0,0.30),inset_1px_0_0_var(--input)] dark:data-[side=right]:shadow-[-2px_0_12px_-7px_rgba(0,0,0,0.7),inset_1px_0_0_oklch(0.285_0.005_107)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>

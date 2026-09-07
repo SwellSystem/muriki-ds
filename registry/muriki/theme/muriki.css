@@ -56,12 +56,13 @@
      faz cartão, campo e diálogo terem superfície de verdade em vez de
      dependerem do filete.
 
-     O RAIL FICA DO LADO DE FORA DO CONTEÚDO, e para qual lado depende de
-     onde há espaço. No claro é acima: 0.998, quase branco, mas ainda com a
-     matiz quente da casa — branco puro ao lado de papel creme lê como
-     azulado. No escuro é abaixo: 0.152 contra 0.175. A moldura toma a borda
-     da rampa; o palco fica no meio. */
-  --rail: oklch(0.998 0.002 85);
+     O RAIL FICA ENTRE A PÁGINA E O CARTÃO, no claro. 98,2 de brilho: 2,1
+     acima da página e 1,0 abaixo do cartão. Em 0.998, quase branco, ele
+     ficava 0,4 ACIMA do cartão — a mesma superfície de novo, e a quebra do
+     branco para o papel era seca demais. Marfim guarda lugar próprio e
+     mantém a matiz quente, então a passagem para o conteúdo é um degrau, não
+     um corte. No escuro é abaixo da página: 0.195 é o espelho disso. */
+  --rail: oklch(0.984 0.005 90);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
      mais claro da página. No escuro é o sunken — o campo é um encaixe,
@@ -156,7 +157,7 @@
   --field: oklch(0.14 0.004 107);
   /* Entre o conteúdo (0.175) e o sunken (0.14), como no claro. Ver a nota
      lá: o rail recua nos dois temas e tem valor próprio nos dois. */
-  --rail: oklch(0.152 0.004 107);
+  --rail: oklch(0.195 0.004 107);
 
   --float: 0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4),
     inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);
