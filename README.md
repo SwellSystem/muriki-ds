@@ -419,11 +419,11 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
-- **O rail é a peça elevada, e usa o relevo do cursor do toggle.** No claro é
-  card branco descendo sombra sobre o papel do conteúdo; no escuro assenta
-  como encaixe, mais escuro que a página, com o fio de luz por dentro. É a
-  regra da luz aplicada ao shell inteiro. Ele também não tem paleta própria:
-  os oito tokens `--sidebar-*` do shadcn são cópias das cores base.
+- **O rail usa a MESMA receita de elevação do cursor do toggle**, não uma
+  parecida. Sombra caindo com o filete por dentro no claro; encaixe com o fio
+  de luz no escuro. Inventar uma sombra lateral para o rail dava uma aresta
+  dura, que é outra linguagem. A superfície é o token `--rail`; os oito
+  `--sidebar-*` do shadcn não existem aqui, eram cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro
