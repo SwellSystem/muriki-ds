@@ -738,6 +738,71 @@
       "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão."
     },
     {
+      "name": "onboarding-pricing",
+      "type": "registry:block",
+      "title": "Onboarding Pricing",
+      "description": "A tela de escolha de plano do onboarding: cabeçalho editorial com a trilha de passos, os dois segmentados (conta e período) e a grade de planos com preço rolante, features, selo de teste e o skeleton do bloco plan-card enquanto carrega.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/badge",
+        "@muriki/button",
+        "@muriki/view-toggle",
+        "@muriki/plan-card"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/pricing-screen.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/pricing-screen.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/onboarding-step-header.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/onboarding-step-header.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/onboarding-stepper.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/onboarding-stepper.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/onboarding-section-label.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/onboarding-section-label.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/plan-price.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/plan-price.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/plan-features.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/plan-features.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/plan-trial-badge.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/plan-trial-badge.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/index.ts"
+        }
+      ],
+      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador."
+    },
+    {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",

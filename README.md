@@ -309,6 +309,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/breadcrumb` | `registry:ui` | trilha com caret e reticências no meio que não cabe |
 | `@muriki/sidebar` | `registry:ui` | rail que recua um degrau abaixo do conteúdo, recolhe para ícones e vira gaveta no celular |
 | `@muriki/plan-card` | `registry:block` | card de plano por slots, com o skeleton que tem a anatomia dele |
+| `@muriki/onboarding-pricing` | `registry:block` | a tela de escolha de plano: trilha de passos, os dois segmentados e a grade com preço que rola os dígitos |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
 | `@muriki/status-pill` | `registry:block` | camada semântica sobre o Badge: cinco famílias de status, um mapa só |
