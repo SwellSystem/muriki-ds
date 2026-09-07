@@ -478,7 +478,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Quando NENHUMA opção tem rótulo, o controle volta ao raio de controle — só com ícone o cursor circular imitaria um switch. Opção sem label visível exige ariaLabel próprio."
+      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio."
     },
     {
       "name": "sonner",

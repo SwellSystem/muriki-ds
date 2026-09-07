@@ -405,10 +405,6 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
-- **O segmentado só com ícone perde o pill.** O cursor em estádio lê como
-  cursor quando há rótulo. Sem rótulo ele vira um círculo dentro de um trilho
-  oval, que é o desenho de um switch — a peça de que o ViewToggle precisa se
-  distinguir. Então sem nenhum rótulo o controle volta ao raio de controle.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro
