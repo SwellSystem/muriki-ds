@@ -4,10 +4,16 @@
  *
  * O rail NÃO tem paleta própria. O shadcn traz oito tokens `--sidebar-*`
  * que são cópias quase iguais das cores base, e manter duas paletas é
- * garantir que uma hora elas divergem. Aqui ele é uma SUPERFÍCIE do
- * sistema: `--sunken`, a mesma do trilho de toggle e do painel do login —
- * mais escura que o fundo nos dois temas, o que faz o rail assentar e a
- * área de conteúdo ficar por cima.
+ * garantir que uma hora elas divergem.
+ *
+ * Ele é a PEÇA ELEVADA, e usa exatamente o relevo do cursor do ViewToggle
+ * — a mesma física, no tamanho de uma tela. No claro a peça está por cima:
+ * card branco descendo sombra sobre o papel do conteúdo. No escuro ela
+ * assenta como encaixe, mais escura que a página, com o fio de luz na
+ * aresta de baixo por dentro. É a regra 04 da prancha do escuro aplicada
+ * ao shell inteiro.
+ *
+ * O conteúdo, do outro lado, é sempre o papel: `--background`.
  *
  * As duas medidas do rail (`--sidebar-width`, `--sidebar-width-icon`)
  * continuam locais: são geometria deste componente, não cor do sistema.
@@ -258,7 +264,7 @@ function SidebarProvider({
           } as React.CSSProperties
         }
         className={cn(
-          "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sunken",
+          "group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-card",
           className
         )}
         {...props}
@@ -331,7 +337,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col bg-sunken text-foreground",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-card shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:bg-[oklch(0.155_0.004_107)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)]",
           className
         )}
         {...props}
@@ -349,7 +355,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sunken p-0 text-foreground [&>button]:hidden"
+          className="w-(--sidebar-width) bg-card p-0 text-foreground [&>button]:hidden"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -455,7 +461,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-sunken group-data-[side=left]:rounded-r-xl group-data-[side=right]:rounded-l-xl group-data-[variant=floating]:rounded-xl group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-card shadow-[1px_0_2px_rgba(0,0,0,0.10),2px_0_8px_rgba(0,0,0,0.05)] dark:bg-[oklch(0.155_0.004_107)] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.05)] group-data-[side=left]:rounded-r-xl group-data-[side=right]:rounded-l-xl group-data-[variant=floating]:rounded-xl group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>
@@ -505,7 +511,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
         "absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
         "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
-        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sunken",
+        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-card",
         "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
         "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
         className
@@ -703,13 +709,13 @@ function SidebarMenuItem({ className, ...props }: React.ComponentProps<"li">) {
 }
 
 const sidebarMenuButtonVariants = cva(
-  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-sm p-2 text-left text-[16px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-md group-data-[collapsible=icon]:p-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 2xl:text-[17px] data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary/15 data-active:text-primary data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary/20 [&_svg]:size-[18px] [&_svg]:shrink-0 2xl:[&_svg]:size-5 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>span:not(:has(*))]:hidden",
+  "peer/menu-button group/menu-button relative flex w-full items-center gap-2.5 overflow-hidden rounded-sm p-2 text-left text-[16px] whitespace-nowrap text-foreground ring-ring outline-hidden transition-colors duration-150 group-has-data-[sidebar=menu-action]/menu-item:pr-8 group-data-[collapsible=icon]:mx-auto group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:rounded-md group-data-[collapsible=icon]:p-0! hover:bg-muted group-data-[collapsible=icon]:hover:bg-muted focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 2xl:text-[17px] data-open:bg-primary/10 data-open:text-foreground data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-2 data-active:before:bottom-2 data-active:before:left-0 data-active:before:w-[3px] data-active:before:rounded-full data-active:before:bg-primary group-data-[collapsible=icon]:data-active:before:hidden data-active:hover:bg-primary-subtle/70 [&_svg]:size-[18px] [&_svg]:shrink-0 2xl:[&_svg]:size-5 [&>span:not(:has(*))]:truncate group-data-[collapsible=icon]:[&>span:not(:has(*))]:hidden",
   {
     variants: {
       variant: {
         default: "",
         outline:
-          "border border-border bg-sunken hover:border-primary/40",
+          "border border-border bg-card hover:border-primary/40",
       },
       size: {
         default: "h-10",
@@ -922,7 +928,7 @@ function SidebarMenuSubButton({
     props: mergeProps<"a">(
       {
         className: cn(
-          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-sm px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs 2xl:data-[size=md]:text-[15px] data-active:bg-primary/15 data-active:text-primary data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 2xl:[&>svg]:size-[18px]",
+          "relative flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-sm px-2 text-foreground/90 ring-ring outline-hidden transition-colors duration-150 group-data-[collapsible=icon]:hidden hover:bg-primary/10 hover:text-foreground focus-visible:ring-2 active:bg-primary/10 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[size=md]:text-sm data-[size=sm]:text-xs 2xl:data-[size=md]:text-[15px] data-active:bg-primary-subtle data-active:text-primary-subtle-foreground data-active:before:absolute data-active:before:top-1 data-active:before:bottom-1 data-active:before:left-0 data-active:before:w-[2px] data-active:before:rounded-full data-active:before:bg-primary [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 2xl:[&>svg]:size-[18px]",
           className
         ),
       },

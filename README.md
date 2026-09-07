@@ -411,16 +411,19 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
-- **Skeleton tem a anatomia do que substitui.** Nome curto, descrição longa,
-  preço grande, quatro linhas de feature com larguras diferentes. Blocos de
-  larguras iguais denunciam a preguiça e leem como erro de carregamento; a
-  silhueta certa lê como o conteúdo chegando. Veja o `@muriki/plan-card`.
+- **Skeleton tem a anatomia do que substitui, e o card segue o skeleton.**
+  Mesma borda, mesmo raio, mesma sombra dos dois lados: se a silhueta da
+  espera não bate com a da chegada, o carregamento pisca. O do `plan-card` é
+  o do onboarding do platform na letra — nome curto, descrição longa, preço
+  grande, quatro linhas de feature com larguras diferentes e o botão.
 - **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
-- **O rail não tem paleta própria.** O shadcn traz oito tokens `--sidebar-*`
-  que são cópias quase iguais das cores base. Aqui o rail é uma superfície do
-  sistema: `--sunken`, a mesma do trilho de toggle e do painel do login.
+- **O rail é a peça elevada, e usa o relevo do cursor do toggle.** No claro é
+  card branco descendo sombra sobre o papel do conteúdo; no escuro assenta
+  como encaixe, mais escuro que a página, com o fio de luz por dentro. É a
+  regra da luz aplicada ao shell inteiro. Ele também não tem paleta própria:
+  os oito tokens `--sidebar-*` do shadcn são cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro
