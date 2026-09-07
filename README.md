@@ -303,6 +303,12 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/task-table` | `registry:block` | tabela hierárquica de tasks (epic → task → sub) com toolbar de filtros com menu, seleção em massa, colapso e slots de composição |
 | `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
 | `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
+| `@muriki/skeleton` | `registry:ui` | um buraco na superfície afundada; a regra é ter a anatomia do que substitui |
+| `@muriki/separator` | `registry:ui` | o filete do sistema, horizontal ou vertical |
+| `@muriki/tabs` | `registry:ui` | filete embaixo da ativa; `enclosed` para o caso denso |
+| `@muriki/breadcrumb` | `registry:ui` | trilha com caret e reticências no meio que não cabe |
+| `@muriki/sidebar` | `registry:ui` | rail que recolhe para ícones e vira gaveta no celular; sem paleta própria |
+| `@muriki/plan-card` | `registry:block` | card de plano por slots, com o skeleton que tem a anatomia dele |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
 | `@muriki/status-pill` | `registry:block` | camada semântica sobre o Badge: cinco famílias de status, um mapa só |
@@ -405,6 +411,16 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Superfície vira encaixe; objeto, não.** O trilho de switch e progress é
   encaixe. O thumb é objeto — não carrega nada e como encaixe sumiria: fica
   elevado nos dois temas, subindo por sombra no claro e por luz no escuro.
+- **Skeleton tem a anatomia do que substitui.** Nome curto, descrição longa,
+  preço grande, quatro linhas de feature com larguras diferentes. Blocos de
+  larguras iguais denunciam a preguiça e leem como erro de carregamento; a
+  silhueta certa lê como o conteúdo chegando. Veja o `@muriki/plan-card`.
+- **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
+  troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
+  pastilha, e o pill fica reservado ao toggle.
+- **O rail não tem paleta própria.** O shadcn traz oito tokens `--sidebar-*`
+  que são cópias quase iguais das cores base. Aqui o rail é uma superfície do
+  sistema: `--sunken`, a mesma do trilho de toggle e do painel do login.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro

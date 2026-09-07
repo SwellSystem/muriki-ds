@@ -591,6 +591,145 @@
       ]
     },
     {
+      "name": "skeleton",
+      "type": "registry:ui",
+      "title": "Skeleton",
+      "description": "Um buraco onde o conteúdo vai entrar: usa a superfície afundada do sistema e raio de controle. A regra de uso vale mais que a peça — skeleton bom tem a anatomia do que substitui.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/skeleton.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Larguras iguais em linhas de texto denunciam a preguiça. Veja o @muriki/plan-card, que traz o próprio."
+    },
+    {
+      "name": "separator",
+      "type": "registry:ui",
+      "title": "Separator",
+      "description": "O filete do sistema, horizontal ou vertical.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/separator.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Nas superfícies que já carregam filete por sombra interna, prefira aquele: dois meios de desenhar a mesma linha divergem de espessura."
+    },
+    {
+      "name": "tabs",
+      "type": "registry:ui",
+      "title": "Tabs",
+      "description": "Aba não é ViewToggle: o toggle troca a FORMA de ver a mesma coisa, a aba troca O QUE se vê. Por isso a padrão é o filete embaixo, sem trilho nem pastilha. `enclosed` existe para o caso denso.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/tabs.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "breadcrumb",
+      "type": "registry:ui",
+      "title": "Breadcrumb",
+      "description": "Trilha de navegação com separador em caret e reticências para o meio que não cabe.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/breadcrumb.tsx",
+          "type": "registry:ui"
+        }
+      ]
+    },
+    {
+      "name": "sidebar",
+      "type": "registry:ui",
+      "title": "Sidebar",
+      "description": "O rail do app: recolhe para ícones, vira gaveta no celular e lembra o estado por cookie. Sem paleta própria — é uma superfície do sistema (--sunken).",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button",
+        "@muriki/input",
+        "@muriki/separator",
+        "@muriki/sheet",
+        "@muriki/skeleton",
+        "@muriki/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/sidebar.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "O shadcn traz oito tokens --sidebar-*, cópias quase iguais das cores base. Aqui eles não existem: manter duas paletas é garantir que uma hora divergem."
+    },
+    {
+      "name": "plan-card",
+      "type": "registry:block",
+      "title": "Plan Card",
+      "description": "Card de plano composto por slots — preço, features e selos são do consumidor. Vem com o PlanCardSkeleton, que tem a anatomia do card em vez de blocos genéricos.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/button",
+        "@muriki/skeleton"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/plan-card/plan-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plan-card/plan-card.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/plan-card/plan-card-skeleton.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plan-card/plan-card-skeleton.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/plan-card/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/plan-card/index.ts"
+        }
+      ],
+      "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão."
+    },
+    {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",
