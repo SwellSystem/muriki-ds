@@ -54,10 +54,26 @@ const tabsListVariants = cva(
   {
     variants: {
       variant: {
-        /** Filete embaixo da ativa. O trilho é a própria linha do sistema. */
+        /**
+         * Filete embaixo da ativa. O trilho é a própria linha do sistema.
+         *
+         * O TRILHO DISSOLVE NAS PONTAS. A lista é `w-fit`, então a linha
+         * tinha começo e fim visíveis e lia como um traço solto embaixo das
+         * abas. Dissolvida ela vira trilho: sustenta o filete da ativa sem
+         * ela mesma virar um objeto. É a forma `soft` do Separator, aqui em
+         * pseudo-elemento porque box-shadow não aceita máscara.
+         *
+         * `before` e não `after`: o filete da aba ativa é um `after` do
+         * gatilho, e o pseudo-elemento do pai pintaria por cima dele.
+         */
         line: [
-          "gap-4 group-data-[orientation=horizontal]/tabs:shadow-[inset_0_-1px_0_var(--border)]",
-          "group-data-[orientation=vertical]/tabs:gap-1 group-data-[orientation=vertical]/tabs:shadow-[inset_-1px_0_0_var(--border)]",
+          "relative gap-4",
+          "before:pointer-events-none before:absolute before:bg-border",
+          "group-data-[orientation=horizontal]/tabs:before:inset-x-0 group-data-[orientation=horizontal]/tabs:before:bottom-0 group-data-[orientation=horizontal]/tabs:before:h-px",
+          "group-data-[orientation=horizontal]/tabs:before:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]",
+          "group-data-[orientation=vertical]/tabs:gap-1",
+          "group-data-[orientation=vertical]/tabs:before:inset-y-0 group-data-[orientation=vertical]/tabs:before:right-0 group-data-[orientation=vertical]/tabs:before:w-px",
+          "group-data-[orientation=vertical]/tabs:before:[mask-image:linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)]",
         ].join(" "),
         /** Trilho afundado, para quando o filete se perderia. */
         enclosed:

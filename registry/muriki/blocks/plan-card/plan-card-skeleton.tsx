@@ -19,17 +19,22 @@ export function PlanCardSkeleton({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        // Igual ao do platform, na letra. A única mudança é a cor da borda
-        // ser explícita: lá ela vinha de uma regra base do shadcn que a casa
-        // não tem, e `border` sozinho pintaria com a cor do texto.
+        // Veio do platform na letra, e acompanha o card quando ele muda: o
+        // anel do destaque saiu junto com o do card, e a linha do selo virou
+        // altura reservada em vez de peça absoluta no canto.
         "relative flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6",
-        emphasized ? "border-primary ring-1 ring-primary/20" : "border-border",
+        emphasized ? "border-primary" : "border-border",
         className
       )}
     >
-      {emphasized ? (
-        <Skeleton className="absolute top-3 right-3 h-5 w-24 rounded-full bg-primary/25" />
-      ) : null}
+      {/* A linha do selo é reservada em TODOS, com ou sem selo — é o que o
+          card faz, e é o que impede o título de pular quando o conteúdo
+          chega. */}
+      <div className="flex h-[22px] items-center">
+        {emphasized ? (
+          <Skeleton className="h-[18px] w-24 rounded-[4px] bg-primary/25" />
+        ) : null}
+      </div>
 
       <div className="space-y-2">
         <Skeleton className="h-5 w-32 md:w-36" />
