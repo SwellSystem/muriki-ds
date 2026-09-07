@@ -8,9 +8,18 @@
  * combinação legítima, e a mais útil em tela apertada: se os dois virassem
  * valores de uma lista só, ela deixaria de existir.
  *
+ * TRÊS COISAS, não duas, e vale nomear direito: POSIÇÃO (encostado ou
+ * flutuando) e LARGURA (rótulos ou ícones) são os eixos; `enablePinning` é
+ * um COMPORTAMENTO em cima deles — desafixado, o rail some e volta quando o
+ * mouse encosta na borda. Por isso ele é opt-in: um rail que se esconde
+ * sozinho não serve a toda tela.
+ *
  * O corte: `inset` saiu (o conteúdo virava cartão dentro de uma moldura que
  * não era superfície de nada) e o sistema de flyout de grupo saiu junto —
- * era uma feature inteira, com contexto exportado, que nada acionava.
+ * era uma feature inteira, com contexto exportado, que nada acionava. E o
+ * `SidebarRail` saiu — uma segunda faixa invisível na borda que recolhia o
+ * menu, sem rótulo e fora do tab order, ocupando as MESMAS coordenadas da
+ * faixa que revela o rail desafixado. Recolher agora tem um botão visível.
  *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
@@ -362,8 +371,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Sidebar</SheetTitle>
-            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+            <SheetTitle>Menu</SheetTitle>
+            <SheetDescription>Navegação principal.</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -487,42 +496,11 @@ function SidebarTrigger({
       {...props}
     >
       <SidebarIcon />
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Recolher menu</span>
     </Button>
   )
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
-  const { toggleSidebar } = useSidebar()
-
-  return (
-    <button
-      data-sidebar="rail"
-      data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
-      tabIndex={-1}
-      onClick={toggleSidebar}
-      title="Toggle Sidebar"
-      className={cn(
-        "absolute inset-y-0 z-20 hidden w-4 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
-        "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
-        "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
-        "group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-card",
-        "[[data-side=left][data-collapsible=offcanvas]_&]:-right-2",
-        "[[data-side=right][data-collapsible=offcanvas]_&]:-left-2",
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-/**
- * Os dois controles do rail, no cabeçalho dele — e não soltos na página.
- * É onde o platform os põe, e faz sentido: quem comanda o rail mora no
- * rail. O de colapsar troca a LARGURA; o de fixar troca a POSIÇÃO. Com o
- * rail em ícones eles empilham, porque não cabem lado a lado.
- */
 function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
   const { toggleSidebar, togglePin, pinned, state, isMobile, enablePinning } =
     useSidebar()
@@ -1013,7 +991,6 @@ export {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
   useSidebar,

@@ -1,0 +1,286 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    body { margin: 0; background: oklch(98% 0.004 82); font-family: "Geist", ui-sans-serif, system-ui, sans-serif; }
+    a { color: oklch(47% 0.185 262.6); text-decoration: none; }
+    a:hover { color: oklch(41% 0.17 262.6); }
+    .sec-title { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: oklch(45% 0.03 257.7); margin: 0; }
+    .cap { font-family: "Geist Mono", ui-monospace, monospace; font-size: 10px; color: oklch(45% 0.03 257.7); }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .card { background: oklch(99.3% 0.002 85); border: 1px solid oklch(94% 0.01 100); border-radius: 12px; padding: 24px 26px; }
+  </style>
+</helmet>
+<div style="background:oklch(98% 0.004 82);color:oklch(32% 0.02 248.5);padding:44px 48px 56px;display:flex;flex-direction:column;gap:38px;">
+  <div style="display:flex;flex-direction:column;gap:5px;">
+    <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;color:oklch(26% 0.022 250);">Rail</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:680px;">O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. Sem paleta própria: a superfície é o token --rail e o relevo é o do cursor do view-toggle.</div>
+  </div>
+
+<div style="display:flex;flex-direction:column;gap:14px;">
+  <p class="sec-title">Os dois eixos, e o comportamento que anda por cima</p>
+  <div style="display:flex;flex-direction:column;gap:18px;">
+    
+<div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:14px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">01</span>
+    <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">Posição e largura são eixos SEPARADOS</span>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">encostado + rótulos</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:46px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        background:oklch(97% 0.015 262.6);">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(47% 0.185 262.6);opacity:0.9;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+  </div>
+</div><span class="cap">encostado + ícones</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:8px;bottom:8px;left:8px;width:46px;border-radius:8px;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        background:oklch(97% 0.015 262.6);">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(47% 0.185 262.6);opacity:0.9;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+  </div>
+</div><span class="cap">flutuando + ícones</span></span></div>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Posição diz onde o rail mora; largura diz quanto ele mostra. Colapsar um rail flutuante é a combinação mais útil em tela apertada — e ela deixaria de existir se os dois virassem valores de uma lista só.</span>
+</div>
+
+    
+<div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:14px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">02</span>
+    <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">Encostado não tem raio</span>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0 14px 14px 0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">errado — raio encostado</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">certo — sem raio</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:8px;bottom:8px;left:8px;width:128px;border-radius:8px;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">certo — flutuando, com raio</span></span></div>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O rail toca três bordas da tela. Arredondar só a quarta o faz parecer um cartão que não chegou na parede — é a mesma regra que o Sheet já declara, e que o rail contradizia. Flutuando, o raio volta: aí a peça está solta de verdade.</span>
+</div>
+
+    
+<div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:14px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">03</span>
+    <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">A elevação é a MESMA do cursor do toggle</span>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">claro — sombra caindo</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(0.175 0.004 107);box-shadow:inset 0 0 0 1px oklch(0.30 0.005 107);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0;background:oklch(0.155 0.004 107);box-shadow:inset 0 1px 3px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px oklch(0.135 0.004 107);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(0.275 0.055 262.6);color:oklch(0.84 0.1 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(0.7 0.145 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(0.70 0.006 100);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(0.70 0.006 100);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">escuro — encaixe com fio de luz</span></span></div>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Não uma parecida. Sombra caindo com o filete por dentro no claro; encaixe com fio de luz no escuro. Uma sombra lateral própria dá aresta dura, que é outra linguagem — e duas maneiras de dizer "isto está por cima" acabam divergindo.</span>
+</div>
+
+    
+<div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:14px;background:oklch(99.3% 0.002 85);box-shadow:inset 0 0 0 1px oklch(89% 0.009 96);">
+  <div style="display:flex;align-items:baseline;gap:8px;">
+    <span class="mono" style="font-size:11px;color:oklch(47% 0.185 262.6);font-weight:500;">04</span>
+    <span style="font-size:13.5px;font-weight:600;color:oklch(26% 0.022 250);">O item ativo é tingido, com filete na borda</span>
+  </div>
+  <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;"><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:128px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  background:oklch(97% 0.015 262.6);color:oklch(33% 0.13 262.6);">
+  <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:999px;background:oklch(47% 0.185 262.6);"></span>
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Perfil
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Workspace
+</div>
+<div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
+  color:oklch(45% 0.03 257.7);">
+  
+  <span style="width:15px;height:15px;border-radius:4px;background:currentColor;opacity:0.35;flex-shrink:0;"></span>
+  Membros
+</div>
+  </div>
+</div><span class="cap">aberto</span></span><span style="display:inline-flex;flex-direction:column;gap:7px;">
+<div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:oklch(98% 0.004 82);box-shadow:inset 0 0 0 1px oklch(94% 0.01 100);">
+  <div style="position:absolute;top:0px;bottom:0px;left:0px;width:46px;border-radius:0;background:oklch(0.993 0.002 85);box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px oklch(92% 0.01 98);padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+    
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        background:oklch(97% 0.015 262.6);">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(47% 0.185 262.6);opacity:0.9;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:8px;position:relative;
+        ">
+        <span style="width:15px;height:15px;border-radius:4px;background:oklch(45% 0.03 257.7);opacity:0.35;"></span>
+      </div>
+  </div>
+</div><span class="cap">em ícones — o filete some, o fundo fica</span></span></div>
+  <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Fundo do par tingido e a tinta correspondente — nunca fundo sólido, que roubaria o único sólido da tela. O filete de 3px encostado na borda é o que dá a leitura de "você está aqui" mesmo quando o rail recolhe e o rótulo some.</span>
+</div>
+  </div>
+</div>
+</div>
+</x-dc>
+</body>
+</html>
