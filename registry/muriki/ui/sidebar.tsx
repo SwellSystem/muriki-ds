@@ -49,6 +49,17 @@
  * mesma tinta do ativo com metade da força: passar o mouse prenuncia o
  * estado selecionado em vez de anunciar outro.
  *
+ * O RAIL RECUA, E POR ISSO NÃO PROJETA. Enquanto ele era a superfície de
+ * cima, carregava a elevação do cursor do view-toggle — sombra caindo no
+ * claro, encaixe no escuro. Recuado, uma sombra para fora diria o
+ * contrário do que a cor diz. Agora encostado ele tem só o filete na borda
+ * livre: o degrau de valor entre `--rail` e `--background` faz o resto.
+ *
+ * SOLTO, O RAIL DEIXA DE RECUAR. Nas variantes que descolam da borda —
+ * `floating` e o rail desafixado — a superfície passa a ser a do cartão e
+ * a sombra volta. É a mesma família de raciocínio de "encostado não tem
+ * raio": o que a peça é depende de estar ou não tocando a parede.
+ *
  * ENCOSTADO NÃO TEM RAIO. O rail toca três bordas da tela, e arredondar só
  * a quarta o faz parecer um cartão que não chegou na parede. É a mesma
  * regra que o Sheet já declara — o painel perde o raio do lado encostado —
@@ -376,7 +387,7 @@ function Sidebar({
       <div
         data-slot="sidebar"
         className={cn(
-          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)]",
+          "flex h-full w-(--sidebar-width) flex-col text-foreground", "bg-rail shadow-[inset_-1px_0_0_var(--border)] data-[side=right]:shadow-[inset_1px_0_0_var(--border)]",
           className
         )}
         {...props}
@@ -490,7 +501,7 @@ function Sidebar({
           // Eixo "pin": desafixada, vira um CARTÃO flutuante (margem, cantos
           // arredondados, sombra) — fiel ao mock. O reveal/hide (transform +
           // opacity + transição) é controlado inline via `floatStyle`.
-          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:rounded-[var(--radius-float)]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
+          "group-data-[pinned=false]:inset-y-2! group-data-[pinned=false]:z-30 group-data-[pinned=false]:h-auto! group-data-[pinned=false]:overflow-hidden group-data-[pinned=false]:bg-card! group-data-[pinned=false]:rounded-[var(--radius-float)]! group-data-[pinned=false]:border! group-data-[pinned=false]:border-border/45! group-data-[pinned=false]:shadow-xl group-data-[pinned=false]:data-[side=left]:left-2! group-data-[pinned=false]:data-[side=right]:right-2!",
           className
         )}
         {...props}
@@ -498,7 +509,7 @@ function Sidebar({
         <div
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
-          className="relative flex size-full flex-col bg-rail shadow-[0_1px_2px_rgba(0,0,0,0.14),0_2px_6px_rgba(0,0,0,0.07),inset_0_0_0_1px_var(--input)] dark:shadow-[inset_0_1px_3px_rgba(0,0,0,0.65),inset_0_-1px_0_rgba(255,255,255,0.06),inset_0_0_0_1px_oklch(0.135_0.004_107)] group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
+          className="relative flex size-full flex-col bg-rail shadow-[inset_-1px_0_0_var(--border)] data-[side=right]:shadow-[inset_1px_0_0_var(--border)] group-data-[variant=floating]:bg-card group-data-[variant=floating]:rounded-[var(--radius-float)] group-data-[variant=floating]:border group-data-[variant=floating]:border-border/35 group-data-[variant=floating]:shadow-[0_18px_45px_-32px_oklch(var(--foreground))] group-data-[variant=floating]:ring-1 group-data-[variant=floating]:ring-border/35"
         >
           {children}
         </div>

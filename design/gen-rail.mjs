@@ -7,13 +7,15 @@ import { HAIR } from './recipes.mjs';
 
 const cap = t => `<span class="cap">${t}</span>`;
 
-// A elevação do rail é a MESMA do cursor do view-toggle. Escrita aqui igual
-// à do componente, para a prancha não divergir do código.
-const ELEV_CLARO = `box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px ${N.borderInput};`;
-const ELEV_ESCURO = 'box-shadow:inset 0 1px 3px rgba(0,0,0,0.65), inset 0 -1px 0 rgba(255,255,255,0.06), inset 0 0 0 1px oklch(0.135 0.004 107);';
+// Encostado, o rail RECUA: só o filete na borda livre. Quem recua não
+// projeta. Escrito aqui igual ao do componente, para a prancha não divergir.
+const ELEV_CLARO = `box-shadow:inset -1px 0 0 ${N.border};`;
+const ELEV_ESCURO = 'box-shadow:inset -1px 0 0 oklch(0.28 0.005 107);';
+// Solto, deixa de recuar: superfície de cartão e sombra de volta.
+const ELEV_SOLTO = 'box-shadow:0 18px 45px -32px rgba(0,0,0,0.9), inset 0 0 0 1px rgba(0,0,0,0.08);';
 
-const RAIL_CLARO = 'oklch(0.993 0.002 85)';    // = --card no claro
-const RAIL_ESCURO = 'oklch(0.21 0.004 107)';   // = --card no escuro
+const RAIL_CLARO = 'oklch(0.962 0.010 94)';    // entre o conteúdo e o sunken
+const RAIL_ESCURO = 'oklch(0.152 0.004 107)';  // entre o conteúdo e o sunken
 
 const item = (txt, ativo = false, escuro = false) => `
 <div style="display:flex;align-items:center;gap:9px;height:30px;padding:0 9px;border-radius:8px;font-size:12.5px;position:relative;
@@ -54,10 +56,11 @@ const planos = (railBg, contBg, escuro, rotulo) => `
 </span>`;
 
 // um rail em miniatura, dentro de uma "tela"
-const tela = ({ escuro = false, largura = 128, raio = '0', margem = 0, rotulos = true }) => {
+const tela = ({ escuro = false, largura = 128, raio = '0', margem = 0, rotulos = true, solto = false }) => {
   const bg = escuro ? 'oklch(0.175 0.004 107)' : N.bg;
   const railBg = escuro ? RAIL_ESCURO : RAIL_CLARO;
-  const elev = escuro ? ELEV_ESCURO : ELEV_CLARO;
+  const elev = solto ? ELEV_SOLTO : (escuro ? ELEV_ESCURO : ELEV_CLARO);
+  const sup = solto ? (escuro ? 'oklch(0.21 0.004 107)' : 'oklch(0.993 0.002 85)') : railBg;
   const itens = rotulos
     ? [item('Perfil', true, escuro), item('Workspace', false, escuro), item('Membros', false, escuro)].join('')
     : ['', '', ''].map((_, i) => `
@@ -69,7 +72,7 @@ const tela = ({ escuro = false, largura = 128, raio = '0', margem = 0, rotulos =
       </div>`).join('');
   return `
 <div style="position:relative;width:268px;height:158px;border-radius:10px;overflow:hidden;background:${bg};box-shadow:inset 0 0 0 1px ${escuro ? 'oklch(0.30 0.005 107)' : N.border};">
-  <div style="position:absolute;top:${margem}px;bottom:${margem}px;left:${margem}px;width:${largura}px;border-radius:${raio};background:${railBg};${elev}padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
+  <div style="position:absolute;top:${margem}px;bottom:${margem}px;left:${margem}px;width:${largura}px;border-radius:${raio};background:${sup};${elev}padding:9px 7px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box;">
     ${itens}
   </div>
 </div>`;
@@ -103,10 +106,11 @@ const body = `
       rotulado('certo — sem raio', tela({})) +
       rotulado('certo — flutuando, com raio', tela({ raio: '8px', margem: 8 })))}
 
-    ${regra('03', 'A elevação é a MESMA do cursor do toggle',
-      'Não uma parecida. Sombra caindo com o filete por dentro no claro; encaixe com fio de luz no escuro. Uma sombra lateral própria dá aresta dura, que é outra linguagem — e duas maneiras de dizer "isto está por cima" acabam divergindo.',
-      rotulado('claro — sombra caindo', tela({})) +
-      rotulado('escuro — encaixe com fio de luz', tela({ escuro: true })))}
+    ${regra('03', 'Encostado não projeta; solto, vira cartão',
+      'O rail recua, então uma sombra para fora diria o contrário do que a cor diz — encostado ele tem só o filete na borda livre, e o degrau de valor faz o resto. Quando descola da parede, deixa de recuar: a superfície passa a ser a do cartão e a sombra volta. É a mesma família de raciocínio da regra 02.',
+      rotulado('encostado — só o filete', tela({})) +
+      rotulado('errado — sombra em quem recua', tela({ raio: '0', margem: 0, solto: true })) +
+      rotulado('flutuando — cartão e sombra', tela({ raio: '8px', margem: 8, solto: true })))}
 
     ${regra('04', 'O item ativo é tingido, com filete na borda',
       'Fundo do par tingido e a tinta correspondente — nunca fundo sólido, que roubaria o único sólido da tela. O filete de 3px encostado na borda é o que dá a leitura de "você está aqui" mesmo quando o rail recolhe e o rótulo some.',
@@ -119,16 +123,16 @@ const body = `
       rotulado('certo — a régua da casa', regua(36, 13, 9, 16, '36 · 13 · 9 · 16')) +
       rotulado('sub-item', regua(28, 12.5, 7, 16, '28 · 12,5 · 7 · 16')))}
 
-    ${regra('06', 'O rail PAIRA nos dois temas',
-      'Ele chegou do platform mais claro que o conteúdo no claro e mais escuro no escuro — a mesma peça pairando num tema e afundando no outro, o que contradiz a regra que a casa já tinha escrita. Agora o token aponta para o do cartão: o rail está no nível do que paira, e se esse nível mudar ele vai junto.',
-      rotulado('errado — escuro invertido', planos('oklch(0.155 0.004 107)', 'oklch(0.175 0.004 107)', true, 'rail 0,155 · conteúdo 0,175')) +
-      rotulado('certo — escuro', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,21 · conteúdo 0,175')) +
-      rotulado('certo — claro', planos(RAIL_CLARO, N.bg, false, 'rail 0,993 · conteúdo 0,98')))}
+    ${regra('06', 'O rail RECUA nos dois temas',
+      'Ele chegou do platform mais claro que o conteúdo no claro e mais escuro no escuro — a mesma peça avançando num tema e recuando no outro. Agora recua sempre: o conteúdo é o palco e a navegação é a moldura. E recuar é a única direção em que este token cabe com valor próprio: para cima, no claro, o cartão já está em 0,993 e o branco é 1,0, então um rail acima do conteúdo teria que emprestar a cor do cartão.',
+      rotulado('errado — claro acima', planos('oklch(0.993 0.002 85)', N.bg, false, 'rail 0,993 — a cor é a do cartão')) +
+      rotulado('certo — claro', planos(RAIL_CLARO, N.bg, false, 'rail 0,962 · conteúdo 0,98')) +
+      rotulado('certo — escuro', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,152 · conteúdo 0,175')))}
   </div>
 </div>`;
 
 const html = page('Rail',
-  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. Sem paleta própria: a superfície é o token --rail e o relevo é o do cursor do view-toggle.',
+  'O menu lateral do app. Dois eixos — posição e largura — mais um comportamento opcional: desafixado, ele some e volta quando o mouse encosta na borda. Encostado, o rail recua: a superfície é o token --rail, um degrau abaixo do conteúdo nos dois temas, e o relevo é só o filete da borda livre. Solto, deixa de recuar e vira cartão.',
   body);
 await Bun.write('Rail.dc.html', html);
 console.log('Rail.dc.html', html.length, 'bytes');

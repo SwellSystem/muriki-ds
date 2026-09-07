@@ -42,14 +42,21 @@
      papel do conteúdo. Precisar de um oklch solto dentro do componente era
      o sinal de que faltava este token.
 
-     O RAIL ESTÁ NO NÍVEL DO CARTÃO, NOS DOIS TEMAS. Ele vinha do platform
-     mais claro que o conteúdo no claro (0.99 contra 0.98) e mais escuro no
-     escuro (0.16 contra 0.18) — a mesma peça pairando num tema e afundando
-     no outro. A casa já tem a regra escrita: o que paira nunca afunda. Um
-     token que muda de lado entre os temas não é uma decisão, é um descuido
-     herdado, e é por isso que aqui ele aponta para o card em vez de trazer
-     um valor próprio: se o nível do que paira mudar, o rail vai junto. */
-  --rail: var(--card);
+     O RAIL RECUA NOS DOIS TEMAS. Ele chegou do platform mais claro que o
+     conteúdo no claro (0.99 contra 0.98) e mais escuro no escuro (0.16
+     contra 0.18) — a mesma peça avançando num tema e recuando no outro.
+     Agora recua sempre: o conteúdo é o palco iluminado e a navegação é a
+     moldura.
+
+     E recuar é a única direção em que este token cabe com valor PRÓPRIO.
+     Para cima, no claro, não há espaço: o card já está em 0.993 e o branco
+     é 1.0, então um rail acima do conteúdo teria que emprestar o valor do
+     card — que foi exatamente o que aconteceu enquanto a direção era outra.
+     Para baixo sobra: 0.980 do conteúdo, 0.962 aqui, 0.955 do sunken.
+
+     Fica entre o conteúdo e o sunken de propósito. O rail recua, mas menos
+     que um campo: campo é buraco, rail é plano. */
+  --rail: oklch(0.962 0.010 94);
 
   /* Superfície do campo de texto. No claro é o card — o campo é o objeto
      mais claro da página. No escuro é o sunken — o campo é um encaixe,
@@ -142,9 +149,9 @@
 
   --sunken: oklch(0.14 0.004 107);
   --field: oklch(0.14 0.004 107);
-  /* 0.21 (o card), não 0.155. Ver a nota no tema claro: o rail paira nos
-     dois temas, e antes ele afundava aqui. */
-  --rail: var(--card);
+  /* Entre o conteúdo (0.175) e o sunken (0.14), como no claro. Ver a nota
+     lá: o rail recua nos dois temas e tem valor próprio nos dois. */
+  --rail: oklch(0.152 0.004 107);
 
   --float: 0 10px 26px oklch(0 0 0 / 0.55), 0 2px 6px oklch(0 0 0 / 0.4),
     inset 0 1px 0 oklch(1 0 0 / 0.06), inset 0 0 0 1px oklch(0.34 0.005 107);

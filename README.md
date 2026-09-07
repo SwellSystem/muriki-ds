@@ -307,7 +307,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/separator` | `registry:ui` | o filete do sistema, horizontal ou vertical |
 | `@muriki/tabs` | `registry:ui` | filete embaixo da ativa; `enclosed` para o caso denso |
 | `@muriki/breadcrumb` | `registry:ui` | trilha com caret e reticências no meio que não cabe |
-| `@muriki/sidebar` | `registry:ui` | rail que recolhe para ícones e vira gaveta no celular; sem paleta própria |
+| `@muriki/sidebar` | `registry:ui` | rail que recua um degrau abaixo do conteúdo, recolhe para ícones e vira gaveta no celular |
 | `@muriki/plan-card` | `registry:block` | card de plano por slots, com o skeleton que tem a anatomia dele |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
@@ -419,11 +419,15 @@ Estão desenhadas e justificadas nas pranchas, e implementadas aqui:
 - **Aba não é ViewToggle.** O toggle troca a FORMA de ver a mesma coisa; a aba
   troca O QUE se vê. Por isso a aba padrão é o filete embaixo, sem trilho nem
   pastilha, e o pill fica reservado ao toggle.
-- **O rail usa a MESMA receita de elevação do cursor do toggle**, não uma
-  parecida. Sombra caindo com o filete por dentro no claro; encaixe com o fio
-  de luz no escuro. Inventar uma sombra lateral para o rail dava uma aresta
-  dura, que é outra linguagem. A superfície é o token `--rail`; os oito
-  `--sidebar-*` do shadcn não existem aqui, eram cópias das cores base.
+- **O rail recua, e por isso não projeta.** Encostado, ele fica um degrau
+  ABAIXO do conteúdo nos dois temas — 0,962 contra 0,980 no claro, 0,152
+  contra 0,175 no escuro — e o relevo é só o filete da borda livre: uma
+  sombra para fora diria o contrário do que a cor diz. Recuar também é a
+  única direção em que `--rail` cabe com valor próprio, porque para cima,
+  no claro, o cartão já está em 0,993 e o branco é 1,0. Solto, o rail deixa
+  de recuar: vira superfície de cartão e a sombra volta, pela mesma lógica
+  de "encostado não tem raio". Os oito `--sidebar-*` do shadcn não existem
+  aqui, eram cópias das cores base.
 - **O que cobre a tela deixa de pairar.** O diálogo em tela cheia perde raio,
   sombra e filete. O filete do `--float` é desenhado por dentro, então numa
   peça do tamanho exato da janela ele vira um contorno correndo pelas quatro
