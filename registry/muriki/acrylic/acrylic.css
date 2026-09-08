@@ -1,0 +1,318 @@
+/* Muriki Acrílico — vidro sobre o vazio.
+   
+   LÍNGUA SEPARADA. Nada aqui herda do papel quente: os tokens nascem dentro
+   de `.muriki-acrylic`, não no :root, e por isso não têm como vazar para o
+   resto do sistema. Não é disciplina, é escopo.
+
+   ACRÍLICO PRECISA DE ALGO ATRÁS. `backdrop-filter` amostra o que está
+   pintado por trás do elemento — borrar uma cor chapada devolve a mesma cor
+   chapada. É por isso que o escopo pinta o próprio fundo: três luzes de cor
+   sobre um vazio escuro, o bastante para o vidro ter o que refratar. Quem
+   tem foto ou vídeo atrás troca o `background` do escopo e pronto.
+
+   O QUE SEPARA ACRÍLICO DE "GLASSMORPHISM DE TUTORIAL" são quatro camadas
+   que o tutorial pula:
+     1. saturate() junto do blur — só blur vira lama; saturar faz a cor de
+        trás florescer através do vidro.
+     2. GRÃO. Ruído a ~4% por cima da tinta. Vidro sem grão parece filme
+        plástico; com grão parece material. Vive num SVG inline — zero asset.
+     3. Brilho especular na aresta de CIMA e sombra na de BAIXO. A luz vem de
+        cima, e é isso que dá espessura à placa em vez de opacidade a um
+        retângulo.
+     4. Um escopo isolado (isolation: isolate) para o Safari não vazar os
+        cantos do blur por fora do raio.
+
+   E dois limites honestos:
+     - backdrop-filter custa. É material para POUCOS elementos grandes —
+       cartão, barra, diálogo, o botão principal. Não para cada linha de
+       uma lista.
+     - texto sobre vidro é contraste no fio da navalha. Esta língua é
+       ESCURA POR NATUREZA: tinta clara sobre fundo profundo é o único jeito
+       de o texto sobreviver a qualquer coisa que passe por trás. O tom
+       claro existe (data-tone="light" no escopo), mas é outra fisionomia —
+       placa fosca, não vidro — e a nota dele explica o porquê. */
+
+@layer components {
+  .muriki-acrylic {
+    /* O vazio: azul-marinho quase preto. Escuro o bastante para tinta branca
+       ter contraste sobre QUALQUER borrão, colorido o bastante para não ser
+       um preto morto. Matiz 258, não 268: a dez graus dali o vazio era
+       violeta, e o saturate() do vidro fazia cada placa sair roxa. */
+    --acr-void: oklch(0.15 0.022 258);
+
+    /* Tinta. Uma família só, três opacidades. Sobre vidro não existe
+       "cinza médio" — existe tinta com mais ou menos presença. */
+    --acr-ink: oklch(0.975 0.006 270);
+    --acr-ink-dim: oklch(0.975 0.006 270 / 0.64);
+    --acr-ink-faint: oklch(0.975 0.006 270 / 0.4);
+
+    /* O vidro. Blur e saturação são um par — ver o cabeçalho. */
+    --acr-blur: 24px;
+    --acr-saturate: 1.7;
+
+    /* A tinta do vidro: branco a 7%. Hover sobe, pressionar desce — a placa
+       reage ao toque clareando, nunca escurecendo (escurecer é o que faz o
+       botão parecer que apagou). */
+    --acr-tint: oklch(0.98 0.005 270 / 0.07);
+    --acr-tint-hover: oklch(0.98 0.005 270 / 0.12);
+    --acr-tint-press: oklch(0.98 0.005 270 / 0.045);
+
+    /* Arestas. O rim é o brilho especular de cima; o edge é o filete que
+       contorna a placa inteira. O rim é três vezes mais forte que o edge —
+       é essa diferença que diz de onde vem a luz. */
+    --acr-rim: oklch(1 0 0 / 0.42);
+    --acr-edge: oklch(1 0 0 / 0.13);
+    --acr-edge-hover: oklch(1 0 0 / 0.22);
+    /* A espessura: sombra na aresta de baixo. */
+    --acr-bottom: oklch(0 0 0 / 0.28);
+    /* O reflexo que passa no hover. */
+    --acr-sheen: oklch(1 0 0 / 0.09);
+    /* A placa fosca dos fallbacks — motor sem blur, menos transparência. */
+    --acr-opaque: oklch(0.23 0.03 258 / 0.94);
+
+    /* O acento: O AZUL DO MURIKI, matiz 262.6 — a do --primary do tema, e
+       por ESCOLHA, não por referência: o escopo não lê var(--primary) porque
+       não pode depender do muriki.css existir.
+
+       É O MESMO AZUL NOS DOIS TONS: L 0.5, chroma 0.185, o azul fundo e
+       saturado do claro. Sobre o vazio escuro ele vira azul elétrico com
+       tinta branca. A primeira versão levantava o azul no dark (L 0.72,
+       menos saturado) para ele "acender" — e acendia pálido. O que muda de
+       um tom para o outro não é a cor, é a PRESENÇA: um azul fundo a 16%
+       sobre o vazio some, então aqui as alphas da tinta e do brilho são
+       maiores que no claro. E o filete de 1px da placa acesa é o mesmo azul
+       com um pouco mais de luz (L 0.62): linha fina fundo demais desaparece.
+
+       Uma cor luminosa só, para a ação principal e para o brilho: duas
+       luminosas competindo é neon de loja. */
+    --acr-accent: oklch(0.5 0.185 262.6);
+    --acr-accent-ink: oklch(0.99 0.005 262.6);
+    --acr-accent-tint: oklch(0.5 0.185 262.6 / 0.26);
+    --acr-accent-tint-hover: oklch(0.5 0.185 262.6 / 0.36);
+    --acr-glow: oklch(0.5 0.185 262.6 / 0.55);
+    --acr-glow-strong: oklch(0.5 0.185 262.6 / 0.75);
+    --acr-accent-edge: oklch(0.62 0.185 262.6 / 0.55);
+    --acr-accent-edge-hover: oklch(0.62 0.185 262.6 / 0.7);
+    --acr-accent-ring: oklch(0.5 0.185 262.6 / 0.2);
+    --acr-accent-ring-hover: oklch(0.5 0.185 262.6 / 0.28);
+
+    --acr-danger: oklch(0.7 0.19 20);
+    --acr-danger-tint: oklch(0.7 0.19 20 / 0.14);
+
+    /* Raio: recipiente macio (16), controle mais seco (12). Mesma razão do
+       papel — o olho lê a diferença de raio como diferença de função. */
+    --acr-radius: 16px;
+    --acr-radius-control: 12px;
+
+    /* Sombra da placa flutuando sobre o vazio. Duas camadas: a longa dá
+       altura, a curta gruda a placa no chão. */
+    --acr-shadow: 0 18px 40px oklch(0.08 0.02 258 / 0.5), 0 2px 6px oklch(0.08 0.02 258 / 0.35);
+    --acr-shadow-lift: 0 26px 56px oklch(0.08 0.02 258 / 0.58), 0 4px 10px oklch(0.08 0.02 258 / 0.4);
+
+    /* O grão. fractalNoise dessaturado, em azulejo de 180px sem emenda.
+       Codificado inline para o material ser um arquivo só. */
+    --acr-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --acr-noise-opacity: 0.045;
+
+    color: var(--acr-ink);
+    color-scheme: dark;
+    /* AS LUZES DO FUNDO ESCURO: azul da marca em cima à esquerda, ciano em
+       cima à direita, azul fundo embaixo — e um sussurro de rosa no canto,
+       a 16%, só para o vazio não ser monocórdio. A primeira versão tinha
+       uma luz magenta inteira embaixo, onde os cartões sentam, e os
+       cartões saíam roxos: o vidro satura o que está atrás, então a luz
+       que fica sob o conteúdo tem que ser da cor da língua. */
+    background:
+      radial-gradient(120% 90% at 12% 6%, oklch(0.42 0.17 262.6 / 0.62), transparent 62%),
+      radial-gradient(90% 80% at 88% 16%, oklch(0.56 0.13 228 / 0.42), transparent 60%),
+      radial-gradient(110% 100% at 58% 108%, oklch(0.36 0.15 252 / 0.5), transparent 64%),
+      radial-gradient(60% 50% at 96% 102%, oklch(0.5 0.12 335 / 0.16), transparent 70%),
+      var(--acr-void);
+    isolation: isolate;
+  }
+
+  /* O TOM CLARO. É acrílico, não vidro — e a diferença está num número:
+     a tinta sobe de 7% para 64% de branco. Tinta escura sobre um borrão
+     claro precisa de um chão quase opaco para o texto sobreviver ao que
+     passa atrás; é a mesma resposta que o Fluent dá ao acrílico claro. O
+     que sobra de transparência (36%) é o bastante para o fundo colorir a
+     placa, e não mais que isso. O acento não muda de tom — ver a nota
+     dele no escopo escuro; aqui só as alphas descem, porque sobre placa
+     clara o azul fundo já tem presença de sobra. */
+  .muriki-acrylic[data-tone="light"] {
+    --acr-void: oklch(0.935 0.018 262);
+    --acr-ink: oklch(0.21 0.03 262);
+    --acr-ink-dim: oklch(0.21 0.03 262 / 0.66);
+    --acr-ink-faint: oklch(0.21 0.03 262 / 0.42);
+    --acr-blur: 28px;
+    --acr-saturate: 1.4;
+    --acr-tint: oklch(1 0 0 / 0.64);
+    --acr-tint-hover: oklch(1 0 0 / 0.76);
+    --acr-tint-press: oklch(1 0 0 / 0.56);
+    --acr-rim: oklch(1 0 0 / 0.95);
+    --acr-edge: oklch(0.21 0.03 262 / 0.1);
+    --acr-edge-hover: oklch(0.21 0.03 262 / 0.18);
+    --acr-bottom: oklch(0.21 0.03 262 / 0.08);
+    --acr-sheen: oklch(1 0 0 / 0.55);
+    --acr-opaque: oklch(0.97 0.008 262 / 0.96);
+    --acr-accent-tint: oklch(0.5 0.185 262.6 / 0.1);
+    --acr-accent-tint-hover: oklch(0.5 0.185 262.6 / 0.16);
+    --acr-glow: oklch(0.5 0.185 262.6 / 0.28);
+    --acr-glow-strong: oklch(0.5 0.185 262.6 / 0.42);
+    --acr-accent-edge: oklch(0.5 0.185 262.6 / 0.35);
+    --acr-accent-edge-hover: oklch(0.5 0.185 262.6 / 0.5);
+    --acr-accent-ring: oklch(0.5 0.185 262.6 / 0.1);
+    --acr-accent-ring-hover: oklch(0.5 0.185 262.6 / 0.16);
+    --acr-shadow: 0 18px 40px oklch(0.21 0.03 262 / 0.14), 0 2px 6px oklch(0.21 0.03 262 / 0.08);
+    --acr-shadow-lift: 0 26px 56px oklch(0.21 0.03 262 / 0.18), 0 4px 10px oklch(0.21 0.03 262 / 0.1);
+    --acr-noise-opacity: 0.06;
+    color: var(--acr-ink);
+    color-scheme: light;
+    background:
+      radial-gradient(120% 90% at 12% 6%, oklch(0.76 0.13 262.6 / 0.6), transparent 62%),
+      radial-gradient(90% 80% at 88% 16%, oklch(0.84 0.1 212 / 0.55), transparent 60%),
+      radial-gradient(110% 100% at 58% 108%, oklch(0.84 0.1 342 / 0.5), transparent 64%),
+      var(--acr-void);
+  }
+
+  /* A PLACA. Tudo que é vidro nesta língua é um .acr-pane — botão, cartão,
+     o que vier depois. A receita mora aqui uma vez. */
+  .acr-pane {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: var(--acr-radius);
+    background-color: var(--acr-tint);
+    -webkit-backdrop-filter: blur(var(--acr-blur)) saturate(var(--acr-saturate));
+    backdrop-filter: blur(var(--acr-blur)) saturate(var(--acr-saturate));
+    box-shadow:
+      inset 0 1px 0 var(--acr-rim),
+      inset 0 0 0 1px var(--acr-edge),
+      inset 0 -1px 0 var(--acr-bottom),
+      var(--acr-shadow);
+  }
+
+  /* O grão fica em z-index -1 DENTRO do contexto isolado da placa: pinta
+     acima do fundo dela e abaixo de todo conteúdo, sem exigir position ou
+     z-index de nenhum filho. */
+  .acr-pane::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: var(--acr-noise);
+    background-size: 180px 180px;
+    opacity: var(--acr-noise-opacity);
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  /* A PLACA QUE REAGE. Hover clareia a tinta, levanta a sombra e passa um
+     reflexo oblíquo da esquerda para a direita — o que uma placa de verdade
+     faz quando você a inclina contra a luz. Pressionar assenta. */
+  .acr-pane-interactive {
+    transition:
+      background-color 120ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+  .acr-pane-interactive::after {
+    content: "";
+    position: absolute;
+    inset: -40% -60%;
+    z-index: -1;
+    background: linear-gradient(
+      115deg,
+      transparent 42%,
+      var(--acr-sheen) 50%,
+      transparent 58%
+    );
+    transform: translateX(-70%);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 650ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 200ms ease;
+  }
+  .acr-pane-interactive:hover {
+    background-color: var(--acr-tint-hover);
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 var(--acr-rim),
+      inset 0 0 0 1px var(--acr-edge-hover),
+      inset 0 -1px 0 var(--acr-bottom),
+      var(--acr-shadow-lift);
+  }
+  .acr-pane-interactive:hover::after {
+    transform: translateX(70%);
+    opacity: 1;
+  }
+  .acr-pane-interactive:active {
+    background-color: var(--acr-tint-press);
+    transform: translateY(0);
+    transition-duration: 60ms;
+    box-shadow:
+      inset 0 1px 0 var(--acr-rim),
+      inset 0 0 0 1px var(--acr-edge),
+      inset 0 -1px 0 var(--acr-bottom),
+      var(--acr-shadow);
+  }
+
+  /* Variante acesa: a placa ganha tinta de acento e brilha para fora. */
+  .acr-pane-accent {
+    background-color: var(--acr-accent-tint);
+    box-shadow:
+      inset 0 1px 0 var(--acr-rim),
+      inset 0 0 0 1px var(--acr-accent-edge),
+      inset 0 -1px 0 var(--acr-bottom),
+      0 0 0 1px var(--acr-accent-ring),
+      0 0 28px var(--acr-glow),
+      var(--acr-shadow);
+  }
+  .acr-pane-accent.acr-pane-interactive:hover {
+    background-color: var(--acr-accent-tint-hover);
+    box-shadow:
+      inset 0 1px 0 var(--acr-rim),
+      inset 0 0 0 1px var(--acr-accent-edge-hover),
+      inset 0 -1px 0 var(--acr-bottom),
+      0 0 0 1px var(--acr-accent-ring-hover),
+      0 0 40px var(--acr-glow-strong),
+      var(--acr-shadow-lift);
+  }
+
+  /* SEM BLUR NO MOTOR: a tinta sobe para quase opaca. O vidro vira placa
+     fosca, mas o texto continua legível — é a única coisa inegociável. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .muriki-acrylic .acr-pane {
+      background-color: var(--acr-opaque);
+    }
+  }
+
+  /* Quem pediu menos transparência no sistema recebe placa fosca também.
+     Não é degradação — é a mesma resposta que o Fluent dá. */
+  @media (prefers-reduced-transparency: reduce) {
+    .muriki-acrylic .acr-pane {
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+      background-color: var(--acr-opaque);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .acr-pane-interactive {
+      transition: none;
+    }
+    .acr-pane-interactive::after {
+      display: none;
+    }
+    .acr-pane-interactive:hover {
+      transform: none;
+    }
+  }
+
+  /* Alto contraste forçado: o vidro some, sobra a borda do sistema. */
+  @media (forced-colors: active) {
+    .muriki-acrylic .acr-pane {
+      border: 1px solid ButtonBorder;
+      box-shadow: none;
+    }
+  }
+}
