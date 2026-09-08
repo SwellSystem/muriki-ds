@@ -1309,6 +1309,35 @@
       }
     },
     {
+      "name": "ai-thread",
+      "type": "registry:block",
+      "title": "AI Thread",
+      "description": "O contêiner da conversa, e o que ele resolve é a rolagem: a página desce sozinha enquanto a resposta chega, mas só se você já estava no fim — rolar para cima é um pedido de ficar, e nenhum token novo desfaz isso. A medida da coluna vive aqui, o composer senta no pé fora da rolagem, com um véu do próprio fundo, e o convite do começo é a primeira fala, não um placeholder.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "button",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-thread/ai-thread.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-thread/ai-thread.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-thread/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-thread/index.ts"
+        }
+      ],
+      "docs": "A thread ocupa a altura do pai: dê h-dvh na tela cheia, ou a altura do painel. Monte <AiThread composer={<AiComposer …/>}>{turnos.map(t => <AiMessage …/>)}</AiThread>. A largura da conversa é --ai-thread-measure (72ch por padrão), e é dela que os turnos herdam a coluna. Passe streaming enquanto a resposta chega."
+    },
+    {
       "name": "acrylic",
       "type": "registry:block",
       "title": "Acrílico",
