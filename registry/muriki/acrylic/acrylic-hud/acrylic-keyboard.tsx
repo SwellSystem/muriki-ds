@@ -48,6 +48,9 @@ export interface AcrylicDataCell {
   id: string
   label: string
   value: string
+  /** Um ícone ao lado do valor — a pessoa, a organização, a versão. Um
+   *  phosphor com size={16}, ou qualquer svg 16×16. */
+  icon?: React.ReactNode
 }
 
 export interface AcrylicChartSegment {
@@ -617,12 +620,31 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
               <g key={cell.id} className="acr-kbd-key acr-kbd-key--arc" style={style}>
                 <path className="acr-kbd-face" d={sectorPath(CORE, DATA_R[0], DATA_R[1], a0, a1)} pathLength={1} />
                 <g className="acr-kbd-face-content" transform={`rotate(${rot.toFixed(1)} ${px.toFixed(2)} ${py.toFixed(2)})`}>
-                  <text className="acr-kbd-cell-label" x={px} y={py - 1.2}>
-                    {cell.label}
-                  </text>
-                  <text className="acr-kbd-cell-value" x={px} y={py + 1.3}>
-                    {cell.value}
-                  </text>
+                  {cell.icon ? (
+                    // ícone ao lado do valor; a largura do valor é estimada pelo mono (0,62 em)
+                    <>
+                      <text className="acr-kbd-cell-label" x={px} y={py - 1.6}>
+                        {cell.label}
+                      </text>
+                      <g className="acr-kbd-cell-icon">
+                        <svg className="acr-kbd-icon" x={px - (2.9 + cell.value.length * 1.12) / 2} y={py + 0.3} width={2.2} height={2.2} viewBox="0 0 16 16">
+                          {cell.icon}
+                        </svg>
+                      </g>
+                      <text className="acr-kbd-cell-value" x={px - (2.9 + cell.value.length * 1.12) / 2 + 2.9} y={py + 1.4} style={{ textAnchor: "start" }}>
+                        {cell.value}
+                      </text>
+                    </>
+                  ) : (
+                    <>
+                      <text className="acr-kbd-cell-label" x={px} y={py - 1.2}>
+                        {cell.label}
+                      </text>
+                      <text className="acr-kbd-cell-value" x={px} y={py + 1.3}>
+                        {cell.value}
+                      </text>
+                    </>
+                  )}
                 </g>
               </g>
             )
