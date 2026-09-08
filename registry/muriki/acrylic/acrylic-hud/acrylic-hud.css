@@ -585,10 +585,18 @@
     --acr-kbd-fill: oklch(0.72 0.15 262.6 / 0.045);
     --acr-kbd-fill-hover: oklch(0.72 0.15 262.6 / 0.16);
     --acr-kbd-ink: oklch(0.86 0.09 262.6);
-    --acr-kbd-ink-dim: oklch(0.86 0.09 262.6 / 0.55);
+    --acr-kbd-ink-dim: oklch(0.86 0.09 262.6 / 0.7);
     --acr-kbd-fill-hi: oklch(0.72 0.15 262.6 / 0.22);
     /* o bloom largo do halo — ver .acr-kbd-face */
     --acr-kbd-glow-wide: oklch(0.72 0.15 262.6 / 0.32);
+    /* O ACESO: a cor do que está sob o ponteiro (traço, luz correndo,
+       ícone e nome) e dos dados vivos dos instrumentos. No claro é o
+       próprio acento — azul fundo sobre placa clara. No escuro o acento
+       (L 0.5) é MAIS ESCURO que a linha em repouso (L 0.72): usá-lo no
+       hover apagava a tecla em vez de acender. Então aqui o aceso é um
+       azul claro, e a tinta sobre a placa acesa é quase branca. */
+    --acr-kbd-hot: oklch(0.8 0.13 262.6);
+    --acr-kbd-hot-ink: oklch(0.97 0.006 270);
   }
   .muriki-acrylic[data-tone="light"] .acr-hud {
     --acr-kbd-line: oklch(0.46 0.17 262.6 / 0.7);
@@ -600,6 +608,8 @@
     --acr-kbd-ink-dim: oklch(0.34 0.14 262.6 / 0.6);
     --acr-kbd-fill-hi: oklch(0.5 0.185 262.6 / 0.14);
     --acr-kbd-glow-wide: oklch(0.5 0.185 262.6 / 0.2);
+    --acr-kbd-hot: var(--acr-accent);
+    --acr-kbd-hot-ink: var(--acr-accent);
   }
   /* O palco: viewBox 200×100, largura da página. 1cqw = 2 unidades. O
      reator é posicionado em unidades de contêiner para o CSS poder
@@ -683,13 +693,13 @@
   .acr-kbd-key:hover .acr-kbd-face,
   .acr-kbd-key:focus-visible .acr-kbd-face {
     fill: var(--acr-kbd-fill-hi);
-    stroke: var(--acr-accent);
+    stroke: var(--acr-kbd-hot);
     filter: drop-shadow(0 0 0.6px var(--acr-glow-strong)) drop-shadow(0 0 2px var(--acr-glow));
     scale: 1.035;
   }
   .acr-kbd-run {
     fill: none;
-    stroke: var(--acr-accent);
+    stroke: var(--acr-kbd-hot);
     stroke-width: 0.3px;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -722,9 +732,12 @@
   }
   .acr-kbd-key:hover .acr-kbd-label,
   .acr-kbd-key:hover .acr-kbd-sublabel,
-  .acr-kbd-key:hover .acr-kbd-icon {
-    fill: var(--acr-accent);
-    color: var(--acr-accent);
+  .acr-kbd-key:hover .acr-kbd-icon,
+  .acr-kbd-key:focus-visible .acr-kbd-label,
+  .acr-kbd-key:focus-visible .acr-kbd-sublabel,
+  .acr-kbd-key:focus-visible .acr-kbd-icon {
+    fill: var(--acr-kbd-hot-ink);
+    color: var(--acr-kbd-hot-ink);
   }
   /* AS FILEIRAS SÃO SÓ ÍCONE, como no teclado do Stark. O nome de cada
      ação existe em dois lugares: na própria tecla, embaixo do ícone, no
@@ -762,7 +775,7 @@
   }
   .acr-kbd-sweep {
     fill: none;
-    stroke: var(--acr-accent);
+    stroke: var(--acr-kbd-hot);
     stroke-width: 0.35px;
     stroke-linecap: round;
     opacity: 0;
@@ -901,7 +914,7 @@
      componente. Não existe fora do modo ouvindo. */
   .acr-kbd-voice {
     fill: none;
-    stroke: var(--acr-accent);
+    stroke: var(--acr-kbd-hot);
     stroke-width: 0.2px;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -974,7 +987,7 @@
   }
   .acr-kbd-inst-seg {
     fill: none;
-    stroke: var(--acr-accent);
+    stroke: var(--acr-kbd-hot);
     stroke-width: 1px;
     opacity: var(--seg, 0.9);
     stroke-dasharray: 1;
@@ -985,7 +998,7 @@
   .acr-kbd-inst-cell,
   .acr-kbd-inst-dot,
   .acr-kbd-inst-swatch {
-    fill: var(--acr-accent);
+    fill: var(--acr-kbd-hot);
     fill-opacity: var(--seg, 0.9);
     stroke: var(--acr-kbd-line);
     stroke-width: 0.1px;
@@ -1022,7 +1035,7 @@
   }
   .acr-kbd-inst-row:hover .acr-kbd-inst-name,
   .acr-kbd-inst-row:hover .acr-kbd-inst-num {
-    fill: var(--acr-accent);
+    fill: var(--acr-kbd-hot-ink);
   }
   /* O reator, holograma: anel de linha em volta do logo, sem disco de
      vidro; loader mais fino e na linha da língua. Nasce no centro da tela
