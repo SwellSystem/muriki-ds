@@ -314,7 +314,7 @@ function KeyShell({ item, className, style, onActive, children }: { item: Acryli
 /** Um instrumento: painel traçado como uma tecla, o gráfico na forma que
  *  o dado pede, o número grande, a legenda ao lado. `index` é a ordem de
  *  entrada na sequência; onde ele senta vem de panelSlots. */
-function Instrument({ chart, index, x0, y0, grainId, onHint }: { chart: AcrylicChart; index: number; x0: number; y0: number; grainId: string; onHint: (text: string | null) => void }) {
+function Instrument({ chart, index, x0, y0, onHint }: { chart: AcrylicChart; index: number; x0: number; y0: number; onHint: (text: string | null) => void }) {
   const [hi, setHi] = React.useState<number | null>(null)
   const segs = chart.segments.slice(0, 4)
   const sum = segs.reduce((acc, s) => acc + s.value, 0)
@@ -399,9 +399,6 @@ function Instrument({ chart, index, x0, y0, grainId, onHint }: { chart: AcrylicC
   return (
     <g className="acr-kbd-panel" style={{ "--i": index } as React.CSSProperties} data-hi={hi ?? undefined} aria-label={`${chart.title}: ${chart.value} ${chart.unit ?? ""}`}>
       <rect className="acr-kbd-face" x={x0} y={y0} width={PANEL.w} height={PANEL.h} pathLength={1} />
-      {/* o material de vidro, só quando o HUD é de vidro: grão e brilho de aresta por cima da placa */}
-      <rect className="acr-kbd-grain" x={x0} y={y0} width={PANEL.w} height={PANEL.h} filter={`url(#${grainId})`} aria-hidden />
-      <path className="acr-kbd-rim" d={`M${(x0 + 0.5).toFixed(2)} ${y0 + 0.2} L${(x0 + PANEL.w - 0.5).toFixed(2)} ${y0 + 0.2}`} aria-hidden />
       <text className="acr-kbd-inst-title acr-kbd-inst-text" x={x0 + 2} y={y0 + 2.6}>
         {chart.title}
       </text>
@@ -447,7 +444,6 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
   const listeningRef = React.useRef(false)
   listeningRef.current = listening
   const maskId = React.useId()
-  const grainId = React.useId()
 
   const modStep = (MODULES_SPAN[1] - MODULES_SPAN[0]) / Math.max(modules.length, 1)
   const datStep = (DATA_SPAN[1] - DATA_SPAN[0]) / Math.max(data.length, 1)
@@ -547,11 +543,6 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
             <rect x="-20" y="-20" width="240" height="140" fill="white" />
             <circle cx={CORE[0]} cy={CORE[1]} r={EDGE_R} fill="black" />
           </mask>
-          {/* o grão do acrílico, em SVG: ruído fractal dessaturado, na frequência do pixel (1 unidade ≈ 7px) */}
-          <filter id={grainId} x="0" y="0" width="1" height="1" primitiveUnits="userSpaceOnUse">
-            <feTurbulence type="fractalNoise" baseFrequency="6" numOctaves="2" stitchTiles="stitch" />
-            <feColorMatrix type="saturate" values="0" />
-          </filter>
         </defs>
 
         {legend ? (
@@ -680,7 +671,7 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
 
         {/* os instrumentos: a fileira do topo e a de baixo */}
         {panelSlots(charts).map(({ chart, x0, y0 }, i) => (
-          <Instrument key={chart.id} chart={chart} index={i} x0={x0} y0={y0} grainId={grainId} onHint={setHint} />
+          <Instrument key={chart.id} chart={chart} index={i} x0={x0} y0={y0} onHint={setHint} />
         ))}
 
         {/* a voz do logo */}

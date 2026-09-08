@@ -932,38 +932,10 @@
   .acr-kbd-panel {
     opacity: 0;
   }
-  /* O MATERIAL DOS PAINÉIS segue o `material` do HUD. Holograma: só a
-     linha e o véu fraco das teclas. Vidro: a placa fosca do tom claro,
-     com a receita do acrílico feita DENTRO do SVG, onde backdrop-filter
-     não existe — a tinta do material (--acr-tint), grão de feTurbulence
-     por cima, brilho branco na aresta de cima (--acr-rim) e uma sombra
-     curta. Sobre o degradê liso do fundo o blur não faria diferença
-     nenhuma; o que faz a placa parecer matéria é o grão e o rim. */
-  .acr-kbd-grain {
-    opacity: 0;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-    transition: opacity 240ms ease;
-  }
-  .acr-kbd-rim {
-    fill: none;
-    stroke: var(--acr-rim);
-    stroke-width: 0.14px;
-    stroke-linecap: round;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 240ms ease;
-  }
-  [data-material="glass"] .acr-kbd-panel .acr-kbd-face {
-    fill: var(--acr-tint);
-    filter: drop-shadow(0 0.4px 1px oklch(0.21 0.03 262 / 0.14)) drop-shadow(0 0 0.4px var(--acr-kbd-glow));
-  }
-  [data-material="glass"] .acr-kbd-grain {
-    opacity: 0.4;
-  }
-  [data-material="glass"] .acr-kbd-rim {
-    opacity: 1;
-  }
+  /* Os painéis são holograma, sempre — a mesma linha e o mesmo véu fraco
+     das teclas, em qualquer `material` do HUD. A placa fosca foi testada
+     e recusada: sobre o degradê liso ela vira o único objeto cheio numa
+     tela onde tudo é linha. */
   .acr-kbd-inst-title {
     fill: var(--acr-kbd-ink-dim);
     font-size: 1.05px;
