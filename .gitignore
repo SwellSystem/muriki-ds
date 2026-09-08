@@ -14,3 +14,8 @@ muriki-ds.html
 
 # Gerado por design/canvas.mjs (inclui Auth quando presente localmente).
 design/canvas.json
+
+# Canvas do Claude Design: o .html semeado carrega o editor inteiro (~2MB) e é
+# regerado a partir dos .dc.html com o seed-canvas. Fonte é o que fica.
+design/home-focus/home-do-focus.html
+design/home-focus/__pycache__/

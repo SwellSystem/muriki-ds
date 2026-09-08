@@ -1,0 +1,190 @@
+{
+ "pages": [
+  {
+   "id": "page-1",
+   "name": "A home"
+  },
+  {
+   "id": "page-2",
+   "name": "Vertente · calendário cheio"
+  },
+  {
+   "id": "page-3",
+   "name": "Peças"
+  }
+ ],
+ "artboards": [
+  {
+   "file": "Main.dc.html",
+   "page": "page-1",
+   "x": 0,
+   "y": 0,
+   "w": 1600,
+   "h": 1000,
+   "title": "Home · calendário no dia"
+  },
+  {
+   "file": "HomeSemana.dc.html",
+   "page": "page-1",
+   "x": 1720,
+   "y": 0,
+   "w": 1600,
+   "h": 1000,
+   "title": "Home · calendário na semana"
+  },
+  {
+   "file": "HomeMes.dc.html",
+   "page": "page-1",
+   "x": 3440,
+   "y": 0,
+   "w": 1600,
+   "h": 1000,
+   "title": "Home · calendário no mês"
+  },
+  {
+   "file": "Kanban.dc.html",
+   "page": "page-1",
+   "x": 0,
+   "y": 1120,
+   "w": 1600,
+   "h": 1000,
+   "title": "Home · visão kanban"
+  },
+  {
+   "file": "CheioDia.dc.html",
+   "page": "page-2",
+   "x": 0,
+   "y": 0,
+   "w": 1600,
+   "h": 820,
+   "title": "Cheio · dia"
+  },
+  {
+   "file": "Cheio.dc.html",
+   "page": "page-2",
+   "x": 1720,
+   "y": 0,
+   "w": 1600,
+   "h": 820,
+   "title": "Cheio · semana"
+  },
+  {
+   "file": "Mes.dc.html",
+   "page": "page-2",
+   "x": 3440,
+   "y": 0,
+   "w": 1600,
+   "h": 940,
+   "title": "Cheio · mês"
+  },
+  {
+   "file": "DiaEscuro.dc.html",
+   "page": "page-2",
+   "x": 0,
+   "y": 1060,
+   "w": 1600,
+   "h": 820,
+   "title": "Cheio · dia no escuro"
+  },
+  {
+   "file": "CheioIcones.dc.html",
+   "page": "page-2",
+   "x": 1720,
+   "y": 1060,
+   "w": 1600,
+   "h": 820,
+   "title": "Cheio · rail em ícones"
+  },
+  {
+   "file": "CheioFlutuante.dc.html",
+   "page": "page-2",
+   "x": 3440,
+   "y": 1060,
+   "w": 1600,
+   "h": 820,
+   "title": "Cheio · rail flutuando"
+  },
+  {
+   "file": "Evento.dc.html",
+   "page": "page-3",
+   "x": 0,
+   "y": 0,
+   "w": 760,
+   "h": 640,
+   "title": "Ver evento"
+  },
+  {
+   "file": "CriarEvento.dc.html",
+   "page": "page-3",
+   "x": 880,
+   "y": 0,
+   "w": 800,
+   "h": 720,
+   "title": "Criar evento"
+  },
+  {
+   "file": "Calendarios.dc.html",
+   "page": "page-3",
+   "x": 1800,
+   "y": 0,
+   "w": 1000,
+   "h": 760,
+   "title": "Sheet de calendários"
+  },
+  {
+   "file": "QuickNotes.dc.html",
+   "page": "page-3",
+   "x": 2920,
+   "y": 0,
+   "w": 1000,
+   "h": 760,
+   "title": "Quick notes"
+  }
+ ],
+ "annotations": [
+  {
+   "id": "a-home",
+   "page": "page-1",
+   "x": -480,
+   "y": 0,
+   "w": 430,
+   "text": "A HOME É A TELA. O CHEIO É UMA VERTENTE.\n\nA home aguenta as três escalas sem perder nada:\no mês pequeno, as tasks para encaixar e a leitura\ndo dia continuam ali nas três. O que troca é o\nmiolo de um painel. O kanban é a quarta tela da\nmesma home, pelo segmentado do topo.\n\nO rail tem dois itens: Hoje abre isto, Tasks abre\no módulo de tasks. Não existe rota de calendário."
+  },
+  {
+   "id": "altura",
+   "page": "page-1",
+   "x": -480,
+   "y": 330,
+   "w": 430,
+   "text": "A SAUDAÇÃO RECOLHE FORA DO DIA\n\nMedido: acima da primeira célula do mês havia\n300px, quase um terço da tela. A saudação sozinha\nvalia 114 mais um vão de 18 — uma fileira inteira\ndo mês.\n\nNo dia ela fica: o calendário é estreito ali e\nsobra espaço. Na semana e no mês ela recolhe, e o\nresumo, os chips de atenção, a barra de capacidade\ne o botão viram uma linha só. Você não está sendo\ncumprimentado, está planejando.\n\nO mês agora começa em 222 e não em 300.\n\nE o espaço liberado virou DADO, não respiro: a\ncélula foi de 104 para 132 e passou a mostrar\nquatro eventos com o \"+N evento\" quando sobra —\ndia 18 é o caso. A semana ganhou a hora de 44\npara 52px. Aumentar a célula sozinho teria só\nempurrado o mês para fora da dobra.\n\nE o DIA passou a preencher também: a espinha era\nnove horas a 56px e morria no meio da tela, com\num vazio embaixo do tamanho do próprio\ncalendário. Agora são dez horas a 68px,\ndimensionadas para o espaço que sobra — o painel\nvai até o pé da janela nas três escalas."
+  },
+  {
+   "id": "cheio",
+   "page": "page-2",
+   "x": -480,
+   "y": 0,
+   "w": 430,
+   "text": "A VERTENTE\n\nO botão de expandir, dentro do painel do\ncalendário, recolhe a coluna da esquerda e o\ncalendário toma a tela. Continua sendo a home —\ntodas estas telas mostram Hoje marcado no rail.\n\nA faixa de atenção não some: ela encolhe para\numa linha na barra do topo, com as vencidas e a\nrelação de horas na mesma frase. Caixa é o\noposto de cheio.\n\nO que sai é a coluna da esquerda, e é ela que\ndevolve a largura — na semana são 300px, quase\num terço de um dia a mais."
+  },
+  {
+   "id": "rail-cheio",
+   "page": "page-2",
+   "x": 1720,
+   "y": 1940,
+   "w": 430,
+   "text": "O RAIL NO CHEIO\n\nRótulos, 220px · a tela de Semana acima.\nÍcones, 56px · devolve mais 164px ao calendário.\nFlutuando, 236px · o mais bonito e o que menos\nserve aqui: não ganha área e a sombra cai sobre\na segunda-feira.\n\nO escuro usa a rampa que fechamos hoje: rail\nabaixo da página, cartão acima."
+  },
+  {
+   "id": "pecas",
+   "page": "page-3",
+   "x": 0,
+   "y": 800,
+   "w": 420,
+   "text": "AS QUATRO PEÇAS\n\nVer evento · o cabeçalho diz de qual calendário\ne de qual fonte veio, e é isso que justifica a\nlinha do pé: um evento do Outlook é somente\nleitura aqui.\n\nCriar evento · o interruptor do fim amarra as\nduas naturezas: criar o compromisso E bloquear o\nhorário como task, num gesto só.\n\nCalendários · agrupados por conta. A cor aqui é\na cor do ponto no cartão.\n\nQuick notes · escrever sem sair do dia. A nota\nque já virou task mostra o código no lugar do\nbotão."
+  }
+ ],
+ "launch": {
+  "view": "canvas",
+  "page": "page-1"
+ }
+}
