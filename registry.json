@@ -1149,6 +1149,295 @@
         }
       ],
       "docs": "O bloco não conhece roteador, i18next nem API: onSubmit e onVerifyCode devolvem um LoginResult. O mascote vem por prop (brand / brandHidden) — o registry não carrega binário."
+    },
+    {
+      "name": "ai-labels",
+      "type": "registry:lib",
+      "title": "Rótulos do muriki-ds-ai",
+      "description": "Chão de strings dos blocos de AI: o t do app ganha quando responde, o default pt-BR entra quando o i18n devolve a chave crua. Instala e funciona sem editar o i18n do sistema.",
+      "registryDependencies": [
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-labels.ts",
+          "type": "registry:lib",
+          "target": "components/ai/ai-labels.ts"
+        }
+      ]
+    },
+    {
+      "name": "ai-composer",
+      "type": "registry:block",
+      "title": "AI Composer",
+      "description": "O campo da conversa como um objeto só: moldura em --field, textarea sem contorno que cresce até 8 linhas, fileira de anexos dentro da caixa e o botão que vira Parar durante o streaming. Enter quebra linha, ⌘+↵ envia.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels",
+        "@muriki/button",
+        "@muriki/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-composer/ai-composer.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/ai-composer.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-composer/ai-composer-attachments.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/ai-composer-attachments.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-composer/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/index.ts"
+        }
+      ],
+      "docs": "O estado do texto é do caller (value/onValueChange) — o composer não guarda rascunho. As chaves composer.* já existem no @muriki/i18n; sem provider, o chão do ai-labels responde igual.",
+      "css": {
+        ".muriki-scroll-x": {
+          "scrollbar-width": "none"
+        },
+        ".muriki-scroll-x::-webkit-scrollbar": {
+          "display": "none"
+        }
+      }
+    },
+    {
+      "name": "ai-message",
+      "type": "registry:block",
+      "title": "AI Message",
+      "description": "O turno da conversa, e a assimetria que define o muriki-ds-ai: a resposta do assistente é tinta na página, sem cartão, na medida de 68ch; só a fala do usuário ganha superfície. Cursor de streaming, linha de erro e régua de ações que aparece no hover e no foco.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels",
+        "@muriki/button",
+        "@muriki/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-message/ai-message.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/ai-message.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-message/ai-message-actions.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/ai-message-actions.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-message/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/index.ts"
+        }
+      ],
+      "docs": "Raciocínio e chamadas de ferramenta entram pela prop `before` — são o mesmo turno, não turnos soltos. As ações só renderizam depois que streaming vira false."
+    },
+    {
+      "name": "ai-reasoning",
+      "type": "registry:block",
+      "title": "AI Reasoning",
+      "description": "O raciocínio afunda: superfície --sunken, a única mais escura que o fundo nos dois temas. Fechado por padrão, ponto âmbar pulsando enquanto pensa e a duração no lugar dele quando termina.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-reasoning/ai-reasoning.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-reasoning/ai-reasoning.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-reasoning/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-reasoning/index.ts"
+        }
+      ],
+      "docs": "Único bloco do muriki-ds-ai que gasta o accent do tema, e só num ponto de 5px que apaga quando o raciocínio acaba."
+    },
+    {
+      "name": "ai-tool-call",
+      "type": "registry:block",
+      "title": "AI Tool Call",
+      "description": "A chamada de ferramenta como meio, não como resposta: afunda igual ao raciocínio e carrega o selo mono do card do kanban no nome da tool. Status nos nove tons do badge, entrada e saída em painéis que rolam sozinhos no eixo x.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-tool-call/ai-tool-call.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-tool-call/ai-tool-call.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-tool-call/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-tool-call/index.ts"
+        }
+      ],
+      "docs": "Sem input nem output o cabeçalho vira legenda: não recebe foco e não abre. O serializador aguenta referência circular sem derrubar a thread.",
+      "css": {
+        ".muriki-scroll-x": {
+          "scrollbar-width": "none"
+        },
+        ".muriki-scroll-x::-webkit-scrollbar": {
+          "display": "none"
+        }
+      }
+    },
+    {
+      "name": "acrylic",
+      "type": "registry:block",
+      "title": "Acrílico",
+      "description": "O material: vidro sobre o vazio, em língua separada do papel. Blur com saturação, grão inline, brilho especular na aresta de cima, reflexo no hover. Tokens escopados em .muriki-acrylic — não vazam para o :root. Acento na matiz do azul do Muriki (262.6), por escolha e não por referência. Fallbacks para motor sem backdrop-filter, prefers-reduced-transparency, reduced-motion e forced-colors.",
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/acrylic/acrylic.css",
+          "type": "registry:file",
+          "target": "components/acrylic/acrylic.css"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-scope.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-scope.tsx"
+        }
+      ],
+      "docs": "Importe o CSS uma vez no globals: @import \"@/components/acrylic/acrylic.css\". Envolva a região de vidro em <AcrylicScope> — é ele que pinta o fundo e carrega os tokens. backdrop-filter custa: use em poucos elementos grandes, não em cada linha de lista."
+    },
+    {
+      "name": "acrylic-button",
+      "type": "registry:block",
+      "title": "Acrylic Button",
+      "description": "Botão de vidro em quatro variantes e só uma acesa: glass (a placa), accent (placa com tinta de acento e brilho — uma por tela), solid (acento opaco para fundo caótico), ghost (sem blur, para barras densas). Foco por outline, não ring — o ring apagaria o vidro.",
+      "dependencies": [
+        "@base-ui/react",
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/acrylic"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/acrylic/acrylic-button/acrylic-button.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-button/acrylic-button.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-button/acrylic-button-variants.ts",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-button/acrylic-button-variants.ts"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-button/index.ts",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-button/index.ts"
+        }
+      ],
+      "docs": "Só funciona dentro de <AcrylicScope>. Base UI por baixo: use render={<a />} para virar link."
+    },
+    {
+      "name": "acrylic-card",
+      "type": "registry:block",
+      "title": "Acrylic Card",
+      "description": "A placa grande, raio 16, com eyebrow mono em caixa alta como marca tipográfica. Eixo interactive: o cartão que é link inclina contra a luz no hover; o que só apresenta fica parado. Rodapé separado por um traço de luz, nunca por cor de fundo.",
+      "dependencies": [
+        "class-variance-authority"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/acrylic"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/acrylic/acrylic-card/acrylic-card.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-card/acrylic-card.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-card/index.ts",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-card/index.ts"
+        }
+      ],
+      "docs": "Só funciona dentro de <AcrylicScope>. Anatomia: Card > Header (Eyebrow, Title, Description) > Content > Footer."
+    },
+    {
+      "name": "acrylic-hud",
+      "type": "registry:block",
+      "title": "Acrylic HUD",
+      "description": "O painel de comando: dois layouts sobre o mesmo núcleo. A ÓRBITA — cinco cartões nos vértices, amarras tracejadas, leque de canto. E o TECLADO do Stark, página inteira: anéis de módulos e de dados em volta do reator, que é a Muriki IA; fileiras de teclas só de ícone com as ações, em arcos de raio enorme com as divisórias convergindo para baixo; tudo linha acesa, sem preenchimento; abre em leque. Núcleo com o logo e os dois anéis contra-rotando do loader do platform-old. Coreografia inteira em CSS, um estado só (open), reduced-motion vai direto ao fim.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/acrylic"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-hud.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/acrylic-hud.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-orbit.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/acrylic-orbit.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-corner-menu.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/acrylic-corner-menu.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-core.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/acrylic-core.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-keyboard.tsx",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/acrylic-keyboard.tsx"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/acrylic-hud.css",
+          "type": "registry:file",
+          "target": "components/acrylic/acrylic-hud/acrylic-hud.css"
+        },
+        {
+          "path": "registry/muriki/acrylic/acrylic-hud/index.ts",
+          "type": "registry:component",
+          "target": "components/acrylic/acrylic-hud/index.ts"
+        }
+      ],
+      "docs": "Importe o CSS uma vez: @import \"@/components/acrylic/acrylic-hud/acrylic-hud.css\" (além do acrylic.css). Monte <AcrylicScope className=\"min-h-dvh\"><AcrylicHud open={ready}><AcrylicOrbit logo={<Logo/>} items={…}/><AcrylicCornerMenu items={…}/></AcrylicHud></AcrylicScope>. O logo entra por prop — com as cores próprias, ou fill=\"currentColor\" se for monocromático. Cinco itens é o número que a ideia pediu e o que cabe; seis ainda cabe."
     }
   ]
 }

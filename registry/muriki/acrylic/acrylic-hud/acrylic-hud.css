@@ -1,0 +1,1333 @@
+/* Muriki Acrílico — HUD.
+
+   O painel de comando: núcleo, órbita e o leque do canto. Tudo em vidro, e
+   toda a coreografia em CSS — @property para os dois números que animam
+   (--acr-k, o quanto o nó já voou; --acr-reveal, até onde a onda radial
+   já mostrou as amarras) e keyframes com atraso para o resto. Nenhuma
+   dependência de animação: o componente só troca data-phase de "boot" para
+   "open", e o CSS faz a sequência inteira.
+
+   A SEQUÊNCIA, a partir do instante em que a fase vira "open":
+      0 ms   os cinco pontos nascem no centro do logo
+    150 ms   explodem juntos para os vértices (uma rajada, não um por vez —
+             é "saindo de dentro do logo", e cinco coisas saindo de um lugar
+             só saem juntas)
+    150 ms   a onda radial revela as amarras tracejadas e os anéis de fundo,
+             no mesmo ritmo dos pontos
+    900 ms   cada ponto desdobra num cartão, um atrás do outro (70 ms)
+   1150 ms   o conteúdo dos cartões aparece
+   1500 ms   o gatilho do canto surge; as três pílulas sobem a escada
+
+   O NÚCLEO É O LOADER DO PLATFORM-OLD: dois anéis de 2px contra-rotando —
+   o de fora só com topo e direita acesos, o de dentro só com base e
+   esquerda — um disco no meio e um brilho borrado atrás. Aqui o de fora é
+   o azul da língua e o de dentro é tinta; o platform-old usava a segunda
+   cor luminosa do papel, e esta língua só tem uma. Em "open" os anéis não
+   param — baixam a presença. Um painel de comando nunca fica parado.
+
+   GEOMETRIA COMPARTILHADA: o raio da órbita é --acr-orbit-r em cqw
+   (1 cqw = 1% da largura do palco), e o SVG das amarras tem viewBox de
+   100 — então "36" quer dizer a mesma coisa nos dois. Um número, dois
+   sistemas de coordenadas, sem conversão. O componente injeta o valor. */
+
+@property --acr-k {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+@property --acr-reveal {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+/* O leque: 1 = teclas empilhadas na tecla central, 0 = espalhadas. Herda,
+   porque anima no anel e cada tecla lê o valor no próprio rotate(). */
+@property --acr-spread {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+
+@layer components {
+  /* Fora do Tailwind não há preflight, e sem border-box o cartão mede
+     largura + padding e o encaixe da semente cai em cima do título. O HUD
+     não depende de reset nenhum: ele mesmo declara a caixa. */
+  .acr-hud,
+  .acr-hud *,
+  .acr-hud *::before,
+  .acr-hud *::after {
+    box-sizing: border-box;
+  }
+  .acr-hud {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100%;
+    padding: 24px;
+    overflow: hidden;
+  }
+
+  /* ---------------------------------------------------------------- palco */
+  .acr-orbit {
+    --acr-orbit-r: 36cqw;
+    --acr-orbit-core: clamp(88px, 18cqw, 136px);
+    --acr-orbit-card-w: clamp(140px, 30cqw, 232px);
+    --acr-orbit-card-h: clamp(72px, 14cqw, 108px);
+    --acr-orbit-seed: 38px;
+    --acr-orbit-seed-pad: 14px;
+    position: relative;
+    container-type: inline-size;
+    width: min(100%, 92vh, 760px);
+    aspect-ratio: 1;
+  }
+
+  /* ------------------------------------------------- amarras e anéis de fundo */
+  .acr-orbit-tethers {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    --acr-reveal: 0px;
+    /* A onda: uma máscara radial que cresce do centro. As amarras já estão
+       desenhadas por inteiro — o que anima é até onde se pode vê-las. É por
+       isso que o tracejado sobrevive: animar dashoffset numa linha
+       tracejada arrasta o padrão. */
+    -webkit-mask: radial-gradient(circle at 50% 50%, #000 var(--acr-reveal), transparent calc(var(--acr-reveal) + 2cqw));
+    mask: radial-gradient(circle at 50% 50%, #000 var(--acr-reveal), transparent calc(var(--acr-reveal) + 2cqw));
+  }
+  .acr-orbit-ring {
+    fill: none;
+    stroke: var(--acr-edge);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+  .acr-orbit-ring--orbit {
+    stroke: var(--acr-accent-edge);
+    stroke-dasharray: 2 5;
+    stroke-linecap: round;
+  }
+  .acr-orbit-tether {
+    fill: none;
+    stroke: var(--acr-accent-edge);
+    stroke-width: 1.25px;
+    stroke-dasharray: 5 4;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  /* O conector: onde a amarra encosta no cartão. A amarra PARA NA BORDA do
+     cartão, não no centro dele — no holograma o cartão é transparente e a
+     linha atravessaria o texto. O componente calcula onde a borda está. */
+  .acr-orbit-port {
+    fill: var(--acr-accent);
+    stroke: none;
+  }
+  /* O pulso: um traço curto que viaja do núcleo ao cartão, em loop. Período
+     do dasharray maior que o comprimento (1) para o traço só aparecer uma
+     vez por volta; o offset anda para o negativo, que é o sentido
+     núcleo → cartão. */
+  .acr-orbit-pulse {
+    fill: none;
+    stroke: var(--acr-accent);
+    stroke-width: 2px;
+    stroke-linecap: round;
+    stroke-dasharray: 0.06 1.5;
+    stroke-dashoffset: 0.06;
+    vector-effect: non-scaling-stroke;
+    opacity: 0;
+  }
+
+  /* ------------------------------------------------------------- núcleo */
+  .acr-orbit-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    z-index: 2;
+    width: var(--acr-orbit-core);
+    aspect-ratio: 1;
+  }
+  .acr-orbit-glow {
+    position: absolute;
+    inset: -34%;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--acr-glow), transparent 66%);
+    filter: blur(14px);
+    pointer-events: none;
+  }
+  .acr-orbit-ring-outer,
+  .acr-orbit-ring-inner {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: opacity 900ms ease;
+  }
+  .acr-orbit-ring-outer {
+    inset: 0;
+    border-top-color: var(--acr-accent);
+    border-right-color: color-mix(in oklab, var(--acr-accent) 55%, transparent);
+    animation: acr-spin 1.2s linear infinite;
+  }
+  .acr-orbit-ring-inner {
+    inset: 8%;
+    border-bottom-color: var(--acr-ink-dim);
+    border-left-color: var(--acr-ink-faint);
+    animation: acr-spin 1.6s linear infinite reverse;
+  }
+  .acr-orbit-disc {
+    position: absolute;
+    inset: 17%;
+    display: grid;
+    place-items: center;
+    border-radius: 50% !important;
+    color: var(--acr-ink);
+  }
+  .acr-orbit-logo {
+    width: 60%;
+    height: 60%;
+    display: block;
+  }
+  .acr-orbit-logo svg,
+  .acr-orbit-logo img {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  [data-phase="open"] .acr-orbit-ring-outer { opacity: 0.55; }
+  [data-phase="open"] .acr-orbit-ring-inner { opacity: 0.4; }
+
+  /* ---------------------------------------------------------------- nós */
+  .acr-orbit-node {
+    --acr-k: 0;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+    outline: none;
+    transform: translate(
+      calc(cos(var(--a)) * var(--acr-orbit-r) * var(--acr-k)),
+      calc(sin(var(--a)) * var(--acr-orbit-r) * var(--acr-k))
+    );
+  }
+  .acr-orbit-node:focus-visible .acr-orbit-card {
+    outline: 2px solid var(--acr-accent);
+    outline-offset: 3px;
+  }
+  /* A SEMENTE: o ícone do módulo dentro de um anel que gira — o loader do
+     núcleo em miniatura. É a primeira coisa que existe de cada módulo:
+     nasce no centro, voa, e só depois o cartão se abre EM VOLTA dela. O
+     ícone não some: desliza para o encaixe à esquerda do cartão, e é o anel
+     que apaga. Semente e cartão ocupam a mesma célula do grid do nó, então
+     o centro de uma é o centro do outro sem conta nenhuma. */
+  .acr-orbit-seed {
+    grid-area: 1 / 1;
+    place-self: center;
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: var(--acr-orbit-seed);
+    height: var(--acr-orbit-seed);
+    border-radius: 50%;
+    background: var(--acr-accent-tint);
+    box-shadow: inset 0 0 0 1px var(--acr-accent-edge), 0 0 18px var(--acr-glow);
+    color: var(--acr-ink);
+    scale: 0;
+    pointer-events: none;
+    /* o encaixe: da metade do cartão até a borda, mais a margem, mais meia
+       semente — onde o ícone fica quando o cartão está aberto */
+    --acr-seed-slot: calc(-1 * var(--acr-orbit-card-w) / 2 + var(--acr-orbit-seed-pad) + var(--acr-orbit-seed) / 2);
+  }
+  .acr-orbit-seed svg {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+  .acr-orbit-seed::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--acr-accent);
+    border-right-color: color-mix(in oklab, var(--acr-accent) 45%, transparent);
+    animation: acr-spin 1s linear infinite;
+  }
+  /* O cartão já existe no tamanho final; o que anima é o recorte circular
+     que o revela a partir da semente. Assim o .acr-pane continua dono do
+     próprio fundo e da própria sombra — e o hover continua funcionando
+     depois, o que não aconteceria se a animação tivesse escrito neles. */
+  .acr-orbit-card {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+    width: var(--acr-orbit-card-w);
+    height: var(--acr-orbit-card-h);
+    padding: 0 clamp(12px, 2.4cqw, 18px) 0
+      calc(var(--acr-orbit-seed-pad) + var(--acr-orbit-seed) + 12px);
+    clip-path: circle(0px at 50% 50%);
+  }
+  .acr-orbit-card > * {
+    opacity: 0;
+    translate: 0 4px;
+  }
+  .acr-orbit-eyebrow {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: clamp(9px, 1.4cqw, 10px);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--acr-ink-faint);
+  }
+  .acr-orbit-title {
+    font-size: clamp(13px, 2.1cqw, 15.5px);
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    line-height: 1.25;
+    color: var(--acr-ink);
+  }
+  .acr-orbit-detail {
+    font-size: clamp(10.5px, 1.7cqw, 12px);
+    line-height: 1.4;
+    color: var(--acr-ink-dim);
+  }
+
+  /* ------------------------------------------------ a sequência em "open" */
+  [data-phase="open"] .acr-orbit-seed {
+    animation:
+      acr-orbit-seed-in 260ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both,
+      acr-orbit-seed-land 560ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(900ms + var(--i) * 70ms) both;
+  }
+  [data-phase="open"] .acr-orbit-seed::after {
+    animation:
+      acr-spin 1s linear infinite,
+      acr-orbit-ring-out 420ms ease calc(1000ms + var(--i) * 70ms) both;
+  }
+  [data-phase="open"] .acr-orbit-node {
+    animation: acr-orbit-fly 760ms cubic-bezier(0.2, 0.75, 0.15, 1.08) 150ms both;
+  }
+  [data-phase="open"] .acr-orbit-tethers {
+    animation: acr-orbit-reveal 950ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both;
+  }
+  [data-phase="open"] .acr-orbit-card {
+    animation: acr-orbit-unfold 540ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(900ms + var(--i) * 70ms) both;
+  }
+  [data-phase="open"] .acr-orbit-card > * {
+    animation: acr-orbit-content 360ms ease calc(1150ms + var(--i) * 70ms) both;
+  }
+  [data-phase="open"] .acr-orbit-pulse {
+    animation:
+      acr-orbit-pulse-in 400ms ease 1800ms both,
+      acr-orbit-pulse 2.6s linear infinite calc(1800ms + var(--i) * 420ms);
+  }
+
+  @keyframes acr-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes acr-orbit-seed-in {
+    from { scale: 0; }
+    to { scale: 1; }
+  }
+  /* Ao pousar, a semente FECHA: de ícone num anel para disco sólido com o
+     ícone em branco — o mesmo peso do disco do mascote. É o crachá do
+     módulo; um brasão de filete fino sumia dentro do cartão claro. */
+  @keyframes acr-orbit-seed-land {
+    from {
+      transform: translateX(0);
+      background-color: var(--acr-accent-tint);
+      color: var(--acr-ink);
+      box-shadow: inset 0 0 0 1px var(--acr-accent-edge), 0 0 18px var(--acr-glow);
+    }
+    to {
+      transform: translateX(var(--acr-seed-slot));
+      background-color: var(--acr-accent);
+      color: var(--acr-accent-ink);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.3), 0 4px 12px var(--acr-glow);
+    }
+  }
+  @keyframes acr-orbit-ring-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes acr-orbit-fly {
+    from { --acr-k: 0; }
+    to { --acr-k: 1; }
+  }
+  @keyframes acr-orbit-reveal {
+    from { --acr-reveal: 0px; }
+    to { --acr-reveal: 64cqw; }
+  }
+  @keyframes acr-orbit-unfold {
+    from { clip-path: circle(6px at 50% 50%); }
+    to { clip-path: circle(80% at 50% 50%); }
+  }
+  @keyframes acr-orbit-content {
+    from { opacity: 0; translate: 0 4px; }
+    to { opacity: 1; translate: 0 0; }
+  }
+  @keyframes acr-orbit-pulse-in {
+    from { opacity: 0; }
+    to { opacity: 0.9; }
+  }
+  @keyframes acr-orbit-pulse {
+    from { stroke-dashoffset: 0.06; }
+    to { stroke-dashoffset: -1.5; }
+  }
+
+  /* ------------------------------------------------------------- o canto */
+  .acr-corner {
+    --acr-corner-step: 58px;
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    z-index: 5;
+    width: 44px;
+    height: 44px;
+  }
+  .acr-corner-trigger {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    color: var(--acr-ink);
+    cursor: pointer;
+    outline: none;
+    border-radius: 50% !important;
+    opacity: 0;
+    scale: 0.6;
+  }
+  .acr-corner-trigger:focus-visible {
+    outline: 2px solid var(--acr-accent);
+    outline-offset: 2px;
+  }
+  .acr-corner-trigger svg { width: 18px; height: 18px; }
+  /* A escada. Cada pílula sobe um degrau para cima e para a esquerda, com
+     a borda direita na diagonal. Fechado, todas voltam para dentro do
+     gatilho — a escada se recolhe, não some. */
+  .acr-corner-item {
+    position: absolute;
+    right: 0;
+    bottom: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px 0 12px;
+    border: 0;
+    border-radius: 11px !important;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    color: var(--acr-ink);
+    text-decoration: none;
+    cursor: pointer;
+    outline: none;
+    opacity: 0;
+    scale: 0.7;
+    pointer-events: none;
+    transform-origin: 100% 100%;
+    transition:
+      translate 420ms cubic-bezier(0.2, 0.75, 0.2, 1.05),
+      opacity 220ms ease,
+      scale 320ms cubic-bezier(0.2, 0.75, 0.2, 1.05);
+    translate: 0 0;
+  }
+  .acr-corner-item svg { width: 15px; height: 15px; color: var(--acr-ink-dim); }
+  .acr-corner-item:focus-visible {
+    outline: 2px solid var(--acr-accent);
+    outline-offset: 2px;
+  }
+  [data-phase="open"] .acr-corner-trigger {
+    animation: acr-corner-in 420ms cubic-bezier(0.2, 0.75, 0.2, 1.1) 1500ms both;
+  }
+  [data-phase="open"] .acr-corner[data-open] .acr-corner-item {
+    opacity: 1;
+    scale: 1;
+    pointer-events: auto;
+    translate: calc(-1 * var(--j) * var(--acr-corner-step)) calc(-1 * var(--j) * var(--acr-corner-step));
+    transition-delay: calc(var(--j) * 60ms);
+  }
+  @keyframes acr-corner-in {
+    from { opacity: 0; scale: 0.6; }
+    to { opacity: 1; scale: 1; }
+  }
+
+  /* ------------------------------------------------------- holograma */
+  /* O SEGUNDO MATERIAL DO HUD. Vidro é placa: precisa de algo atrás para
+     refratar, e num painel onde só há vazio atrás ele vira bloco fosco que
+     briga com as amarras. Holograma é LINHA E LUZ: quase nada de fundo,
+     filete no acento, cantoneiras nos quatro cantos, scanlines no lugar do
+     grão — e sem blur, o que também o torna barato. É o Jarvis; o vidro é
+     o Fluent. Mesma língua, materiais diferentes, e o HUD escolhe por
+     data-material.
+
+     ONDE CADA UM É BOM: holograma no ESCURO, onde a linha acesa é o que
+     existe; vidro no CLARO, onde a placa branca fosca com sombra macia é
+     a mesma matéria das pílulas do canto e do disco do mascote — e
+     cantoneira com scanline em fundo claro vira mira de alvo em papel
+     pautado. O padrão do componente é vidro. */
+  .acr-hud {
+    --acr-holo-ink: oklch(0.76 0.13 262.6);
+    --acr-holo-fill: color-mix(in oklab, var(--acr-accent) 7%, transparent);
+    --acr-holo-fill-hover: color-mix(in oklab, var(--acr-accent) 13%, transparent);
+    --acr-holo-glow: color-mix(in oklab, var(--acr-glow) 40%, transparent);
+    --acr-holo-scan: oklch(1 0 0 / 0.035);
+  }
+  /* HOLOGRAMA NO CLARO: a luz é branca. No escuro o painel é um filete
+     azul em volta de quase nada; no claro, quase nada some no fundo
+     pastel, então o painel ganha um véu branco a 46% — translúcido, sem
+     blur — e o filete, as cantoneiras e o rótulo descem para o azul fundo
+     da marca. As scanlines viram tinta escura: linha branca sobre branco
+     não é linha. */
+  .muriki-acrylic[data-tone="light"] .acr-hud {
+    --acr-holo-ink: oklch(0.46 0.17 262.6);
+    --acr-holo-fill: oklch(0.995 0.004 262.6 / 0.46);
+    --acr-holo-fill-hover: oklch(0.995 0.004 262.6 / 0.62);
+    --acr-holo-glow: oklch(0.5 0.185 262.6 / 0.12);
+    /* sem scanlines no claro: tinta escura em linhas de 1px vira papel
+       pautado, não holograma */
+    --acr-holo-scan: transparent;
+  }
+  [data-material="hologram"] .acr-orbit-node .acr-orbit-card,
+  [data-material="hologram"] .acr-corner .acr-corner-item,
+  [data-material="hologram"] .acr-corner .acr-corner-trigger {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: var(--acr-holo-fill);
+    box-shadow:
+      inset 0 0 0 1px var(--acr-accent-edge),
+      0 0 24px var(--acr-holo-glow);
+  }
+  [data-material="hologram"] .acr-orbit-node .acr-orbit-card:hover,
+  [data-material="hologram"] .acr-corner .acr-corner-item:hover,
+  [data-material="hologram"] .acr-corner .acr-corner-trigger:hover {
+    background-color: var(--acr-holo-fill-hover);
+    box-shadow:
+      inset 0 0 0 1px var(--acr-accent-edge-hover),
+      0 0 34px var(--acr-glow);
+  }
+  /* scanlines no lugar do grão */
+  [data-material="hologram"] .acr-orbit-node .acr-orbit-card::before {
+    background-image: repeating-linear-gradient(0deg, transparent 0 3px, var(--acr-holo-scan) 3px 4px);
+    background-size: auto;
+    opacity: 1;
+    mix-blend-mode: normal;
+  }
+  /* cantoneiras no lugar do reflexo: oito gradientes de 1px, dois por canto */
+  [data-material="hologram"] .acr-orbit-node .acr-orbit-card::after {
+    inset: 0;
+    opacity: 1;
+    transform: none;
+    transition: none;
+    --acr-holo-tick: linear-gradient(var(--acr-holo-ink), var(--acr-holo-ink));
+    background:
+      var(--acr-holo-tick) left 6px top 6px / 10px 1px no-repeat,
+      var(--acr-holo-tick) left 6px top 6px / 1px 10px no-repeat,
+      var(--acr-holo-tick) right 6px top 6px / 10px 1px no-repeat,
+      var(--acr-holo-tick) right 6px top 6px / 1px 10px no-repeat,
+      var(--acr-holo-tick) left 6px bottom 6px / 10px 1px no-repeat,
+      var(--acr-holo-tick) left 6px bottom 6px / 1px 10px no-repeat,
+      var(--acr-holo-tick) right 6px bottom 6px / 10px 1px no-repeat,
+      var(--acr-holo-tick) right 6px bottom 6px / 1px 10px no-repeat;
+  }
+  [data-material="hologram"] .acr-orbit-eyebrow { color: var(--acr-holo-ink); }
+  [data-material="hologram"] .acr-orbit-seed {
+    background: var(--acr-holo-fill);
+    color: var(--acr-holo-ink);
+  }
+  [data-material="hologram"] .acr-corner-item svg { color: var(--acr-holo-ink); }
+
+  /* ------------------------------------------------------------ teclado */
+  /* O CORPO DO JARVIS, página inteira, e a história sai do loading.
+
+     O LOGO MORA NO CANTO INFERIOR ESQUERDO, grande — é a Muriki IA. Em
+     volta dele, A VOLTA GRANDE: os arcos de módulos e de dados entram pela
+     borda esquerda, passam por cima do logo e saem pela borda de baixo.
+     Não fecham círculo; a tela corta o resto.
+
+     O TECLADO TEM UMA VOLTA: as fileiras de ações são arcos fortes com o
+     centro fora da tela, embaixo à direita. Nascem no pé do cluster,
+     sobem curvando e chegam à borda direita lá em cima — coladas no arco
+     por uma máscara. As divisórias das teclas apontam para o centro da
+     curva; é o que faz parecer uma peça só.
+
+     NO TOPO, quatro cards de chart em vidro fosco (HTML, com blur de
+     verdade), fora do SVG para o texto ser texto. Clicar no logo liga o
+     modo ouvindo: o reator acende e uma onda de voz vibra embaixo dele.
+
+     O BOOT É A CENA: logo e órbita nascem NO CENTRO da tela, inteiros.
+     Quando a fase vira "open", o reator viaja para o canto (900 ms) e só
+     então o teclado se desdobra em volta dele: leque, ícones voando da
+     órbita, fileiras saindo de trás do arco, cards, onda. --acr-kbd-t0 é
+     a espera pelo atraque — todo atraso da sequência soma com ele. */
+  .acr-hud {
+    --acr-kbd-line: oklch(0.72 0.15 262.6 / 0.8);
+    --acr-kbd-line-dim: oklch(0.72 0.15 262.6 / 0.38);
+    --acr-kbd-glow: oklch(0.72 0.15 262.6 / 0.5);
+    --acr-kbd-fill: oklch(0.72 0.15 262.6 / 0.045);
+    --acr-kbd-fill-hover: oklch(0.72 0.15 262.6 / 0.16);
+    --acr-kbd-ink: oklch(0.86 0.09 262.6);
+    --acr-kbd-ink-dim: oklch(0.86 0.09 262.6 / 0.7);
+    --acr-kbd-fill-hi: oklch(0.72 0.15 262.6 / 0.22);
+    /* o bloom largo do halo — ver .acr-kbd-face */
+    --acr-kbd-glow-wide: oklch(0.72 0.15 262.6 / 0.32);
+    /* O ACESO: a cor do que está sob o ponteiro (traço, luz correndo,
+       ícone e nome) e dos dados vivos dos instrumentos. No claro é o
+       próprio acento — azul fundo sobre placa clara. No escuro o acento
+       (L 0.5) é MAIS ESCURO que a linha em repouso (L 0.72): usá-lo no
+       hover apagava a tecla em vez de acender. Então aqui o aceso é um
+       azul claro, e a tinta sobre a placa acesa é quase branca. */
+    --acr-kbd-hot: oklch(0.8 0.13 262.6);
+    --acr-kbd-hot-ink: oklch(0.97 0.006 270);
+  }
+  .muriki-acrylic[data-tone="light"] .acr-hud {
+    --acr-kbd-line: oklch(0.46 0.17 262.6 / 0.7);
+    --acr-kbd-line-dim: oklch(0.46 0.17 262.6 / 0.3);
+    --acr-kbd-glow: oklch(0.5 0.185 262.6 / 0.16);
+    --acr-kbd-fill: oklch(0.99 0.004 262 / 0.16);
+    --acr-kbd-fill-hover: oklch(0.99 0.004 262 / 0.36);
+    --acr-kbd-ink: oklch(0.34 0.14 262.6);
+    --acr-kbd-ink-dim: oklch(0.34 0.14 262.6 / 0.6);
+    --acr-kbd-fill-hi: oklch(0.5 0.185 262.6 / 0.14);
+    --acr-kbd-glow-wide: oklch(0.5 0.185 262.6 / 0.2);
+    --acr-kbd-hot: var(--acr-accent);
+    --acr-kbd-hot-ink: var(--acr-accent);
+  }
+  /* Na tinta a linha é o --primary do dark do sistema (0.7 0.145 262.6),
+     um pouco mais presente que no vazio: o chão é mais fundo. */
+  .muriki-acrylic[data-tone="ink"] .acr-hud {
+    --acr-kbd-line: oklch(0.7 0.145 262.6 / 0.85);
+    --acr-kbd-line-dim: oklch(0.7 0.145 262.6 / 0.4);
+    --acr-kbd-fill: oklch(0.7 0.145 262.6 / 0.05);
+  }
+  /* O palco: viewBox 200×100, largura da página. 1cqw = 2 unidades. O
+     reator é posicionado em unidades de contêiner para o CSS poder
+     calcular a viagem do centro até o canto. */
+  .acr-kbd {
+    --acr-kbd-core-x: 10cqw;
+    --acr-kbd-core-y: 78cqh;
+    --acr-kbd-core: 11cqw;
+    /* A viagem da órbita, em unidades do viewBox: do CORE (20, 78) do
+       componente até o centro (100, 50). Dentro do SVG, px é unidade de
+       usuário — por isso não dá para reaproveitar os cq acima. */
+    --acr-kbd-orbit-dx: 80px;
+    --acr-kbd-orbit-dy: -28px;
+    /* O mesmo CORE, para os eixos de rotação DENTRO do SVG (leque, órbita):
+       ali px é unidade do viewBox, e cq não serve. */
+    --acr-kbd-core-ux: 20px;
+    --acr-kbd-core-uy: 78px;
+    --acr-kbd-t0: 650ms;
+    position: relative;
+    container-type: size;
+    width: min(100%, calc(190vh - 48px));
+    aspect-ratio: 2 / 1;
+  }
+  .acr-kbd-svg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .acr-kbd-ring,
+  .acr-kbd-key--arc,
+  .acr-kbd-orbit-ring {
+    transform-box: view-box;
+    transform-origin: var(--acr-kbd-core-ux) var(--acr-kbd-core-uy);
+  }
+  .acr-kbd-key {
+    cursor: pointer;
+    outline: none;
+    opacity: 0;
+  }
+  .acr-kbd-key--arc {
+    transform: rotate(calc((var(--i) - var(--c)) * var(--step) * var(--acr-spread) * -1));
+  }
+  /* A FACE. Holograma plano: preenchimento fraco e uniforme, traço em
+     unidades do viewBox — sem non-scaling-stroke, para o traçado poder se
+     desenhar com dashoffset na abertura. O hover é onde a placa acende:
+     preenche no acento, traço no acento, brilho.
+
+     TRÊS PESOS DE TRAÇO, como no teclado do Stark: os trilhos (as arestas
+     do cluster e das fileiras) fortes, o anel dos módulos médio, a grade
+     de ícones, os dados e os painéis finos. 0.11 ≈ 0,8px numa tela de
+     1400; o olho lê a diferença como hierarquia, não como espessura.
+
+     O HALO TEM DUAS CAMADAS: um fio fino forte colado na linha e um
+     bloom largo e fraco em volta — é o que faz a linha parecer acesa e
+     não só desenhada. */
+  .acr-kbd-face {
+    fill: var(--acr-kbd-fill);
+    stroke: var(--acr-kbd-line);
+    stroke-width: 0.11px;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 0.22px var(--acr-kbd-glow)) drop-shadow(0 0 1.3px var(--acr-kbd-glow-wide));
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: fill 140ms ease, stroke 120ms ease, filter 160ms ease, fill-opacity 120ms ease, scale 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  /* O HOVER TEM MOVIMENTO, em três camadas ao mesmo tempo: a placa
+     levanta (escala a partir do próprio centro), o ícone salta, e uma luz
+     corre o contorno da tecla enquanto o ponteiro está nela. A luz é um
+     segundo traço por cima da face, com a mesma geometria — só existe no
+     hover — e um dash curto que anda pelo pathLength. Escala com
+     `scale`, não com `transform`: o voo do ícone anima transform e fica
+     preenchido para sempre; as propriedades individuais compõem por cima. */
+  .acr-kbd-ring--modules .acr-kbd-face {
+    stroke-width: 0.17px;
+  }
+  .acr-kbd-key:hover .acr-kbd-face,
+  .acr-kbd-key:focus-visible .acr-kbd-face {
+    fill: var(--acr-kbd-fill-hi);
+    stroke: var(--acr-kbd-hot);
+    filter: drop-shadow(0 0 0.6px var(--acr-glow-strong)) drop-shadow(0 0 2px var(--acr-glow));
+    scale: 1.035;
+  }
+  .acr-kbd-run {
+    fill: none;
+    stroke: var(--acr-kbd-hot);
+    stroke-width: 0.3px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 0.22 0.78;
+    stroke-dashoffset: 1;
+    opacity: 0;
+    filter: drop-shadow(0 0 0.7px var(--acr-glow-strong));
+    transform-box: fill-box;
+    transform-origin: center;
+    pointer-events: none;
+    transition: opacity 160ms ease, scale 200ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .acr-kbd-key:hover .acr-kbd-run,
+  .acr-kbd-key:focus-visible .acr-kbd-run {
+    opacity: 1;
+    scale: 1.035;
+    animation: acr-kbd-run 1.1s linear infinite;
+  }
+  @keyframes acr-kbd-run {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  .acr-kbd-key .acr-kbd-slot {
+    transition: scale 220ms cubic-bezier(0.2, 0.7, 0.2, 1), translate 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .acr-kbd-key:hover .acr-kbd-slot,
+  .acr-kbd-key:focus-visible .acr-kbd-slot {
+    scale: 1.18;
+    translate: 0 -0.35px;
+  }
+  .acr-kbd-key:hover .acr-kbd-label,
+  .acr-kbd-key:hover .acr-kbd-sublabel,
+  .acr-kbd-key:hover .acr-kbd-icon,
+  .acr-kbd-key:focus-visible .acr-kbd-label,
+  .acr-kbd-key:focus-visible .acr-kbd-sublabel,
+  .acr-kbd-key:focus-visible .acr-kbd-icon {
+    fill: var(--acr-kbd-hot-ink);
+    color: var(--acr-kbd-hot-ink);
+  }
+  /* AS FILEIRAS SÃO SÓ ÍCONE, como no teclado do Stark. O nome de cada
+     ação existe em dois lugares: na própria tecla, embaixo do ícone, no
+     hover e no foco (o ícone sobe para dar lugar), e na leitura embaixo
+     do logo. O anel dos módulos continua com nome — ali a palavra é o
+     conteúdo. Leitor de tela lê o aria-label da tecla, sempre. */
+  .acr-kbd-key--row .acr-kbd-sublabel {
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+  .acr-kbd-key--row:hover .acr-kbd-sublabel,
+  .acr-kbd-key--row:focus-visible .acr-kbd-sublabel {
+    opacity: 1;
+  }
+  .acr-kbd-key--row:hover .acr-kbd-slot,
+  .acr-kbd-key--row:focus-visible .acr-kbd-slot {
+    scale: 1.14;
+    translate: 0 -0.7px;
+  }
+  .acr-kbd-key:active .acr-kbd-face {
+    fill: var(--acr-accent-tint);
+  }
+  .acr-kbd-key:focus-visible .acr-kbd-face {
+    stroke: var(--acr-ink);
+    stroke-width: 0.3px;
+  }
+  /* O assento do reator: um anel tracejado no vão, e o varredor de radar
+     que dá a volta na régua depois que tudo abriu. */
+  .acr-kbd-seat {
+    fill: none;
+    stroke: var(--acr-kbd-line-dim);
+    stroke-width: 0.12px;
+    stroke-dasharray: 0.6 0.9;
+    opacity: 0;
+  }
+  .acr-kbd-sweep {
+    fill: none;
+    stroke: var(--acr-kbd-hot);
+    stroke-width: 0.35px;
+    stroke-linecap: round;
+    opacity: 0;
+    transform-box: view-box;
+    transform-origin: var(--acr-kbd-core-ux) var(--acr-kbd-core-uy);
+  }
+  /* As legendas das teclas são legendas de teclado: mono, caixa alta,
+     espaçadas. É a única caixa alta desta tela, e é por ser teclado. */
+  .acr-kbd-label,
+  .acr-kbd-sublabel,
+  .acr-kbd-cell-label,
+  .acr-kbd-cell-value,
+  .acr-kbd-legend,
+  .acr-kbd-inst-title,
+  .acr-kbd-inst-value,
+  .acr-kbd-inst-unit,
+  .acr-kbd-inst-name,
+  .acr-kbd-inst-num {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    text-transform: uppercase;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+  }
+  .acr-kbd-label {
+    fill: var(--acr-kbd-ink);
+    font-size: 1.8px;
+    letter-spacing: 0.24px;
+  }
+  .acr-kbd-sublabel {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 1.15px;
+    letter-spacing: 0.16px;
+  }
+  .acr-kbd-cell-label {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 1.15px;
+    letter-spacing: 0.18px;
+  }
+  .acr-kbd-cell-value {
+    fill: var(--acr-kbd-ink);
+    font-size: 1.8px;
+    font-weight: 600;
+    letter-spacing: 0.06px;
+    text-transform: none;
+  }
+  .acr-kbd-legend {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 1.15px;
+    letter-spacing: 0.3px;
+    text-anchor: start;
+  }
+  /* Os ícones: nas teclas, e na órbita do boot. O que anima nunca é o
+     <svg> do ícone (transform em svg aninhado é inconsistente) — é um <g>
+     em volta: .acr-kbd-slot na tecla, .acr-kbd-orbiter na órbita. --dx/--dy
+     é de onde a tecla recebe o ícone: o componente escreve, a animação lê. */
+  .acr-kbd-icon {
+    color: var(--acr-kbd-ink);
+    overflow: visible;
+    pointer-events: none;
+  }
+  .acr-kbd-slot {
+    transform-box: fill-box;
+    transform-origin: center;
+    --dx: 0;
+    --dy: 0;
+  }
+  /* O conteúdo da tecla (ícone + nome) gira junto com ela: pela tangente
+     do arco no círculo, pela tangente da fileira no teclado. A escrita
+     acompanha o formato. */
+  .acr-kbd-face-content {
+    pointer-events: none;
+  }
+  /* A órbita nasce no centro da tela, junto do reator, e atraca com ele. */
+  .acr-kbd-orbit {
+    pointer-events: none;
+    transform-box: view-box;
+    transform-origin: var(--acr-kbd-core-ux) var(--acr-kbd-core-uy);
+    transform: translate(var(--acr-kbd-orbit-dx), var(--acr-kbd-orbit-dy));
+  }
+  .acr-kbd-orbit-ring {
+    animation: acr-spin var(--acr-orbit-speed, 12s) linear infinite;
+  }
+  .acr-kbd-orbit-ring--reverse {
+    animation-direction: reverse;
+  }
+  .acr-kbd-orbiter {
+    transform-box: view-box;
+    animation: acr-spin var(--acr-orbit-speed, 12s) linear infinite reverse;
+    opacity: 0.85;
+  }
+  .acr-kbd-orbit-ring--reverse .acr-kbd-orbiter {
+    animation-direction: normal;
+  }
+  /* As arestas se desenham (dashoffset com pathLength=1). SEM
+     non-scaling-stroke: no Chrome ele escala o dasharray junto e o traço
+     sai tracejado. Largura em unidades do viewBox — 0.15 é ~1px. */
+  .acr-kbd-edge {
+    fill: none;
+    stroke: var(--acr-kbd-line);
+    stroke-width: 0.26px;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 0.22px var(--acr-kbd-glow)) drop-shadow(0 0 1.3px var(--acr-kbd-glow-wide));
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .acr-kbd-edge--static {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  /* o trilho de dentro da régua: mais fino que a aresta, é o par dela */
+  .acr-kbd-rail {
+    stroke-width: 0.14px;
+  }
+  .acr-kbd-tick {
+    stroke: var(--acr-kbd-line-dim);
+    stroke-width: 1px;
+    vector-effect: non-scaling-stroke;
+  }
+  .acr-kbd-tick--major {
+    stroke: var(--acr-kbd-line);
+    stroke-width: 1.4px;
+  }
+  .acr-kbd-ticks,
+  .acr-kbd-legend {
+    opacity: 0;
+  }
+  /* As fileiras saem de trás do cluster; a máscara (no SVG) é o que faz o
+     arco recortar as primeiras teclas. */
+  .acr-kbd-rows {
+    transform: translate(-14px, 14px);
+  }
+  /* A VOZ DO LOGO. Clicar no mascote liga o modo ouvindo: o reator acende
+     e uma onda curta vibra embaixo dele, redesenhada a cada quadro pelo
+     componente. Não existe fora do modo ouvindo. */
+  .acr-kbd-voice {
+    fill: none;
+    stroke: var(--acr-kbd-hot);
+    stroke-width: 0.2px;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 0.5px var(--acr-glow-strong));
+    opacity: 0;
+    transition: opacity 250ms ease;
+    pointer-events: none;
+  }
+  .acr-kbd[data-listening] .acr-kbd-voice {
+    opacity: 1;
+  }
+  .acr-kbd[data-listening] .acr-orbit-glow {
+    opacity: 0.9;
+  }
+  .acr-kbd[data-listening] .acr-orbit-ring-outer {
+    border-top-color: var(--acr-accent);
+    border-right-color: var(--acr-accent);
+  }
+  .acr-kbd[data-listening] .acr-orbit-disc {
+    box-shadow: inset 0 0 0 1px var(--acr-accent), 0 0 22px var(--acr-glow-strong);
+  }
+  /* OS INSTRUMENTOS, no topo: quatro painéis desenhados no SVG, na mesma
+     linha e no mesmo mono das teclas — não são cards de dashboard, são
+     mostradores. Cada um tem a forma que o dado pede: anel segmentado
+     (partes de um todo), pontos (um por pessoa), grade de células (uma
+     por nota), manômetro de arco (quanto do dia já foi). Uma matiz só,
+     em degraus de presença; a legenda diz o que é cada segmento. */
+  .acr-kbd-panel {
+    opacity: 0;
+  }
+  /* Os painéis são holograma, sempre — a mesma linha e o mesmo véu fraco
+     das teclas, em qualquer `material` do HUD. A placa fosca foi testada
+     e recusada: sobre o degradê liso ela vira o único objeto cheio numa
+     tela onde tudo é linha. */
+  .acr-kbd-inst-title {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 1.05px;
+    letter-spacing: 0.2px;
+    text-anchor: start;
+  }
+  .acr-kbd-inst-value {
+    fill: var(--acr-kbd-ink);
+    font-size: 2.6px;
+    font-weight: 600;
+    letter-spacing: -0.04px;
+    text-transform: none;
+  }
+  .acr-kbd-inst-unit {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 0.9px;
+    letter-spacing: 0.14px;
+  }
+  .acr-kbd-inst-name {
+    fill: var(--acr-kbd-ink-dim);
+    font-size: 0.95px;
+    letter-spacing: 0.12px;
+    text-anchor: start;
+  }
+  .acr-kbd-inst-num {
+    fill: var(--acr-kbd-ink);
+    font-size: 1.05px;
+    font-weight: 600;
+    text-anchor: end;
+    text-transform: none;
+  }
+  .acr-kbd-inst-track {
+    fill: none;
+    stroke: var(--acr-kbd-line-dim);
+    stroke-width: 0.14px;
+  }
+  .acr-kbd-inst-seg {
+    fill: none;
+    stroke: var(--acr-kbd-hot);
+    stroke-width: 1px;
+    opacity: var(--seg, 0.9);
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    transition: opacity 140ms ease, stroke-width 140ms ease;
+    cursor: default;
+  }
+  .acr-kbd-inst-cell,
+  .acr-kbd-inst-dot,
+  .acr-kbd-inst-swatch {
+    fill: var(--acr-kbd-hot);
+    fill-opacity: var(--seg, 0.9);
+    stroke: var(--acr-kbd-line);
+    stroke-width: 0.1px;
+    transition: opacity 140ms ease;
+  }
+  .acr-kbd-inst-swatch {
+    stroke: none;
+  }
+  .acr-kbd-inst-row {
+    cursor: default;
+  }
+  /* destaque cruzado: a linha da legenda (ou o próprio segmento) sob o
+     ponteiro acende o segmento dela e apaga os outros */
+  .acr-kbd-inst-seg:hover {
+    opacity: 1;
+    stroke-width: 1.3px;
+  }
+  .acr-kbd-panel[data-hi] .acr-kbd-inst-seg,
+  .acr-kbd-panel[data-hi] .acr-kbd-inst-cell,
+  .acr-kbd-panel[data-hi] .acr-kbd-inst-dot {
+    opacity: 0.2;
+  }
+  .acr-kbd-panel[data-hi="0"] [data-j="0"],
+  .acr-kbd-panel[data-hi="1"] [data-j="1"],
+  .acr-kbd-panel[data-hi="2"] [data-j="2"],
+  .acr-kbd-panel[data-hi="3"] [data-j="3"] {
+    opacity: 1;
+  }
+  .acr-kbd-panel[data-hi="0"] .acr-kbd-inst-seg[data-j="0"],
+  .acr-kbd-panel[data-hi="1"] .acr-kbd-inst-seg[data-j="1"],
+  .acr-kbd-panel[data-hi="2"] .acr-kbd-inst-seg[data-j="2"],
+  .acr-kbd-panel[data-hi="3"] .acr-kbd-inst-seg[data-j="3"] {
+    stroke-width: 1.3px;
+  }
+  .acr-kbd-inst-row:hover .acr-kbd-inst-name,
+  .acr-kbd-inst-row:hover .acr-kbd-inst-num {
+    fill: var(--acr-kbd-hot-ink);
+  }
+  /* O reator, holograma: anel de linha em volta do logo, sem disco de
+     vidro; loader mais fino e na linha da língua. Nasce no centro da tela
+     e atraca no canto quando a fase abre — o botão de clique vai junto. */
+  .acr-kbd .acr-orbit-core,
+  .acr-kbd-core-button {
+    left: var(--acr-kbd-core-x);
+    top: var(--acr-kbd-core-y);
+    width: var(--acr-kbd-core);
+    transform: translate(calc(50cqw - var(--acr-kbd-core-x)), calc(50cqh - var(--acr-kbd-core-y)));
+  }
+  .acr-kbd .acr-orbit-core {
+    z-index: 2;
+  }
+  .acr-kbd .acr-orbit-glow {
+    opacity: 0.3;
+  }
+  .acr-kbd .acr-orbit-disc {
+    background: var(--acr-kbd-fill);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow: inset 0 0 0 1px var(--acr-kbd-line), 0 0 14px var(--acr-kbd-glow);
+  }
+  .acr-kbd .acr-orbit-disc::before {
+    display: none;
+  }
+  .acr-kbd .acr-orbit-ring-outer {
+    border-width: 1.5px;
+    border-top-color: var(--acr-kbd-line);
+    border-right-color: var(--acr-kbd-line-dim);
+  }
+  .acr-kbd .acr-orbit-ring-inner {
+    border-width: 1.5px;
+    border-bottom-color: var(--acr-kbd-line-dim);
+    border-left-color: var(--acr-kbd-line-dim);
+  }
+  .acr-kbd-core-button {
+    position: absolute;
+    z-index: 4;
+    translate: -50% -50%;
+    aspect-ratio: 1;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+  }
+  .acr-kbd-core-button:focus-visible {
+    outline: 2px solid var(--acr-accent);
+    outline-offset: 4px;
+  }
+  /* A leitura, embaixo do logo — o que a IA está dizendo. */
+  .acr-kbd-readout {
+    position: absolute;
+    left: var(--acr-kbd-core-x);
+    top: calc(var(--acr-kbd-core-y) + var(--acr-kbd-core) / 2 + 8px);
+    z-index: 3;
+    translate: -50% 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--acr-kbd-ink);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* ------------------------------------------------- a sequência */
+  [data-phase="open"] .acr-kbd .acr-orbit-core,
+  [data-phase="open"] .acr-kbd-core-button {
+    animation: acr-kbd-dock 900ms cubic-bezier(0.45, 0, 0.2, 1) both;
+  }
+  /* A órbita atraca JUNTO com o reator — mesma curva, mesmos 900 ms — mas
+     com a própria viagem, em unidades do viewBox. A do reator é em cq; se a
+     órbita a usasse, os ícones seriam jogados centenas de unidades para
+     fora do quadro durante a viagem e só reapareceriam no fim. */
+  [data-phase="open"] .acr-kbd-orbit {
+    animation: acr-kbd-orbit-dock 900ms cubic-bezier(0.45, 0, 0.2, 1) both;
+  }
+  [data-phase="open"] .acr-kbd-ring {
+    animation: acr-arc-fan 820ms cubic-bezier(0.2, 0.75, 0.15, 1.06) calc(var(--acr-kbd-t0) + var(--ring) * 340ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key--arc {
+    animation: acr-arc-key-in 200ms ease calc(var(--acr-kbd-t0) + var(--ring) * 340ms + var(--d) * 60ms) both;
+  }
+  /* cada tecla nasce como traçado — a linha se desenha — e só depois enche */
+  [data-phase="open"] .acr-kbd-key--arc .acr-kbd-face {
+    animation:
+      acr-kbd-trace 560ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + var(--ring) * 340ms + var(--d) * 60ms) both,
+      acr-kbd-fill-in 420ms ease calc(var(--acr-kbd-t0) + 380ms + var(--ring) * 340ms + var(--d) * 60ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key--arc .acr-kbd-face-content {
+    animation: acr-arc-key-in 300ms ease calc(var(--acr-kbd-t0) + 420ms + var(--ring) * 340ms + var(--d) * 60ms) both;
+  }
+  [data-phase="open"] .acr-kbd-seat {
+    animation: acr-arc-key-in 700ms ease calc(var(--acr-kbd-t0) + 300ms) both;
+  }
+  [data-phase="open"] .acr-kbd-sweep {
+    animation:
+      acr-orbit-pulse-in 500ms ease calc(var(--acr-kbd-t0) + 2300ms) both,
+      acr-spin 14s linear infinite calc(var(--acr-kbd-t0) + 2300ms);
+  }
+  /* O VOO. O componente mede, no instante certo, onde o ícone está na
+     órbita e onde a tecla o espera, escreve --dx/--dy e liga .is-flying;
+     o orbitante ganha .is-gone. Sem JS nenhum, o fallback acende os
+     ícones aos 3,3 s. */
+  .acr-kbd-key .acr-kbd-slot {
+    opacity: 0;
+  }
+  [data-phase="open"] .acr-kbd-key .acr-kbd-slot {
+    animation: acr-arc-key-in 300ms ease calc(var(--acr-kbd-t0) + 2650ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key .acr-kbd-slot.is-flying {
+    animation: acr-kbd-fly 720ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .acr-kbd-orbiter.is-gone {
+    animation:
+      acr-spin var(--acr-orbit-speed, 12s) linear infinite reverse,
+      acr-orbit-ring-out 260ms ease both;
+  }
+  .acr-kbd-orbit-ring--reverse .acr-kbd-orbiter.is-gone {
+    animation:
+      acr-spin var(--acr-orbit-speed, 12s) linear infinite,
+      acr-orbit-ring-out 260ms ease both;
+  }
+  [data-phase="open"] .acr-kbd-rows {
+    animation: acr-kbd-emerge 800ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + 550ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key--row {
+    animation: acr-arc-key-in 200ms ease calc(var(--acr-kbd-t0) + 610ms + var(--row) * 220ms + var(--i) * 40ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key--row .acr-kbd-face {
+    animation:
+      acr-kbd-trace 520ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + 610ms + var(--row) * 220ms + var(--i) * 40ms) both,
+      acr-kbd-fill-in 400ms ease calc(var(--acr-kbd-t0) + 960ms + var(--row) * 220ms + var(--i) * 40ms) both;
+  }
+  [data-phase="open"] .acr-kbd-key--row .acr-kbd-face-content {
+    animation: acr-arc-key-in 300ms ease calc(var(--acr-kbd-t0) + 980ms + var(--row) * 220ms + var(--i) * 40ms) both;
+  }
+  [data-phase="open"] .acr-kbd-edge {
+    animation: acr-fan-draw 1100ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + 450ms + var(--e, 0) * 180ms) both;
+  }
+  [data-phase="open"] .acr-kbd-edge--static {
+    animation: acr-arc-key-in 700ms ease calc(var(--acr-kbd-t0) + 850ms) both;
+  }
+  [data-phase="open"] .acr-kbd-ticks,
+  [data-phase="open"] .acr-kbd-legend {
+    animation: acr-arc-key-in 800ms ease calc(var(--acr-kbd-t0) + 950ms) both;
+  }
+  /* os instrumentos: o painel se traça como uma tecla; depois cada
+     segmento se desenha, cada célula acende */
+  [data-phase="open"] .acr-kbd-panel {
+    animation: acr-arc-key-in 300ms ease calc(var(--acr-kbd-t0) + 1900ms + var(--i) * 140ms) both;
+  }
+  [data-phase="open"] .acr-kbd-panel .acr-kbd-face {
+    animation:
+      acr-kbd-trace 560ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + 1900ms + var(--i) * 140ms) both,
+      acr-kbd-fill-in 420ms ease calc(var(--acr-kbd-t0) + 2280ms + var(--i) * 140ms) both;
+  }
+  [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-seg {
+    animation: acr-kbd-trace 700ms cubic-bezier(0.2, 0.7, 0.2, 1) calc(var(--acr-kbd-t0) + 2300ms + var(--i) * 140ms + var(--j) * 120ms) both;
+  }
+  [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-cell,
+  [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-dot {
+    animation: acr-arc-key-in 260ms ease calc(var(--acr-kbd-t0) + 2300ms + var(--i) * 140ms + var(--k, 0) * 45ms) both;
+  }
+  [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-text {
+    animation: acr-arc-key-in 400ms ease calc(var(--acr-kbd-t0) + 2500ms + var(--i) * 140ms) both;
+  }
+  [data-phase="open"] .acr-kbd-readout {
+    animation: acr-kbd-readout-in 420ms ease calc(var(--acr-kbd-t0) + 2700ms) both;
+  }
+  @keyframes acr-kbd-dock {
+    from { transform: translate(calc(50cqw - var(--acr-kbd-core-x)), calc(50cqh - var(--acr-kbd-core-y))) scale(1.14); }
+    to { transform: translate(0, 0) scale(1); }
+  }
+  @keyframes acr-kbd-orbit-dock {
+    from { transform: translate(var(--acr-kbd-orbit-dx), var(--acr-kbd-orbit-dy)) scale(1.14); }
+    to { transform: translate(0, 0) scale(1); }
+  }
+  @keyframes acr-kbd-trace {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes acr-kbd-fill-in {
+    from { fill-opacity: 0; }
+    to { fill-opacity: 1; }
+  }
+  @keyframes acr-arc-fan {
+    from { --acr-spread: 1; }
+    to { --acr-spread: 0; }
+  }
+  @keyframes acr-arc-key-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes acr-fan-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes acr-kbd-fly {
+    from { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(0.85); }
+    to { opacity: 1; transform: translate(0, 0) scale(1); }
+  }
+  @keyframes acr-kbd-emerge {
+    from { transform: translate(-14px, 14px); }
+    to { transform: translate(0, 0); }
+  }
+  @keyframes acr-kbd-readout-in {
+    from { opacity: 0; translate: -50% 4px; }
+    to { opacity: 1; translate: -50% 0; }
+  }
+
+  /* ----------------------------------------------------- menos movimento */
+  @media (prefers-reduced-motion: reduce) {
+    [data-phase="open"] .acr-orbit-node,
+    [data-phase="open"] .acr-orbit-seed,
+    [data-phase="open"] .acr-orbit-seed::after,
+    [data-phase="open"] .acr-orbit-tethers,
+    [data-phase="open"] .acr-orbit-card,
+    [data-phase="open"] .acr-orbit-card > *,
+    [data-phase="open"] .acr-orbit-pulse,
+    [data-phase="open"] .acr-corner-trigger,
+    [data-phase="open"] .acr-kbd .acr-orbit-core,
+    [data-phase="open"] .acr-kbd-core-button,
+    [data-phase="open"] .acr-kbd-orbit,
+    [data-phase="open"] .acr-kbd-ring,
+    [data-phase="open"] .acr-kbd-key,
+    [data-phase="open"] .acr-kbd-key .acr-kbd-slot,
+    [data-phase="open"] .acr-kbd-rows,
+    [data-phase="open"] .acr-kbd-edge,
+    [data-phase="open"] .acr-kbd-ticks,
+    [data-phase="open"] .acr-kbd-legend,
+    [data-phase="open"] .acr-kbd-panel,
+    [data-phase="open"] .acr-kbd-panel .acr-kbd-face,
+    [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-seg,
+    [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-cell,
+    [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-dot,
+    [data-phase="open"] .acr-kbd-panel .acr-kbd-inst-text,
+    [data-phase="open"] .acr-kbd-key .acr-kbd-face,
+    [data-phase="open"] .acr-kbd-key .acr-kbd-face-content,
+    [data-phase="open"] .acr-kbd-seat,
+    [data-phase="open"] .acr-kbd-sweep,
+    [data-phase="open"] .acr-kbd-readout {
+      animation: none;
+    }
+    [data-phase="open"] .acr-kbd-seat { opacity: 1; }
+    [data-phase="open"] .acr-kbd-sweep { opacity: 0; }
+    .acr-kbd-orbit-ring, .acr-kbd-orbiter { animation: none; }
+    [data-phase="open"] .acr-kbd-orbit { display: none; }
+    .acr-kbd-face, .acr-kbd-run, .acr-kbd-key .acr-kbd-slot { transition: none; }
+    .acr-kbd-key:hover .acr-kbd-face, .acr-kbd-key:focus-visible .acr-kbd-face,
+    .acr-kbd-key:hover .acr-kbd-run, .acr-kbd-key:focus-visible .acr-kbd-run { scale: 1; }
+    .acr-kbd-key:hover .acr-kbd-run, .acr-kbd-key:focus-visible .acr-kbd-run { animation: none; stroke-dasharray: none; }
+    .acr-kbd-key:hover .acr-kbd-slot, .acr-kbd-key:focus-visible .acr-kbd-slot { scale: 1; translate: 0 0; }
+    [data-phase="open"] .acr-kbd .acr-orbit-core,
+    [data-phase="open"] .acr-kbd-core-button { transform: none; }
+    [data-phase="open"] .acr-kbd-key,
+    [data-phase="open"] .acr-kbd-ticks,
+    [data-phase="open"] .acr-kbd-legend,
+    [data-phase="open"] .acr-kbd-edge--static,
+    [data-phase="open"] .acr-kbd-panel,
+    [data-phase="open"] .acr-kbd-readout { opacity: 1; }
+    [data-phase="open"] .acr-kbd-key .acr-kbd-slot { transform: none; opacity: 1; }
+    [data-phase="open"] .acr-kbd-rows { transform: none; }
+    [data-phase="open"] .acr-kbd-ring { --acr-spread: 0; }
+    [data-phase="open"] .acr-kbd-edge { stroke-dashoffset: 0; }
+    [data-phase="open"] .acr-orbit-node { --acr-k: 1; }
+    [data-phase="open"] .acr-orbit-seed {
+      scale: 1;
+      transform: translateX(var(--acr-seed-slot));
+      background-color: var(--acr-accent);
+      color: var(--acr-accent-ink);
+      box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.3), 0 4px 12px var(--acr-glow);
+    }
+    [data-phase="open"] .acr-orbit-seed::after { opacity: 0; }
+    [data-phase="open"] .acr-orbit-tethers { --acr-reveal: 64cqw; }
+    [data-phase="open"] .acr-orbit-card { clip-path: none; }
+    [data-phase="open"] .acr-orbit-card > * { opacity: 1; translate: 0 0; }
+    [data-phase="open"] .acr-orbit-pulse { opacity: 0; }
+    [data-phase="open"] .acr-corner-trigger { opacity: 1; scale: 1; }
+    .acr-corner-item { transition: none; }
+    .acr-orbit-ring-outer,
+    .acr-orbit-ring-inner { animation-duration: 12s; }
+  }
+}
