@@ -618,6 +618,12 @@
     --acr-kbd-line-dim: oklch(0.7 0.145 262.6 / 0.4);
     --acr-kbd-fill: oklch(0.7 0.145 262.6 / 0.05);
   }
+  /* Na tinta os painéis ganham placa azul: sobre o chão quase preto o véu
+     das teclas some, e os instrumentos precisam de corpo para serem lidos
+     como mostradores e não como mais teclas. É o azul do hover, parado. */
+  .muriki-acrylic[data-tone="ink"] .acr-kbd-panel .acr-kbd-face {
+    fill: oklch(0.7 0.145 262.6 / 0.18);
+  }
   /* O palco: viewBox 200×100, largura da página. 1cqw = 2 unidades. O
      reator é posicionado em unidades de contêiner para o CSS poder
      calcular a viagem do centro até o canto. */
