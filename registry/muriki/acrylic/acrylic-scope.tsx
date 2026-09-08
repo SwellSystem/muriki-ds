@@ -13,13 +13,15 @@ import { cn } from "@/lib/utils"
  *
  * `tone`: "dark" é o vidro — a fisionomia desta língua. "light" é acrílico
  * fosco, placa a 64% de branco; existe para quando a região de vidro mora
- * numa tela clara e não pode ser um buraco escuro no meio dela.
+ * numa tela clara e não pode ser um buraco escuro no meio dela. "ink" é a
+ * tinta: o chão do tema dark do sistema, sem as luzes — o tom do HUD de
+ * linha, onde nada precisa refratar.
  *
  * Tem foto ou vídeo atrás? Passe `background` pelo style ou className — o
  * gradiente padrão é só o mínimo para o vidro ter o que borrar.
  */
 interface AcrylicScopeProps extends React.ComponentProps<"div"> {
-  tone?: "dark" | "light"
+  tone?: "dark" | "light" | "ink"
 }
 
 function AcrylicScope({ className, tone = "dark", ...props }: AcrylicScopeProps) {

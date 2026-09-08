@@ -611,6 +611,13 @@
     --acr-kbd-hot: var(--acr-accent);
     --acr-kbd-hot-ink: var(--acr-accent);
   }
+  /* Na tinta a linha é o --primary do dark do sistema (0.7 0.145 262.6),
+     um pouco mais presente que no vazio: o chão é mais fundo. */
+  .muriki-acrylic[data-tone="ink"] .acr-hud {
+    --acr-kbd-line: oklch(0.7 0.145 262.6 / 0.85);
+    --acr-kbd-line-dim: oklch(0.7 0.145 262.6 / 0.4);
+    --acr-kbd-fill: oklch(0.7 0.145 262.6 / 0.05);
+  }
   /* O palco: viewBox 200×100, largura da página. 1cqw = 2 unidades. O
      reator é posicionado em unidades de contêiner para o CSS poder
      calcular a viagem do centro até o canto. */
