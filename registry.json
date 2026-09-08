@@ -1149,6 +1149,164 @@
         }
       ],
       "docs": "O bloco não conhece roteador, i18next nem API: onSubmit e onVerifyCode devolvem um LoginResult. O mascote vem por prop (brand / brandHidden) — o registry não carrega binário."
+    },
+    {
+      "name": "ai-labels",
+      "type": "registry:lib",
+      "title": "Rótulos do muriki-ds-ai",
+      "description": "Chão de strings dos blocos de AI: o t do app ganha quando responde, o default pt-BR entra quando o i18n devolve a chave crua. Instala e funciona sem editar o i18n do sistema.",
+      "registryDependencies": [
+        "@muriki/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-labels.ts",
+          "type": "registry:lib",
+          "target": "components/ai/ai-labels.ts"
+        }
+      ]
+    },
+    {
+      "name": "ai-composer",
+      "type": "registry:block",
+      "title": "AI Composer",
+      "description": "O campo da conversa como um objeto só: moldura em --field, textarea sem contorno que cresce até 8 linhas, fileira de anexos dentro da caixa e o botão que vira Parar durante o streaming. Enter quebra linha, ⌘+↵ envia.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels",
+        "@muriki/button",
+        "@muriki/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-composer/ai-composer.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/ai-composer.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-composer/ai-composer-attachments.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/ai-composer-attachments.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-composer/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-composer/index.ts"
+        }
+      ],
+      "docs": "O estado do texto é do caller (value/onValueChange) — o composer não guarda rascunho. As chaves composer.* já existem no @muriki/i18n; sem provider, o chão do ai-labels responde igual.",
+      "css": {
+        ".muriki-scroll-x": {
+          "scrollbar-width": "none"
+        },
+        ".muriki-scroll-x::-webkit-scrollbar": {
+          "display": "none"
+        }
+      }
+    },
+    {
+      "name": "ai-message",
+      "type": "registry:block",
+      "title": "AI Message",
+      "description": "O turno da conversa, e a assimetria que define o muriki-ds-ai: a resposta do assistente é tinta na página, sem cartão, na medida de 68ch; só a fala do usuário ganha superfície. Cursor de streaming, linha de erro e régua de ações que aparece no hover e no foco.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels",
+        "@muriki/button",
+        "@muriki/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-message/ai-message.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/ai-message.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-message/ai-message-actions.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/ai-message-actions.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-message/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-message/index.ts"
+        }
+      ],
+      "docs": "Raciocínio e chamadas de ferramenta entram pela prop `before` — são o mesmo turno, não turnos soltos. As ações só renderizam depois que streaming vira false."
+    },
+    {
+      "name": "ai-reasoning",
+      "type": "registry:block",
+      "title": "AI Reasoning",
+      "description": "O raciocínio afunda: superfície --sunken, a única mais escura que o fundo nos dois temas. Fechado por padrão, ponto âmbar pulsando enquanto pensa e a duração no lugar dele quando termina.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-reasoning/ai-reasoning.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-reasoning/ai-reasoning.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-reasoning/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-reasoning/index.ts"
+        }
+      ],
+      "docs": "Único bloco do muriki-ds-ai que gasta o accent do tema, e só num ponto de 5px que apaga quando o raciocínio acaba."
+    },
+    {
+      "name": "ai-tool-call",
+      "type": "registry:block",
+      "title": "AI Tool Call",
+      "description": "A chamada de ferramenta como meio, não como resposta: afunda igual ao raciocínio e carrega o selo mono do card do kanban no nome da tool. Status nos nove tons do badge, entrada e saída em painéis que rolam sozinhos no eixo x.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "@muriki/theme",
+        "@muriki/i18n",
+        "@muriki/ai-labels"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ai/ai-tool-call/ai-tool-call.tsx",
+          "type": "registry:component",
+          "target": "components/ai/ai-tool-call/ai-tool-call.tsx"
+        },
+        {
+          "path": "registry/muriki/ai/ai-tool-call/index.ts",
+          "type": "registry:component",
+          "target": "components/ai/ai-tool-call/index.ts"
+        }
+      ],
+      "docs": "Sem input nem output o cabeçalho vira legenda: não recebe foco e não abre. O serializador aguenta referência circular sem derrubar a thread.",
+      "css": {
+        ".muriki-scroll-x": {
+          "scrollbar-width": "none"
+        },
+        ".muriki-scroll-x::-webkit-scrollbar": {
+          "display": "none"
+        }
+      }
     }
   ]
 }
