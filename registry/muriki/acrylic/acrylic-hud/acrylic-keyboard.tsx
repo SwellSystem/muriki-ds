@@ -454,6 +454,14 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
   // O voo: mede na hora, porque a órbita gira e a tecla só está no lugar
   // depois que o reator atracou e o leque abriu. O delta medido na tela
   // é levado para o referencial girado da tecla (data-rot).
+  //
+  // O QUE DISPARA O VOO É A FASE E OS IDS, nunca a identidade das listas:
+  // `actions` é rows.flat(), um array novo a cada render, e o app recria
+  // rows e data com frequência (a hora, o tom). Se o efeito dependesse dos
+  // arrays, cada hover — que muda o estado deste componente — limpava o
+  // voo, devolvia os ícones à órbita e recomeçava os timers. Os ícones
+  // nunca chegavam.
+  const flightKey = [...modules, ...actions].map((k) => k.id).join("|")
   React.useEffect(() => {
     const svg = svgRef.current
     if (phase !== "open" || !svg) return
@@ -490,7 +498,8 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
         el.style.removeProperty("--dy")
       })
     }
-  }, [phase, modules, actions])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ver o comentário acima
+  }, [phase, flightKey])
 
   // A voz: só existe ouvindo; vibra como voz.
   React.useEffect(() => {
