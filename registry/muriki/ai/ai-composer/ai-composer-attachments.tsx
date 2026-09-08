@@ -7,7 +7,6 @@
  * nem numa barra separada embaixo. O anexo é parte da mensagem que está
  * sendo escrita; tirar ele de dentro do campo sugere que é outra coisa.
  */
-import * as React from "react"
 import { File, X } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"

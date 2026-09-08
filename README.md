@@ -318,6 +318,16 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/password-strength` | `registry:block` | régua de senha em quatro degraus e a barra de quatro segmentos, com a lista de requisitos |
 | `@muriki/login-page` | `registry:block` | a tela de entrada: painel editorial com o mascote, provedores em hierarquia, campos underline, força de senha e segundo fator inline |
 | `@muriki/i18n` | `registry:lib` | labels dos blocos com defaults pt-BR embutidos; apps com i18n injetam o próprio `t` via provider |
+| `@muriki/ai-labels` | `registry:lib` | o chão de strings da conversa: o `t` do app ganha quando responde, o default pt-BR entra quando o i18n devolve a chave crua |
+| `@muriki/ai-composer` | `registry:block` | o campo da conversa como um objeto só: anexos dentro da caixa, cresce até 8 linhas, Enter quebra e ⌘+↵ envia |
+| `@muriki/ai-message` | `registry:block` | o turno, e a assimetria: a resposta é tinta na página em 68ch, sem cartão; só a fala do usuário ganha superfície |
+| `@muriki/ai-reasoning` | `registry:block` | o raciocínio afunda em `--sunken`, fechado por padrão, ponto âmbar pulsando e a duração no lugar dele |
+| `@muriki/ai-tool-call` | `registry:block` | a chamada de ferramenta como meio, não como resposta: selo mono no nome da tool e status nos tons do badge |
+| `@muriki/ai-thread` | `registry:block` | o contêiner: a página desce sozinha enquanto a resposta chega, mas só se você já estava no fim |
+| `@muriki/acrylic` | `registry:block` | o material: vidro sobre o vazio, em língua separada do papel — tokens escopados que não vazam para o `:root` |
+| `@muriki/acrylic-button` | `registry:block` | botão de vidro em quatro variantes e só uma acesa; foco por outline, não ring |
+| `@muriki/acrylic-card` | `registry:block` | a placa grande com eyebrow mono; o cartão que é link inclina contra a luz no hover |
+| `@muriki/acrylic-hud` | `registry:block` | o painel de comando: a órbita e o teclado do Stark, com o reator, os anéis, as fileiras de teclas e os instrumentos |
 
 ## Blocos ao vivo
 
