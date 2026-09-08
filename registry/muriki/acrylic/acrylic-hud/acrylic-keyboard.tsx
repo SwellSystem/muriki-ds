@@ -87,7 +87,19 @@ export interface AcrylicKeyboardProps {
   rows: AcrylicKey[][]
   charts?: AcrylicChart[]
   /** O logo como assistente de voz: clicar alterna o modo ouvindo. */
-  core?: { label: string; detail?: string; listeningLabel?: string; onSelect?: (listening: boolean) => void }
+  core?: {
+    label: string
+    detail?: string
+    listeningLabel?: string
+    onSelect?: (listening: boolean) => void
+    /**
+     * A altura da onda, de 0 a 1, lida a cada quadro enquanto o modo
+     * ouvindo está ligado. É por aqui que entra um microfone de verdade —
+     * o bloco não sabe o que é microfone, e não deve saber. Sem isto, a
+     * onda vibra sozinha, que é o certo numa vitrine.
+     */
+    level?: () => number
+  }
   readout?: string
   legend?: string
   label?: string
@@ -502,21 +514,39 @@ function AcrylicKeyboard({ logo, modules, data = [], rows, charts = [], core, re
   }, [phase, flightKey])
 
   // A voz: só existe ouvindo; vibra como voz.
+  //
+  // A altura vem de `core.level` quando o app tem uma — um microfone, por
+  // exemplo — e de uma simulação quando não tem. O nível real é SUAVIZADO
+  // aqui, não lá: som cru salta de quadro a quadro e a onda tremeria; o
+  // que se vê numa voz é a envoltória, não a amostra.
+  const levelRef = React.useRef(0)
   React.useEffect(() => {
     const path = voiceRef.current
     if (!path || !listening) return
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const source = core?.level
     let raf = 0
     const start = performance.now()
+    levelRef.current = 0
     const frame = (now: number) => {
       const t = (now - start) / 1000
-      const amp = 1.1 * (0.55 + 0.45 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1)))
+      let amp: number
+      if (source) {
+        const target = Math.min(Math.max(source(), 0), 1)
+        // sobe rápido (a voz começa), desce devagar (a onda não pisca)
+        const k = target > levelRef.current ? 0.35 : 0.08
+        levelRef.current += (target - levelRef.current) * k
+        // um fio de onda mesmo no silêncio: linha reta parece desligado
+        amp = 0.12 + levelRef.current * 1.5
+      } else {
+        amp = 1.1 * (0.55 + 0.45 * Math.abs(Math.sin(t * 7.3) * Math.sin(t * 3.1)))
+      }
       path.setAttribute("d", voicePath(still ? 0 : t, amp))
       if (!still) raf = window.requestAnimationFrame(frame)
     }
     raf = window.requestAnimationFrame(frame)
     return () => window.cancelAnimationFrame(raf)
-  }, [listening])
+  }, [listening, core?.level])
 
   const ticks = React.useMemo(() => {
     const out: { key: number; d: string; major: boolean }[] = []
