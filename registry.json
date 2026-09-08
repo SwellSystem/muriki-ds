@@ -1466,7 +1466,7 @@
           "target": "components/acrylic/acrylic-hud/index.ts"
         }
       ],
-      "docs": "Importe o CSS uma vez: @import \"@/components/acrylic/acrylic-hud/acrylic-hud.css\" (além do acrylic.css). Monte <AcrylicScope className=\"min-h-dvh\"><AcrylicHud open={ready}><AcrylicOrbit logo={<Logo/>} items={…}/><AcrylicCornerMenu items={…}/></AcrylicHud></AcrylicScope>. O logo entra por prop — com as cores próprias, ou fill=\"currentColor\" se for monocromático. Cinco itens é o número que a ideia pediu e o que cabe; seis ainda cabe."
+      "docs": "Importe o CSS uma vez: @import \"@/components/acrylic/acrylic-hud/acrylic-hud.css\" (além do acrylic.css). Monte <AcrylicScope className=\"min-h-dvh\"><AcrylicHud open={ready}><AcrylicOrbit logo={<Logo/>} items={…}/><AcrylicCornerMenu items={…}/></AcrylicHud></AcrylicScope>. O logo entra por prop — com as cores próprias, ou fill=\"currentColor\" se for monocromático. Cinco itens é o número que a ideia pediu e o que cabe; seis ainda cabe. O modo ouvindo do reator aceita uma fonte de nível (core.level, 0..1 por quadro) para a onda responder a um microfone de verdade; sem ela, a onda vibra sozinha."
     }
   ]
 }
