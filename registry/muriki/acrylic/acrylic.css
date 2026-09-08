@@ -183,10 +183,10 @@
      quanto mais fundo o chão, mais o holograma existe. Tinta, vidro e
      acento são os do escuro; só o chão muda. */
   .muriki-acrylic[data-tone="ink"] {
-    --acr-void: oklch(0.155 0.004 107);
+    --acr-void: oklch(0.125 0.004 107);
     background:
-      radial-gradient(90% 70% at 14% 6%, oklch(0.42 0.17 262.6 / 0.16), transparent 60%),
-      radial-gradient(70% 60% at 90% 100%, oklch(0.36 0.15 252 / 0.1), transparent 62%),
+      radial-gradient(90% 70% at 14% 6%, oklch(0.42 0.17 262.6 / 0.07), transparent 60%),
+      radial-gradient(70% 60% at 90% 100%, oklch(0.36 0.15 252 / 0.04), transparent 62%),
       var(--acr-void);
   }
 
