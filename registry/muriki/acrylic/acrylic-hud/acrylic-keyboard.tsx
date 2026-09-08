@@ -372,7 +372,6 @@ function Instrument({ chart, index, x0, y0, onHint }: { chart: AcrylicChart; ind
       for (let k = 0; k < Math.round(seg.value); k++) owner.push(j)
     })
     const cols = form === "dots" ? Math.min(count, 6) : 6
-    const rowsN = Math.ceil(count / cols)
     const pitch = form === "dots" ? 2.6 : 2.5
     const gx = cx - ((cols - 1) * pitch) / 2
     const gy = y0 + 6.2
