@@ -1,3 +1,5 @@
+"use client"
+
 // Portado do muriki-platform sem redesenhar: o desenho é o de lá,
 // as dependências é que passaram a ser as da casa.
 //

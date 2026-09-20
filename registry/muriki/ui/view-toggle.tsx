@@ -1,3 +1,5 @@
+"use client"
+
 /**
  * Muriki ViewToggle — controle segmentado com pill animada.
  *

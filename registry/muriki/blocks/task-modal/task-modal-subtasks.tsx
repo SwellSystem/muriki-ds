@@ -1,3 +1,5 @@
+"use client"
+
 // Portado do muriki-platform sem redesenhar.
 import { ArrowUpRight, Plus, TreeStructure, X } from "@phosphor-icons/react"
 import { useState } from "react"

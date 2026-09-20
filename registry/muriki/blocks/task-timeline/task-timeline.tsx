@@ -1,3 +1,5 @@
+"use client"
+
 // @component-doc
 // @source custom: Claude Design handoff (vVSr672L5kIdNwUplOSvOQ) — components-timeline.html
 // @used-by src/routes/_authenticated.$workspaceSlug.projects.tsx

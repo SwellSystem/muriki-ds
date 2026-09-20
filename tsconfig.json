@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "paths": {
+      "@/lib/utils": ["./typecheck/utils.ts"],
+      "@/lib/*": ["./registry/muriki/lib/*"],
+      "@/components/ui/*": ["./registry/muriki/ui/*"],
+      "@/components/blocks/*": ["./registry/muriki/blocks/*"],
+      "@/components/ai/*": ["./registry/muriki/ai/*"],
+      "@/components/acrylic/*": ["./registry/muriki/acrylic/*"]
+    }
+  },
+  "include": ["registry/**/*.ts", "registry/**/*.tsx", "typecheck/**/*.ts"]
+}

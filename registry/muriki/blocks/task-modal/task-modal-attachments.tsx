@@ -1,3 +1,5 @@
+"use client"
+
 // Portado do muriki-platform sem redesenhar.
 import { CloudArrowUp, File as FileIcon, Trash } from "@phosphor-icons/react"
 import { useRef, useState } from "react"

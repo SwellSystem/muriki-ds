@@ -1,3 +1,5 @@
+"use client"
+
 // Portado do muriki-platform sem redesenhar.
 import { Hash } from "@phosphor-icons/react"
 

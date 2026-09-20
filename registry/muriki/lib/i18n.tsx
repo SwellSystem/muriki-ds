@@ -1,3 +1,5 @@
+"use client"
+
 // Runtime mínimo de labels dos blocks: defaults pt-BR embutidos, sem
 // dependência de i18next. Apps com i18n injetam o próprio `t` (assinatura
 // compatível com react-i18next) via <MurikiI18nProvider t={t}>.

@@ -579,7 +579,8 @@
       "title": "Priority Flag",
       "description": "Prioridade com ícone e cor por nível, nos nove tons do sistema — urgent quebra a escala de propósito.",
       "dependencies": [
-        "@phosphor-icons/react"
+        "@phosphor-icons/react",
+        "class-variance-authority"
       ],
       "registryDependencies": [
         "utils"
@@ -1318,7 +1319,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "button",
+        "@muriki/button",
         "@muriki/theme",
         "@muriki/i18n",
         "@muriki/ai-labels"
