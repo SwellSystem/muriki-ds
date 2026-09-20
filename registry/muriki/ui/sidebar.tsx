@@ -1,3 +1,5 @@
+"use client"
+
 /* oxlint-disable react-refresh/only-export-components */
 /**
  * Muriki Sidebar.

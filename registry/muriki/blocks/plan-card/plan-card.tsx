@@ -1,3 +1,5 @@
+"use client"
+
 // Portado do muriki-platform e vestido com a casa: o card é composto por
 // slots, então preço, features e selos são do consumidor.
 import { useId, type ReactNode } from "react"
