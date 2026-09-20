@@ -23,14 +23,28 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile
+      - name: Typecheck dos componentes
+        run: bun run typecheck
       - name: Build registry
         run: bun run registry:build
-      - name: Conferir que os itens saíram
+      - name: Conferir que todo item do registry.json saiu
         run: |
           test -f public/r/registry.json
-          for item in theme button badge input field textarea radio-group select tooltip popover dropdown-menu dialog alert-dialog sheet modal switch checkbox progress sonner view-toggle row-actions task-table task-timeline kanban priority-flag avatar calendar skeleton separator tabs breadcrumb sidebar plan-card status-pill task-modal password-strength login-page i18n; do
-            test -f "public/r/$item.json" || { echo "faltou $item.json"; exit 1; }
-          done
+          node -e '
+            const fs = require("fs")
+            const { items } = require("./registry.json")
+            const nomes = items.map((i) => i.name)
+            const faltou = nomes.filter((n) => !fs.existsSync(`public/r/${n}.json`))
+            const sobrou = fs
+              .readdirSync("public/r")
+              .filter((f) => f.endsWith(".json") && f !== "registry.json")
+              .map((f) => f.slice(0, -5))
+              .filter((n) => !nomes.includes(n))
+            if (faltou.length) console.error("faltou no build: " + faltou.join(", "))
+            if (sobrou.length) console.error("sobrou de build antigo: " + sobrou.join(", "))
+            if (faltou.length || sobrou.length) process.exit(1)
+            console.log(`${nomes.length} itens conferidos, um por um`)
+          '
           echo "itens gerados:"; ls -1 public/r
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
