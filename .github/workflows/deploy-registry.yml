@@ -3,6 +3,7 @@ name: Deploy registry
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -10,8 +11,10 @@ permissions:
   pages: write
   id-token: write
 
+# Um grupo por ref: agora que PR também roda, um PR não pode cancelar o
+# deploy do main nem a checagem de outro PR.
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -47,12 +50,15 @@ jobs:
           '
           echo "itens gerados:"; ls -1 public/r
       - uses: actions/configure-pages@v5
+        if: github.ref == 'refs/heads/main'
       - uses: actions/upload-pages-artifact@v3
+        if: github.ref == 'refs/heads/main'
         with:
           path: public
 
   deploy:
     needs: build
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
