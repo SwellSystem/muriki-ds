@@ -157,7 +157,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -180,7 +180,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -204,7 +204,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -224,7 +224,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -244,8 +244,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/input"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/input"
       ],
       "files": [
         {
@@ -265,7 +265,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -286,7 +286,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -306,7 +306,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -326,7 +326,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -346,7 +346,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -367,7 +367,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -388,8 +388,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button"
       ],
       "files": [
         {
@@ -410,7 +410,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -428,9 +428,9 @@
       "dependencies": [],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/dialog",
-        "@muriki/sheet"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/dialog",
+        "SwellSystem/muriki-ds/sheet"
       ],
       "files": [
         {
@@ -450,9 +450,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/tooltip",
-        "@muriki/dropdown-menu",
-        "@muriki/button"
+        "SwellSystem/muriki-ds/tooltip",
+        "SwellSystem/muriki-ds/dropdown-menu",
+        "SwellSystem/muriki-ds/button"
       ],
       "files": [
         {
@@ -472,7 +472,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -493,7 +493,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -509,7 +509,7 @@
       "title": "Switch",
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "dependencies": [
         "@base-ui/react"
@@ -528,7 +528,7 @@
       "title": "Checkbox",
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "dependencies": [
         "@base-ui/react"
@@ -547,7 +547,7 @@
       "title": "Progress",
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "dependencies": [
         "@base-ui/react"
@@ -601,7 +601,7 @@
       "dependencies": [],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -621,7 +621,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -642,7 +642,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -662,7 +662,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -683,13 +683,13 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button",
-        "@muriki/input",
-        "@muriki/separator",
-        "@muriki/sheet",
-        "@muriki/skeleton",
-        "@muriki/tooltip"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/input",
+        "SwellSystem/muriki-ds/separator",
+        "SwellSystem/muriki-ds/sheet",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/tooltip"
       ],
       "files": [
         {
@@ -709,10 +709,10 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button",
-        "@muriki/skeleton",
-        "@muriki/separator"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/separator"
       ],
       "files": [
         {
@@ -748,11 +748,11 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/badge",
-        "@muriki/button",
-        "@muriki/view-toggle",
-        "@muriki/plan-card"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/view-toggle",
+        "SwellSystem/muriki-ds/plan-card"
       ],
       "files": [
         {
@@ -813,7 +813,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme"
+        "SwellSystem/muriki-ds/theme"
       ],
       "files": [
         {
@@ -833,8 +833,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button"
       ],
       "files": [
         {
@@ -852,8 +852,8 @@
       "dependencies": [],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/badge"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/badge"
       ],
       "files": [
         {
@@ -874,21 +874,21 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button",
-        "@muriki/badge",
-        "@muriki/dialog",
-        "@muriki/sheet",
-        "@muriki/popover",
-        "@muriki/select",
-        "@muriki/calendar",
-        "@muriki/avatar",
-        "@muriki/status-pill",
-        "@muriki/priority-flag",
-        "@muriki/checkbox",
-        "@muriki/progress",
-        "@muriki/view-toggle",
-        "@muriki/i18n"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/dialog",
+        "SwellSystem/muriki-ds/sheet",
+        "SwellSystem/muriki-ds/popover",
+        "SwellSystem/muriki-ds/select",
+        "SwellSystem/muriki-ds/calendar",
+        "SwellSystem/muriki-ds/avatar",
+        "SwellSystem/muriki-ds/status-pill",
+        "SwellSystem/muriki-ds/priority-flag",
+        "SwellSystem/muriki-ds/checkbox",
+        "SwellSystem/muriki-ds/progress",
+        "SwellSystem/muriki-ds/view-toggle",
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -959,9 +959,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/dropdown-menu",
-        "@muriki/button",
-        "@muriki/i18n"
+        "SwellSystem/muriki-ds/dropdown-menu",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -1002,9 +1002,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/button",
-        "@muriki/i18n",
-        "@muriki/task-table"
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/task-table"
       ],
       "files": [
         {
@@ -1044,9 +1044,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/tooltip",
-        "@muriki/theme",
-        "@muriki/priority-flag"
+        "SwellSystem/muriki-ds/tooltip",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/priority-flag"
       ],
       "files": [
         {
@@ -1087,8 +1087,8 @@
       "description": "Régua de senha em quatro degraus (8+ caracteres, número, minúscula, maiúscula) e a barra de quatro segmentos num trilho afundado, com a lista de requisitos opcional.",
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/i18n"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -1114,13 +1114,13 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/button",
-        "@muriki/checkbox",
-        "@muriki/input",
-        "@muriki/field",
-        "@muriki/password-strength",
-        "@muriki/i18n"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/checkbox",
+        "SwellSystem/muriki-ds/input",
+        "SwellSystem/muriki-ds/field",
+        "SwellSystem/muriki-ds/password-strength",
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -1157,7 +1157,7 @@
       "title": "Rótulos do muriki-ds-ai",
       "description": "Chão de strings dos blocos de AI: o t do app ganha quando responde, o default pt-BR entra quando o i18n devolve a chave crua. Instala e funciona sem editar o i18n do sistema.",
       "registryDependencies": [
-        "@muriki/i18n"
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -1177,11 +1177,11 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/i18n",
-        "@muriki/ai-labels",
-        "@muriki/button",
-        "@muriki/tooltip"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/ai-labels",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/tooltip"
       ],
       "files": [
         {
@@ -1220,11 +1220,11 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/i18n",
-        "@muriki/ai-labels",
-        "@muriki/button",
-        "@muriki/tooltip"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/ai-labels",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/tooltip"
       ],
       "files": [
         {
@@ -1255,9 +1255,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/i18n",
-        "@muriki/ai-labels"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/ai-labels"
       ],
       "files": [
         {
@@ -1283,9 +1283,9 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/theme",
-        "@muriki/i18n",
-        "@muriki/ai-labels"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/ai-labels"
       ],
       "files": [
         {
@@ -1319,10 +1319,10 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/button",
-        "@muriki/theme",
-        "@muriki/i18n",
-        "@muriki/ai-labels"
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/ai-labels"
       ],
       "files": [
         {
@@ -1371,7 +1371,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/acrylic"
+        "SwellSystem/muriki-ds/acrylic"
       ],
       "files": [
         {
@@ -1402,7 +1402,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/acrylic"
+        "SwellSystem/muriki-ds/acrylic"
       ],
       "files": [
         {
@@ -1428,7 +1428,7 @@
       ],
       "registryDependencies": [
         "utils",
-        "@muriki/acrylic"
+        "SwellSystem/muriki-ds/acrylic"
       ],
       "files": [
         {
