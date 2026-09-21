@@ -1,0 +1,316 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "Avaliacao.dc.html": {
+   "h": 900,
+   "title": "Avaliação · rubrica, explicação e o porquê",
+   "w": 1440,
+   "x": 4560,
+   "y": 2640,
+   "is_interactive": true
+  },
+  "Conectar.dc.html": {
+   "h": 900,
+   "title": "Conectar IDE · código no navegador",
+   "w": 1440,
+   "x": 1520,
+   "y": 5280,
+   "is_interactive": true
+  },
+  "Exercicio.dc.html": {
+   "h": 900,
+   "title": "Exercício · editor, testes e explicação",
+   "w": 1440,
+   "x": 3040,
+   "y": 2640,
+   "is_interactive": true
+  },
+  "Main.dc.html": {
+   "h": 900,
+   "title": "Evolução · declarado, observado e estado",
+   "w": 1440,
+   "x": 0,
+   "y": 2640,
+   "is_interactive": true
+  },
+  "Peer.dc.html": {
+   "h": 900,
+   "title": "Peer na IDE",
+   "w": 1440,
+   "x": 0,
+   "y": 5280,
+   "is_interactive": true
+  },
+  "Planos.dc.html": {
+   "h": 900,
+   "title": "Planos · Starter e Pro",
+   "w": 1440,
+   "x": 3040,
+   "y": 5280,
+   "is_interactive": true
+  },
+  "Jornada.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · escolha da jornada",
+   "is_interactive": true
+  },
+  "JornadaEscuro.dc.html": {
+   "x": 3040,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · escolha da jornada · escuro",
+   "is_interactive": true
+  },
+  "MainEscuro.dc.html": {
+   "x": 0,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Evolução · declarado, observado e estado · escuro",
+   "is_interactive": true
+  },
+  "ExercicioEscuro.dc.html": {
+   "x": 3040,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Exercício · editor, testes e explicação · escuro",
+   "is_interactive": true
+  },
+  "AvaliacaoEscuro.dc.html": {
+   "x": 4560,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Avaliação · rubrica, explicação e o porquê · escuro",
+   "is_interactive": true
+  },
+  "PeerEscuro.dc.html": {
+   "x": 0,
+   "y": 6600,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer na IDE · escuro",
+   "is_interactive": true
+  },
+  "ConectarEscuro.dc.html": {
+   "x": 1520,
+   "y": 6600,
+   "w": 1440,
+   "h": 900,
+   "title": "Conectar IDE · código no navegador · escuro",
+   "is_interactive": true
+  },
+  "PlanosEscuro.dc.html": {
+   "x": 3040,
+   "y": 6600,
+   "w": 1440,
+   "h": 900,
+   "title": "Planos · Starter e Pro · escuro",
+   "is_interactive": true
+  },
+  "Entrar.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · conta Muriki",
+   "is_interactive": true
+  },
+  "EntrarEscuro.dc.html": {
+   "x": 0,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · conta Muriki · escuro",
+   "is_interactive": true
+  },
+  "CriarConta.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Criar conta",
+   "is_interactive": true
+  },
+  "CriarContaEscuro.dc.html": {
+   "x": 1520,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Criar conta · escuro",
+   "is_interactive": true
+  },
+  "PrimeiroExercicio.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro exercício · guia de três passos",
+   "is_interactive": true
+  },
+  "PrimeiroExercicioEscuro.dc.html": {
+   "x": 6080,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro exercício · guia de três passos · escuro",
+   "is_interactive": true
+  },
+  "PerfilVazio.dc.html": {
+   "x": 7600,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Evolução · perfil antes da primeira evidência",
+   "is_interactive": true
+  },
+  "PerfilVazioEscuro.dc.html": {
+   "x": 7600,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Evolução · perfil antes da primeira evidência · escuro",
+   "is_interactive": true
+  },
+  "Ajuste.dc.html": {
+   "x": 4560,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · declarado por competência",
+   "is_interactive": true
+  },
+  "AjusteEscuro.dc.html": {
+   "x": 4560,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · declarado por competência · escuro",
+   "is_interactive": true
+  },
+  "Competencia.dc.html": {
+   "x": 1520,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Competência · Testing: caminho, histórico e trajetória",
+   "is_interactive": true
+  },
+  "CompetenciaEscuro.dc.html": {
+   "x": 1520,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Competência · Testing: caminho, histórico e trajetória · escuro",
+   "is_interactive": true
+  },
+  "Playground.dc.html": {
+   "x": 6080,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Playground · código livre com o Peer",
+   "is_interactive": true
+  },
+  "PlaygroundEscuro.dc.html": {
+   "x": 6080,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Playground · código livre com o Peer · escuro",
+   "is_interactive": true
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-21T05:31:07Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "ide": {
+   "kind": "title1",
+   "maxW": 4480,
+   "text": "Peer na IDE, conta e plano",
+   "w": 240,
+   "x": 0,
+   "y": 4980
+  },
+  "web": {
+   "kind": "title1",
+   "maxW": 7520,
+   "text": "Code web: perfil, competência, exercício, avaliação e playground",
+   "w": 240,
+   "x": 0,
+   "y": 2340
+  },
+  "jornada": {
+   "x": 0,
+   "y": -300,
+   "text": "Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício e perfil vazio",
+   "kind": "title1",
+   "maxW": 9040
+  },
+  "webEscuro": {
+   "x": 0,
+   "y": 3660,
+   "text": "Code web no tema escuro",
+   "kind": "title1",
+   "maxW": 7520
+  },
+  "ideEscuro": {
+   "x": 0,
+   "y": 6300,
+   "text": "Peer na IDE, conta e plano no tema escuro",
+   "kind": "title1",
+   "maxW": 4480
+  },
+  "jornadaEscuro": {
+   "x": 0,
+   "y": 1020,
+   "text": "Entrada e primeiro acesso no tema escuro",
+   "kind": "title1",
+   "maxW": 9040
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Exercicio.dc.html",
+  "Avaliacao.dc.html",
+  "Peer.dc.html",
+  "Conectar.dc.html",
+  "Planos.dc.html",
+  "Jornada.dc.html",
+  "JornadaEscuro.dc.html",
+  "MainEscuro.dc.html",
+  "ExercicioEscuro.dc.html",
+  "AvaliacaoEscuro.dc.html",
+  "PeerEscuro.dc.html",
+  "ConectarEscuro.dc.html",
+  "PlanosEscuro.dc.html",
+  "Entrar.dc.html",
+  "EntrarEscuro.dc.html",
+  "CriarConta.dc.html",
+  "CriarContaEscuro.dc.html",
+  "PrimeiroExercicio.dc.html",
+  "PrimeiroExercicioEscuro.dc.html",
+  "PerfilVazio.dc.html",
+  "PerfilVazioEscuro.dc.html",
+  "Ajuste.dc.html",
+  "AjusteEscuro.dc.html",
+  "Competencia.dc.html",
+  "CompetenciaEscuro.dc.html",
+  "Playground.dc.html",
+  "PlaygroundEscuro.dc.html"
+ ],
+ "pages": [],
+ "title": "Muriki Code"
+}
