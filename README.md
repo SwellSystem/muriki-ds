@@ -25,7 +25,19 @@ Duas metades que se alimentam:
 
 ## Consumir
 
-No projeto que vai instalar (ex.: `muriki-platform`), declare o registry em `components.json`:
+O repositório é o registry: é público e tem o `registry.json` na raiz, então o
+`shadcn` instala direto do GitHub, sem declarar nada no `components.json` de quem
+consome:
+
+```bash
+bunx shadcn@latest add SwellSystem/muriki-ds/button SwellSystem/muriki-ds/badge SwellSystem/muriki-ds/task-table
+```
+
+Os itens pedem uns aos outros pelo mesmo endereço, então a árvore inteira vem
+junto sem configuração.
+
+Quem já declarou o namespace (ex.: `muriki-platform`) continua instalando por ele —
+é o mesmo item servido pelo Pages:
 
 ```json
 {
@@ -35,13 +47,13 @@ No projeto que vai instalar (ex.: `muriki-platform`), declare o registry em `com
 }
 ```
 
-E instale:
-
 ```bash
-bunx shadcn@latest add @muriki/button @muriki/badge @muriki/task-table @muriki/login-page
+bunx shadcn@latest add @muriki/button
 ```
 
-O `@muriki/theme` vem junto como dependência — ele injeta os tokens claro e escuro
+Na tabela de itens abaixo, `@muriki/x` e `SwellSystem/muriki-ds/x` são o mesmo item.
+
+O `theme` vem junto como dependência — ele injeta os tokens claro e escuro
 no CSS do projeto e gera os mapeamentos `--color-*`, então `bg-tone-blue` e
 `text-primary-subtle-foreground` passam a existir como classe do Tailwind.
 
@@ -389,9 +401,13 @@ bun install
 bun run registry:build     # gera public/r/*.json
 ```
 
-Para testar a instalação antes de hospedar, sirva o `public/` e aponte o
-`registries` do projeto consumidor para `http://localhost:PORTA/r/{name}.json`.
-O `shadcn` **não** aceita `file://` — precisa ser HTTP.
+Para testar a instalação de uma branch antes do merge, ponha a ref no fim do
+endereço: `bunx shadcn@latest add SwellSystem/muriki-ds/button#minha-branch`. A ref
+vale só para o item pedido — as dependências dele vêm do `main`.
+
+Para testar sem subir nada, sirva o `public/` e aponte o `registries` do projeto
+consumidor para `http://localhost:PORTA/r/{name}.json`. O `shadcn` **não** aceita
+`file://` — precisa ser HTTP.
 
 Para regerar as pranchas do canvas:
 
