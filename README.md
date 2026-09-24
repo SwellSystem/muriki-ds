@@ -295,6 +295,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 4; `solid` é exceção declarada — uma por tela |
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
 | `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
+| `@muriki/otp-input` | `registry:ui` | código de verificação em quadrados, um por dígito (4 ou 6), com colar e autocomplete do sistema |
 | `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
 | `@muriki/textarea` | `registry:ui` | o campo do Input, só que alto; divide as variantes com ele e cresce com o texto |
 | `@muriki/radio-group` | `registry:ui` | o checkbox redondo: vazio é encaixe, marcado é chapado |
