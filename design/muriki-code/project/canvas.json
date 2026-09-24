@@ -225,6 +225,22 @@
    "h": 900,
    "title": "Playground · código livre com o Peer · escuro",
    "is_interactive": true
+  },
+  "Passkey.dc.html": {
+   "x": 9120,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · passkey",
+   "is_interactive": true
+  },
+  "PasskeyEscuro.dc.html": {
+   "x": 9120,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · passkey · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -255,30 +271,34 @@
   "jornada": {
    "x": 0,
    "y": -300,
-   "text": "Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício e perfil vazio",
+   "text": "Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício, perfil vazio e passkey",
    "kind": "title1",
-   "maxW": 9040
+   "maxW": 10560,
+   "w": 240
   },
   "webEscuro": {
    "x": 0,
    "y": 3660,
    "text": "Code web no tema escuro",
    "kind": "title1",
-   "maxW": 7520
+   "maxW": 7520,
+   "w": 240
   },
   "ideEscuro": {
    "x": 0,
    "y": 6300,
    "text": "Peer na IDE, conta e plano no tema escuro",
    "kind": "title1",
-   "maxW": 4480
+   "maxW": 4480,
+   "w": 240
   },
   "jornadaEscuro": {
    "x": 0,
    "y": 1020,
    "text": "Entrada e primeiro acesso no tema escuro",
    "kind": "title1",
-   "maxW": 9040
+   "maxW": 10560,
+   "w": 240
   }
  },
  "order": [
@@ -309,7 +329,9 @@
   "Competencia.dc.html",
   "CompetenciaEscuro.dc.html",
   "Playground.dc.html",
-  "PlaygroundEscuro.dc.html"
+  "PlaygroundEscuro.dc.html",
+  "Passkey.dc.html",
+  "PasskeyEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
