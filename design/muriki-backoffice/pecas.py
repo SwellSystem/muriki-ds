@@ -72,6 +72,13 @@ def logica(tema, antes='', valores=''):
             'temaRotulo: tema === "escuro" ? "Usar tema claro" : "Usar tema escuro",\n'
             'trocarTema: () => this.setState({ tema: tema === "escuro" ? "claro" : "escuro" }),\n'
             'railA: recolhido ? "none" : "flex",\nrailF: recolhido ? "flex" : "none",\n'
+            'usarClaro: () => this.setState({ tema: "claro" }),\nusarEscuro: () => this.setState({ tema: "escuro" }),\n'
+            'usarSistema: () => this.setState({ tema: "sistema" }),\n'
+            'selClaro: temaPedido === "claro" ? "true" : "false",\nselEscuro: temaPedido === "escuro" ? "true" : "false",\n'
+            'selSistema: temaPedido === "sistema" ? "true" : "false",\n'
+            'anelClaro: temaPedido === "claro" ? "0 0 0 1.5px var(--pri)" : "inset 0 0 0 1px var(--input)",\n'
+            'anelEscuro: temaPedido === "escuro" ? "0 0 0 1.5px var(--pri)" : "inset 0 0 0 1px var(--input)",\n'
+            'anelSistema: temaPedido === "sistema" ? "0 0 0 1.5px var(--pri)" : "inset 0 0 0 1px var(--input)",\n'
             # senha visível: o macaco fecha os olhos (o brandHidden do login-page)
             'olhoA: s.verSenha ? "none" : "flex",\nolhoF: s.verSenha ? "flex" : "none",\n'
             'tipoSenha: s.verSenha ? "text" : "password",\n'

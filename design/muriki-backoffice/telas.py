@@ -988,6 +988,145 @@ def tela_auditoria(k, detalhe=False):
     return app(k, 'auditoria', cab + filtros + lista, sobre=sobre, gap=16)
 
 
+# ── Minha conta ─────────────────────────────────────────────────────────
+# GET /staff/me (nome, e-mail, papel, twoFactorEnabled, createdAt) e /staff/sessions (ip,
+# userAgent, createdAt, expiresAt, current); POST /staff/auth/password (atual + nova);
+# DELETE /staff/sessions/{id}. Não há rota para trocar o próprio nome nem para o próprio
+# membro trocar o TOTP — "Trocar de autenticador" é o alvo, e depende da muriki-api.
+# O tema é preferência do navegador, não vai para a API.
+def _cartao_conta(k, titulo, sub, corpo, direita='', extra=''):
+    s_ = f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{sub}</span>' if sub else ''
+    return (f'<section aria-label="{titulo}" style="background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+            f'padding:16px 20px;display:flex;flex-direction:column;gap:14px;{extra}">'
+            f'<div style="display:flex;align-items:flex-start;gap:12px;"><span style="display:flex;flex-direction:column;gap:2px;flex:1;">'
+            f'<h2 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">{titulo}</h2>{s_}</span>{direita}</div>{corpo}</section>')
+
+
+def _opcao_tema(k, nome, acao, sel, anel, fundo, barra, tinta):
+    mini = (f'<span aria-hidden="true" style="display:flex;height:58px;border-radius:8px;overflow:hidden;background:{fundo};">'
+            f'<span style="width:22px;background:{barra};"></span>'
+            f'<span style="flex:1;display:flex;flex-direction:column;gap:5px;padding:9px;">'
+            f'<span style="height:5px;width:60%;border-radius:2px;background:{tinta};"></span>'
+            f'<span style="height:5px;width:85%;border-radius:2px;background:{tinta};opacity:0.4;"></span>'
+            f'<span style="height:5px;width:40%;border-radius:2px;background:#1B50C0;"></span></span></span>')
+    return (f'<button type="button" role="radio" aria-checked="{{{{{sel}}}}}" onClick="{{{{{acao}}}}}" style="flex:1;display:flex;flex-direction:column;'
+            f'gap:8px;padding:8px;border:0;border-radius:10px;background:{k["field"]};box-shadow:{{{{{anel}}}}};font-family:{FONTE};'
+            f'font-size:13px;font-weight:500;color:{k["fgs"]};text-align:left;cursor:pointer;">{mini}<span style="padding:0 2px;">{nome}</span></button>')
+
+
+def tela_conta(k, sobre=''):
+    cab = cabecalho(k, 'Minha conta', 'Seu perfil, a aparência, a senha, o autenticador e onde você está conectada.')
+    perfil = _cartao_conta(k, 'Perfil', '', (
+        f'<div style="display:flex;align-items:center;gap:14px;">{avatar("AL", k, "yellow", 44)}'
+        f'<span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">'
+        f'<span style="font-size:15px;font-weight:600;color:{k["fgs"]};">Ana Lima</span>'
+        f'<span style="font-family:{MONO};font-size:12.5px;color:{k["mfg"]};">ana.lima@muriki.app</span></span>'
+        f'{badge("Administradora", k, "blue")}</div>'
+        f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">Na equipe desde março de 2026. '
+        f'Nome e e-mail só mudam por outro administrador, em Equipe.</span>'))
+    temas = (f'<div role="radiogroup" aria-label="Tema" style="display:flex;gap:10px;">'
+             + _opcao_tema(k, 'Claro', 'usarClaro', 'selClaro', 'anelClaro', '#F6F4EE', '#FBFAF6', '#2B343D')
+             + _opcao_tema(k, 'Escuro', 'usarEscuro', 'selEscuro', 'anelEscuro', '#11110F', '#0C0C0A', '#E7E6E3')
+             + _opcao_tema(k, 'Sistema', 'usarSistema', 'selSistema', 'anelSistema', 'linear-gradient(90deg,#F6F4EE 50%,#11110F 50%)',
+                           'linear-gradient(90deg,#FBFAF6 50%,#0C0C0A 50%)', '#8A8F96')
+             + '</div>')
+    aparencia = _cartao_conta(k, 'Aparência', 'Fica neste navegador. "Sistema" segue o claro ou escuro do computador.', temas)
+
+    senha = _cartao_conta(k, 'Senha', 'Trocou por suspeita? Encerre também as outras sessões, aqui embaixo.', (
+        f'<form style="display:flex;flex-direction:column;gap:14px;margin:0;">'
+        + campo(k, 'Senha atual', '••••••••••••••', id_='senha-atual', monoespaco=True)
+        + f'<div style="display:flex;flex-direction:column;gap:6px;">'
+          f'<label for="senha-nova" style="font-size:13px;font-weight:500;color:{k["fgs"]};">Senha nova</label>'
+          f'<input id="senha-nova" type="{{{{tipoSenha}}}}" value="{{{{sn.valor}}}}" onChange="{{{{mudarSenha}}}}" autocomplete="new-password" '
+          f'style="height:36px;padding:0 12px;border:0;border-radius:9px;box-shadow:inset 0 0 0 1px {k["input"]};background:{k["field"]};'
+          f'font-family:{MONO};font-size:13px;color:{k["fgs"]};outline:0;">'
+          f'<div role="meter" aria-label="Tamanho da senha" aria-valuemin="0" aria-valuemax="12" aria-valuenow="{{{{sn.n}}}}" style="display:flex;gap:6px;padding-top:2px;">'
+        + ''.join(f'<span style="height:4px;flex:1;border-radius:999px;background:{{{{sn.s{x}}}}};"></span>' for x in range(1, 5))
+        + f'</div><span style="font-family:{MONO};font-size:10.5px;color:{{{{sn.cor}}}};">{{{{sn.txt}}}}</span></div>'
+        + f'<div style="display:flex;justify-content:flex-end;">{link_botao(k, "Trocar senha", "#", "primary", 32)}</div></form>'))
+
+    dois = _cartao_conta(k, 'Verificação em duas etapas', 'Obrigatória na equipe: dá para trocar o app, não para desligar.', (
+        f'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:{k["sunken"]};">'
+        f'<span style="display:flex;color:{k["ok"]};">{ic("escudo", 18)}</span>'
+        f'<span style="display:flex;flex-direction:column;flex:1;"><span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">App autenticador</span>'
+        f'<span style="font-size:12px;color:{k["mfg"]};">Configurado em 23 de setembro de 2026</span></span>{badge("Ativa", k, "green", ponto=True)}</div>'
+        f'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
+        f'{link_botao(k, "Trocar de autenticador", href("ContaAutenticador"), "outline", 32, "troca")}'
+        f'{link_botao(k, "Gerar códigos de recuperação", "#", "ghost", 32, "chave")}</div>'
+        f'<span style="font-size:12px;line-height:17px;color:{k["mfg"]};">Trocar revoga o app antigo e os códigos de recuperação antigos na hora.</span>'))
+
+    sess = [('Chrome · macOS', '189.40.12.7', 'hoje, 22:09', 'em 7 dias', True),
+            ('Safari · iOS', '177.8.40.21', 'ontem, 08:12', 'em 6 dias', False),
+            ('Firefox · Windows', '45.231.9.14', '18 de setembro, 14:30', 'em 2 dias', False)]
+    linhas = ''
+    for disp, ip, quando, expira, atual in sess:
+        acao = (f'<span style="display:flex;justify-content:flex-end;">{badge("Esta sessão", k, "green", ponto=True)}</span>' if atual
+                else f'<span style="display:flex;justify-content:flex-end;">{link_botao(k, "Encerrar", href("ContaSessoes"), "ghost", 28)}</span>')
+        linhas += (f'<div style="display:grid;grid-template-columns:28px minmax(0,1fr) 130px 190px 110px 120px;gap:12px;align-items:center;'
+                   f'min-height:46px;box-shadow:inset 0 -1px 0 {k["muted"]};">'
+                   f'<span style="display:flex;color:{k["mfg"]};">{ic("laptop", 16)}</span>'
+                   f'<span style="font-size:13.5px;color:{k["fgs"]};">{disp}</span>'
+                   f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};">{ip}</span>'
+                   f'<span style="font-size:12.5px;color:{k["mfg"]};">Entrou {quando}</span>'
+                   f'<span style="font-size:12.5px;color:{k["mfg"]};">Expira {expira}</span>{acao}</div>')
+    sessoes = _cartao_conta(k, 'Sessões', 'Onde sua conta está conectada agora. Encerrar derruba o acesso naquele aparelho na hora.',
+                            f'<div style="display:flex;flex-direction:column;">{linhas}</div>',
+                            direita=link_botao(k, 'Encerrar as outras', href('ContaSessoes'), 'outline', 32, 'sair'))
+    corpo = (cab + f'<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;">'
+             f'<div style="display:flex;flex-direction:column;gap:16px;">{perfil}{aparencia}</div>'
+             f'<div style="display:flex;flex-direction:column;gap:16px;">{senha}{dois}</div></div>{sessoes}')
+    return app(k, 'conta', corpo, sobre=sobre, gap=16)
+
+
+def tela_conta_autenticador(k):
+    corpo_s = (
+        f'<div style="padding:18px 20px 0;">{_passos_trocar(k, 1)}</div>'
+        + secao_sheet(k, 'Novo app', (
+            f'<div style="display:flex;gap:16px;align-items:center;">{_qr(k, 132)}'
+            f'<div style="display:flex;flex-direction:column;gap:8px;min-width:0;">'
+            f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">Escaneie com o app novo. Até você ativar, o antigo continua valendo.</span>'
+            f'<span style="font-size:12px;color:{k["mfg"]};">Não dá para escanear? A chave:</span>'
+            f'<code style="padding:7px 10px;border-radius:8px;background:{k["sunken"]};font-family:{MONO};font-size:12px;letter-spacing:0.08em;color:{k["fgs"]};">'
+            f'KRSX G5CT MVRX EZLU</code></div></div>'
+            + _quadrados(k, 'codigo-novo')))
+        + secao_sheet(k, 'O que acontece ao ativar', (
+            f'<ul style="margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:19px;color:{k["fg"]};">'
+            f'<li>O app antigo para de gerar códigos que funcionam.</li>'
+            f'<li>Os 10 códigos de recuperação antigos deixam de valer, e vêm 10 novos.</li>'
+            f'<li>Suas sessões abertas continuam; encerre-as se trocou por perda do celular.</li></ul>')))
+    rodape = (f'<span style="flex:1;"></span>{link_botao(k, "Cancelar", href("Conta"), "ghost", 36)}'
+              f'{link_botao(k, "Ativar o novo app", href("Conta"), "solid", 36)}')
+    s_ = sheet(k, 'Trocar de autenticador', 'Você confirmou com o código do app atual. Agora o novo.', corpo_s, rodape, largura=520)
+    return tela_conta(k, sobre=s_)
+
+
+def _passos_trocar(k, atual):
+    itens = ['Confirmar que é você', 'Novo app', 'Códigos novos']
+    h = ''
+    for i, t in enumerate(itens):
+        feito, at = i < atual, i == atual
+        bola = (f'<span style="width:20px;height:20px;border-radius:999px;display:flex;align-items:center;justify-content:center;'
+                f'font-family:{MONO};font-size:10.5px;font-weight:500;'
+                + (f'background:{k["pri"]};color:{k["prifg"]};' if at else
+                   f'background:{k["prisub"]};color:{k["prisubfg"]};' if feito else
+                   f'background:{k["sunken"]};color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["input"]};')
+                + f'">{ic("check", 11) if feito else i + 1}</span>')
+        h += (f'<li style="display:flex;align-items:center;gap:8px;font-size:12.5px;'
+              f'{"color:" + k["fgs"] + ";font-weight:500;" if at else "color:" + k["mfg"] + ";"}">{bola}{t}</li>')
+        if i < len(itens) - 1:
+            h += f'<li aria-hidden="true" style="flex:1;height:1px;background:{k["input"]};max-width:24px;"></li>'
+    return f'<ol aria-label="Trocar de autenticador" style="margin:0;padding:0;list-style:none;display:flex;align-items:center;gap:8px;">{h}</ol>'
+
+
+def tela_conta_sessoes(k):
+    rodape = (link_botao(k, 'Cancelar', href('Conta'), 'outline', 36)
+              + link_botao(k, 'Encerrar 2 sessões', href('Conta'), 'destrutivo', 36))
+    a = alerta(k, 'Encerrar as outras sessões?',
+               'Safari no iOS e Firefox no Windows saem agora e pedem senha e código de novo. Esta sessão continua.',
+               '', rodape, icone='sair')
+    return tela_conta(k, sobre=a)
+
+
 # ── Montagem ───────────────────────────────────────────────────────────
 def montar(tela, tema):
     sufixo = '' if tema == 'claro' else 'Escuro'
@@ -1015,6 +1154,12 @@ def _montar(tela, tema):
         return pagina(t, tela_auditoria(k), tema)
     if i == 'auditoria-evento':
         return pagina(t, tela_auditoria(k, detalhe=True), tema)
+    if i == 'conta':
+        return pagina(t, tela_conta(k), tema, ANTES_SENHA, VALORES_SENHA)
+    if i == 'conta-autenticador':
+        return pagina(t, tela_conta_autenticador(k), tema, ANTES_SENHA + '\n' + ANTES_TOTP.replace('"4829"', '""'), VALORES_SENHA + ',\n' + VALORES_TOTP)
+    if i == 'conta-sessoes':
+        return pagina(t, tela_conta_sessoes(k), tema, ANTES_SENHA, VALORES_SENHA)
     if i == 'inicio':
         return pagina(t, tela_inicio(k), tema)
     if i == 'clientes':
