@@ -143,7 +143,7 @@ export function ResourceTable<T>({
         </div>
       ) : null}
 
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div className="muriki-scroll min-h-0 flex-1 overflow-auto">
         <table className="w-full table-fixed border-collapse text-[13px]">
           <caption className="sr-only">{label}</caption>
           <colgroup>

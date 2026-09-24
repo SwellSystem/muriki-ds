@@ -110,7 +110,7 @@ function DialogContent({
           fullscreen
             ? "h-dvh max-h-none w-screen max-w-none rounded-none shadow-none"
             : "max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100vw-2rem)] rounded-[var(--radius-float)] shadow-[var(--float-strong)] sm:max-w-lg",
-          framed ? "gap-0 overflow-hidden" : "gap-4 overflow-y-auto p-5",
+          framed ? "gap-0 overflow-hidden" : "muriki-scroll gap-4 overflow-y-auto p-5",
           "bg-popover text-popover-foreground outline-none",
           "transition-[opacity,transform] duration-150 ease-out",
           "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
@@ -183,7 +183,7 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-body"
       className={cn(
-        "min-h-0 flex-1 overflow-y-auto",
+        "muriki-scroll min-h-0 flex-1 overflow-y-auto",
         // no solto o corpo precisa vazar o padding da caixa para a barra de
         // rolagem encostar na borda; no estruturado a caixa não tem padding
         framed ? "" : "-mx-5 px-5",

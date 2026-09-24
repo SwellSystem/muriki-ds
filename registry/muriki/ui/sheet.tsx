@@ -163,7 +163,7 @@ function SheetBody({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-body"
       className={cn(
-        "min-h-0 flex-1 overflow-y-auto",
+        "muriki-scroll min-h-0 flex-1 overflow-y-auto",
         framed ? "" : "-mx-5 px-5",
         className
       )}
