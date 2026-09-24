@@ -337,6 +337,38 @@
       "h": 900,
       "title": "Minha conta · encerrar as outras sessões · escuro",
       "is_interactive": true
+    },
+    "Relatorios.dc.html": {
+      "x": 7600,
+      "y": 5280,
+      "w": 1440,
+      "h": 900,
+      "title": "Relatórios · o catálogo",
+      "is_interactive": true
+    },
+    "RelatoriosEscuro.dc.html": {
+      "x": 7600,
+      "y": 6600,
+      "w": 1440,
+      "h": 900,
+      "title": "Relatórios · o catálogo · escuro",
+      "is_interactive": true
+    },
+    "RelatorioGerar.dc.html": {
+      "x": 9120,
+      "y": 5280,
+      "w": 1440,
+      "h": 900,
+      "title": "Relatórios · gerar no sheet",
+      "is_interactive": true
+    },
+    "RelatorioGerarEscuro.dc.html": {
+      "x": 9120,
+      "y": 6600,
+      "w": 1440,
+      "h": 900,
+      "title": "Relatórios · gerar no sheet · escuro",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -398,15 +430,15 @@
     },
     "planos": {
       "kind": "title1",
-      "maxW": 7520,
-      "text": "Planos, features e cupons: o mesmo CRUD; feature nasce uma vez, o plano só escolhe o valor",
+      "maxW": 8000,
+      "text": "Planos, cupons e relatórios: o mesmo CRUD; feature nasce uma vez; relatório é PDF do pdf-report",
       "w": 240,
       "x": 0,
       "y": 4980
     },
     "planosEscuro": {
       "kind": "title1",
-      "maxW": 7520,
+      "maxW": 8000,
       "text": "Planos, features e cupons no tema escuro",
       "w": 240,
       "x": 0,
@@ -455,7 +487,11 @@
     "ContaAutenticador.dc.html",
     "ContaAutenticadorEscuro.dc.html",
     "ContaSessoes.dc.html",
-    "ContaSessoesEscuro.dc.html"
+    "ContaSessoesEscuro.dc.html",
+    "Relatorios.dc.html",
+    "RelatoriosEscuro.dc.html",
+    "RelatorioGerar.dc.html",
+    "RelatorioGerarEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"

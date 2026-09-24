@@ -43,6 +43,7 @@ I.update(
     raio=svg('<path d="M9 1.8L3.5 9h4l-.5 5.2L12.5 7h-4z"/>'),
     grade=svg('<rect x="2" y="2" width="12" height="12" rx="1.6"/><path d="M2 6.2h12M2 10h12M6.4 2v12"/>'),
     painel=svg('<rect x="1.8" y="2.6" width="12.4" height="10.8" rx="1.8"/><path d="M5.8 2.6v10.8"/>'),
+    relatorio=svg('<path d="M4 1.8h5.5L12.5 5v9.2H4z"/><path d="M9.5 1.8V5h3"/><path d="M6.3 12V9.6M8.3 12V7.8M10.3 12v-1.4"/>'),
     lista=svg('<path d="M5.6 4h8.4M5.6 8h8.4M5.6 12h8.4"/><path d="M2.2 4h.1M2.2 8h.1M2.2 12h.1"/>'),
 )
 
@@ -101,7 +102,7 @@ def pagina(titulo, corpo, tema, antes='', valores='', props=None):
 # o app real tem os dois grupos: a operação do produto e a equipe que opera
 EQUIPE = [('equipe', 'Equipe', 'pessoa', None), ('convites', 'Convites', 'envelope', None), ('auditoria', 'Auditoria', 'relogio', 'Auditoria')]
 MENU = [('inicio', 'Início', 'casa', 'Inicio'), ('clientes', 'Clientes', 'pessoas', 'Clientes'),
-        ('planos', 'Planos', 'plano', 'Planos'), ('cupons', 'Cupons', 'cupom', 'Cupons')]
+        ('planos', 'Planos', 'plano', 'Planos'), ('cupons', 'Cupons', 'cupom', 'Cupons'), ('relatorios', 'Relatórios', 'relatorio', 'Relatorios')]
 
 
 def avatar(iniciais, k, tom='blue', tam=28):
