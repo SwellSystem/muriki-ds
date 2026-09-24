@@ -45,8 +45,9 @@ function Switch({
         className={cn(
           "pointer-events-none block rounded-full transition-transform",
           "group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3",
-          "group-data-[size=default]/switch:translate-x-0.5 group-data-[size=sm]/switch:translate-x-0.5",
-          "data-checked:translate-x-[calc(100%+2px)]",
+          // desligado e ligado são estados que se excluem, com a mesma especificidade. O recuo de
+          // 2px ficava num seletor de grupo, mais forte, e vencia o ligado: o thumb não andava.
+          "data-unchecked:translate-x-0.5 data-checked:translate-x-[calc(100%+2px)]",
           // objeto elevado: sombra no claro, luz no escuro
           "bg-card shadow-[0_1px_2px_rgba(0,0,0,0.28),0_0_0_0.5px_rgba(0,0,0,0.06)]",
           "dark:bg-[oklch(0.86_0.004_100)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_1px_2px_rgba(0,0,0,0.5)]"
