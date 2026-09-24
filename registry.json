@@ -185,7 +185,8 @@
       ],
       "registryDependencies": [
         "utils",
-        "SwellSystem/muriki-ds/theme"
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/spinner"
       ],
       "files": [
         {
@@ -196,7 +197,8 @@
           "path": "registry/muriki/ui/button-variants.ts",
           "type": "registry:ui"
         }
-      ]
+      ],
+      "docs": "`loading` trava o botão, põe o spinner no lugar do ícone da esquerda e marca aria-busy; o rótulo fica."
     },
     {
       "name": "badge",
@@ -658,6 +660,23 @@
         }
       ],
       "docs": "Larguras iguais em linhas de texto denunciam a preguiça. Veja o @muriki/plan-card, que traz o próprio."
+    },
+    {
+      "name": "spinner",
+      "type": "registry:ui",
+      "title": "Spinner",
+      "description": "Espera curta e sem forma conhecida: anel de 2px na tinta atual, arco de um quarto girando. Com forma conhecida, é skeleton.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/spinner.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Herda a cor de quem o contém. Decorativo por padrão; passe label quando ele for o único sinal. O Button já usa: <Button loading>."
     },
     {
       "name": "separator",
@@ -1133,7 +1152,26 @@
           "target": "components/blocks/resource-table/index.ts"
         }
       ],
-      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app."
+      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app. ResourcePageSkeleton é a tela inteira carregando: use como pendingComponent da rota."
+    },
+    {
+      "name": "route-progress",
+      "type": "registry:block",
+      "title": "Route Progress",
+      "description": "A barra fina no topo enquanto a próxima tela carrega: aparece depois de 120ms, sobe freando sem chegar ao fim sozinha e completa quando termina.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/route-progress/route-progress.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/route-progress/route-progress.tsx"
+        }
+      ],
+      "docs": "Controlada por `active`. TanStack Router: const carregando = useRouterState({ select: (s) => s.isLoading }); <RouteProgress active={carregando} /> uma vez no layout raiz."
     },
     {
       "name": "task-timeline",
