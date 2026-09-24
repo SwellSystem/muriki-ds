@@ -26,6 +26,9 @@ TELAS = [
     ('cupom', 'CupomNovo', 'Novo cupom', 'Cupons · novo cupom no sheet', 4, 4, 5),
     ('auditoria', 'Auditoria', 'Auditoria', 'Auditoria · a linha do tempo da equipe', 0, 6, 7),
     ('auditoria-evento', 'AuditoriaEvento', 'Evento', 'Auditoria · o evento no sheet', 1, 6, 7),
+    ('conta', 'Conta', 'Minha conta', 'Minha conta · perfil, tema, senha, autenticador e sessões', 2, 6, 7),
+    ('conta-autenticador', 'ContaAutenticador', 'Trocar de autenticador', 'Minha conta · trocar de autenticador', 3, 6, 7),
+    ('conta-sessoes', 'ContaSessoes', 'Encerrar sessões', 'Minha conta · encerrar as outras sessões', 4, 6, 7),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -69,8 +72,8 @@ for chave, lin, n, texto in [
     ('clientesEscuro', 3, 4, 'Início e clientes no tema escuro'),
     ('planos', 4, 5, 'Planos, features e cupons: o mesmo CRUD; feature nasce uma vez, o plano só escolhe o valor'),
     ('planosEscuro', 5, 5, 'Planos, features e cupons no tema escuro'),
-    ('equipe', 6, 2, 'Equipe: a auditoria é leitura em ordem, não CRUD; o evento abre no sheet'),
-    ('equipeEscuro', 7, 2, 'Equipe no tema escuro'),
+    ('equipe', 6, 5, 'Equipe e conta: a auditoria é leitura em ordem; minha conta troca tema, senha, autenticador e encerra sessões'),
+    ('equipeEscuro', 7, 5, 'Equipe no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 
