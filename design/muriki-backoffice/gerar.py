@@ -66,6 +66,47 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         gerados.append(arquivo)
 
 # o editor limita a largura de um título a 8000px
+# ── PDFs: as páginas reais do takumi, renderizadas por pdf/render.tsx a partir do registry e
+# subidas como assets do canvas. Papel não tem tema: um quadro A4 por página.
+A4_W, A4_H = 794, 1123
+PDFS = [
+    ('PdfCodigos.dc.html', 'PDF · códigos de recuperação', '/_blob/7d586bef4c42f395fb2a6498f82edaa1'),
+    ('PdfRelatorio1.dc.html', 'PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)', '/_blob/faf03c5c424741beef7b923dffda3a95'),
+    ('PdfRelatorio2.dc.html', 'PDF · relatório gerencial · página 2 (tabela e nota)', '/_blob/0eef546d6a948e94d9b0b4fe2bffcc19'),
+    ('PdfRelatorio3.dc.html', 'PDF · relatório gerencial · página 3 (tabela longa)', '/_blob/f610a9062d73cf1db08f126746de1e95'),
+]
+LINHA_PDF = 8
+for n, (arquivo, titulo, blob) in enumerate(PDFS):
+    open(os.path.join(SAIDA, arquivo), 'w').write(f'''<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>{titulo.split(' · ', 1)[1]}</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{{margin:0;background:#ffffff;}}</style>
+</helmet>
+<div style="width:{A4_W}px;height:{A4_H}px;background:#ffffff;">
+<img src="{blob}" alt="{titulo}" style="display:block;width:{A4_W}px;height:{A4_H}px;">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{A4_W},"height":{A4_H}}}}}'>
+class Component extends DCLogic {{
+renderVals() {{ return {{}}; }}
+}}
+</script>
+</body>
+</html>
+''')
+    b = boards.setdefault(arquivo, {})
+    b.update(x=n * (A4_W + 80), y=LINHA_PDF * LINHA_Y, w=A4_W, h=A4_H, title=titulo)
+    if arquivo not in order:
+        order.append(arquivo)
+    gerados.append(arquivo)
+
 largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
@@ -75,6 +116,7 @@ for chave, lin, n, texto in [
     ('clientesEscuro', 3, 4, 'Início e clientes no tema escuro'),
     ('planos', 4, 7, 'Planos, cupons e relatórios: o mesmo CRUD; feature nasce uma vez; relatório é PDF do pdf-report'),
     ('planosEscuro', 5, 7, 'Planos, features e cupons no tema escuro'),
+    ('pdfs', 8, 3, 'PDFs: o pdf-report e o pdf-recovery-codes do DS, renderizados de verdade pelo takumi'),
     ('equipe', 6, 5, 'Equipe e conta: a auditoria é leitura em ordem; minha conta troca tema, senha, autenticador e encerra sessões'),
     ('equipeEscuro', 7, 5, 'Equipe no tema escuro'),
 ]:
