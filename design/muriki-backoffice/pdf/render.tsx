@@ -50,7 +50,7 @@ const vendas = Array.from({ length: 30 }, (_, i) => ({
 
 const relatorio = (
   <ReportDocument {...meta} generatedBy="Ana Lima" generatedAt="2026-09-24T14:32:00Z"
-    summary="Quanto entrou, por quais planos e com quais cupons. Valores já sem os descontos." motif="money">
+    summary="Quanto entrou, por quais planos e com quais cupons. Valores já sem os descontos." motif="business">
     <ReportKpis items={[
       { label: "Vendido", value: formatBRL(46416, false), delta: "+8,2%", trend: "up", hint: "contra agosto" },
       { label: "Vendas", value: "381", delta: "+5,1%", trend: "up", hint: "contra agosto" },
