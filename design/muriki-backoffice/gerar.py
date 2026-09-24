@@ -10,6 +10,11 @@ os.makedirs(SAIDA, exist_ok=True)
 TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · e-mail e senha', 0, 0, 1),
     ('totp', 'SegundoFator', 'Segundo fator', 'Segundo fator · um quadrado por dígito', 1, 0, 1),
+    ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Esqueci a senha · o link por e-mail', 2, 0, 1),
+    ('novasenha', 'NovaSenha', 'Senha nova', 'Senha nova · vinda do link', 3, 0, 1),
+    ('convite', 'Convite', 'Convite', 'Primeiro acesso · aceitar o convite', 4, 0, 1),
+    ('autenticador', 'Autenticador', 'Autenticador', 'Primeiro acesso · configurar o autenticador', 5, 0, 1),
+    ('codigos', 'CodigosRecuperacao', 'Códigos de recuperação', 'Primeiro acesso · dez códigos, uma vez', 6, 0, 1),
     ('inicio', 'Inicio', 'Início', 'Início · clientes, vendido até agora e planos', 0, 2, 3),
     ('clientes', 'Clientes', 'Clientes', 'Clientes · o molde do CRUD', 1, 2, 3),
     ('cliente', 'ClienteEditar', 'Editar cliente', 'Clientes · editar no sheet (criar é o mesmo, vazio)', 2, 2, 3),
@@ -56,8 +61,8 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('acesso', 0, 2, 'Entrada: e-mail e senha, depois o código TOTP; tudo vai à API num POST só'),
-    ('acessoEscuro', 1, 2, 'Entrada no tema escuro'),
+    ('acesso', 0, 7, 'Entrada: e-mail e senha, depois o código TOTP num POST só; senha esquecida; e o primeiro acesso, do convite aos códigos de recuperação'),
+    ('acessoEscuro', 1, 7, 'Entrada no tema escuro'),
     ('clientes', 2, 4, 'Início e clientes: a lista é o molde do CRUD, criar e editar no sheet, revogar no alert-dialog'),
     ('clientesEscuro', 3, 4, 'Início e clientes no tema escuro'),
     ('planos', 4, 5, 'Planos, features e cupons: o mesmo CRUD; feature nasce uma vez, o plano só escolhe o valor'),

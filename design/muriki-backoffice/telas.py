@@ -64,14 +64,13 @@ def _voltar(k, txt, destino):
 
 
 def tela_acesso(k, modo):
-    linha = lambda cor, larg: f'<span style="height:1px;{larg}background:{cor};"></span>'
     titulo_legenda, hero_a, hero_b, sub = {
         'entrar': ('Entrar', 'Backoffice', 'Muriki.', 'Só para a equipe. Sem acesso? Peça um convite a quem administra. Depois da senha, o código do app autenticador.'),
         'totp': ('Segundo fator', 'Mais um', 'passo.', 'Agora o código do seu app autenticador. A gente confere tudo junto.'),
     }[modo]
 
     if modo == 'entrar':
-        esqueci = (f'<a href="#" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.2em;'
+        esqueci = (f'<a href="{href("EsqueciSenha")}" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.2em;'
                    f'text-transform:uppercase;color:{k["mfg"]};">Esqueci a senha</a>')
         corpo = (
             f'<form style="display:flex;flex-direction:column;gap:24px;margin:0;">'
@@ -88,22 +87,20 @@ def tela_acesso(k, modo):
             f'<div><p style="margin:0;font-size:14px;font-weight:500;color:{k["fgs"]};">Verificação em duas etapas</p>'
             f'<p style="margin:4px 0 0;font-size:12px;color:{k["mfg"]};">Abra o app autenticador e digite o código de {{{{n}}}} dígitos.</p>'
             f'<p style="margin:4px 0 0;font-family:{MONO};font-size:11px;color:{k["mfg"]};">ana.lima@muriki.app</p></div>'
-            f'<div style="display:flex;flex-direction:column;gap:8px;">'
-            f'<label for="codigo" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:{k["mfg"]};">Código</label>'
-            # um <input> de verdade por cima dos quadrados: é ele que recebe o teclado, o colar e o autocomplete do SMS/app
-            f'<div style="position:relative;display:flex;gap:8px;">'
-            f'<sc-for list="{{{{caixas}}}}" as="q" hint-placeholder-count="6">'
-            f'<span aria-hidden="true" style="flex:1;max-width:52px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:10px;'
-            f'background:{k["field"]};box-shadow:{{{{q.sombra}}}};font-family:{MONO};font-size:22px;font-weight:500;color:{k["fgs"]};">{{{{q.c}}}}</span>'
-            f'</sc-for>'
-            f'<input id="codigo" inputmode="numeric" autocomplete="one-time-code" aria-describedby="codigo-dica" maxlength="{{{{n}}}}" value="{codigo}" onChange="{{{{mudarCodigo}}}}" '
-            f'style="position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;font-size:16px;cursor:text;"></div>'
-            f'<span id="codigo-dica" style="font-size:12px;color:{k["mfg"]};">{{{{dica}}}}</span></div>'
+            f'{_quadrados(k)}'
             f'{_voltar(k, "Voltar para a senha", href("Entrar"))}</div></div>'
             f'{_enviar(k, "Verificar", href("Inicio"))}'
-            f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">Perdeu o app? '
-            f'<a href="#" style="font-weight:500;color:{k["fg"]};">Use um código de recuperação</a>.</span>')
+            f'<ul style="margin:0;padding:14px 0 0;list-style:none;display:flex;flex-direction:column;gap:8px;'
+            f'box-shadow:inset 0 1px 0 {k["input"]};font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
+            f'<li>Perdeu o app? <a href="#" style="font-weight:500;color:{k["fg"]};">Use um código de recuperação</a>.</li>'
+            # quem acabou de aceitar o convite ainda não tem autenticador: a API aceita sem código e manda configurar
+            f'<li>Primeiro acesso? <a href="{href("Autenticador")}" style="font-weight:500;color:{k["fg"]};">Entrar sem código e configurar o autenticador</a>.</li></ul>')
 
+    return _entrada(k, titulo_legenda, hero_a, hero_b, sub, corpo)
+
+
+def _entrada(k, titulo_legenda, hero_a, hero_b, sub, corpo, largura=440):
+    linha = lambda cor, larg: f'<span style="height:1px;{larg}background:{cor};"></span>'
     formulario = (
         f'<div style="grid-column:2;display:flex;flex-direction:column;gap:20px;">'
         f'<div style="display:flex;align-items:center;gap:12px;">{legenda(titulo_legenda, k)}{linha(k["pri"], "width:40px;")}{linha(k["input"], "flex:1;")}</div>'
@@ -113,9 +110,23 @@ def tela_acesso(k, modo):
         f'<p style="margin:0;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div>{corpo}</div>')
     lado = (f'<main style="position:relative;display:flex;flex-direction:column;min-width:0;">'
             f'<header style="display:flex;justify-content:flex-end;align-items:center;gap:4px;padding:32px 48px 0;">{botao_tema(k)}</header>'
-            f'<div style="flex:1;display:grid;grid-template-columns:minmax(0, 0.8fr) minmax(0, 440px) minmax(0, 1fr);'
+            f'<div style="flex:1;display:grid;grid-template-columns:minmax(0, 0.8fr) minmax(0, {largura}px) minmax(0, 1fr);'
             f'align-content:center;padding:24px 80px 56px;">{formulario}</div></main>')
     return f'{raiz(k, "display:grid;grid-template-columns:1.05fr 1fr;")}{_painel(k)}{lado}</div>'
+
+
+def _quadrados(k, id_='codigo'):
+    # um <input> de verdade por cima dos quadrados: é ele que recebe o teclado, o colar e o autocomplete
+    return (f'<div style="display:flex;flex-direction:column;gap:8px;">'
+            f'<label for="{id_}" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:{k["mfg"]};">Código</label>'
+            f'<div style="position:relative;display:flex;gap:8px;">'
+            f'<sc-for list="{{{{caixas}}}}" as="q" hint-placeholder-count="6">'
+            f'<span aria-hidden="true" style="flex:1;max-width:52px;height:56px;display:flex;align-items:center;justify-content:center;border-radius:10px;'
+            f'background:{k["field"]};box-shadow:{{{{q.sombra}}}};font-family:{MONO};font-size:22px;font-weight:500;color:{k["fgs"]};">{{{{q.c}}}}</span>'
+            f'</sc-for>'
+            f'<input id="{id_}" inputmode="numeric" autocomplete="one-time-code" aria-describedby="{id_}-dica" maxlength="{{{{n}}}}" value="{{{{codigo}}}}" onChange="{{{{mudarCodigo}}}}" '
+            f'style="position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;font-size:16px;cursor:text;"></div>'
+            f'<span id="{id_}-dica" style="font-size:12px;color:{k["mfg"]};">{{{{dica}}}}</span></div>')
 
 
 ANTES_TOTP = """const n = Number(this.props.digitos || 6);
@@ -131,6 +142,167 @@ const falta = n - codigo.length;
 const dica = falta === 0 ? "Pronto. Verificar manda e-mail, senha e código juntos." : "Faltam " + falta + (falta === 1 ? " dígito." : " dígitos.");"""
 VALORES_TOTP = 'n: n,\ncodigo: codigo,\ncaixas: caixas,\ndica: dica,\nmudarCodigo: (e) => this.setState({ codigo: e.target.value.replace(/\\D/g, "").slice(0, n) })'
 PROPS_TOTP = {'digitos': {'editor': 'enum', 'options': ['4', '6'], 'default': '6'}}
+
+
+# ── Primeiro acesso e senha esquecida ───────────────────────────────────
+# O contrato da muriki-api (openapi/admin.json do backoffice): o convite aceita token, nome e
+# senha (12+ caracteres); o autenticador sai de /two-factor/setup (secret + otpauthUri) e só
+# vale depois do /confirm, que devolve DEZ códigos de recuperação, mostrados uma vez. O pedido
+# de senha nova responde 202 exista a conta ou não — a tela não pode dizer se o e-mail existe.
+def _senha_nova(k, id_='senha', rot='Senha nova'):
+    v = lambda c: '{{sn.' + c + '}}'
+    return (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+            + _campo_editorial(k, id_, rot, 'cadeado', 'password', '', 'Pelo menos 12 caracteres', olho=True, auto='new-password',
+                               extra_input=f' value="{v("valor")}" onChange="{{{{mudarSenha}}}}"')
+            + f'<div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;">'
+            f'<div role="meter" aria-label="Tamanho da senha" aria-valuemin="0" aria-valuemax="12" aria-valuenow="{v("n")}" style="display:flex;gap:6px;">'
+            + ''.join(f'<span style="height:4px;flex:1;border-radius:999px;background:{v(f"s{x}")};"></span>' for x in range(1, 5))
+            + f'</div><span style="display:flex;align-items:center;gap:6px;font-family:{MONO};font-size:10.5px;letter-spacing:0.025em;color:{v("cor")};">'
+            f'{v("txt")}</span></div></div>')
+
+
+ANTES_SENHA = """const valor = s.senha == null ? "muriki-backoff" : s.senha;
+const n = valor.length;
+const ok = n >= 12;
+const cor = ok ? "var(--ok)" : n >= 8 ? "var(--warn)" : "var(--mfg)";
+const seg = (x) => (n >= (x + 1) * 3 ? (ok ? "var(--ok)" : "var(--pri)") : "var(--sunken)");
+const sn = { valor: valor, n: Math.min(n, 12), cor: cor, s1: seg(0), s2: seg(1), s3: seg(2), s4: seg(3),
+  txt: ok ? "✓ 12 caracteres ou mais" : n === 0 ? "Pelo menos 12 caracteres" : "Faltam " + (12 - n) + (12 - n === 1 ? " caractere" : " caracteres") };"""
+VALORES_SENHA = 'sn: sn,\nmudarSenha: (e) => this.setState({ senha: e.target.value })'
+
+
+def _passos(k, atual):
+    itens = ['Criar acesso', 'Autenticador', 'Códigos']
+    h = ''
+    for i, t in enumerate(itens):
+        feito, at = i < atual, i == atual
+        bola = (f'<span style="width:20px;height:20px;border-radius:999px;display:flex;align-items:center;justify-content:center;'
+                f'font-family:{MONO};font-size:10.5px;font-weight:500;'
+                + (f'background:{k["pri"]};color:{k["prifg"]};' if at else
+                   f'background:{k["prisub"]};color:{k["prisubfg"]};' if feito else
+                   f'background:{k["sunken"]};color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["input"]};')
+                + f'">{ic("check", 11) if feito else i + 1}</span>')
+        h += (f'<li {"aria-current=step " if at else ""}style="display:flex;align-items:center;gap:8px;font-size:12.5px;'
+              f'{"color:" + k["fgs"] + ";font-weight:500;" if at else "color:" + k["mfg"] + ";"}">{bola}{t}</li>')
+        if i < len(itens) - 1:
+            h += f'<li aria-hidden="true" style="flex:1;height:1px;background:{k["input"]};max-width:28px;"></li>'
+    return f'<ol aria-label="Primeiro acesso" style="margin:0;padding:0;list-style:none;display:flex;align-items:center;gap:10px;">{h}</ol>'
+
+
+def tela_convite(k):
+    email = (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+             f'<span style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;color:{k["mfg"]};">E-mail</span>'
+             f'<div style="display:flex;align-items:center;gap:10px;height:44px;box-shadow:inset 0 -1px 0 {k["input"]};">'
+             f'<span style="display:flex;opacity:0.6;color:{k["mfg"]};">{ic("envelope", 18)}</span>'
+             f'<span style="flex:1;font-size:16px;color:{k["fgs"]};">bruno.melo@muriki.app</span>{badge("do convite", k, "gray")}</div></div>')
+    convite = (f'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;background:{k["card"]};'
+               f'box-shadow:inset 0 0 0 1px {k["border"]};">{avatar("AL", k, "yellow", 32)}'
+               f'<span style="display:flex;flex-direction:column;flex:1;font-size:13px;line-height:18px;color:{k["mfg"]};">'
+               f'<span><b style="font-weight:500;color:{k["fgs"]};">Ana Lima</b> convidou você como {badge("Operação", k, "blue")}</span>'
+               f'<span>O convite vale até 30 de setembro.</span></span></div>')
+    corpo = (f'{_passos(k, 0)}{convite}'
+             f'<form style="display:flex;flex-direction:column;gap:22px;margin:0;">{email}'
+             f'{_campo_editorial(k, "nome", "Nome", "pessoa", "text", "Bruno Melo", "Como a equipe vai te ver", auto="name")}'
+             f'{_senha_nova(k)}'
+             f'{_enviar(k, "Criar acesso", href("Autenticador"))}</form>'
+             f'<span style="display:flex;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{ic("escudo", 15, k["mfg"])}'
+             f'<span>Em seguida, o app autenticador: na equipe, o segundo fator é obrigatório.</span></span>')
+    return _entrada(k, 'Convite', 'Boas-vindas', 'à equipe.', 'Crie seu acesso ao Backoffice. É rápido: nome, senha e o autenticador.', corpo)
+
+
+def _qr(k, tam=132):
+    # QR de mentira, fixo: três marcadores de canto e módulos por semente — o de verdade vem do otpauthUri
+    import random
+    r, N = random.Random(7), 25
+    cel = tam / N
+    mods = ''
+    marc = lambda x, y: ((x < 7 and y < 7) or (x >= N - 7 and y < 7) or (x < 7 and y >= N - 7))
+    for y in range(N):
+        for x in range(N):
+            if marc(x, y) or r.random() > 0.52:
+                continue
+            mods += f'<rect x="{x * cel:.2f}" y="{y * cel:.2f}" width="{cel:.2f}" height="{cel:.2f}"/>'
+    def canto(x, y):
+        return (f'<rect x="{x * cel + cel / 2:.2f}" y="{y * cel + cel / 2:.2f}" width="{6 * cel:.2f}" height="{6 * cel:.2f}" fill="none" stroke-width="{cel:.2f}"/>'
+                f'<rect x="{(x + 2) * cel:.2f}" y="{(y + 2) * cel:.2f}" width="{3 * cel:.2f}" height="{3 * cel:.2f}"/>')
+    return (f'<div style="padding:10px;border-radius:10px;background:#fff;box-shadow:inset 0 0 0 1px {k["input"]};flex:0 0 auto;">'
+            f'<svg role="img" aria-label="QR code para o app autenticador" viewBox="0 0 {tam} {tam}" width="{tam}" height="{tam}" '
+            f'style="display:block;fill:#141413;stroke:#141413;">{mods}{canto(0, 0)}{canto(N - 7, 0)}{canto(0, N - 7)}</svg></div>')
+
+
+def tela_autenticador(k):
+    chave = (f'<div style="display:flex;flex-direction:column;gap:8px;min-width:0;">'
+             f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">Escaneie com o app que você já usa: Google Authenticator, 1Password, Authy…</span>'
+             f'<span style="font-size:12px;color:{k["mfg"]};">Não dá para escanear? Digite a chave:</span>'
+             f'<div style="display:flex;align-items:center;gap:6px;">'
+             f'<code style="flex:1;padding:8px 10px;border-radius:8px;background:{k["sunken"]};font-family:{MONO};font-size:12.5px;'
+             f'letter-spacing:0.08em;color:{k["fgs"]};word-break:break-all;">JBSW Y3DP EHPK 3PXP</code>'
+             f'{botao_icone(k, "copiar", "Copiar a chave", tam=32)}</div></div>')
+    corpo = (f'{_passos(k, 1)}'
+             f'<div style="display:flex;gap:16px;align-items:center;padding:14px;border-radius:12px;background:{k["card"]};'
+             f'box-shadow:inset 0 0 0 1px {k["border"]};">{_qr(k)}{chave}</div>'
+             f'{_quadrados(k, "codigo-setup")}'
+             f'{_enviar(k, "Ativar", href("CodigosRecuperacao"))}')
+    return _entrada(k, 'Autenticador', 'Proteja', 'seu acesso.', 'Aponte a câmera do app para o código e digite os 6 dígitos que ele mostrar.', corpo, largura=460)
+
+
+CODIGOS = ['7K2F-9QXM', 'B4TN-3WLC', 'H8PD-6ZRA', 'M2VQ-5JYE', 'R9CX-1NGT',
+           'T3WB-8KFH', 'W6LM-4DPS', 'X1ZR-7QAV', 'Y5HE-2CBN', 'Z7GJ-0UTL']
+
+
+def tela_codigos(k):
+    lista = ''.join(f'<li style="display:flex;align-items:center;gap:10px;font-family:{MONO};font-size:14px;letter-spacing:0.06em;color:{k["fgs"]};">'
+                    f'<span style="font-size:10.5px;color:{k["mfg"]};width:16px;text-align:right;">{i + 1}</span>{c}</li>'
+                    for i, c in enumerate(CODIGOS))
+    corpo = (f'{_passos(k, 2)}'
+             f'<div style="display:flex;flex-direction:column;gap:14px;padding:18px 20px;border-radius:12px;background:{k["card"]};'
+             f'box-shadow:inset 0 0 0 1px {k["border"]};">'
+             f'<ol aria-label="Códigos de recuperação" style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;">{lista}</ol>'
+             f'<div style="display:flex;gap:8px;padding-top:12px;box-shadow:inset 0 1px 0 {k["muted"]};">'
+             f'{link_botao(k, "Copiar", "#", "outline", 32, "copiar")}{link_botao(k, "Baixar .txt", "#", "outline", 32, "baixar")}</div></div>'
+             f'<div style="display:flex;gap:10px;padding:12px 14px;border-radius:10px;background:{k["tyellow"]};color:{k["tyellowfg"]};font-size:12.5px;line-height:18px;">'
+             f'<span style="margin-top:1px;display:flex;">{ic("aviso", 15)}</span>'
+             f'<span>Esta é a única vez que eles aparecem. Cada um entra uma vez, no lugar do código do app.</span></div>'
+             f'<label style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:{k["fg"]};cursor:pointer;">'
+             f'{caixa(k, True, "Guardei os códigos")}Guardei os códigos num lugar seguro</label>'
+             f'{_enviar(k, "Ir para o Backoffice", href("Inicio"))}')
+    return _entrada(k, 'Códigos de recuperação', 'Guarde estes', 'dez códigos.', 'Se você perder o celular, é com eles que você entra.', corpo, largura=460)
+
+
+def tela_esqueci(k):
+    pedido = (f'<form style="display:{{{{pedidoD}}}};flex-direction:column;gap:24px;margin:0;">'
+              f'{_campo_editorial(k, "email-reset", "E-mail", "envelope", "email", "ana.lima@muriki.app", "voce@muriki.app", auto="username")}'
+              f'<button type="button" onClick="{{{{enviar}}}}" style="display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 20px;'
+              f'border:0;border-radius:10px;background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:15px;font-weight:500;letter-spacing:0.025em;cursor:pointer;">'
+              f'<span>Mandar o link</span><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;'
+              f'background:color-mix(in oklch, {k["prifg"]} 15%, transparent);">{ic("seta", 14)}</span></button></form>')
+    enviado = (f'<div role="status" style="display:{{{{enviadoD}}}};gap:12px;padding:16px;border-radius:10px;background:{k["card"]};'
+               f'box-shadow:inset 0 0 0 1px {k["border"]};">'
+               f'<span style="margin-top:2px;display:flex;color:{k["ok"]};">{ic("envelope", 18)}</span>'
+               f'<span style="display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:19px;color:{k["mfg"]};">'
+               f'<b style="font-size:14px;font-weight:500;color:{k["fgs"]};">Confira seu e-mail</b>'
+               # 202 sempre: a tela nunca confirma que a conta existe
+               f'<span>Se <span style="font-family:{MONO};font-size:12px;color:{k["fg"]};">ana.lima@muriki.app</span> tiver acesso ao Backoffice, '
+               f'o link para criar uma senha nova chega em alguns minutos.</span>'
+               f'<span>Não chegou? Olhe o spam ou <a href="#" onClick="{{{{voltar}}}}" style="font-weight:500;color:{k["fg"]};">peça de novo</a>.</span></span></div>')
+    corpo = pedido + enviado + _voltar(k, 'Voltar para entrar', href('Entrar'))
+    return _entrada(k, 'Esqueci a senha', 'Senha nova', 'por e-mail.', 'Mandamos um link para você escolher outra. O código do autenticador continua o mesmo.', corpo)
+
+
+ANTES_ESQUECI = 'const enviado = this.props.estado === "enviado" ? s.enviado !== false : !!s.enviado;'
+VALORES_ESQUECI = ('pedidoD: enviado ? "none" : "flex",\nenviadoD: enviado ? "flex" : "none",\n'
+                   'enviar: () => this.setState({ enviado: true }),\nvoltar: () => this.setState({ enviado: false })')
+PROPS_ESQUECI = {'estado': {'editor': 'enum', 'options': ['pedido', 'enviado'], 'default': 'pedido'}}
+
+
+def tela_nova_senha(k):
+    corpo = (f'<form style="display:flex;flex-direction:column;gap:22px;margin:0;">'
+             f'{_campo_editorial(k, "email-nova", "E-mail", "envelope", "email", "ana.lima@muriki.app", "", auto="username")}'
+             f'{_senha_nova(k)}'
+             f'{_enviar(k, "Salvar a senha nova", href("Entrar"))}</form>'
+             f'<span style="display:flex;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{ic("escudo", 15, k["mfg"])}'
+             f'<span>Depois você entra com a senha nova e o código do autenticador, como sempre.</span></span>')
+    return _entrada(k, 'Senha nova', 'Escolha', 'a senha nova.', 'O link vale uma vez. Se ele expirou, peça outro em "Esqueci a senha".', corpo)
 
 
 # ── Dados de exemplo, um conjunto só para todas as telas ───────────────
@@ -323,7 +495,7 @@ def tela_clientes(k, hover=2, sobre=''):
             acoes_linha(k, i == hover, itens),
         ]
         linhas += linha_tabela(k, COLS_CLIENTES, cel, hover=i == hover)
-    t = tabela(k, COLS_CLIENTES, cab_t, linhas, paginacao(k, '1–10 de 1.284', 1, 129))
+    t = tabela(k, COLS_CLIENTES, cab_t, linhas, paginacao(k, 1))
     return app(k, 'clientes', cab + barra + t, sobre=sobre, gap=16)
 
 
@@ -649,7 +821,7 @@ def tela_cupons(k, hover=1, sobre=''):
             acoes_linha(k, i == hover, itens),
         ]
         linhas += linha_tabela(k, COLS_CUPONS, cel, hover=i == hover, altura=54)
-    t = tabela(k, COLS_CUPONS, cab_t, linhas, paginacao(k, '1–9 de 9', 1, 1))
+    t = tabela(k, COLS_CUPONS, cab_t, linhas, paginacao(k, 1, tem_proxima=False))
     return app(k, 'cupons', cab + barra + t, sobre=sobre, gap=16)
 
 
@@ -708,6 +880,16 @@ def _montar(tela, tema):
         return pagina(t, tela_acesso(k, 'entrar'), tema)
     if i == 'totp':
         return pagina(t, tela_acesso(k, 'totp'), tema, ANTES_TOTP, VALORES_TOTP, PROPS_TOTP)
+    if i == 'esqueci':
+        return pagina(t, tela_esqueci(k), tema, ANTES_ESQUECI, VALORES_ESQUECI, PROPS_ESQUECI)
+    if i == 'novasenha':
+        return pagina(t, tela_nova_senha(k), tema, ANTES_SENHA, VALORES_SENHA)
+    if i == 'convite':
+        return pagina(t, tela_convite(k), tema, ANTES_SENHA, VALORES_SENHA)
+    if i == 'autenticador':
+        return pagina(t, tela_autenticador(k), tema, ANTES_TOTP.replace('"4829"', '"31"'), VALORES_TOTP)
+    if i == 'codigos':
+        return pagina(t, tela_codigos(k), tema)
     if i == 'inicio':
         return pagina(t, tela_inicio(k), tema)
     if i == 'clientes':

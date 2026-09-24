@@ -177,6 +177,86 @@
    "w": 1440,
    "x": 1520,
    "y": 1320
+  },
+  "EsqueciSenha.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Esqueci a senha · o link por e-mail",
+   "is_interactive": true
+  },
+  "EsqueciSenhaEscuro.dc.html": {
+   "x": 3040,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Esqueci a senha · o link por e-mail · escuro",
+   "is_interactive": true
+  },
+  "NovaSenha.dc.html": {
+   "x": 4560,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Senha nova · vinda do link",
+   "is_interactive": true
+  },
+  "NovaSenhaEscuro.dc.html": {
+   "x": 4560,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Senha nova · vinda do link · escuro",
+   "is_interactive": true
+  },
+  "Convite.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · aceitar o convite",
+   "is_interactive": true
+  },
+  "ConviteEscuro.dc.html": {
+   "x": 6080,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · aceitar o convite · escuro",
+   "is_interactive": true
+  },
+  "Autenticador.dc.html": {
+   "x": 7600,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · configurar o autenticador",
+   "is_interactive": true
+  },
+  "AutenticadorEscuro.dc.html": {
+   "x": 7600,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · configurar o autenticador · escuro",
+   "is_interactive": true
+  },
+  "CodigosRecuperacao.dc.html": {
+   "x": 9120,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · dez códigos, uma vez",
+   "is_interactive": true
+  },
+  "CodigosRecuperacaoEscuro.dc.html": {
+   "x": 9120,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · dez códigos, uma vez · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -190,15 +270,15 @@
  "notes": {
   "acesso": {
    "kind": "title1",
-   "maxW": 2960,
-   "text": "Entrada: e-mail e senha, depois o código TOTP; tudo vai à API num POST só",
+   "maxW": 10560,
+   "text": "Entrada: e-mail e senha, depois o código TOTP num POST só; senha esquecida; e o primeiro acesso, do convite aos códigos de recuperação",
    "w": 240,
    "x": 0,
    "y": -300
   },
   "acessoEscuro": {
    "kind": "title1",
-   "maxW": 2960,
+   "maxW": 10560,
    "text": "Entrada no tema escuro",
    "w": 240,
    "x": 0,
@@ -259,7 +339,17 @@
   "Cupons.dc.html",
   "CuponsEscuro.dc.html",
   "CupomNovo.dc.html",
-  "CupomNovoEscuro.dc.html"
+  "CupomNovoEscuro.dc.html",
+  "EsqueciSenha.dc.html",
+  "EsqueciSenhaEscuro.dc.html",
+  "NovaSenha.dc.html",
+  "NovaSenhaEscuro.dc.html",
+  "Convite.dc.html",
+  "ConviteEscuro.dc.html",
+  "Autenticador.dc.html",
+  "AutenticadorEscuro.dc.html",
+  "CodigosRecuperacao.dc.html",
+  "CodigosRecuperacaoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Backoffice"

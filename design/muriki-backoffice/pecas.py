@@ -352,19 +352,19 @@ def acoes_linha(k, visiveis, itens):
             f'<span style="display:flex;gap:2px;padding:2px;border-radius:9px;background:{k["card"]};box-shadow:{k["sombra"]}, inset 0 0 0 1px {k["border"]};">{bs}</span></span>')
 
 
-def paginacao(k, faixa, pagina_, total_paginas):
-    nums = ''
-    for p in ([1, 2, 3, '…', total_paginas] if total_paginas > 4 else range(1, total_paginas + 1)):
-        at = p == pagina_
-        est = (f'background:{k["prisub"]};color:{k["prisubfg"]};font-weight:500;' if at else f'color:{k["mfg"]};')
-        nums += (f'<span {"aria-current=page " if at else ""}style="display:flex;align-items:center;justify-content:center;min-width:28px;height:28px;'
-                 f'border-radius:7px;font-family:{MONO};font-size:12px;{est}">{p}</span>')
+def paginacao(k, pagina_=1, tem_proxima=True):
+    # a API pagina por cursor: sem total e sem pular página — só anterior, próxima e o tamanho
+    ant = 'opacity:0.4;' if pagina_ <= 1 else ''
+    prox = '' if tem_proxima else 'opacity:0.4;'
+    seta = lambda icone, rot, est: (f'<button type="button" aria-label="{rot}" style="display:inline-flex;align-items:center;gap:6px;height:28px;'
+                                    f'padding:0 10px;border:0;border-radius:7px;background:transparent;font-family:{FONTE};font-size:12.5px;color:{k["fg"]};{est}">'
+                                    f'{icone}</button>')
     return (f'<footer style="display:flex;align-items:center;gap:12px;height:48px;padding:0 16px;box-shadow:inset 0 1px 0 {k["muted"]};">'
-            f'<span style="font-size:12.5px;color:{k["mfg"]};">{faixa}</span><span style="flex:1;"></span>'
+            f'<span style="font-size:12.5px;color:{k["mfg"]};">Página {pagina_}</span><span style="flex:1;"></span>'
             f'<span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:{k["mfg"]};">Por página '
-            f'{seletor(k, "", "10", alt=28, largura="64px")}</span>'
-            f'<span style="display:flex;align-items:center;gap:2px;">{botao_icone(k, "esquerda", "Página anterior")}{nums}'
-            f'{botao_icone(k, "direita", "Próxima página")}</span></footer>')
+            f'{seletor(k, "", "50", alt=28, largura="64px")}</span>'
+            f'<span style="display:flex;align-items:center;gap:2px;">'
+            f'{seta(ic("esquerda", 14) + "Anterior", "Página anterior", ant)}{seta("Próxima" + ic("direita", 14), "Próxima página", prox)}</span></footer>')
 
 
 def selo_status(k, status):
