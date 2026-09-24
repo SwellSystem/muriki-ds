@@ -770,6 +770,27 @@
       ]
     },
     {
+      "name": "back-link",
+      "type": "registry:ui",
+      "title": "Back Link",
+      "description": "O voltar da tela de detalhe: seta + para onde volta (\"← Planos\"), acima do título. Um nível acima, para um lugar fixo, nunca history.back().",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/back-link.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Vai acima do h1, no lugar da trilha. Com 3+ níveis a trilha (breadcrumb) fica e o BackLink sobe um nível. Com roteador: <BackLink render={<Link to=\"/planos\" />}>Planos</BackLink>."
+    },
+    {
       "name": "breadcrumb",
       "type": "registry:ui",
       "title": "Breadcrumb",

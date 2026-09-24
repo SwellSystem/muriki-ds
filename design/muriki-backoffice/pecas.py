@@ -5,7 +5,7 @@ import json, os, sys
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(AQUI, '..', 'muriki-code'))
-from base import (TOKENS, K, W, H, FONTE, MONO, LOGO, I, svg, ic, casca, badge, botao, cartao,
+from base import (voltar, TOKENS, K, W, H, FONTE, MONO, LOGO, I, svg, ic, casca, badge, botao, cartao,
                   legenda, rotulo, botao_tema, icone_tema, mono, props_tema)  # noqa: E402,F401
 
 # o logo da marca é o novo (design/logo-aberto.svg, vetorizado dos PNGs), não o logo.svg antigo
@@ -186,11 +186,15 @@ def app(k, ativo, conteudo, sobre='', pad='28px 40px 24px', gap=20):
 def cabecalho(k, titulo, sub='', direita='', trilha=None, contagem=''):
     t = ''
     if trilha:
-        partes = [f'<a href="{href(d)}" style="color:{k["mfg"]};">{n}</a>' for n, d in trilha[:-1]]
-        partes.append(f'<span style="color:{k["fg"]};">{trilha[-1][0]}</span>')
-        sep = f'<span style="display:flex;color:{k["input"]};">{ic("direita", 12)}</span>'
-        t = (f'<nav aria-label="Trilha" style="display:flex;gap:6px;align-items:center;font-size:12.5px;">'
-             f'{sep.join(partes)}</nav>')
+        # tela de detalhe: "← pai" acima do título (o BackLink do DS). Com 3+ níveis, a trilha fica ao lado
+        n, d = trilha[-2]
+        t = voltar(k, n, href(d))
+        if len(trilha) > 2:
+            partes = [f'<a href="{href(d)}" style="color:{k["mfg"]};">{n}</a>' for n, d in trilha[:-1]]
+            partes.append(f'<span style="color:{k["fg"]};">{trilha[-1][0]}</span>')
+            sep = f'<span style="display:flex;color:{k["input"]};">{ic("direita", 12)}</span>'
+            t = (f'<div style="display:flex;align-items:center;gap:14px;">{t}<span style="width:1px;height:14px;background:{k["input"]};"></span>'
+                 f'<nav aria-label="Trilha" style="display:flex;gap:6px;align-items:center;font-size:12.5px;">{sep.join(partes)}</nav></div>')
     c = (f'<span style="font-family:{MONO};font-size:14px;font-weight:400;color:{k["mfg"]};margin-left:10px;">{contagem}</span>'
          if contagem else '')
     s = f'<p style="margin:0;font-size:14px;color:{k["mfg"]};max-width:72ch;">{sub}</p>' if sub else ''
