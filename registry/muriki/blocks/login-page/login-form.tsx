@@ -75,6 +75,7 @@ export function LoginForm({
   busy = false,
   busyLabel,
   passwordMinLength = PASSWORD_MIN_LENGTH,
+  showPasswordStrength = true,
   showRememberMe = true,
   showTrustDevice = true,
   onPasswordVisibilityChange,
@@ -347,7 +348,9 @@ export function LoginForm({
             </Button>
           </div>
           {errors.password ? <FieldError>{errors.password}</FieldError> : null}
-          <PasswordStrengthBar password={password} requirements className="pt-1" />
+          {showPasswordStrength ? (
+            <PasswordStrengthBar password={password} requirements className="pt-1" />
+          ) : null}
         </Field>
         </>
         ) : null}
