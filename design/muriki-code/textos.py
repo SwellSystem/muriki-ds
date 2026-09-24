@@ -263,7 +263,7 @@ PLANOS = {
 
 JORNADA = {
     'pt-BR': dict(
-        rotulo='Primeiro acesso · 1 de 2', titulo='Por onde você quer começar?',
+        rotulo='Primeiro acesso · 2 de 3', titulo='Por onde você quer começar?',
         sub='Escolha o nível que mais parece com o seu momento. É só o ponto de partida: '
             'cada competência se ajusta com o que você faz nos exercícios e no Peer.',
         jornadas='Jornadas', aprofundar='aprofundar',
@@ -292,7 +292,7 @@ JORNADA = {
         trocarDepois='Dá para trocar de jornada quando quiser, sem perder o que já fez.',
     ),
     'en-US': dict(
-        rotulo='Getting started · 1 of 2', titulo='Where do you want to start?',
+        rotulo='Getting started · 2 of 3', titulo='Where do you want to start?',
         sub='Pick the level that feels closest to where you are now. It’s just the starting point: '
             'each competency adjusts to what you do in exercises and with the Peer.',
         jornadas='Journeys', aprofundar='go deeper',
@@ -321,7 +321,7 @@ JORNADA = {
         trocarDepois='You can switch journeys any time without losing what you’ve done.',
     ),
     'es-ES': dict(
-        rotulo='Primeros pasos · 1 de 2', titulo='¿Por dónde quieres empezar?',
+        rotulo='Primeros pasos · 2 de 3', titulo='¿Por dónde quieres empezar?',
         sub='Elige el nivel que más se parece a tu momento. Es solo el punto de partida: '
             'cada competencia se ajusta con lo que haces en los ejercicios y con el Peer.',
         jornadas='Trayectorias', aprofundar='profundizar',
@@ -558,7 +558,7 @@ COMPETENCIA = {
 
 AJUSTE = {
     'pt-BR': dict(
-        rotulo='Primeiro acesso · 2 de 2', titulo='Onde você é diferente?',
+        rotulo='Primeiro acesso · 3 de 3', titulo='Onde você é diferente?',
         sub='A jornada marcou tudo como Pleno. Ajuste o que não for verdade e diga quais linguagens você usa. '
             'É só o ponto de partida: as evidências confirmam ou ajustam depois.',
         grupoLing='Linguagens', grupoEng='Engenharia', naoUso='Não uso', ajustado='ajustado',
@@ -567,7 +567,7 @@ AJUSTE = {
         mudarDepois='Dá para mudar o declarado depois, no perfil.',
     ),
     'en-US': dict(
-        rotulo='Getting started · 2 of 2', titulo='Where are you different?',
+        rotulo='Getting started · 3 of 3', titulo='Where are you different?',
         sub='Your journey set everything to Mid-level. Change what isn’t true and tell us which languages you use. '
             'It’s only the starting point: evidence confirms or adjusts it later.',
         grupoLing='Languages', grupoEng='Engineering', naoUso='Don’t use', ajustado='adjusted',
@@ -576,13 +576,47 @@ AJUSTE = {
         mudarDepois='You can change it later in your profile.',
     ),
     'es-ES': dict(
-        rotulo='Primeros pasos · 2 de 2', titulo='¿Dónde eres diferente?',
+        rotulo='Primeros pasos · 3 de 3', titulo='¿Dónde eres diferente?',
         sub='La trayectoria marcó todo como Intermedio. Ajusta lo que no sea verdad y dinos qué lenguajes usas. '
             'Es solo el punto de partida: las evidencias lo confirman o lo ajustan después.',
         grupoLing='Lenguajes', grupoEng='Ingeniería', naoUso='No lo uso', ajustado='ajustado',
         ajuste1='ajuste', ajustes='ajustes', semAjuste='ningún ajuste', niveisAria='Nivel declarado en',
         voltar='Volver a las trayectorias', continuar='Empezar el primer ejercicio',
         mudarDepois='Puedes cambiarlo después, en tu perfil.',
+    ),
+}
+
+# passo 1 do primeiro acesso: a PricingScreen do DS (onboarding-pricing); soma-se ao PLANOS
+PLANO_INICIAL = {
+    'pt-BR': dict(
+        rotuloInicial='Primeiro acesso · 1 de 3', passosAria='Passo 1 de 3', tituloInicial='Como você quer começar?',
+        subInicial='O Starter é grátis e não pede cartão. O Pro põe o Peer na sua IDE e explica cada nota. '
+                   'Dá para trocar quando quiser, sem perder nada.',
+        secaoPlanos='Planos', economia='-17%', mesCurto='mês', anoCurto='ano',
+        descStarter='Para praticar com testes e ver onde você está.',
+        descPro='Para ter o Peer junto e o porquê de cada nota.',
+        notaStarter='para sempre, sem cartão', notaMensal='ou R$ 499 por ano', notaAnual='R$ 41,58 por mês',
+        tudoStarter='Tudo do Starter, mais', ctaStarter='Começar com o Starter', ctaPro='Assinar o Pro',
+    ),
+    'en-US': dict(
+        rotuloInicial='Getting started · 1 of 3', passosAria='Step 1 of 3', tituloInicial='How do you want to start?',
+        subInicial='Starter is free and needs no card. Pro puts the Peer in your IDE and explains every grade. '
+                   'You can switch anytime without losing anything.',
+        secaoPlanos='Plans', economia='-17%', mesCurto='month', anoCurto='year',
+        descStarter='To practice with tests and see where you stand.',
+        descPro='To have the Peer alongside and the why behind every grade.',
+        notaStarter='forever, no card', notaMensal='or R$499 a year', notaAnual='R$41.58 a month',
+        tudoStarter='Everything in Starter, plus', ctaStarter='Start with Starter', ctaPro='Subscribe to Pro',
+    ),
+    'es-ES': dict(
+        rotuloInicial='Primeros pasos · 1 de 3', passosAria='Paso 1 de 3', tituloInicial='¿Cómo quieres empezar?',
+        subInicial='Starter es gratis y no pide tarjeta. Pro pone el Peer en tu IDE y explica cada nota. '
+                   'Puedes cambiar cuando quieras, sin perder nada.',
+        secaoPlanos='Planes', economia='-17%', mesCurto='mes', anoCurto='año',
+        descStarter='Para practicar con pruebas y ver dónde estás.',
+        descPro='Para tener el Peer contigo y el porqué de cada nota.',
+        notaStarter='para siempre, sin tarjeta', notaMensal='o R$ 499 al año', notaAnual='R$ 41,58 al mes',
+        tudoStarter='Todo lo de Starter, más', ctaStarter='Empezar con Starter', ctaPro='Suscribirme a Pro',
     ),
 }
 

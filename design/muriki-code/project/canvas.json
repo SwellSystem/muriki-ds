@@ -51,7 +51,7 @@
    "is_interactive": true
   },
   "Jornada.dc.html": {
-   "x": 3040,
+   "x": 4560,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -59,7 +59,7 @@
    "is_interactive": true
   },
   "JornadaEscuro.dc.html": {
-   "x": 3040,
+   "x": 4560,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -147,7 +147,7 @@
    "is_interactive": true
   },
   "PrimeiroExercicio.dc.html": {
-   "x": 6080,
+   "x": 7600,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -155,7 +155,7 @@
    "is_interactive": true
   },
   "PrimeiroExercicioEscuro.dc.html": {
-   "x": 6080,
+   "x": 7600,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -163,7 +163,7 @@
    "is_interactive": true
   },
   "PerfilVazio.dc.html": {
-   "x": 7600,
+   "x": 9120,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -171,7 +171,7 @@
    "is_interactive": true
   },
   "PerfilVazioEscuro.dc.html": {
-   "x": 7600,
+   "x": 9120,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -179,7 +179,7 @@
    "is_interactive": true
   },
   "Ajuste.dc.html": {
-   "x": 4560,
+   "x": 6080,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -187,7 +187,7 @@
    "is_interactive": true
   },
   "AjusteEscuro.dc.html": {
-   "x": 4560,
+   "x": 6080,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -227,7 +227,7 @@
    "is_interactive": true
   },
   "Passkey.dc.html": {
-   "x": 9120,
+   "x": 10640,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -235,11 +235,27 @@
    "is_interactive": true
   },
   "PasskeyEscuro.dc.html": {
-   "x": 9120,
+   "x": 10640,
    "y": 1320,
    "w": 1440,
    "h": 900,
    "title": "Entrar · passkey · escuro",
+   "is_interactive": true
+  },
+  "PlanoInicial.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · escolha do plano",
+   "is_interactive": true
+  },
+  "PlanoInicialEscuro.dc.html": {
+   "x": 3040,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · escolha do plano · escuro",
    "is_interactive": true
   }
  },
@@ -271,9 +287,9 @@
   "jornada": {
    "x": 0,
    "y": -300,
-   "text": "Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício, perfil vazio e passkey",
+   "text": "Entrada e primeiro acesso: entrar, criar conta, plano, jornada, ajuste, primeiro exercício, perfil vazio e passkey",
    "kind": "title1",
-   "maxW": 10560,
+   "maxW": 12080,
    "w": 240
   },
   "webEscuro": {
@@ -297,7 +313,7 @@
    "y": 1020,
    "text": "Entrada e primeiro acesso no tema escuro",
    "kind": "title1",
-   "maxW": 10560,
+   "maxW": 12080,
    "w": 240
   }
  },
@@ -331,7 +347,9 @@
   "Playground.dc.html",
   "PlaygroundEscuro.dc.html",
   "Passkey.dc.html",
-  "PasskeyEscuro.dc.html"
+  "PasskeyEscuro.dc.html",
+  "PlanoInicial.dc.html",
+  "PlanoInicialEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

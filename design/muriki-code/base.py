@@ -36,7 +36,7 @@ def _vars(d):
     return ''.join(f'--{n}:{v};' for n, v in d.items())
 
 
-def casca(titulo, corpo, logica, props):
+def casca(titulo, corpo, logica, props, css=''):
     dados = dict(props)
     dados['$preview'] = dict(width=W, height=H)
     dados = json.dumps(dados, ensure_ascii=False, separators=(',', ':')).replace('&', '&amp;').replace("'", '&#39;')
@@ -59,7 +59,7 @@ body:has(.mc.escuro){{background:{e["bg"]};}}
 .mc{{color-scheme:light;{_vars(c)}}}
 .mc.escuro{{color-scheme:dark;{_vars(e)}}}
 .mc a{{color:var(--pri);text-decoration:none;}}
-.mc a:hover{{color:var(--prisubfg);}}
+.mc a:hover{{color:var(--prisubfg);}}{css}
 .mc.escuro .so-claro,.mc:not(.escuro) .so-escuro{{display:none !important;}}
 </style>
 </helmet>
@@ -139,6 +139,7 @@ I = dict(
     laptop=svg('<rect x="3" y="3.4" width="10" height="7" rx="1.2"/><path d="M1.5 12.6h13"/>'),
     cadeado=svg('<rect x="3" y="7" width="10" height="7" rx="1.6"/><path d="M5.2 7V5a2.8 2.8 0 015.6 0v2"/>'),
     check=svg('<path d="M3 8.5l3 3 7-7"/>'),
+    brilho=svg('<path d="M8 2l1.4 4.6L14 8l-4.6 1.4L8 14l-1.4-4.6L2 8l4.6-1.4z"/>'),
     x=svg('<path d="M4.5 4.5l7 7"/><path d="M11.5 4.5l-7 7"/>'),
     baixo=svg('<path d="M4 6l4 4 4-4"/>'),
     troca=svg('<path d="M3 5.5h9.5L10 3"/><path d="M13 10.5H3.5L6 13"/>'),
@@ -450,3 +451,15 @@ def cabecalho(k, trilha, titulo, sub='', direita='', chips=''):
 
 def mono(t, k, cor=None, tam=12.5):
     return f'<code style="font-family:{MONO};font-size:{tam}px;color:{cor or k["fgs"]};">{t}</code>'
+
+
+# O que só algumas telas usam, fora do CSS comum: o --divider e o skeleton do DS (o item skeleton
+# traz o mesmo @keyframes). Entra pelo `css` da casca para não mexer nas telas que não usam.
+CSS_DIVIDER_SKELETON = (
+    '\n.mc{--divider:oklch(0.32 0.02 248.5 / 0.06);}.mc.escuro{--divider:oklch(0.925 0.004 100 / 0.055);}'
+    '\n@keyframes muriki-shimmer{from{background-position:-100vw 0;}to{background-position:100vw 0;}}'
+    '\n.mc .muriki-skeleton{border-radius:8px;background-color:var(--sunken);background-image:linear-gradient(100deg, transparent 35%, '
+    'color-mix(in oklab, var(--card) 85%, transparent) 50%, transparent 65%);background-size:200vw 100%;background-repeat:no-repeat;'
+    'background-attachment:fixed;animation:muriki-shimmer 1.5s ease-in-out infinite;}'
+    '\n.mc.escuro .muriki-skeleton{background-image:linear-gradient(100deg, transparent 35%, color-mix(in oklab, var(--card) 70%, transparent) 50%, transparent 65%);}'
+    '\n@media (prefers-reduced-motion: reduce){.mc .muriki-skeleton{animation:none;background-image:none;}}')

@@ -1,6 +1,6 @@
 import json
 from base import *
-from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, JORNADA, ACESSO, PRIMEIRO, PERFIL_VAZIO,
+from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL, JORNADA, ACESSO, PRIMEIRO, PERFIL_VAZIO,
                     COMPETENCIA, AJUSTE, PLAYGROUND, juntar)
 from textos_exercicio import TEXTOS as EXERCICIO
 from logos import logo_linguagem
@@ -1092,7 +1092,7 @@ def tela_acesso(k, modo, sufixo):
                           depois=forca, olho=True, auto='new-password'))
         termos = (f'{T("termosA")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("termos")}</a> '
                   f'{T("termosE")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("privacidade")}</a>.')
-        fim = (caixa(termos) + enviar(T('criarBotao'), f'Jornada{sufixo}.dc.html')
+        fim = (caixa(termos) + enviar(T('criarBotao'), f'PlanoInicial{sufixo}.dc.html')
                + f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
                  f'{ic("cadeado", 13)}{T("semTreino")}</span>')
         gap_form = 20
@@ -1255,6 +1255,115 @@ def tela_ajuste(k, sufixo):
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
             f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:18px;width:1040px;align-self:center;padding:16px 0 28px;">'
             f'{cab}{lista}{rodape}</main></div>')
+
+
+# ── Primeiro acesso, passo 1: o plano ──────────────────────────────────
+# Vem logo depois de criar a conta, como no Platform: quem vai de Pro sai para o pagamento e volta
+# antes de configurar o perfil (Jornada e Ajuste), então nada do que a pessoa preencheu se perde.
+# A PricingScreen do DS (onboarding-pricing + plan-card), a mesma do Platform: barra de passos,
+# título de display, rótulo de seção, período à direita e os cards com a CTA de cada um. O Starter
+# é tingido e o Pro, recomendado, é o único sólido. `estado: carregando` mostra o skeleton do plan-card.
+def tela_plano_inicial(k, sufixo):
+    h = lambda caminho: '{{' + caminho + '}}'
+    sk = lambda estilo: f'<span class="muriki-skeleton" style="display:block;{estilo}"></span>'
+    regua = (f'<span aria-hidden="true" style="display:block;height:1px;background:{"var(--divider)"};'
+             f'-webkit-mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);'
+             f'mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);"></span>')
+
+    passos = ''.join(f'<span style="height:4px;flex:1;border-radius:2px;background:{k["pri"] if i == 0 else k["sunken"]};"></span>' for i in range(3))
+    cab = (f'<header style="display:flex;flex-direction:column;gap:16px;">'
+           f'<div style="display:flex;flex-direction:column;gap:8px;">{rotulo(T("rotuloInicial"), k["mfg"])}'
+           f'<div role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-label="{T("passosAria")}" '
+           f'style="display:flex;gap:6px;">{passos}</div></div>'
+           f'<div style="display:flex;flex-direction:column;gap:12px;">'
+           f'<h1 style="margin:0;font-size:52px;line-height:1.02;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{T("tituloInicial")}</h1>'
+           f'<p style="margin:0;max-width:65ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{T("subInicial")}</p></div></header>')
+
+    secao = (f'<div style="display:flex;align-items:center;gap:12px;">'
+             f'<span style="font-family:{MONO};font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:{k["mfg"]};">{T("secaoPlanos")}</span>'
+             f'<span style="height:1px;width:32px;background:color-mix(in oklch, {k["pri"]} 60%, transparent);"></span>'
+             f'<span style="height:1px;width:128px;background:{"var(--divider)"};"></span></div>')
+    seg = lambda v, txt, extra='': (
+        f'<button type="button" role="tab" aria-selected="{h("per." + v)}" onClick="{h("per.ir_" + v)}" '
+        f'style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 14px;border:0;border-radius:999px;'
+        f'background:{h("per.fundo_" + v)};box-shadow:{h("per.sombra_" + v)};color:{h("per.cor_" + v)};'
+        f'font-family:{FONTE};font-size:13px;font-weight:500;cursor:pointer;">{txt}{extra}</button>')
+    periodo = (f'<div role="tablist" aria-label="{T("periodo")}" style="margin-left:auto;display:inline-flex;gap:2px;padding:3px;'
+               f'border-radius:999px;background:{k["sunken"]};">'
+               f'{seg("mes", T("mensal"))}{seg("ano", T("anual"), badge(T("economia"), k, "green"))}</div>')
+    controles = f'<div style="display:flex;align-items:center;gap:12px;">{periodo}</div>'
+
+    def feature(t, faisca=False):
+        if faisca:
+            return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;font-weight:500;color:{k["fgs"]};">'
+                    f'<span style="margin-top:2px;display:flex;color:{k["pri"]};">{ic("brilho", 14)}</span><span>{t}</span></li>')
+        return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;color:{k["fg"]};">'
+                f'<span style="margin-top:2px;display:flex;color:{k["ok"]};">{ic("check", 14)}</span><span>{t}</span></li>')
+
+    def card(nome, desc, selo, preco, nota, feats, titulo_feats, cta, destaque):
+        borda = (f'border:1px solid {k["pri"]};box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:scale(1.03);' if destaque
+                 else f'border:1px solid {k["border"]};box-shadow:{k["sombra"]};')
+        botao_ = (f'background:{k["pri"]};color:{k["prifg"]};' if destaque
+                  else f'background:{k["prisub"]};color:{k["prisubfg"]};')
+        tf = (f'<p style="margin:0;font-family:{MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:{k["mfg"]};">{titulo_feats}</p>'
+              if titulo_feats else '')
+        return (f'<article aria-label="{nome}" style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:14px;background:{k["card"]};{borda}">'
+                f'<header style="display:flex;flex-direction:column;gap:6px;">'
+                f'<div style="display:flex;align-items:center;height:22px;">{selo}</div>'
+                f'<h3 style="margin:0;font-size:28px;line-height:1.05;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};">{nome}</h3>'
+                f'<p style="margin:0;font-size:14px;line-height:1.35;color:{k["mfg"]};">{desc}</p></header>'
+                f'{regua}<div style="display:flex;flex-direction:column;gap:4px;">'
+                f'<p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;">{preco}</p>'
+                f'<span style="font-size:12.5px;color:{k["mfg"]};">{nota}</span></div>'
+                f'{regua}<div style="flex:1;display:flex;flex-direction:column;gap:8px;">{tf}'
+                f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{feats}</ul></div>'
+                f'<a href="Jornada{sufixo}.dc.html" style="display:flex;align-items:center;justify-content:center;height:36px;'
+                f'border-radius:9px;{botao_}font-size:14px;font-weight:500;">{cta}</a></article>')
+
+    valor = lambda v: f'<span style="font-size:30px;line-height:1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{v}</span>'
+    starter = card('Starter', T('descStarter'), '', valor(T('gratis')), T('notaStarter'),
+                   feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False)
+    pro = card('Pro', T('descPro'), badge(T('recomendado'), k, 'blue'),
+               valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
+               feature(T('p2'), True) + feature(T('p3'), True) + feature(T('p4'), True), T('tudoStarter'), T('ctaPro'), True)
+
+    def esqueleto(destaque):
+        borda = f'border:1px solid {k["pri"]};' if destaque else f'border:1px solid {k["border"]};'
+        sel = sk(f'height:18px;width:96px;border-radius:4px;background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);') if destaque else ''
+        return (f'<div aria-hidden="true" style="display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:14px;background:{k["card"]};{borda}box-shadow:{k["sombra"]};">'
+                f'<div style="display:flex;align-items:center;height:22px;">{sel}</div>'
+                f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:20px;width:144px;")}{sk("height:12px;width:176px;")}</div>'
+                f'{sk("height:20px;width:112px;border-radius:999px;")}'
+                f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:40px;width:176px;")}{sk("height:12px;width:64px;")}</div>'
+                f'<div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px;">'
+                f'{sk("height:12px;width:85%;")}{sk("height:12px;width:72%;")}{sk("height:12px;width:78%;")}{sk("height:12px;width:60%;")}</div>'
+                + sk(f'height:40px;width:100%;' + (f'background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);' if destaque else '')) + '</div>')
+
+    grade = lambda filhos: (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;width:672px;margin:0 auto;">{filhos}</div>')
+    planos = (f'<sc-if value="{h("pronto")}" hint-placeholder-val="{{{{ true }}}}">{grade(starter + pro)}</sc-if>'
+              f'<sc-if value="{h("carregando")}" hint-placeholder-val="{{{{ false }}}}">{grade(esqueleto(False) + esqueleto(True))}</sc-if>')
+    return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:8px 24px 32px;">'
+            f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles}{planos}</div></main></div>')
+
+
+ANTES_PLANO_INICIAL = """const per0 = s.periodo || "mes";
+const carregando = (s.estado || this.props.estado) === "carregando";
+const ativo = (v) => per0 === v;
+const per = {
+mes: ativo("mes"), ano: ativo("ano"),
+ir_mes: () => this.setState({ periodo: "mes" }), ir_ano: () => this.setState({ periodo: "ano" }),
+fundo_mes: ativo("mes") ? "var(--card)" : "transparent", fundo_ano: ativo("ano") ? "var(--card)" : "transparent",
+sombra_mes: ativo("mes") ? "var(--sombra)" : "none", sombra_ano: ativo("ano") ? "var(--sombra)" : "none",
+cor_mes: ativo("mes") ? "var(--fgs)" : "var(--mfg)", cor_ano: ativo("ano") ? "var(--fgs)" : "var(--mfg)",
+preco: ativo("ano") ? (t.lang === "en-US" ? "R$499" : "R$ 499") : t.preco,
+intervalo: ativo("ano") ? t.anoCurto : t.mesCurto,
+nota: ativo("ano") ? t.notaAnual : t.notaMensal
+};"""
+
+VALORES_PLANO_INICIAL = """per: per,
+pronto: !carregando,
+carregando: carregando"""
 
 
 ANTES_AJUSTE = """const LING = __LING__;
@@ -1457,12 +1566,16 @@ def montar(tela, tema):
 
 
 def _montar(tela, tema, sufixo):
-    web = lambda textos, corpo, antes='', valores='', props=None: casca(
+    web = lambda textos, corpo, antes='', valores='', props=None, css='': casca(
         tela['titulo'], corpo, logica(juntar(COMUM, textos), tema, antes, valores),
-        {**PROPS_IDIOMA, **props_tema(tema), **(props or {})})
+        {**PROPS_IDIOMA, **props_tema(tema), **(props or {})}, css)
     k = K
     if tela['id'] == 'competencia':
         return web(COMPETENCIA, tela_competencia(k))
+    if tela['id'] == 'plano_inicial':
+        textos = {l: {**PLANOS[l], **PLANO_INICIAL[l]} for l in PLANOS}
+        return web(textos, tela_plano_inicial(k, sufixo), ANTES_PLANO_INICIAL, VALORES_PLANO_INICIAL,
+                   {'estado': {'editor': 'enum', 'options': ['pronto', 'carregando'], 'default': 'pronto'}}, CSS_DIVIDER_SKELETON)
     if tela['id'] == 'ajuste':
         return web(AJUSTE, tela_ajuste(k, sufixo), ANTES_AJUSTE, 'ling: ling,\neng: eng,\ncontagem: contagem')
     if tela['id'] == 'playground':
