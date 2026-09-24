@@ -34,11 +34,15 @@ export interface RouteProgressProps {
 export function RouteProgress({ active, delay = 120, label = "Carregando a página", className }: RouteProgressProps) {
   const [largura, setLargura] = React.useState(0)
   const [visivel, setVisivel] = React.useState(false)
+  // o effect precisa saber se a barra está na tela sem depender dela: se dependesse, cada
+  // aparição reiniciaria a subida. Só os callbacks de timer escrevem aqui.
+  const naTela = React.useRef(false)
 
   React.useEffect(() => {
     if (active) {
       let passo: ReturnType<typeof setInterval> | undefined
       const inicio = setTimeout(() => {
+        naTela.current = true
         setVisivel(true)
         setLargura(30)
         // freia: cada passo anda 8% do que falta até 90
@@ -49,16 +53,18 @@ export function RouteProgress({ active, delay = 120, label = "Carregando a pági
         if (passo) clearInterval(passo)
       }
     }
-    if (!visivel) return
-    setLargura(100)
+    if (!naTela.current) return
+    // terminou: o render já desenha 100% (concluindo); aqui só sai de cena
     const fim = setTimeout(() => {
+      naTela.current = false
       setVisivel(false)
       setLargura(0)
     }, 200)
     return () => clearTimeout(fim)
-    // `visivel` fica de fora de propósito: a troca de active é que dirige a barra
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, delay])
+
+  // derivado, não estado: acabou de carregar e a barra ainda está na tela
+  const concluindo = !active && visivel
 
   return (
     <div
@@ -75,7 +81,7 @@ export function RouteProgress({ active, delay = 120, label = "Carregando a pági
     >
       <div
         className="h-full bg-primary shadow-[0_0_8px_var(--primary)] transition-[width] duration-300 ease-out motion-reduce:transition-none"
-        style={{ width: `${largura}%` }}
+        style={{ width: `${concluindo ? 100 : largura}%` }}
       />
     </div>
   )

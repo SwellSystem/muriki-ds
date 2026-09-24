@@ -502,7 +502,8 @@
         "utils",
         "SwellSystem/muriki-ds/tooltip",
         "SwellSystem/muriki-ds/dropdown-menu",
-        "SwellSystem/muriki-ds/button"
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/spinner"
       ],
       "files": [
         {
@@ -510,7 +511,7 @@
           "type": "registry:component"
         }
       ],
-      "docs": "A linha que contém o RowActions precisa da classe `group/row` — a barra usa `group-hover/row` para aparecer. Em telas de toque passe `alwaysVisible` e `inlineCount={0}`."
+      "docs": "A linha que contém o RowActions precisa da classe `group/row` — a barra usa `group-hover/row` para aparecer. Em telas de toque passe `alwaysVisible` e `inlineCount={0}`. `loading` numa ação põe o spinner no lugar do ícone, trava a ação e mantém a barra visível enquanto ela roda."
     },
     {
       "name": "view-toggle",
