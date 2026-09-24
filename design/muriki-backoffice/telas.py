@@ -1128,6 +1128,114 @@ def tela_conta_sessoes(k):
     return tela_conta(k, sobre=a)
 
 
+# ── Relatórios ──────────────────────────────────────────────────────────
+# Cada relatório é um PDF feito com o pdf-report do DS (capa, KPIs, seções, gráfico, página N
+# de M) ou um CSV. O catálogo é honesto com a API: hoje ela tem equipe, auditoria e o catálogo
+# de planos; vendas, clientes, cupons e inadimplência chegam quando houver rota com os dados.
+RELATORIOS = [
+    ('Prontos para gerar', [
+        ('Equipe e acessos', 'Quem tem acesso, com qual papel, 2FA e último acesso.', 'pessoa', True),
+        ('Segurança', 'Falhas de login, bloqueios, trocas de autenticador e sessões encerradas.', 'escudo', True),
+        ('Planos e features', 'Os planos, os preços e o que cada um libera.', 'plano', True),
+    ]),
+    ('Vendas e receita', [
+        ('Vendas do período', 'Quanto entrou, por plano, por dia e com quais cupons.', 'evolucao', False),
+        ('Receita recorrente', 'MRR, novos, cancelamentos e expansão, mês a mês.', 'relatorio', False),
+        ('Cupons', 'Quanto cada cupom trouxe de venda e quanto custou de desconto.', 'cupom', False),
+    ]),
+    ('Clientes', [
+        ('Clientes e assinaturas', 'Quem entrou, quem está em teste, quem cancelou, por plano.', 'pessoas', False),
+        ('Inadimplência', 'Quanto está em aberto, há quanto tempo e de quem.', 'aviso', False),
+    ]),
+]
+
+
+def _cartao_relatorio(k, titulo, texto, icone, pronto, destaque=False):
+    anel = f'box-shadow:0 0 0 1.5px {k["pri"]}, {k["sombra"]};' if destaque else f'box-shadow:{k["sombra"]};'
+    if pronto:
+        rodape = (f'<div style="display:flex;align-items:center;gap:6px;">'
+                  f'{badge("PDF", k, "blue", mono=True)}{badge("CSV", k, "gray", mono=True)}<span style="flex:1;"></span>'
+                  f'{link_botao(k, "Gerar", href("RelatorioGerar"), "outline", 28)}</div>')
+        cor_icone = f'background:{k["prisub"]};color:{k["prisubfg"]};'
+        op = ''
+    else:
+        rodape = (f'<div style="display:flex;align-items:center;gap:8px;">{badge("Em breve", k, tracejado=True)}'
+                  f'<span style="font-size:11.5px;color:{k["mfg"]};">quando a API tiver os dados</span></div>')
+        cor_icone = f'background:{k["sunken"]};color:{k["mfg"]};'
+        op = 'opacity:0.72;'
+    return (f'<article style="display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:12px;background:{k["card"]};{anel}{op}">'
+            f'<div style="display:flex;align-items:center;gap:10px;">'
+            f'<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 auto;border-radius:8px;{cor_icone}">{ic(icone, 15)}</span>'
+            f'<h3 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">{titulo}</h3></div>'
+            f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};flex:1;">{texto}</span>{rodape}</article>')
+
+
+def tela_relatorios(k, sobre='', destaque=''):
+    cab = cabecalho(k, 'Relatórios', 'PDF para mandar e guardar, CSV para abrir na planilha. Cada um responde uma pergunta da operação.',
+                    direita=segmentado(k, ['Todos', 'Prontos'], 'Todos', 'Relatórios'))
+    grupos = ''
+    for nome, itens in RELATORIOS:
+        cartoes = ''.join(_cartao_relatorio(k, t, x, i, p, destaque=(t == destaque)) for t, x, i, p in itens)
+        grupos += (f'<section style="display:flex;flex-direction:column;gap:10px;">{rotulo(nome, k["mfg"])}'
+                   f'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;">{cartoes}</div></section>')
+    return app(k, 'relatorios', cab + f'<div style="display:flex;flex-direction:column;gap:18px;">{grupos}</div>', sobre=sobre, gap=18)
+
+
+def _miniatura_pdf(k):
+    # a primeira página do pdf-report em miniatura: capa azul, KPIs, barras e a tabela
+    barras = ''.join(f'<span style="flex:1;height:{h}%;background:#0E53CF;border-radius:1.5px 1.5px 0 0;"></span>'
+                     for h in (30, 42, 48, 55, 52, 46, 40, 44, 58, 70, 82, 90, 96, 92, 86))
+    kpi = lambda: (f'<span style="flex:1;display:flex;flex-direction:column;gap:3px;padding:5px;border-radius:4px;border:1px solid #e3e1da;">'
+                   f'<span style="height:3px;width:60%;background:#c9c5ba;border-radius:1px;"></span>'
+                   f'<span style="height:6px;width:80%;background:#051124;border-radius:1px;"></span></span>')
+    linhas = ''.join(f'<span style="display:flex;gap:4px;padding:3px 0;border-bottom:1px solid #efede7;">'
+                     f'<span style="height:3px;width:34%;background:#c9c5ba;border-radius:1px;"></span><span style="flex:1;"></span>'
+                     f'<span style="height:3px;width:16%;background:#c9c5ba;border-radius:1px;"></span></span>' for _ in range(5))
+    return (f'<div aria-label="Prévia da primeira página" style="width:188px;height:266px;flex:0 0 auto;background:#fff;border-radius:6px;'
+            f'box-shadow:0 1px 3px rgba(0,0,0,0.18), 0 8px 20px rgba(0,0,0,0.10);padding:12px;display:flex;flex-direction:column;gap:9px;overflow:hidden;">'
+            f'<div style="position:relative;overflow:hidden;background:#0E53CF;border-radius:6px;padding:9px;display:flex;flex-direction:column;gap:5px;">'
+            f'<span style="height:3px;width:40%;background:#FCCD08;border-radius:1px;"></span>'
+            f'<span style="height:8px;width:72%;background:#fff;border-radius:1px;"></span>'
+            f'<span style="height:3px;width:86%;background:rgba(255,255,255,0.6);border-radius:1px;"></span>'
+            f'<span style="position:absolute;right:6px;bottom:-8px;width:30px;height:28px;display:flex;">{LOGO}</span></div>'
+            f'<div style="display:flex;gap:4px;">{kpi()}{kpi()}{kpi()}{kpi()}</div>'
+            f'<span style="height:5px;width:44%;background:#051124;border-radius:1px;"></span>'
+            f'<div style="display:flex;align-items:flex-end;gap:2px;height:52px;border-bottom:1px solid #c9c5ba;">{barras}</div>'
+            f'<span style="height:5px;width:30%;background:#051124;border-radius:1px;"></span>'
+            f'<div style="display:flex;flex-direction:column;">{linhas}</div>'
+            f'<span style="margin-top:auto;display:flex;justify-content:space-between;"><span style="height:2px;width:40%;background:#c9c5ba;"></span>'
+            f'<span style="height:2px;width:14%;background:#c9c5ba;"></span></span></div>')
+
+
+def tela_relatorio_gerar(k):
+    periodo = secao_sheet(k, 'Período', (
+        segmentado(k, ['Este mês', 'Mês passado', 'Trimestre', 'Ano', 'Personalizado'], 'Mês passado', 'Período')
+        + f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+        + campo(k, 'De', '01/08/2026', icone='calendario', id_='de') + campo(k, 'Até', '31/08/2026', icone='calendario', id_='ate') + '</div>'
+        + f'<div style="display:flex;align-items:center;gap:12px;"><span style="display:flex;flex-direction:column;flex:1;">'
+          f'<span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">Comparar com o período anterior</span>'
+          f'<span style="font-size:12px;color:{k["mfg"]};">As variações dos KPIs saem contra julho.</span></span>{switch(k, True, "Comparar")}</div>'))
+    filtros = secao_sheet(k, 'O que entra', (
+        f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+        + seletor(k, 'Membros', 'Todos os ativos') + seletor(k, 'Papéis', 'Todos') + '</div>'
+        + f'<label style="display:flex;align-items:center;gap:10px;font-size:13px;color:{k["fg"]};">{caixa(k, True, "Incluir suspensos")}Incluir quem está suspenso</label>'))
+    formato = secao_sheet(k, 'Formato', (
+        f'<div role="radiogroup" aria-label="Formato" style="display:flex;gap:8px;">'
+        + radio(k, True, 'PDF', 'capa, KPIs e tabelas, para mandar') + radio(k, False, 'CSV', 'uma linha por membro, para a planilha') + '</div>'
+        + f'<div style="display:flex;gap:16px;align-items:flex-start;padding-top:4px;">{_miniatura_pdf(k)}'
+          f'<div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
+          f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">Equipe e acessos · agosto de 2026</span>'
+          f'<span>Capa com o período e quem gerou, 4 KPIs, papéis por mês e a tabela de membros.</span>'
+          f'<span>Cerca de 3 páginas, com cabeçalho e "página N de M" em todas.</span>'
+          f'<span style="display:flex;align-items:center;gap:6px;">{ic("escudo", 13, k["mfg"])}Marcado como confidencial.</span></div></div>'))
+    rodape = (f'<span style="font-size:12px;color:{k["mfg"]};flex:1;">Gera no navegador, nada fica salvo.</span>'
+              f'{link_botao(k, "Cancelar", href("Relatorios"), "ghost", 36)}'
+              f'{link_botao(k, "Gerar PDF", href("Relatorios"), "solid", 36, "baixar")}')
+    s_ = sheet(k, 'Equipe e acessos', 'Quem tem acesso ao Backoffice, com qual papel, 2FA e último acesso.',
+               periodo + filtros + formato, rodape, largura=560)
+    return tela_relatorios(k, sobre=s_, destaque='Equipe e acessos')
+
+
 # ── Montagem ───────────────────────────────────────────────────────────
 def montar(tela, tema):
     sufixo = '' if tema == 'claro' else 'Escuro'
@@ -1161,6 +1269,10 @@ def _montar(tela, tema):
         return pagina(t, tela_conta_autenticador(k), tema, ANTES_SENHA + '\n' + ANTES_TOTP.replace('"4829"', '""'), VALORES_SENHA + ',\n' + VALORES_TOTP)
     if i == 'conta-sessoes':
         return pagina(t, tela_conta_sessoes(k), tema, ANTES_SENHA, VALORES_SENHA)
+    if i == 'relatorios':
+        return pagina(t, tela_relatorios(k), tema)
+    if i == 'relatorio-gerar':
+        return pagina(t, tela_relatorio_gerar(k), tema)
     if i == 'inicio':
         return pagina(t, tela_inicio(k), tema)
     if i == 'clientes':
