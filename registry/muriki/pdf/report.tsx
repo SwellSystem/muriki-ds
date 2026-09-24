@@ -23,6 +23,7 @@ import { PageNumber, TotalPages } from "takumi-pdf/primitives"
 import { MurikiLogo } from "@/components/ui/muriki-logo"
 import { PdfcnThemeProvider } from "@/components/pdf/theme-provider"
 import { Document, Page, Text, View } from "@/lib/pdf-primitives"
+import { Path, Svg } from "@/lib/pdf-svg"
 import { MURIKI_BLUE, MURIKI_INK, MURIKI_MONO, MURIKI_YELLOW, murikiTheme } from "@/lib/pdf-themes/muriki"
 
 const MUTED = murikiTheme.colors.mutedForeground
@@ -129,6 +130,35 @@ export function reportRenderOptions(meta: ReportMeta) {
   } as const
 }
 
+export type ReportMotif = "money" | "shield" | "people" | "chart" | "none"
+
+const TINTA_MOTIVO = "rgba(255,255,255,0.08)"
+
+function Motivo({ motif }: { motif: ReportMotif }) {
+  if (motif === "none") return null
+  if (motif === "money") {
+    return (
+      <View style={{ position: "absolute", right: 58, top: -30, transform: "rotate(-8deg)" }}>
+        <Text style={{ fontSize: 230, lineHeight: 1, fontWeight: 700, letterSpacing: -10, color: TINTA_MOTIVO }}>R$</Text>
+      </View>
+    )
+  }
+  const caminhos: Record<Exclude<ReportMotif, "money" | "none">, string[]> = {
+    shield: ["M8 1.8l5.2 2v4c0 3.2-2.2 5.4-5.2 6.4-3-1-5.2-3.2-5.2-6.4v-4z", "M5.8 8.2l1.6 1.6 3-3"],
+    people: ["M6 3.2a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8z", "M1.8 13.4c.5-2.4 2.2-3.8 4.2-3.8s3.7 1.4 4.2 3.8", "M10.4 3.4a2.4 2.4 0 0 1 0 4.4", "M11.8 9.8c1.3.5 2.2 1.7 2.4 3.6"],
+    chart: ["M2.5 13.5h11", "M4.5 11.5v-3", "M8 11.5v-6", "M11.5 11.5v-8"],
+  }
+  return (
+    <View style={{ position: "absolute", right: 40, top: -40, transform: "rotate(-8deg)" }}>
+      <Svg width={250} height={250} viewBox="0 0 16 16">
+        {caminhos[motif].map((d) => (
+          <Path key={d} d={d} fill="none" stroke={TINTA_MOTIVO} strokeWidth={1.4} strokeLinecap="round" strokeLinejoin="round" />
+        ))}
+      </Svg>
+    </View>
+  )
+}
+
 export interface ReportDocumentProps extends ReportMeta {
   /** Acima do título, em mono. Padrão: "Relatório gerencial". */
   eyebrow?: string
@@ -137,6 +167,12 @@ export interface ReportDocumentProps extends ReportMeta {
   generatedAt: string
   /** Uma ou duas frases do que o relatório mostra, na capa. */
   summary?: string
+  /**
+   * O desenho grande e translúcido atrás do macaco na capa, que diz o assunto antes do título:
+   * `money` (R$) para vendas, receita e cupons; `shield` para segurança; `people` para equipe e
+   * clientes; `chart` para o resto. Padrão: `chart`.
+   */
+  motif?: ReportMotif
   children: ReactNode
 }
 
@@ -148,6 +184,7 @@ export function ReportDocument({
   generatedBy,
   generatedAt,
   summary,
+  motif = "chart",
   children,
 }: ReportDocumentProps) {
   return (
@@ -169,18 +206,7 @@ export function ReportDocument({
                 gap: 18,
               }}
             >
-              <View
-                style={{
-                  position: "absolute",
-                  right: -60,
-                  top: -80,
-                  width: 260,
-                  height: 260,
-                  borderRadius: 999,
-                  borderWidth: 30,
-                  borderColor: "rgba(255,255,255,0.07)",
-                }}
-              />
+              <Motivo motif={motif} />
               <View style={{ position: "absolute", right: 24, bottom: -30, transform: "rotate(-8deg)" }}>
                 <MurikiLogo width={112} height={105} />
               </View>

@@ -86,30 +86,13 @@ function Faixa({ product }: { product: string }) {
         gap: 18,
       }}
     >
-      {/* dois anéis de luz atrás do macaco, e o macaco grande espiando pelo canto */}
-      <View
-        style={{
-          position: "absolute",
-          right: -70,
-          bottom: -170,
-          width: 380,
-          height: 380,
-          borderRadius: 999,
-          borderWidth: 36,
-          borderColor: "rgba(255,255,255,0.07)",
-        }}
-      />
-      <View
-        style={{
-          position: "absolute",
-          right: 10,
-          bottom: -90,
-          width: 220,
-          height: 220,
-          borderRadius: 999,
-          backgroundColor: "rgba(255,255,255,0.06)",
-        }}
-      />
+      {/* um cadeado grande e translúcido atrás do macaco: o papel é confidencial */}
+      <View style={{ position: "absolute", right: -18, top: -28, transform: "rotate(-8deg)" }}>
+        <Svg width={300} height={300} viewBox="0 0 16 16">
+          <Path d="M3.4 7.2h9.2a1.1 1.1 0 0 1 1.1 1.1v5.2a1.1 1.1 0 0 1-1.1 1.1H3.4a1.1 1.1 0 0 1-1.1-1.1V8.3a1.1 1.1 0 0 1 1.1-1.1z" fill="rgba(255,255,255,0.07)" />
+          <Path d="M5.1 7.2V5.3a2.9 2.9 0 0 1 5.8 0v1.9" fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth={1.3} strokeLinecap="round" />
+        </Svg>
+      </View>
       <View style={{ position: "absolute", right: 28, bottom: -46, transform: "rotate(-8deg)" }}>
         <MurikiLogo width={176} height={165} />
       </View>
