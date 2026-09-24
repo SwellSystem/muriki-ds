@@ -313,6 +313,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/sonner` | `registry:ui` | toaster vestido com a paleta: info neutro, success e warning tingidos, error sólido |
 | `@muriki/row-actions` | `registry:block` | barra de ferramentas de linha, só ícone, com tooltip e `aria-label` obrigatórios na API |
 | `@muriki/task-table` | `registry:block` | tabela hierárquica de tasks (epic → task → sub) com toolbar de filtros com menu, seleção em massa, colapso e slots de composição |
+| `@muriki/resource-table` | `registry:block` | o molde do CRUD: cabeçalho com contagem, busca com abas de status, tabela controlada com seleção, ordenação, ações da linha e paginação, sheet de criar/editar e diálogo de confirmação |
 | `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
 | `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
 | `@muriki/skeleton` | `registry:ui` | um buraco na superfície afundada; a regra é ter a anatomia do que substitui |
