@@ -257,6 +257,38 @@
    "h": 900,
    "title": "Primeiro acesso · dez códigos, uma vez · escuro",
    "is_interactive": true
+  },
+  "Auditoria.dc.html": {
+   "x": 0,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · a linha do tempo da equipe",
+   "is_interactive": true
+  },
+  "AuditoriaEscuro.dc.html": {
+   "x": 0,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · a linha do tempo da equipe · escuro",
+   "is_interactive": true
+  },
+  "AuditoriaEvento.dc.html": {
+   "x": 1520,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · o evento no sheet",
+   "is_interactive": true
+  },
+  "AuditoriaEventoEscuro.dc.html": {
+   "x": 1520,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · o evento no sheet · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -315,6 +347,20 @@
    "w": 240,
    "x": 0,
    "y": 6300
+  },
+  "equipe": {
+   "x": 0,
+   "y": 7620,
+   "text": "Equipe: a auditoria é leitura em ordem, não CRUD; o evento abre no sheet",
+   "kind": "title1",
+   "maxW": 2960
+  },
+  "equipeEscuro": {
+   "x": 0,
+   "y": 8940,
+   "text": "Equipe no tema escuro",
+   "kind": "title1",
+   "maxW": 2960
   }
  },
  "order": [
@@ -349,7 +395,11 @@
   "Autenticador.dc.html",
   "AutenticadorEscuro.dc.html",
   "CodigosRecuperacao.dc.html",
-  "CodigosRecuperacaoEscuro.dc.html"
+  "CodigosRecuperacaoEscuro.dc.html",
+  "Auditoria.dc.html",
+  "AuditoriaEscuro.dc.html",
+  "AuditoriaEvento.dc.html",
+  "AuditoriaEventoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Backoffice"

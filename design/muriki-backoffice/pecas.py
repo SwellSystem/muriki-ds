@@ -77,6 +77,8 @@ def pagina(titulo, corpo, tema, antes='', valores='', props=None):
 
 
 # ── Rail ────────────────────────────────────────────────────────────────
+# o app real tem os dois grupos: a operação do produto e a equipe que opera
+EQUIPE = [('equipe', 'Equipe', 'pessoa', None), ('convites', 'Convites', 'envelope', None), ('auditoria', 'Auditoria', 'relogio', 'Auditoria')]
 MENU = [('inicio', 'Início', 'casa', 'Inicio'), ('clientes', 'Clientes', 'pessoas', 'Clientes'),
         ('planos', 'Planos', 'plano', 'Planos'), ('cupons', 'Cupons', 'cupom', 'Cupons')]
 
@@ -102,18 +104,21 @@ def rail(k, ativo):
         b = (f'<span style="position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:999px;background:{k["pri"]};"></span>'
              if at else '')
         cur = ' aria-current="page"' if at else ''
-        return (f'<a href="{href(destino)}"{cur} style="position:relative;display:flex;align-items:center;gap:10px;height:36px;'
+        alvo = href(destino) if destino else '#'
+        return (f'<a href="{alvo}"{cur} style="position:relative;display:flex;align-items:center;gap:10px;height:36px;'
                 f'padding:0 10px;border-radius:9px;font-size:13px;{f}">{b}{ic(icone)}<span style="flex:1;">{nome}</span>{extra}</a>')
 
     def item_icone(chave, nome, icone, destino):
         at = chave == ativo
         f = f'background:{k["prisub"]};color:{k["prisubfg"]};' if at else f'color:{k["mfg"]};'
         cur = ' aria-current="page"' if at else ''
-        return (f'<a href="{href(destino)}" aria-label="{nome}" title="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
+        alvo = href(destino) if destino else '#'
+        return (f'<a href="{alvo}" aria-label="{nome}" title="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
                 f'width:40px;height:40px;border-radius:10px;{f}">{ic(icone, 17)}</a>')
 
     conta = lambda n: f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{n}</span>'
     nav = ''.join(item(c, n, i, d, conta('1.284') if c == 'clientes' else '') for c, n, i, d in MENU)
+    nav_equipe = ''.join(item(c, n, i, d) for c, n, i, d in EQUIPE)
     sair = (f'<a href="{href("Entrar")}" aria-label="Sair" title="Sair" style="display:flex;align-items:center;justify-content:center;'
             f'width:32px;height:32px;border-radius:8px;color:{k["mfg"]};">{ic("sair", 16)}</a>')
     sombra = 'box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);'
@@ -126,7 +131,8 @@ def rail(k, ativo):
         f'<span style="font-size:11px;color:{k["mfg"]};">Backoffice</span></span>{_botao_rail(k)}</div></div>'
         f'<div style="padding:4px 10px;display:flex;flex-direction:column;gap:2px;">'
         f'<div style="height:30px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;">{rotulo("Operação", k["mfg"])}'
-        f'{badge("prod", k, "green", ponto=True, mono=True)}</div>{nav}</div>'
+        f'{badge("prod", k, "green", ponto=True, mono=True)}</div>{nav}'
+        f'<div style="height:30px;display:flex;align-items:center;padding:0 10px;margin-top:10px;">{rotulo("Equipe", k["mfg"])}</div>{nav_equipe}</div>'
         f'<div style="flex:1;"></div>'
         f'<div style="padding:10px;display:flex;flex-direction:column;gap:2px;">'
         f'<div style="height:1px;background:{k["muted"]};margin:8px 4px;"></div>'
@@ -142,6 +148,8 @@ def rail(k, ativo):
         f'<span style="display:flex;width:30px;height:30px;margin-bottom:6px;">{LOGO}</span>{_botao_rail(k, 36)}'
         f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
         + ''.join(item_icone(c, n, i, d) for c, n, i, d in MENU)
+        + f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
+        + ''.join(item_icone(c, n, i, d) for c, n, i, d in EQUIPE)
         + f'<div style="flex:1;"></div>{botao_tema(k, 36)}{sair}'
         f'<span title="Ana Lima · Administradora" style="margin-top:6px;display:flex;">{avatar("AL", k, "yellow")}</span></nav>')
     return aberto + fechado

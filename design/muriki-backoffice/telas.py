@@ -867,6 +867,109 @@ def tela_cupom_novo(k):
     return tela_cupons(k, hover=-1, sobre=s)
 
 
+# ── Auditoria: a linha do tempo da equipe ──────────────────────────────
+# GET /staff/audit-log: action (20 tipos), actorId (ausente na falha anônima), target, ip,
+# userAgent, requestId, details e occurredAt; filtros actorId, action, from/to; cursor.
+# Log não é CRUD: é leitura em ordem. Agrupa por dia, a hora vem em mono, o evento vira frase
+# e a cor diz a família — neutro para rotina, laranja para falha, vermelho para bloqueio.
+FAMILIA = {
+    'rotina': ('tgray', 'tgrayfg'), 'convite': ('tblue', 'tbluefg'), 'protecao': ('tgreen', 'tgreenfg'),
+    'falha': ('torange', 'torangefg'), 'bloqueio': ('tred', 'tredfg'),
+}
+EVENTOS = [
+    ('Hoje', 'quarta, 23 de setembro', [
+        ('22:09', 'rotina', 'sair', 'AL', 'yellow', '<b>Ana Lima</b> entrou', 'Chrome · macOS', '189.40.12.7', 1),
+        ('22:07', 'rotina', 'sair', 'AL', 'yellow', '<b>Ana Lima</b> saiu', 'Chrome · macOS', '189.40.12.7', 1),
+        ('22:06', 'bloqueio', 'cadeado', None, None, 'Conta de <b>bruno.melo@muriki.app</b> bloqueada por 15 minutos', 'Safari · iOS', '201.17.88.3', 1),
+        ('22:06', 'falha', 'aviso', None, None, 'Tentativa de entrar falhou para <b>bruno.melo@muriki.app</b>', 'Safari · iOS', '201.17.88.3', 3),
+        ('22:00', 'protecao', 'escudo', 'BM', 'blue', '<b>Bruno Melo</b> ativou o autenticador', 'Chrome · Windows', '177.8.40.21', 1),
+        ('21:58', 'convite', 'envelope', 'BM', 'blue', '<b>Bruno Melo</b> aceitou o convite', 'Chrome · Windows', '177.8.40.21', 1),
+        ('21:41', 'convite', 'envelope', 'AL', 'yellow', '<b>Ana Lima</b> convidou <b>bruno.melo@muriki.app</b> como Operação', 'Chrome · macOS', '189.40.12.7', 1),
+    ]),
+    ('Ontem', 'terça, 22 de setembro', [
+        ('18:12', 'rotina', 'pessoa', 'AL', 'yellow', '<b>Ana Lima</b> mudou o papel de <b>Carla Dias</b>: Operação → Admin', 'Chrome · macOS', '189.40.12.7', 1),
+        ('17:40', 'falha', 'chave', 'CD', 'green', '<b>Carla Dias</b> entrou com um código de recuperação', 'Firefox · Linux', '45.231.9.14', 1),
+        ('09:03', 'protecao', 'cadeado', 'CD', 'green', '<b>Carla Dias</b> trocou a senha', 'Firefox · Linux', '45.231.9.14', 1),
+    ]),
+]
+
+
+def tela_auditoria(k, detalhe=False):
+    cab = cabecalho(k, 'Auditoria', 'O que a equipe fez e o que tentaram fazer com ela, do mais recente para o mais antigo.',
+                    direita=link_botao(k, 'Exportar CSV', '#', 'ghost', 32, 'baixar'))
+    periodo = (f'<button type="button" style="display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:0;border-radius:8px;'
+               f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["field"]};font-family:{FONTE};font-size:13px;color:{k["fgs"]};cursor:pointer;">'
+               f'{ic("calendario", 14, k["mfg"])}Últimos 7 dias{ic("baixo", 13, k["mfg"])}</button>')
+    so_seguranca = (f'<label style="display:flex;align-items:center;gap:8px;margin-left:6px;font-size:13px;color:{k["fg"]};">'
+                    f'{switch(k, False, "Só eventos de segurança")}Só segurança</label>')
+    filtros = (f'<div style="display:flex;align-items:center;gap:8px;">{periodo}'
+               f'{filtro_chip(k, "Ação")}{filtro_chip(k, "Quem")}{so_seguranca}'
+               f'<span style="flex:1;"></span><span style="font-size:12.5px;color:{k["mfg"]};">Horário de Brasília</span></div>')
+
+    corpo = ''
+    for dia, data, evs in EVENTOS:
+        linhas = ''
+        for i, (hora, fam, icone, ini, tom, frase, disp, ip, vezes) in enumerate(evs):
+            a, b = FAMILIA[fam]
+            sel = detalhe and fam == 'falha' and dia == 'Hoje'
+            quem = (avatar(ini, k, tom, 24) if ini else
+                    f'<span title="Sem sessão: quem tentou não entrou" style="width:24px;height:24px;border-radius:999px;display:flex;align-items:center;'
+                    f'justify-content:center;box-shadow:inset 0 0 0 1px {k["input"]};color:{k["mfg"]};">{ic("pessoa", 13)}</span>')
+            multi = (f'<span style="margin-left:8px;display:inline-flex;vertical-align:1px;">{badge(f"×{vezes}", k, "orange", mono=True)}</span>'
+                     if vezes > 1 else '')
+            fundo = f'background:{k["prisub"]};' if sel else ''
+            linhas += (
+                f'<a href="{href("AuditoriaEvento") if fam == "falha" and dia == "Hoje" else "#"}" style="display:grid;'
+                f'grid-template-columns:52px 28px minmax(0,1fr) 150px 120px 16px;gap:12px;align-items:center;min-height:48px;padding:0 16px;'
+                f'box-shadow:inset 0 -1px 0 {k["muted"]};color:inherit;{fundo}">'
+                f'<span style="font-family:{MONO};font-size:12.5px;color:{k["mfg"]};">{hora}</span>'
+                f'<span style="width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;'
+                f'background:{k[a]};color:{k[b]};">{ic(icone, 14)}</span>'
+                f'<span style="display:flex;align-items:center;gap:10px;min-width:0;font-size:13.5px;color:{k["fg"]};">{quem}'
+                f'<span style="min-width:0;">{frase.replace("<b>", "<b style=\"font-weight:500;color:" + k["fgs"] + ";\">")}{multi}</span></span>'
+                f'<span style="font-size:12.5px;color:{k["mfg"]};">{disp}</span>'
+                f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};text-align:right;">{ip}</span>'
+                f'<span style="display:flex;color:{k["mfg"]};">{ic("direita", 13)}</span></a>')
+        corpo += (f'<div style="display:flex;align-items:baseline;gap:10px;height:34px;padding:0 16px;background:{k["rail"]};'
+                  f'box-shadow:inset 0 -1px 0 {k["muted"]};align-items:center;">'
+                  f'<span style="font-size:13px;font-weight:600;color:{k["fgs"]};">{dia}</span>'
+                  f'<span style="font-size:12.5px;color:{k["mfg"]};">{data}</span><span style="flex:1;"></span>'
+                  f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{sum(e[8] for e in evs)} eventos</span></div>{linhas}')
+    lista = (f'<section aria-label="Eventos" style="flex:1;min-height:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+             f'display:flex;flex-direction:column;overflow:hidden;"><div style="flex:1;min-height:0;overflow:hidden;">{corpo}</div>'
+             f'<footer style="display:flex;justify-content:center;padding:10px;box-shadow:inset 0 1px 0 {k["muted"]};">'
+             f'{link_botao(k, "Carregar eventos anteriores", "#", "ghost", 32)}</footer></section>')
+
+    sobre = ''
+    if detalhe:
+        def campo_det(rot, valor, mono_=False):
+            v = (f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};word-break:break-all;">{valor}</span>' if mono_
+                 else f'<span style="font-size:13.5px;color:{k["fgs"]};">{valor}</span>')
+            return (f'<div style="display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:baseline;">'
+                    f'<span style="font-size:12.5px;color:{k["mfg"]};">{rot}</span>{v}</div>')
+        tentativas = ''.join(
+            f'<li style="display:flex;align-items:center;gap:10px;font-size:13px;color:{k["fg"]};">'
+            f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};">{h}</span>{t}</li>'
+            for h, t in [('22:06:41', 'Código do autenticador errado'), ('22:06:18', 'Código do autenticador errado'), ('22:06:02', 'Senha errada')])
+        json_ = ('{\n  "email": "bruno.melo@muriki.app",\n  "reason": "invalid_totp",\n  "attempt": 3\n}')
+        corpo_s = (
+            secao_sheet(k, 'Evento', campo_det('Ação', badge('Falha ao entrar', k, 'orange', ponto=True))
+                        + campo_det('Quem', 'Ninguém entrou: a tentativa foi com bruno.melo@muriki.app')
+                        + campo_det('Alvo', '<a href="#">Bruno Melo</a> · membro da equipe')
+                        + campo_det('Quando', '23/09/2026, 22:06:41 <span style="color:' + k['mfg'] + ';">· há 3 min</span>'))
+            + secao_sheet(k, 'As 3 tentativas', f'<ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{tentativas}</ol>'
+                          + f'<span style="font-size:12px;color:{k["mfg"]};">Na quinta falha seguida a conta trava por 15 minutos.</span>')
+            + secao_sheet(k, 'Origem', campo_det('IP', '201.17.88.3', True) + campo_det('Dispositivo', 'Safari · iOS 19')
+                          + campo_det('User agent', 'Mozilla/5.0 (iPhone; CPU iPhone OS 19_0 like Mac OS X) AppleWebKit/605.1.15 Safari/605.1', True)
+                          + campo_det('Request', 'req_01J8Z4K2QW7M3X', True))
+            + secao_sheet(k, 'Detalhes', f'<pre style="margin:0;padding:12px 14px;border-radius:8px;background:{k["sunken"]};font-family:{MONO};'
+                          f'font-size:12px;line-height:18px;color:{k["fg"]};white-space:pre-wrap;">{json_}</pre>'))
+        rodape = (f'{link_botao(k, "Copiar ID do evento", "#", "ghost", 36, "copiar")}<span style="flex:1;"></span>'
+                  f'{link_botao(k, "Ver tudo de bruno.melo", "#", "outline", 36)}')
+        sobre = sheet(k, 'Tentativa de entrar falhou', 'bruno.melo@muriki.app · 3 vezes em 39 segundos', corpo_s, rodape, largura=500)
+    return app(k, 'auditoria', cab + filtros + lista, sobre=sobre, gap=16)
+
+
 # ── Montagem ───────────────────────────────────────────────────────────
 def montar(tela, tema):
     sufixo = '' if tema == 'claro' else 'Escuro'
@@ -890,6 +993,10 @@ def _montar(tela, tema):
         return pagina(t, tela_autenticador(k), tema, ANTES_TOTP.replace('"4829"', '"31"'), VALORES_TOTP)
     if i == 'codigos':
         return pagina(t, tela_codigos(k), tema)
+    if i == 'auditoria':
+        return pagina(t, tela_auditoria(k), tema)
+    if i == 'auditoria-evento':
+        return pagina(t, tela_auditoria(k, detalhe=True), tema)
     if i == 'inicio':
         return pagina(t, tela_inicio(k), tema)
     if i == 'clientes':
