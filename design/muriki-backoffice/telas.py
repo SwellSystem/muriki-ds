@@ -1,6 +1,6 @@
 import json
 from pecas import *  # noqa: F401,F403
-from pecas import (K, W, H, FONTE, MONO, LOGO, I, ic, badge, legenda, rotulo, mono, raiz, app, cabecalho, campo, seletor,
+from pecas import (K, W, H, FONTE, MONO, LOGO, LOGO_FECHADO, I, ic, badge, legenda, rotulo, mono, raiz, app, cabecalho, campo, seletor,
                    switch, switch_dinamico, caixa, radio, segmentado, botao_icone, link_botao, barra_recurso, filtro_chip,
                    tabela, linha_tabela, acoes_linha, paginacao, selo_status, sheet, secao_sheet, alerta, avatar, href,
                    brl, milhar, botao_tema)
@@ -11,6 +11,11 @@ from pecas import (K, W, H, FONTE, MONO, LOGO, I, ic, badge, legenda, rotulo, mo
 # criar conta (a equipe entra por convite), sem provedor social e sem passkey — a API da equipe
 # não tem. São dois passos na tela (senha, depois código em quadrados), mas um POST só: a API
 # recebe e-mail, senha e código juntos, e qualquer um errado volta o mesmo 401.
+def _dois_logos():
+    return (f'<span style="display:{{{{olhoA}}}};width:100%;height:100%;">{LOGO}</span>'
+            f'<span style="display:{{{{olhoF}}}};width:100%;height:100%;">{LOGO_FECHADO}</span>')
+
+
 def _painel(k):
     linha = lambda cor, larg: f'<span style="height:1px;{larg}background:{cor};"></span>'
     deco = (
@@ -21,12 +26,12 @@ def _painel(k):
         f'<div aria-hidden="true" style="position:absolute;right:0;bottom:0;width:420px;height:420px;border-radius:999px;'
         f'transform:translate(33.333%, 25%);background:color-mix(in oklch, {k["accent"]} 25%, transparent);filter:blur(120px);pointer-events:none;"></div>'
         f'<div aria-hidden="true" style="position:absolute;right:-40px;bottom:-64px;width:480px;height:480px;display:flex;'
-        f'opacity:0.08;transform:rotate(-6deg);pointer-events:none;">{LOGO}</div>')
+        f'opacity:0.08;transform:rotate(-6deg);pointer-events:none;">{_dois_logos()}</div>')
     return (
         f'<aside style="position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;'
         f'padding:64px;background:{k["sunken"]};box-shadow:inset -1px 0 0 {k["border"]};">{deco}'
         f'<div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">'
-        f'<span style="display:flex;width:36px;height:36px;">{LOGO}</span>{legenda("muriki / backoffice", k)}</div>'
+        f'<span style="display:flex;width:36px;height:36px;">{_dois_logos()}</span>{legenda("muriki / backoffice", k)}</div>'
         f'<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:24px;max-width:512px;">'
         f'<div style="display:flex;align-items:center;gap:12px;">{legenda("Uso interno", k, "0.3em")}{linha(k["pri"], "width:64px;")}</div>'
         f'<h2 style="margin:0;font-size:72px;line-height:0.95;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
@@ -37,8 +42,9 @@ def _painel(k):
 
 
 def _campo_editorial(k, id_, rot, icone, tipo, valor, ph, cabeca='', olho=False, auto='', extra_input=''):
-    o = (f'<span aria-hidden="true" style="position:absolute;right:0;top:50%;transform:translateY(-50%);display:flex;'
-         f'width:32px;height:32px;align-items:center;justify-content:center;color:{k["mfg"]};">{ic("olho", 18)}</span>') if olho else ''
+    o = (f'<button type="button" aria-label="Mostrar a senha" onClick="{{{{alternarSenha}}}}" style="position:absolute;right:0;top:50%;'
+         f'transform:translateY(-50%);display:flex;width:32px;height:32px;align-items:center;justify-content:center;border:0;'
+         f'background:transparent;color:{k["mfg"]};cursor:pointer;">{ic("olho", 18)}</button>') if olho else ''
     v = f' value="{valor}"' if valor else ''
     return (f'<div style="display:flex;flex-direction:column;gap:6px;">'
             f'<div style="display:flex;align-items:center;justify-content:space-between;">'
@@ -46,7 +52,7 @@ def _campo_editorial(k, id_, rot, icone, tipo, valor, ph, cabeca='', olho=False,
             f'text-transform:uppercase;color:{k["mfg"]};">{rot}</label>{cabeca}</div>'
             f'<div style="position:relative;display:flex;align-items:center;">'
             f'<span style="position:absolute;left:0;top:50%;transform:translateY(-50%);display:flex;opacity:0.6;color:{k["mfg"]};">{ic(icone, 18)}</span>'
-            f'<input id="{id_}" type="{tipo}" autocomplete="{auto}" placeholder="{ph}"{v}{extra_input} '
+            f'<input id="{id_}" type="{"{{tipoSenha}}" if tipo == "password" else tipo}" autocomplete="{auto}" placeholder="{ph}"{v}{extra_input} '
             f'style="width:100%;height:44px;padding:0 {36 if olho else 0}px 0 28px;border:0;border-bottom:1px solid {k["input"]};'
             f'border-radius:0;background:transparent;font-family:{FONTE};font-size:16px;color:{k["fgs"]};outline:0;">{o}</div></div>')
 
@@ -232,8 +238,8 @@ def _qr(k, tam=156):
                 f'<rect x="{(x + 2) * cel:.2f}" y="{(y + 2) * cel:.2f}" width="{3 * cel:.2f}" height="{3 * cel:.2f}" rx="{1.1 * cel:.2f}" fill="#1B50C0"/>')
     lado = (c1 - c0 + 1) * cel
     logo = (f'<rect x="{c0 * cel:.2f}" y="{c0 * cel:.2f}" width="{lado:.2f}" height="{lado:.2f}" rx="{lado * .28:.2f}" fill="#fff"/>'
-            f'<svg x="{(c0 + .9) * cel:.2f}" y="{(c0 + .9) * cel:.2f}" width="{lado - 1.8 * cel:.2f}" height="{lado - 1.8 * cel:.2f}" viewBox="0 0 2000 2000">'
-            + LOGO.split('>', 1)[1].rsplit('</svg>', 1)[0].replace('style="fill:var(--logo)"', 'fill="rgb(36,36,33)"') + '</svg>')
+            f'<svg x="{(c0 + .9) * cel:.2f}" y="{(c0 + .9) * cel:.2f}" width="{lado - 1.8 * cel:.2f}" height="{lado - 1.8 * cel:.2f}" viewBox="0 0 932 874">'
+            + LOGO.split('>', 1)[1].rsplit('</svg>', 1)[0] + '</svg>')
     return (f'<div style="padding:12px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1px {k["border"]};flex:0 0 auto;">'
             f'<svg role="img" aria-label="QR code para o app autenticador" viewBox="0 0 {tam} {tam}" width="{tam}" height="{tam}" '
             f'style="display:block;fill:#1C252E;">{pontos}{canto(0, 0)}{canto(N - 7, 0)}{canto(0, N - 7)}{logo}</svg></div>')

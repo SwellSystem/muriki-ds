@@ -8,6 +8,16 @@ sys.path.insert(0, os.path.join(AQUI, '..', 'muriki-code'))
 from base import (TOKENS, K, W, H, FONTE, MONO, LOGO, I, svg, ic, casca, badge, botao, cartao,
                   legenda, rotulo, botao_tema, icone_tema, mono, props_tema)  # noqa: E402,F401
 
+# o logo da marca é o novo (design/logo-aberto.svg, vetorizado dos PNGs), não o logo.svg antigo
+# que a base do Code usa; as cores não mudam com o tema
+def _logo(nome):
+    svg = open(os.path.join(AQUI, '..', f'logo-{nome}.svg')).read()
+    return svg.replace('<svg ', '<svg width="100%" height="100%" aria-hidden="true" ', 1).strip()
+
+
+LOGO = _logo('aberto')
+LOGO_FECHADO = _logo('fechado')
+
 # --field do tema do registry: card no claro, sunken no escuro
 TOKENS['claro']['field'] = TOKENS['claro']['card']
 TOKENS['escuro']['field'] = TOKENS['escuro']['sunken']
@@ -62,6 +72,10 @@ def logica(tema, antes='', valores=''):
             'temaRotulo: tema === "escuro" ? "Usar tema claro" : "Usar tema escuro",\n'
             'trocarTema: () => this.setState({ tema: tema === "escuro" ? "claro" : "escuro" }),\n'
             'railA: recolhido ? "none" : "flex",\nrailF: recolhido ? "flex" : "none",\n'
+            # senha visível: o macaco fecha os olhos (o brandHidden do login-page)
+            'olhoA: s.verSenha ? "none" : "flex",\nolhoF: s.verSenha ? "flex" : "none",\n'
+            'tipoSenha: s.verSenha ? "text" : "password",\n'
+            'alternarSenha: () => this.setState({ verSenha: !s.verSenha }),\n'
             'railRotulo: recolhido ? "Expandir menu" : "Recolher menu",\n'
             'alternarRail: () => this.setState({ recolhido: !recolhido }),\n'
             f'{valores}\n'
