@@ -93,7 +93,9 @@ t: t,
 temaClasse: tema === "escuro" ? "escuro" : "",
 temaRotulo: tema === "escuro" ? t.paraClaro : t.paraEscuro,
 trocarTema: () => this.setState({ tema: tema === "escuro" ? "claro" : "escuro" }),
-trocarIdioma: () => this.setState({ idioma: ORDEM[(ORDEM.indexOf(idioma) + 1) % ORDEM.length] }),
+menuIdioma: !!s.menuIdioma,
+abrirIdioma: () => this.setState({ menuIdioma: !s.menuIdioma }),
+idiomas: ORDEM.map((l) => ({ lang: l, nome: TEXTOS[l].idiomaNome, atual: l === idioma, escolher: () => this.setState({ idioma: l, menuIdioma: false }) })),
 __VALORES__
 };
 }'''
@@ -299,11 +301,34 @@ def botao_tema(k, tam=36):
             f'border:0;border-radius:9px;background:transparent;color:{k["mfg"]};cursor:pointer;">{icone_tema()}</button>')
 
 
-def botao_idioma(k, alt=36, extra=''):
-    return (f'<button type="button" aria-label="{T("trocarIdioma")}" onClick="{{{{trocarIdioma}}}}" '
-            f'style="display:flex;align-items:center;gap:8px;height:{alt}px;padding:0 10px;border:0;border-radius:9px;'
-            f'background:transparent;color:{k["mfg"]};font-family:{FONTE};font-size:13px;cursor:pointer;{extra}">'
-            f'{ic("globo", 16)}<span>{T("idiomaNome")}</span></button>')
+def botao_idioma(k, alt=36, extra='', abre='baixo', compacto=False):
+    # menu, não ciclo: o clique abre a lista inteira, cada idioma no próprio idioma
+    lugar = {'baixo': 'top:calc(100% + 6px);right:0;',
+             'cima': 'bottom:calc(100% + 6px);left:0;',
+             'lado': 'left:calc(100% + 8px);bottom:0;'}[abre]
+    if compacto:
+        botao = (f'<button type="button" aria-label="{T("trocarIdioma")}" aria-haspopup="menu" aria-expanded="{{{{menuIdioma}}}}" '
+                 f'onClick="{{{{abrirIdioma}}}}" style="display:flex;flex-direction:column;align-items:center;gap:2px;width:44px;padding:6px 0;'
+                 f'border:0;border-radius:10px;background:transparent;color:{k["mfg"]};font-family:{MONO};font-size:10px;letter-spacing:0.08em;cursor:pointer;">'
+                 f'{ic("globo", 16)}{T("idiomaCurto")}</button>')
+    else:
+        botao = (f'<button type="button" aria-label="{T("trocarIdioma")}" aria-haspopup="menu" aria-expanded="{{{{menuIdioma}}}}" '
+                 f'onClick="{{{{abrirIdioma}}}}" style="display:flex;align-items:center;gap:8px;width:100%;height:{alt}px;padding:0 10px;border:0;'
+                 f'border-radius:9px;background:transparent;color:{k["mfg"]};font-family:{FONTE};font-size:13px;cursor:pointer;">'
+                 f'{ic("globo", 16)}<span>{T("idiomaNome")}</span><span style="display:flex;opacity:0.6;">{ic("baixo", 12)}</span></button>')
+    menu = (f'<sc-if value="{{{{menuIdioma}}}}" hint-placeholder-val="{{{{ false }}}}">'
+            f'<div role="menu" aria-label="{T("idiomaMenu")}" style="position:absolute;{lugar}z-index:20;min-width:176px;padding:4px;'
+            f'border-radius:12px;background:{k["card"]};box-shadow:inset 0 0 0 1px {k["border"]}, {k["sombraFlut"]};display:flex;flex-direction:column;">'
+            f'<span style="padding:6px 8px;font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;'
+            f'color:{k["mfg"]};">{T("idiomaMenu")}</span>'
+            f'<sc-for list="{{{{idiomas}}}}" as="i" hint-placeholder-count="3">'
+            f'<button type="button" role="menuitemradio" aria-checked="{{{{i.atual}}}}" lang="{{{{i.lang}}}}" onClick="{{{{i.escolher}}}}" '
+            f'style="display:flex;align-items:center;justify-content:space-between;gap:8px;height:32px;padding:0 8px;border:0;border-radius:6px;'
+            f'background:transparent;color:{k["fg"]};font-family:{FONTE};font-size:13px;text-align:left;cursor:pointer;">'
+            f'<span>{{{{i.nome}}}}</span>'
+            f'<sc-if value="{{{{i.atual}}}}" hint-placeholder-val="{{{{ false }}}}"><span style="display:flex;color:{k["pri"]};">{ic("check", 14)}</span></sc-if>'
+            f'</button></sc-for></div></sc-if>')
+    return f'<span style="position:relative;display:flex;{extra}">{botao}{menu}</span>'
 
 
 def rail(k, ativo):
@@ -339,7 +364,7 @@ def rail(k, ativo):
         f'<div style="flex:1;"></div>'
         f'<div style="padding:10px;display:flex;flex-direction:column;gap:2px;">{base}'
         f'<div style="height:1px;background:{k["muted"]};margin:8px 4px;"></div>'
-        f'<div style="display:flex;align-items:center;gap:2px;">{botao_idioma(k, extra="flex:1;")}{botao_tema(k)}</div>'
+        f'<div style="display:flex;align-items:center;gap:2px;">{botao_idioma(k, extra="flex:1;", abre="cima")}{botao_tema(k)}</div>'
         f'<div style="display:flex;align-items:center;gap:10px;height:44px;padding:0 10px;">'
         f'<span style="width:28px;height:28px;border-radius:999px;background:{k["tgreen"]};color:{k["tgreenfg"]};'
         f'display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">RM</span>'
@@ -357,10 +382,7 @@ def rail_compacto(k, ativo):
         return (f'<a href="{destino(chave)}" aria-label="{T(chave)}"{cur} style="display:flex;align-items:center;justify-content:center;'
                 f'width:40px;height:40px;border-radius:10px;{f}">{ic(icone, 17)}</a>')
     nav = ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS)
-    idioma = (f'<button type="button" aria-label="{T("trocarIdioma")}" onClick="{{{{trocarIdioma}}}}" '
-              f'style="display:flex;flex-direction:column;align-items:center;gap:2px;width:44px;padding:6px 0;margin-top:6px;'
-              f'border:0;border-radius:10px;background:transparent;color:{k["mfg"]};font-family:{MONO};font-size:10px;letter-spacing:0.08em;cursor:pointer;">'
-              f'{ic("globo", 16)}{T("idiomaCurto")}</button>')
+    idioma = botao_idioma(k, extra='margin-top:6px;', abre='lado', compacto=True)
     return (
         f'<nav aria-label="Muriki Code" style="width:64px;flex:0 0 64px;background:{k["rail"]};display:flex;'
         f'flex-direction:column;align-items:center;gap:4px;padding:14px 0 12px;box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);">'

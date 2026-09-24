@@ -516,6 +516,27 @@
       "docs": "A linha que contém o RowActions precisa da classe `group/row` — a barra usa `group-hover/row` para aparecer. Em telas de toque passe `alwaysVisible` e `inlineCount={0}`. `loading` numa ação põe o spinner no lugar do ícone, trava a ação e mantém a barra visível enquanto ela roda."
     },
     {
+      "name": "language-switcher",
+      "type": "registry:block",
+      "title": "Language Switcher",
+      "description": "Troca de idioma em menu, não em ciclo: o clique abre a lista inteira, cada idioma no próprio idioma, com marca no atual. Modo compact (globo + sigla) para trilho recolhido.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/dropdown-menu",
+        "SwellSystem/muriki-ds/button"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/language-switcher/language-switcher.tsx",
+          "type": "registry:component"
+        }
+      ],
+      "docs": "O bloco não guarda estado nem sabe de i18n: o app passa value, options e onValueChange, e o label (\"Idioma\") já traduzido. Os nomes das opções ficam no próprio idioma (Português, English, Español) e não se traduzem."
+    },
+    {
       "name": "view-toggle",
       "type": "registry:ui",
       "title": "View Toggle",
