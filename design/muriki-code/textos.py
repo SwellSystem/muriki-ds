@@ -371,6 +371,11 @@ ACESSO = {
         req8='8 caracteres', reqNum='1 número', reqMin='1 minúscula', reqMai='1 maiúscula',
         termosA='Li e aceito os', termos='termos de uso', termosE='e a', privacidade='política de privacidade',
         semTreino='Seu código não é usado para treinar modelos de IA.', criarBotao='Criar conta',
+        rotuloPasskey='Passkey', heroPasskeyA='Confirme no', heroPasskeyB='seu dispositivo.',
+        subPasskey='O navegador abriu o pedido da sua chave de acesso.', aguardando='Aguardando a confirmação',
+        aguardandoTxt='Use Touch ID, Windows Hello ou a chave física que você cadastrou. Se a janela do navegador sumiu, peça de novo.',
+        pedirDeNovo='Pedir de novo', usarEmail='Usar email e senha',
+        passkeyNota='A passkey já é o segundo fator: quem entra por ela não digita código.',
     ),
     'en-US': dict(
         acesso='Access', pitch1='You already write code.', pitch2='Here you learn to decide',
@@ -390,6 +395,11 @@ ACESSO = {
         req8='8 characters', reqNum='1 number', reqMin='1 lowercase', reqMai='1 uppercase',
         termosA='I have read and accept the', termos='terms of use', termosE='and the', privacidade='privacy policy',
         semTreino='Your code is never used to train AI models.', criarBotao='Create account',
+        rotuloPasskey='Passkey', heroPasskeyA='Confirm on', heroPasskeyB='your device.',
+        subPasskey='Your browser opened the request for your passkey.', aguardando='Waiting for confirmation',
+        aguardandoTxt='Use Touch ID, Windows Hello or the security key you registered. If the browser window went away, ask again.',
+        pedirDeNovo='Ask again', usarEmail='Use email and password',
+        passkeyNota='A passkey is already the second factor: signing in with it needs no code.',
     ),
     'es-ES': dict(
         acesso='Acceso', pitch1='Código ya escribes.', pitch2='Aquí aprendes a decidir',
@@ -409,6 +419,11 @@ ACESSO = {
         req8='8 caracteres', reqNum='1 número', reqMin='1 minúscula', reqMai='1 mayúscula',
         termosA='He leído y acepto los', termos='términos de uso', termosE='y la', privacidade='política de privacidad',
         semTreino='Tu código nunca se usa para entrenar modelos de IA.', criarBotao='Crear cuenta',
+        rotuloPasskey='Passkey', heroPasskeyA='Confirma en', heroPasskeyB='tu dispositivo.',
+        subPasskey='El navegador abrió la solicitud de tu llave de acceso.', aguardando='Esperando la confirmación',
+        aguardandoTxt='Usa Touch ID, Windows Hello o la llave física que registraste. Si la ventana del navegador desapareció, pídela de nuevo.',
+        pedirDeNovo='Pedir de nuevo', usarEmail='Usar email y contraseña',
+        passkeyNota='La passkey ya es el segundo factor: quien entra con ella no escribe código.',
     ),
 }
 

@@ -1116,6 +1116,41 @@ def tela_acesso(k, modo, sufixo):
                           cabeca=esqueci, depois=forca, olho=True, auto='current-password'))
         fim = caixa(T('lembrar')) + enviar(T('entrar'), f'Main{sufixo}.dc.html')
         gap_form = 24
+    if modo == 'passkey':
+        rotulo_, hero_a, hero_b, sub = T('rotuloPasskey'), T('heroPasskeyA'), T('heroPasskeyB'), T('subPasskey')
+
+    if modo == 'passkey':
+        # o mesmo pedido da passkey do backoffice: o navegador abre o pedido e a tela espera
+        aneis = ''.join(
+            f'<span aria-hidden="true" style="position:absolute;inset:{-i * 14}px;border-radius:999px;'
+            f'box-shadow:inset 0 0 0 1px color-mix(in oklch, {k["pri"]} {40 - i * 12}%, transparent);"></span>' for i in (1, 2, 3))
+        corpo = (
+            f'<div role="status" style="display:flex;flex-direction:column;align-items:center;gap:22px;padding:34px 24px 26px;border-radius:12px;'
+            f'background:{k["card"]};box-shadow:inset 0 0 0 1px {k["border"]}, {k["sombra"]};">'
+            f'<span style="position:relative;display:flex;align-items:center;justify-content:center;width:72px;height:72px;margin:18px 0;'
+            f'border-radius:999px;background:{k["prisub"]};color:{k["pri"]};">{aneis}<span style="display:flex;width:34px;height:34px;">{I["digital"]}</span></span>'
+            f'<div style="display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;">'
+            f'<span style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:{k["fgs"]};">'
+            f'<span style="width:7px;height:7px;border-radius:999px;background:{k["warn"]};"></span>{T("aguardando")}</span>'
+            f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};max-width:320px;">{T("aguardandoTxt")}</span></div>'
+            f'<a href="#" style="display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 12px;border-radius:8px;'
+            f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["fgs"]};font-size:13px;font-weight:500;">'
+            f'{ic("troca", 14)}{T("pedirDeNovo")}</a></div>'
+            f'<div style="display:flex;align-items:flex-start;gap:10px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
+            f'<span style="display:flex;margin-top:1px;color:{k["ok"]};">{ic("cadeado", 15)}</span><span>{T("passkeyNota")}</span></div>'
+            f'<a href="Entrar{sufixo}.dc.html" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;'
+            f'font-size:13px;font-weight:500;color:{k["mfg"]};"><span style="display:flex;transform:rotate(180deg);">{ic("seta", 13)}</span>'
+            f'{T("usarEmail")}</a>')
+    else:
+        passkey = provedor("digital", "Passkey")
+        if not criar:
+            passkey = f'<a href="Passkey{sufixo}.dc.html" style="display:grid;">{passkey}</a>'
+        corpo = (
+            f'<div style="display:flex;flex-direction:column;gap:10px;">{legenda(com, k)}{provedor_largo("github", "GitHub")}'
+            f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:8px;">'
+            f'{provedor("google", "Google")}{passkey}</div></div>'
+            f'<div style="display:flex;align-items:center;gap:12px;">{linha(k["input"], "flex:1;")}{legenda(T("ou"), k)}{linha(k["input"], "flex:1;")}</div>'
+            f'<form style="display:flex;flex-direction:column;gap:{gap_form}px;margin:0;">{campos}{fim}</form>')
 
     formulario = (
         f'<div style="grid-column:2;display:flex;flex-direction:column;gap:20px;">'
@@ -1124,11 +1159,7 @@ def tela_acesso(k, modo, sufixo):
         f'<h1 style="margin:0;font-size:36px;line-height:1;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
         f'{hero_a}<br><span style="color:{k["pri"]};">{hero_b}</span></h1>'
         f'<p style="margin:0;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div>'
-        f'<div style="display:flex;flex-direction:column;gap:10px;">{legenda(com, k)}{provedor_largo("github", "GitHub")}'
-        f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:8px;">'
-        f'{provedor("google", "Google")}{provedor("digital", "Passkey")}</div></div>'
-        f'<div style="display:flex;align-items:center;gap:12px;">{linha(k["input"], "flex:1;")}{legenda(T("ou"), k)}{linha(k["input"], "flex:1;")}</div>'
-        f'<form style="display:flex;flex-direction:column;gap:{gap_form}px;margin:0;">{campos}{fim}</form></div>')
+        f'{corpo}</div>')
 
     lado = (f'<main style="position:relative;display:flex;flex-direction:column;min-width:0;">'
             f'<header style="display:flex;justify-content:flex-end;align-items:center;gap:4px;padding:32px 48px 0;">'
@@ -1445,6 +1476,8 @@ def _montar(tela, tema, sufixo):
         return web(PLAYGROUND, tela_playground(k), ANTES_PLAYGROUND, 'lg: lg,\nlinguas: linguas,\nsel: sel', PROPS_PLAYGROUND)
     if tela['id'] == 'entrar':
         return web(ACESSO, tela_acesso(k, 'entrar', sufixo), antes_acesso('', '', ''), VALORES_ACESSO)
+    if tela['id'] == 'passkey':
+        return web(ACESSO, tela_acesso(k, 'passkey', sufixo), antes_acesso('', '', ''), VALORES_ACESSO)
     if tela['id'] == 'criar':
         return web(ACESSO, tela_acesso(k, 'criar', sufixo), antes_acesso('Rafael Moura', 'rafael@moura.dev', 'murikicode26'), VALORES_ACESSO)
     if tela['id'] == 'primeiro':

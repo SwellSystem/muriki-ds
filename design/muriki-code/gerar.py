@@ -9,6 +9,7 @@ os.makedirs(SAIDA, exist_ok=True)
 TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · conta Muriki', 0, 0, 1),
     ('criar', 'CriarConta', 'Criar conta', 'Criar conta', 1, 0, 1),
+    ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 6, 0, 1),
     ('jornada', 'Jornada', 'Primeiro acesso', 'Primeiro acesso · escolha da jornada', 2, 0, 1),
     ('ajuste', 'Ajuste', 'Ajuste por competência', 'Primeiro acesso · declarado por competência', 3, 0, 1),
     ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 4, 0, 1),
