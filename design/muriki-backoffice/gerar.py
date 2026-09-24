@@ -71,7 +71,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 A4_W, A4_H = 794, 1123
 PDFS = [
     ('PdfCodigos.dc.html', 'PDF · códigos de recuperação', '/_blob/7d586bef4c42f395fb2a6498f82edaa1'),
-    ('PdfRelatorio1.dc.html', 'PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)', '/_blob/faf03c5c424741beef7b923dffda3a95'),
+    ('PdfRelatorio1.dc.html', 'PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)', '/_blob/767ac3742b0c51091dfa2528773ec93d'),
     ('PdfRelatorio2.dc.html', 'PDF · relatório gerencial · página 2 (tabela e nota)', '/_blob/0eef546d6a948e94d9b0b4fe2bffcc19'),
     ('PdfRelatorio3.dc.html', 'PDF · relatório gerencial · página 3 (tabela longa)', '/_blob/f610a9062d73cf1db08f126746de1e95'),
 ]

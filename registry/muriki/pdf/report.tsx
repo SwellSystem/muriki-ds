@@ -256,20 +256,34 @@ export function ReportDocument({
 export interface ReportKpi {
   label: string
   value: string
-  /** Variação contra o período anterior, já formatada: "+6,8%". */
+  /** Variação contra o período anterior, já formatada e com sinal: "+6,8%", "−2". A seta segue o sinal. */
   delta?: string
-  /** Se a variação é boa, ruim ou neutra — para a cor E a seta. */
+  /**
+   * Se a variação é boa, ruim ou neutra: decide só a COR. A seta vem do sinal do delta,
+   * porque subir nem sempre é bom — mais falhas de login sobem e são ruins ("↑ +2" em vermelho).
+   */
+  tone?: "good" | "bad" | "neutral"
+  /** @deprecated Use `tone`. `up` vale como good e `down` como bad; a seta já não depende dele. */
   trend?: "up" | "down" | "neutral"
   /** Linha de apoio: "contra agosto", "412 pagantes". */
   hint?: string
+}
+
+/** A seta pelo sinal do delta: "+" sobe, "−"/"-" desce, zero ou sem sinal fica sem seta. */
+function setaDoDelta(delta: string) {
+  const t = delta.trim()
+  if (/^\+/.test(t)) return "↑ "
+  if (/^[−-]/.test(t)) return "↓ "
+  return ""
 }
 
 export function ReportKpis({ items }: { items: ReportKpi[] }) {
   return (
     <View style={{ flexDirection: "row", gap: 10, breakInside: "avoid" }}>
       {items.map((k) => {
-        const cor = k.trend === "up" ? OK : k.trend === "down" ? RUIM : MUTED
-        const seta = k.trend === "up" ? "↑ " : k.trend === "down" ? "↓ " : ""
+        const tom = k.tone ?? (k.trend === "up" ? "good" : k.trend === "down" ? "bad" : "neutral")
+        const cor = tom === "good" ? OK : tom === "bad" ? RUIM : MUTED
+        const seta = k.delta ? setaDoDelta(k.delta) : ""
         return (
           <View
             key={k.label}

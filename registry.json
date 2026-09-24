@@ -1016,7 +1016,7 @@
           "target": "components/pdf-documents/report.tsx"
         }
       ],
-      "docs": "render(<ReportDocument title period generatedBy generatedAt summary?>…</ReportDocument>, { ...reportRenderOptions({ title, period, product }), fonts }). Miolo: ReportKpis, ReportSection (breakBefore, keepTogether), ReportBarChart, ReportNote e, para tabelas, o DataTable do pdfcn (@pdfcn/takumi/data-table). Use ReportBarChart em vez do Graph do pdfcn, que no takumi duplica os rótulos. Limitação conhecida: uma tabela que enche a página exatamente pode deixar uma página vazia no fim. Precisa do registry do pdfcn declarado no components.json do app: \"@pdfcn\": \"https://pdfcn.dev/r/{name}.json\" (as peças takumi vêm de lá). Registre Geist (400/500/600/700) e Geist Mono (400) no render."
+      "docs": "render(<ReportDocument title period generatedBy generatedAt summary?>…</ReportDocument>, { ...reportRenderOptions({ title, period, product }), fonts }). Miolo: ReportKpis (a seta segue o sinal do delta; `tone` good/bad/neutral só pinta — mais falhas é \"↑ +2\" em vermelho), ReportSection (breakBefore, keepTogether), ReportBarChart, ReportNote e, para tabelas, o DataTable do pdfcn (@pdfcn/takumi/data-table). Use ReportBarChart em vez do Graph do pdfcn, que no takumi duplica os rótulos. Limitação conhecida: uma tabela que enche a página exatamente pode deixar uma página vazia no fim. Precisa do registry do pdfcn declarado no components.json do app: \"@pdfcn\": \"https://pdfcn.dev/r/{name}.json\" (as peças takumi vêm de lá). Registre Geist (400/500/600/700) e Geist Mono (400) no render."
     },
     {
       "name": "calendar",
