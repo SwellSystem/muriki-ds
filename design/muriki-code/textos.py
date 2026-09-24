@@ -374,7 +374,7 @@ ACESSO = {
         rotuloPasskey='Passkey', heroPasskeyA='Confirme no', heroPasskeyB='seu dispositivo.',
         subPasskey='O navegador abriu o pedido da sua chave de acesso.', aguardando='Aguardando a confirmação',
         aguardandoTxt='Use Touch ID, Windows Hello ou a chave física que você cadastrou. Se a janela do navegador sumiu, peça de novo.',
-        pedirDeNovo='Pedir de novo', usarEmail='Usar email e senha',
+        pedirDeNovo='Pedir de novo', passkeyDica='Touch ID, Windows Hello ou chave física. Dispensa o código.', usarEmail='Usar email e senha',
         passkeyNota='A passkey já é o segundo fator: quem entra por ela não digita código.',
     ),
     'en-US': dict(
@@ -398,7 +398,7 @@ ACESSO = {
         rotuloPasskey='Passkey', heroPasskeyA='Confirm on', heroPasskeyB='your device.',
         subPasskey='Your browser opened the request for your passkey.', aguardando='Waiting for confirmation',
         aguardandoTxt='Use Touch ID, Windows Hello or the security key you registered. If the browser window went away, ask again.',
-        pedirDeNovo='Ask again', usarEmail='Use email and password',
+        pedirDeNovo='Ask again', passkeyDica='Touch ID, Windows Hello or a security key. No code needed.', usarEmail='Use email and password',
         passkeyNota='A passkey is already the second factor: signing in with it needs no code.',
     ),
     'es-ES': dict(
@@ -422,7 +422,7 @@ ACESSO = {
         rotuloPasskey='Passkey', heroPasskeyA='Confirma en', heroPasskeyB='tu dispositivo.',
         subPasskey='El navegador abrió la solicitud de tu llave de acceso.', aguardando='Esperando la confirmación',
         aguardandoTxt='Usa Touch ID, Windows Hello o la llave física que registraste. Si la ventana del navegador desapareció, pídela de nuevo.',
-        pedirDeNovo='Pedir de nuevo', usarEmail='Usar email y contraseña',
+        pedirDeNovo='Pedir de nuevo', passkeyDica='Touch ID, Windows Hello o llave física. Sin código.', usarEmail='Usar email y contraseña',
         passkeyNota='La passkey ya es el segundo factor: quien entra con ella no escribe código.',
     ),
 }

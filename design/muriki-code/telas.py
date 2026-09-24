@@ -1043,12 +1043,6 @@ def tela_acesso(k, modo, sufixo):
                 f'<span style="display:flex;width:18px;height:18px;color:{k["fgs"]};">{I[icone]}</span>'
                 f'<span style="font-size:14px;font-weight:500;letter-spacing:-0.01em;color:{k["fgs"]};">{nome}</span></button>')
 
-    def provedor(icone, nome):
-        return (f'<button type="button" aria-label="{T("criarCom" if criar else "entrarCom")} {nome}" style="display:flex;align-items:center;'
-                f'justify-content:center;gap:6px;height:40px;border-radius:10px;border:1px solid {k["input"]};background:{k["card"]};'
-                f'font-family:{MONO};font-size:9px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:{k["mfg"]};cursor:pointer;">'
-                f'<span style="display:flex;width:14px;height:14px;color:{k["fg"]};">{I[icone]}</span>{nome}</button>')
-
     def campo(id_, rotulo_, icone, tipo, valor, mudar, ph, cabeca='', depois='', olho=False, auto=''):
         botao_olho = ''
         if olho:
@@ -1142,15 +1136,16 @@ def tela_acesso(k, modo, sufixo):
             f'font-size:13px;font-weight:500;color:{k["mfg"]};"><span style="display:flex;transform:rotate(180deg);">{ic("seta", 13)}</span>'
             f'{T("usarEmail")}</a>')
     else:
-        passkey = provedor("digital", "Passkey")
+        # a API do Code entra por email e senha ou por passkey, sem GitHub nem Google; a passkey só
+        # existe depois da conta criada, então o criar conta fica só com o formulário
+        entrada = ''
         if not criar:
-            passkey = f'<a href="Passkey{sufixo}.dc.html" style="display:grid;">{passkey}</a>'
-        corpo = (
-            f'<div style="display:flex;flex-direction:column;gap:10px;">{legenda(com, k)}{provedor_largo("github", "GitHub")}'
-            f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:8px;">'
-            f'{provedor("google", "Google")}{passkey}</div></div>'
-            f'<div style="display:flex;align-items:center;gap:12px;">{linha(k["input"], "flex:1;")}{legenda(T("ou"), k)}{linha(k["input"], "flex:1;")}</div>'
-            f'<form style="display:flex;flex-direction:column;gap:{gap_form}px;margin:0;">{campos}{fim}</form>')
+            entrada = (
+                f'<div style="display:flex;flex-direction:column;gap:10px;">{legenda(com, k)}'
+                f'<a href="Passkey{sufixo}.dc.html" style="display:grid;">{provedor_largo("digital", "Passkey")}</a>'
+                f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("passkeyDica")}</span></div>'
+                f'<div style="display:flex;align-items:center;gap:12px;">{linha(k["input"], "flex:1;")}{legenda(T("ou"), k)}{linha(k["input"], "flex:1;")}</div>')
+        corpo = f'{entrada}<form style="display:flex;flex-direction:column;gap:{gap_form}px;margin:0;">{campos}{fim}</form>'
 
     formulario = (
         f'<div style="grid-column:2;display:flex;flex-direction:column;gap:20px;">'
