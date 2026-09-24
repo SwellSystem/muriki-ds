@@ -54,8 +54,8 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('jornada', 0, 6, 'Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício e perfil vazio'),
-    ('jornadaEscuro', 1, 6, 'Entrada e primeiro acesso no tema escuro'),
+    ('jornada', 0, 7, 'Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, primeiro exercício, perfil vazio e passkey'),
+    ('jornadaEscuro', 1, 7, 'Entrada e primeiro acesso no tema escuro'),
     ('web', 2, 5, 'Code web: perfil, competência, exercício, avaliação e playground'),
     ('webEscuro', 3, 5, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
