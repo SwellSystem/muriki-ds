@@ -991,8 +991,9 @@ def tela_auditoria(k, detalhe=False):
 # ── Minha conta ─────────────────────────────────────────────────────────
 # GET /staff/me (nome, e-mail, papel, twoFactorEnabled, createdAt) e /staff/sessions (ip,
 # userAgent, createdAt, expiresAt, current); POST /staff/auth/password (atual + nova);
-# DELETE /staff/sessions/{id}. Não há rota para trocar o próprio nome nem para o próprio
-# membro trocar o TOTP — "Trocar de autenticador" é o alvo, e depende da muriki-api.
+# DELETE /staff/sessions/{id}. Não há rota para trocar o próprio nome. Trocar o TOTP é o mesmo
+# /two-factor/setup + /confirm depois de um step-up (regra R15): o app antigo vale até o
+# confirm, que devolve 10 códigos novos e encerra as outras sessões.
 # O tema é preferência do navegador, não vai para a API.
 def _cartao_conta(k, titulo, sub, corpo, direita='', extra=''):
     s_ = f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{sub}</span>' if sub else ''
@@ -1053,7 +1054,7 @@ def tela_conta(k, sobre=''):
         f'<div style="display:flex;gap:8px;flex-wrap:wrap;">'
         f'{link_botao(k, "Trocar de autenticador", href("ContaAutenticador"), "outline", 32, "troca")}'
         f'{link_botao(k, "Gerar códigos de recuperação", "#", "ghost", 32, "chave")}</div>'
-        f'<span style="font-size:12px;line-height:17px;color:{k["mfg"]};">Trocar revoga o app antigo e os códigos de recuperação antigos na hora.</span>'))
+        f'<span style="font-size:12px;line-height:17px;color:{k["mfg"]};">Trocar revoga o app antigo, os códigos de recuperação antigos e as outras sessões.</span>'))
 
     sess = [('Chrome · macOS', '189.40.12.7', 'hoje, 22:09', 'em 7 dias', True),
             ('Safari · iOS', '177.8.40.21', 'ontem, 08:12', 'em 6 dias', False),
@@ -1093,7 +1094,7 @@ def tela_conta_autenticador(k):
             f'<ul style="margin:0;padding:0 0 0 18px;display:flex;flex-direction:column;gap:6px;font-size:13px;line-height:19px;color:{k["fg"]};">'
             f'<li>O app antigo para de gerar códigos que funcionam.</li>'
             f'<li>Os 10 códigos de recuperação antigos deixam de valer, e vêm 10 novos.</li>'
-            f'<li>Suas sessões abertas continuam; encerre-as se trocou por perda do celular.</li></ul>')))
+            f'<li>As suas outras sessões são encerradas; esta continua aberta.</li></ul>')))
     rodape = (f'<span style="flex:1;"></span>{link_botao(k, "Cancelar", href("Conta"), "ghost", 36)}'
               f'{link_botao(k, "Ativar o novo app", href("Conta"), "solid", 36)}')
     s_ = sheet(k, 'Trocar de autenticador', 'Você confirmou com o código do app atual. Agora o novo.', corpo_s, rodape, largura=520)

@@ -63,7 +63,8 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
             order.append(arquivo)
         gerados.append(arquivo)
 
-largura = lambda n: n * W + (n - 1) * 80
+# o editor limita a largura de um título a 8000px
+largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('acesso', 0, 7, 'Entrada: e-mail e senha, depois o código TOTP num POST só; senha esquecida; e o primeiro acesso, do convite aos códigos de recuperação'),
@@ -77,5 +78,5 @@ for chave, lin, n, texto in [
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 
-json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=1)
+json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=2)
 print(f'{len(gerados)} quadros em {SAIDA}')
