@@ -329,6 +329,9 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/muriki-logo` | `registry:ui` | o macaco da marca em SVG inline, de olhos abertos ou fechados |
 | `@muriki/qr-code` | `registry:ui` | QR escaneável com cara de marca: pontos, olhos arredondados e logo no meio; placa sempre branca |
+| `@muriki/pdf-theme` | `registry:lib` | o tema do pdfcn com a marca no papel; fonte única de todo PDF da Muriki |
+| `@muriki/pdf-recovery-codes` | `registry:block` | os códigos de recuperação do 2FA em PDF |
+| `@muriki/pdf-report` | `registry:block` | a casca dos relatórios gerenciais em PDF: capa, KPIs, seções, gráfico, página N de M |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
 | `@muriki/status-pill` | `registry:block` | camada semântica sobre o Badge: cinco famílias de status, um mapa só |
 | `@muriki/task-modal` | `registry:block` | o modal de criar task em três modos — central, lateral e tela cheia — com o seletor no topo, mais a criação rápida |
