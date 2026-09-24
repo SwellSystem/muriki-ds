@@ -648,7 +648,7 @@
       "name": "skeleton",
       "type": "registry:ui",
       "title": "Skeleton",
-      "description": "Um buraco onde o conteúdo vai entrar: usa a superfície afundada do sistema e raio de controle. A regra de uso vale mais que a peça — skeleton bom tem a anatomia do que substitui.",
+      "description": "Um buraco onde o conteúdo vai entrar: superfície afundada e raio de controle, com uma faixa na cor do card varrendo a tela inteira em sincronia. A regra de uso vale mais que a peça.",
       "dependencies": [],
       "registryDependencies": [
         "utils",
@@ -660,7 +660,34 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Larguras iguais em linhas de texto denunciam a preguiça. Veja o @muriki/plan-card, que traz o próprio."
+      "docs": "Larguras iguais em linhas de texto denunciam a preguiça. Veja o @muriki/plan-card, que traz o próprio.",
+      "css": {
+        "@keyframes muriki-shimmer": {
+          "from": {
+            "background-position": "-100vw 0"
+          },
+          "to": {
+            "background-position": "100vw 0"
+          }
+        },
+        ".muriki-skeleton": {
+          "background-color": "var(--sunken)",
+          "background-image": "linear-gradient(100deg, transparent 35%, color-mix(in oklab, var(--card) 85%, transparent) 50%, transparent 65%)",
+          "background-size": "200vw 100%",
+          "background-repeat": "no-repeat",
+          "background-attachment": "fixed",
+          "animation": "muriki-shimmer 1.5s ease-in-out infinite"
+        },
+        ".dark .muriki-skeleton": {
+          "background-image": "linear-gradient(100deg, transparent 35%, color-mix(in oklab, var(--card) 70%, transparent) 50%, transparent 65%)"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-skeleton": {
+            "animation": "none",
+            "background-image": "none"
+          }
+        }
+      }
     },
     {
       "name": "spinner",
