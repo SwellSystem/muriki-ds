@@ -57,7 +57,7 @@ export function TaskModalDescription({
       <div className="mb-1.5 flex w-max items-center gap-px rounded-[8px] bg-card p-0.5 shadow-[inset_0_0_0_1px_var(--border)]">
         {TOOLBAR.map((item) =>
           "divider" in item ? (
-            <span key={item.key} className="mx-1 h-4 w-px bg-border" />
+            <span key={item.key} className="mx-1 h-4 w-px bg-divider" />
           ) : (
             <Button
               key={item.key}

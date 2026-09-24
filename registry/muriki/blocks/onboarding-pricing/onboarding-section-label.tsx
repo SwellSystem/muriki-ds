@@ -23,7 +23,7 @@ export function OnboardingSectionLabel({
         {label}
       </span>
       <span aria-hidden className="h-px w-8 bg-primary/60" />
-      <span aria-hidden className="h-px w-32 bg-border/60" />
+      <span aria-hidden className="h-px w-32 bg-divider" />
     </div>
   )
 }
