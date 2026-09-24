@@ -130,20 +130,27 @@ export function reportRenderOptions(meta: ReportMeta) {
   } as const
 }
 
-export type ReportMotif = "money" | "shield" | "people" | "chart" | "none"
+export type ReportMotif = "business" | "shield" | "people" | "chart" | "none"
 
 const TINTA_MOTIVO = "rgba(255,255,255,0.08)"
 
 function Motivo({ motif }: { motif: ReportMotif }) {
   if (motif === "none") return null
-  if (motif === "money") {
+  if (motif === "business") {
+    // a maleta, no mesmo desenho do cadeado dos códigos: corpo cheio, alça em traço, e a
+    // faixa do fecho, que por cima do corpo sai no dobro da luz
     return (
-      <View style={{ position: "absolute", right: 58, top: -30, transform: "rotate(-8deg)" }}>
-        <Text style={{ fontSize: 230, lineHeight: 1, fontWeight: 700, letterSpacing: -10, color: TINTA_MOTIVO }}>R$</Text>
+      <View style={{ position: "absolute", right: 30, top: -46, transform: "rotate(-8deg)" }}>
+        <Svg width={270} height={270} viewBox="0 0 16 16">
+          <Path d="M2.6 5.2h10.8a1.2 1.2 0 0 1 1.2 1.2v6.4a1.2 1.2 0 0 1-1.2 1.2H2.6a1.2 1.2 0 0 1-1.2-1.2V6.4a1.2 1.2 0 0 1 1.2-1.2z" fill={TINTA_MOTIVO} />
+          <Path d="M5.8 5.2V3.9a1.1 1.1 0 0 1 1.1-1.1h2.2a1.1 1.1 0 0 1 1.1 1.1v1.3" fill="none" stroke={TINTA_MOTIVO} strokeWidth={1.2} strokeLinecap="round" />
+          <Path d="M1.4 9h13.2" fill="none" stroke={TINTA_MOTIVO} strokeWidth={0.9} />
+          <Path d="M7 8.3h2v1.6H7z" fill={TINTA_MOTIVO} />
+        </Svg>
       </View>
     )
   }
-  const caminhos: Record<Exclude<ReportMotif, "money" | "none">, string[]> = {
+  const caminhos: Record<Exclude<ReportMotif, "business" | "none">, string[]> = {
     shield: ["M8 1.8l5.2 2v4c0 3.2-2.2 5.4-5.2 6.4-3-1-5.2-3.2-5.2-6.4v-4z", "M5.8 8.2l1.6 1.6 3-3"],
     people: ["M6 3.2a2.4 2.4 0 1 1 0 4.8a2.4 2.4 0 1 1 0-4.8z", "M1.8 13.4c.5-2.4 2.2-3.8 4.2-3.8s3.7 1.4 4.2 3.8", "M10.4 3.4a2.4 2.4 0 0 1 0 4.4", "M11.8 9.8c1.3.5 2.2 1.7 2.4 3.6"],
     chart: ["M2.5 13.5h11", "M4.5 11.5v-3", "M8 11.5v-6", "M11.5 11.5v-8"],
@@ -169,7 +176,7 @@ export interface ReportDocumentProps extends ReportMeta {
   summary?: string
   /**
    * O desenho grande e translúcido atrás do macaco na capa, que diz o assunto antes do título:
-   * `money` (R$) para vendas, receita e cupons; `shield` para segurança; `people` para equipe e
+   * `business` (a maleta) para vendas, receita e cupons; `shield` para segurança; `people` para equipe e
    * clientes; `chart` para o resto. Padrão: `chart`.
    */
   motif?: ReportMotif
