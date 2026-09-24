@@ -5,4 +5,12 @@ export type { ResourcePageHeaderProps, ResourceToolbarProps } from "./resource-p
 export { ResourceFormSheet, ResourceFormSection, ResourceConfirmDialog } from "./resource-form-sheet"
 export type { ResourceFormSheetProps, ResourceFormSectionProps, ResourceConfirmDialogProps } from "./resource-form-sheet"
 export { useResourceLabel, RESOURCE_STRINGS } from "./labels"
-export type { ResourceColumn, ResourceSort, ResourcePagination, ResourceStatusTab, RowAction } from "./types"
+export type {
+  ResourceColumn,
+  ResourceSort,
+  ResourcePagination,
+  ResourcePagePagination,
+  ResourceCursorPagination,
+  ResourceStatusTab,
+  RowAction,
+} from "./types"

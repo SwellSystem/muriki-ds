@@ -24,7 +24,9 @@ export interface ResourceSort {
   direction: "asc" | "desc"
 }
 
-export interface ResourcePagination {
+/** Paginação por número: a API devolve o total e aceita pular de página. */
+export interface ResourcePagePagination {
+  mode?: "page"
   /** Começa em 1. */
   page: number
   pageSize: number
@@ -34,6 +36,26 @@ export interface ResourcePagination {
   pageSizeOptions?: number[]
   onPageSizeChange?: (pageSize: number) => void
 }
+
+/**
+ * Paginação por cursor: a API devolve `nextCursor` e nada de total. Sem
+ * total não há "1–50 de 1.284" nem números de página — só anterior, próxima
+ * e o tamanho. O caller guarda a pilha de cursores para poder voltar.
+ */
+export interface ResourceCursorPagination {
+  mode: "cursor"
+  pageSize: number
+  hasPrevious: boolean
+  hasNext: boolean
+  onPrevious: () => void
+  onNext: () => void
+  /** Número da página atual, só para o rótulo "Página N". Sem ele, o rótulo some. */
+  page?: number
+  pageSizeOptions?: number[]
+  onPageSizeChange?: (pageSize: number) => void
+}
+
+export type ResourcePagination = ResourcePagePagination | ResourceCursorPagination
 
 export interface ResourceStatusTab {
   value: string

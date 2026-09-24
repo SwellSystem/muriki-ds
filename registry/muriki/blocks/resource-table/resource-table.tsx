@@ -339,52 +339,70 @@ function janela(pagina: number, total: number): (number | "…")[] {
   return saida
 }
 
-export function ResourcePaginationBar({
-  page,
-  pageSize,
-  total,
-  onPageChange,
-  pageSizeOptions = [10, 25, 50, 100],
-  onPageSizeChange,
-}: ResourcePagination) {
+export function ResourcePaginationBar(props: ResourcePagination) {
   const t = useResourceLabel()
+  const { pageSize, pageSizeOptions = [10, 25, 50, 100], onPageSizeChange } = props
+
+  const tamanho = onPageSizeChange ? (
+    <label className="hidden items-center gap-2 sm:flex">
+      {t("resource.per_page")}
+      <Select
+        value={pageSize}
+        items={pageSizeOptions.map((n) => ({ value: n, label: String(n) }))}
+        onValueChange={(v) => v != null && onPageSizeChange(v)}
+      >
+        <SelectTrigger size="sm" className="w-[68px]">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {pageSizeOptions.map((n) => (
+            <SelectItem key={n} value={n}>
+              {n}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </label>
+  ) : null
+
+  const barra = "flex h-12 shrink-0 items-center gap-3 px-4 text-[12.5px] text-muted-foreground shadow-[inset_0_1px_0_var(--border)]"
+
+  if (props.mode === "cursor") {
+    // Sem total: nada de faixa "de N" nem números. Anterior e próxima, com texto — sozinhas, setas mudas não dizem o bastante.
+    const { page, hasPrevious, hasNext, onPrevious, onNext } = props
+    return (
+      <nav data-slot="resource-pagination" data-mode="cursor" aria-label={t("resource.pagination")} className={barra}>
+        {page != null ? <span className="tabular-nums">{t("resource.page", { page })}</span> : null}
+        <span className="flex-1" />
+        {tamanho}
+        <div className="flex items-center gap-0.5">
+          <Button variant="ghost" size="sm" disabled={!hasPrevious} onClick={onPrevious} aria-label={t("resource.previous_page")}>
+            <CaretLeftIcon />
+            {t("resource.previous")}
+          </Button>
+          <Button variant="ghost" size="sm" disabled={!hasNext} onClick={onNext} aria-label={t("resource.next_page")}>
+            {t("resource.next")}
+            <CaretRightIcon />
+          </Button>
+        </div>
+      </nav>
+    )
+  }
+
+  const { page, total, onPageChange } = props
   const paginas = Math.max(1, Math.ceil(total / pageSize))
   const de = total === 0 ? 0 : (page - 1) * pageSize + 1
   const ate = Math.min(total, page * pageSize)
 
   return (
-    <nav
-      data-slot="resource-pagination"
-      aria-label={t("resource.page", { page })}
-      className="flex h-12 shrink-0 items-center gap-3 px-4 text-[12.5px] text-muted-foreground shadow-[inset_0_1px_0_var(--border)]"
-    >
+    <nav data-slot="resource-pagination" data-mode="page" aria-label={t("resource.page", { page })} className={barra}>
       <span className="tabular-nums">
         {total === 0
           ? t("resource.range_empty", { total: 0 })
           : t("resource.range", { from: formatCount(de), to: formatCount(ate), total: formatCount(total) })}
       </span>
       <span className="flex-1" />
-      {onPageSizeChange ? (
-        <label className="hidden items-center gap-2 sm:flex">
-          {t("resource.per_page")}
-          <Select
-            value={pageSize}
-            items={pageSizeOptions.map((n) => ({ value: n, label: String(n) }))}
-            onValueChange={(v) => v != null && onPageSizeChange(v)}
-          >
-            <SelectTrigger size="sm" className="w-[68px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {pageSizeOptions.map((n) => (
-                <SelectItem key={n} value={n}>
-                  {n}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
-      ) : null}
+      {tamanho}
       <div className="flex items-center gap-0.5">
         <Button
           variant="ghost"

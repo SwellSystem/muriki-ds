@@ -1066,7 +1066,7 @@
           "target": "components/blocks/resource-table/index.ts"
         }
       ],
-      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app."
+      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app."
     },
     {
       "name": "task-timeline",
