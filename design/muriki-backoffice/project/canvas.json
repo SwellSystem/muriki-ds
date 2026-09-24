@@ -369,6 +369,34 @@
       "h": 900,
       "title": "Relatórios · gerar no sheet · escuro",
       "is_interactive": true
+    },
+    "PdfCodigos.dc.html": {
+      "x": 0,
+      "y": 10560,
+      "w": 794,
+      "h": 1123,
+      "title": "PDF · códigos de recuperação"
+    },
+    "PdfRelatorio1.dc.html": {
+      "x": 874,
+      "y": 10560,
+      "w": 794,
+      "h": 1123,
+      "title": "PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)"
+    },
+    "PdfRelatorio2.dc.html": {
+      "x": 1748,
+      "y": 10560,
+      "w": 794,
+      "h": 1123,
+      "title": "PDF · relatório gerencial · página 2 (tabela e nota)"
+    },
+    "PdfRelatorio3.dc.html": {
+      "x": 2622,
+      "y": 10560,
+      "w": 794,
+      "h": 1123,
+      "title": "PDF · relatório gerencial · página 3 (tabela longa)"
     }
   },
   "createdOnFiles": {
@@ -443,6 +471,13 @@
       "w": 240,
       "x": 0,
       "y": 6300
+    },
+    "pdfs": {
+      "x": 0,
+      "y": 10260,
+      "text": "PDFs: o pdf-report e o pdf-recovery-codes do DS, renderizados de verdade pelo takumi",
+      "kind": "title1",
+      "maxW": 4480
     }
   },
   "order": [
@@ -491,7 +526,11 @@
     "Relatorios.dc.html",
     "RelatoriosEscuro.dc.html",
     "RelatorioGerar.dc.html",
-    "RelatorioGerarEscuro.dc.html"
+    "RelatorioGerarEscuro.dc.html",
+    "PdfCodigos.dc.html",
+    "PdfRelatorio1.dc.html",
+    "PdfRelatorio2.dc.html",
+    "PdfRelatorio3.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"
