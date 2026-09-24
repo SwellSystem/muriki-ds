@@ -10,9 +10,9 @@ TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · conta Muriki', 0, 0, 1),
     ('criar', 'CriarConta', 'Criar conta', 'Criar conta', 1, 0, 1),
     ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 7, 0, 1),
-    ('jornada', 'Jornada', 'Primeiro acesso', 'Primeiro acesso · escolha da jornada', 2, 0, 1),
-    ('ajuste', 'Ajuste', 'Ajuste por competência', 'Primeiro acesso · declarado por competência', 3, 0, 1),
-    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · escolha do plano', 4, 0, 1),
+    ('jornada', 'Jornada', 'Primeiro acesso', 'Primeiro acesso · escolha da jornada', 3, 0, 1),
+    ('ajuste', 'Ajuste', 'Ajuste por competência', 'Primeiro acesso · declarado por competência', 4, 0, 1),
+    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · escolha do plano', 2, 0, 1),
     ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 5, 0, 1),
     ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 6, 0, 1),
     ('evolucao', 'Main', 'Evolução', 'Evolução · declarado, observado e estado', 0, 2, 3),
@@ -55,7 +55,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('jornada', 0, 8, 'Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, plano, primeiro exercício, perfil vazio e passkey'),
+    ('jornada', 0, 8, 'Entrada e primeiro acesso: entrar, criar conta, plano, jornada, ajuste, primeiro exercício, perfil vazio e passkey'),
     ('jornadaEscuro', 1, 8, 'Entrada e primeiro acesso no tema escuro'),
     ('web', 2, 5, 'Code web: perfil, competência, exercício, avaliação e playground'),
     ('webEscuro', 3, 5, 'Code web no tema escuro'),

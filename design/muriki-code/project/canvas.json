@@ -51,7 +51,7 @@
    "is_interactive": true
   },
   "Jornada.dc.html": {
-   "x": 3040,
+   "x": 4560,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -59,7 +59,7 @@
    "is_interactive": true
   },
   "JornadaEscuro.dc.html": {
-   "x": 3040,
+   "x": 4560,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -179,7 +179,7 @@
    "is_interactive": true
   },
   "Ajuste.dc.html": {
-   "x": 4560,
+   "x": 6080,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -187,7 +187,7 @@
    "is_interactive": true
   },
   "AjusteEscuro.dc.html": {
-   "x": 4560,
+   "x": 6080,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -243,7 +243,7 @@
    "is_interactive": true
   },
   "PlanoInicial.dc.html": {
-   "x": 6080,
+   "x": 3040,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -251,7 +251,7 @@
    "is_interactive": true
   },
   "PlanoInicialEscuro.dc.html": {
-   "x": 6080,
+   "x": 3040,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -287,7 +287,7 @@
   "jornada": {
    "x": 0,
    "y": -300,
-   "text": "Entrada e primeiro acesso: entrar, criar conta, jornada, ajuste, plano, primeiro exercício, perfil vazio e passkey",
+   "text": "Entrada e primeiro acesso: entrar, criar conta, plano, jornada, ajuste, primeiro exercício, perfil vazio e passkey",
    "kind": "title1",
    "maxW": 12080,
    "w": 240

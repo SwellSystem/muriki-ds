@@ -1092,7 +1092,7 @@ def tela_acesso(k, modo, sufixo):
                           depois=forca, olho=True, auto='new-password'))
         termos = (f'{T("termosA")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("termos")}</a> '
                   f'{T("termosE")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("privacidade")}</a>.')
-        fim = (caixa(termos) + enviar(T('criarBotao'), f'Jornada{sufixo}.dc.html')
+        fim = (caixa(termos) + enviar(T('criarBotao'), f'PlanoInicial{sufixo}.dc.html')
                + f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
                  f'{ic("cadeado", 13)}{T("semTreino")}</span>')
         gap_form = 20
@@ -1251,70 +1251,119 @@ def tela_ajuste(k, sufixo):
     rodape = (f'<div style="display:flex;align-items:center;gap:16px;">'
               f'{botao_link(T("voltar"), f"Jornada{sufixo}.dc.html", k, "ghost", 40)}'
               f'<span style="margin-left:auto;font-size:12.5px;color:{k["mfg"]};">{h("contagem")} · {T("mudarDepois")}</span>'
-              f'{botao_link(T("continuar"), f"PlanoInicial{sufixo}.dc.html", k, "solid", 40, "seta")}</div>')
+              f'{botao_link(T("continuar"), f"PrimeiroExercicio{sufixo}.dc.html", k, "solid", 40, "seta")}</div>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
             f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:18px;width:1040px;align-self:center;padding:16px 0 28px;">'
             f'{cab}{lista}{rodape}</main></div>')
 
 
-# ── Primeiro acesso, passo 3: o plano ──────────────────────────────────
-# O Starter vem marcado e seguir é um clique, sem cartão. O Pro fica ao lado, com o que ele
-# muda para quem acabou de dizer onde está; assinar abre o pagamento e volta ao primeiro exercício.
+# ── Primeiro acesso, passo 1: o plano ──────────────────────────────────
+# Vem logo depois de criar a conta, como no Platform: quem vai de Pro sai para o pagamento e volta
+# antes de configurar o perfil (Jornada e Ajuste), então nada do que a pessoa preencheu se perde.
+# A PricingScreen do DS (onboarding-pricing + plan-card), a mesma do Platform: barra de passos,
+# título de display, rótulo de seção, período à direita e os cards com a CTA de cada um. O Starter
+# é tingido e o Pro, recomendado, é o único sólido. `estado: carregando` mostra o skeleton do plan-card.
 def tela_plano_inicial(k, sufixo):
     h = lambda caminho: '{{' + caminho + '}}'
-    item = lambda t: (f'<li style="display:flex;gap:10px;align-items:flex-start;font-size:13.5px;line-height:21px;color:{k["fg"]};">'
-                      f'<span style="margin-top:3px;">{ic("check", 14, k["ok"])}</span><span>{t}</span></li>')
+    sk = lambda estilo: f'<span class="muriki-skeleton" style="display:block;{estilo}"></span>'
+    regua = (f'<span aria-hidden="true" style="display:block;height:1px;background:{"var(--divider)"};'
+             f'-webkit-mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);'
+             f'mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);"></span>')
 
-    def cartao_plano(chave, nome, preco, sub, itens, selo=''):
-        return (f'<button type="button" role="radio" aria-checked="{h(chave + ".marcado")}" onClick="{h(chave + ".escolher")}" '
-                f'style="flex:1;min-width:0;display:flex;flex-direction:column;gap:18px;padding:24px 26px;border:0;border-radius:16px;'
-                f'background:{k["card"]};box-shadow:{h(chave + ".borda")};text-align:left;font-family:{FONTE};cursor:pointer;">'
-                f'<span style="display:flex;align-items:center;gap:10px;width:100%;">'
-                f'<span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;'
-                f'box-shadow:inset 0 0 0 1.5px {h(chave + ".anel")};">'
-                f'<span style="width:9px;height:9px;border-radius:999px;background:{k["pri"]};display:{h(chave + ".ponto")};"></span></span>'
-                f'<span style="font-size:17px;font-weight:600;color:{k["fgs"]};">{nome}</span>{selo}</span>'
-                f'<span style="display:flex;flex-direction:column;gap:2px;">'
-                f'<span style="font-size:30px;line-height:36px;font-weight:600;color:{k["fgs"]};letter-spacing:-0.02em;">{preco}</span>'
-                f'<span style="font-size:13px;color:{k["mfg"]};">{sub}</span></span>'
-                f'<ul style="margin:0;padding:16px 0 0;border-top:1px solid {k["muted"]};list-style:none;display:flex;flex-direction:column;gap:10px;width:100%;">'
-                f'{itens}</ul></button>')
+    passos = ''.join(f'<span style="height:4px;flex:1;border-radius:2px;background:{k["pri"] if i == 0 else k["sunken"]};"></span>' for i in range(3))
+    cab = (f'<header style="display:flex;flex-direction:column;gap:16px;">'
+           f'<div style="display:flex;flex-direction:column;gap:8px;">{rotulo(T("rotuloInicial"), k["mfg"])}'
+           f'<div role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-label="{T("passosAria")}" '
+           f'style="display:flex;gap:6px;">{passos}</div></div>'
+           f'<div style="display:flex;flex-direction:column;gap:12px;">'
+           f'<h1 style="margin:0;font-size:52px;line-height:1.02;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{T("tituloInicial")}</h1>'
+           f'<p style="margin:0;max-width:65ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{T("subInicial")}</p></div></header>')
 
-    starter = cartao_plano('starter', 'Starter', T('gratis'), T('semCartao'), item(T('s1')) + item(T('s2')) + item(T('s3')))
-    pro = cartao_plano('pro', 'Pro', f'{T("preco")}<span style="font-size:14px;font-weight:500;color:{k["mfg"]};">{T("porMes")}</span>',
-                       T('porAno'), item(T('p2')) + item(T('p3')) + item(T('p4')), selo=badge(T('recomendado'), k, 'blue'))
-    cab = (f'<div style="display:flex;flex-direction:column;gap:8px;">{rotulo(T("rotuloInicial"), k["mfg"])}'
-           f'<h1 style="margin:0;font-size:30px;line-height:36px;font-weight:600;color:{k["fgs"]};letter-spacing:-0.015em;">{T("tituloInicial")}</h1>'
-           f'<p style="margin:0;font-size:14.5px;line-height:22px;color:{k["mfg"]};max-width:70ch;">{T("subInicial")}</p></div>')
-    escolha = (f'<div role="radiogroup" aria-label="{T("escolhaAria")}" style="display:flex;gap:20px;">{starter}{pro}</div>')
-    regras = (f'<ul style="margin:0;padding:0 4px;list-style:none;display:flex;gap:28px;">'
-              + ''.join(f'<li style="display:flex;gap:10px;align-items:flex-start;flex:1;font-size:12.5px;line-height:19px;color:{k["mfg"]};">'
-                        f'<span style="margin-top:1px;">{ic(i, 14, k["mfg"])}</span><span>{T(t)}</span></li>'
-                        for i, t in (('relogio', 'r1'), ('troca', 'r2'))) + '</ul>')
-    rodape = (f'<div style="display:flex;align-items:center;gap:16px;">'
-              f'{botao_link(T("voltarAjuste"), f"Ajuste{sufixo}.dc.html", k, "ghost", 40)}'
-              f'<span style="margin-left:auto;max-width:420px;text-align:right;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{h("nota")}</span>'
-              f'<a href="PrimeiroExercicio{sufixo}.dc.html" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;'
-              f'border-radius:10px;background:{k["pri"]};color:{k["prifg"]};font-size:14px;font-weight:500;white-space:nowrap;">'
-              f'{h("acao")}{ic("seta", 14)}</a></div>')
+    secao = (f'<div style="display:flex;align-items:center;gap:12px;">'
+             f'<span style="font-family:{MONO};font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:{k["mfg"]};">{T("secaoPlanos")}</span>'
+             f'<span style="height:1px;width:32px;background:color-mix(in oklch, {k["pri"]} 60%, transparent);"></span>'
+             f'<span style="height:1px;width:128px;background:{"var(--divider)"};"></span></div>')
+    seg = lambda v, txt, extra='': (
+        f'<button type="button" role="tab" aria-selected="{h("per." + v)}" onClick="{h("per.ir_" + v)}" '
+        f'style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 14px;border:0;border-radius:999px;'
+        f'background:{h("per.fundo_" + v)};box-shadow:{h("per.sombra_" + v)};color:{h("per.cor_" + v)};'
+        f'font-family:{FONTE};font-size:13px;font-weight:500;cursor:pointer;">{txt}{extra}</button>')
+    periodo = (f'<div role="tablist" aria-label="{T("periodo")}" style="margin-left:auto;display:inline-flex;gap:2px;padding:3px;'
+               f'border-radius:999px;background:{k["sunken"]};">'
+               f'{seg("mes", T("mensal"))}{seg("ano", T("anual"), badge(T("economia"), k, "green"))}</div>')
+    controles = f'<div style="display:flex;align-items:center;gap:12px;">{periodo}</div>'
+
+    def feature(t, faisca=False):
+        if faisca:
+            return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;font-weight:500;color:{k["fgs"]};">'
+                    f'<span style="margin-top:2px;display:flex;color:{k["pri"]};">{ic("brilho", 14)}</span><span>{t}</span></li>')
+        return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;color:{k["fg"]};">'
+                f'<span style="margin-top:2px;display:flex;color:{k["ok"]};">{ic("check", 14)}</span><span>{t}</span></li>')
+
+    def card(nome, desc, selo, preco, nota, feats, titulo_feats, cta, destaque):
+        borda = (f'border:1px solid {k["pri"]};box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:scale(1.03);' if destaque
+                 else f'border:1px solid {k["border"]};box-shadow:{k["sombra"]};')
+        botao_ = (f'background:{k["pri"]};color:{k["prifg"]};' if destaque
+                  else f'background:{k["prisub"]};color:{k["prisubfg"]};')
+        tf = (f'<p style="margin:0;font-family:{MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:{k["mfg"]};">{titulo_feats}</p>'
+              if titulo_feats else '')
+        return (f'<article aria-label="{nome}" style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:14px;background:{k["card"]};{borda}">'
+                f'<header style="display:flex;flex-direction:column;gap:6px;">'
+                f'<div style="display:flex;align-items:center;height:22px;">{selo}</div>'
+                f'<h3 style="margin:0;font-size:28px;line-height:1.05;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};">{nome}</h3>'
+                f'<p style="margin:0;font-size:14px;line-height:1.35;color:{k["mfg"]};">{desc}</p></header>'
+                f'{regua}<div style="display:flex;flex-direction:column;gap:4px;">'
+                f'<p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;">{preco}</p>'
+                f'<span style="font-size:12.5px;color:{k["mfg"]};">{nota}</span></div>'
+                f'{regua}<div style="flex:1;display:flex;flex-direction:column;gap:8px;">{tf}'
+                f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{feats}</ul></div>'
+                f'<a href="Jornada{sufixo}.dc.html" style="display:flex;align-items:center;justify-content:center;height:36px;'
+                f'border-radius:9px;{botao_}font-size:14px;font-weight:500;">{cta}</a></article>')
+
+    valor = lambda v: f'<span style="font-size:30px;line-height:1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{v}</span>'
+    starter = card('Starter', T('descStarter'), '', valor(T('gratis')), T('notaStarter'),
+                   feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False)
+    pro = card('Pro', T('descPro'), badge(T('recomendado'), k, 'blue'),
+               valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
+               feature(T('p2'), True) + feature(T('p3'), True) + feature(T('p4'), True), T('tudoStarter'), T('ctaPro'), True)
+
+    def esqueleto(destaque):
+        borda = f'border:1px solid {k["pri"]};' if destaque else f'border:1px solid {k["border"]};'
+        sel = sk(f'height:18px;width:96px;border-radius:4px;background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);') if destaque else ''
+        return (f'<div aria-hidden="true" style="display:flex;flex-direction:column;gap:16px;padding:24px;border-radius:14px;background:{k["card"]};{borda}box-shadow:{k["sombra"]};">'
+                f'<div style="display:flex;align-items:center;height:22px;">{sel}</div>'
+                f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:20px;width:144px;")}{sk("height:12px;width:176px;")}</div>'
+                f'{sk("height:20px;width:112px;border-radius:999px;")}'
+                f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:40px;width:176px;")}{sk("height:12px;width:64px;")}</div>'
+                f'<div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px;">'
+                f'{sk("height:12px;width:85%;")}{sk("height:12px;width:72%;")}{sk("height:12px;width:78%;")}{sk("height:12px;width:60%;")}</div>'
+                + sk(f'height:40px;width:100%;' + (f'background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);' if destaque else '')) + '</div>')
+
+    grade = lambda filhos: (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;width:672px;margin:0 auto;">{filhos}</div>')
+    planos = (f'<sc-if value="{h("pronto")}" hint-placeholder-val="{{{{ true }}}}">{grade(starter + pro)}</sc-if>'
+              f'<sc-if value="{h("carregando")}" hint-placeholder-val="{{{{ false }}}}">{grade(esqueleto(False) + esqueleto(True))}</sc-if>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:22px;width:960px;align-self:center;padding:0 0 64px;">'
-            f'{cab}{escolha}{regras}<div style="height:12px;"></div>{rodape}</main></div>')
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:8px 24px 32px;">'
+            f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles}{planos}</div></main></div>')
 
 
-ANTES_PLANO_INICIAL = """const plano = s.plano || "starter";
-const opcao = (chave) => ({
-marcado: plano === chave,
-escolher: () => this.setState({ plano: chave }),
-borda: plano === chave ? "0 0 0 1.5px var(--pri), var(--sombraFlut)" : "inset 0 0 0 1px var(--border), var(--sombra)",
-anel: plano === chave ? "var(--pri)" : "var(--input)",
-ponto: plano === chave ? "block" : "none"
-});"""
+ANTES_PLANO_INICIAL = """const per0 = s.periodo || "mes";
+const carregando = (s.estado || this.props.estado) === "carregando";
+const ativo = (v) => per0 === v;
+const per = {
+mes: ativo("mes"), ano: ativo("ano"),
+ir_mes: () => this.setState({ periodo: "mes" }), ir_ano: () => this.setState({ periodo: "ano" }),
+fundo_mes: ativo("mes") ? "var(--card)" : "transparent", fundo_ano: ativo("ano") ? "var(--card)" : "transparent",
+sombra_mes: ativo("mes") ? "var(--sombra)" : "none", sombra_ano: ativo("ano") ? "var(--sombra)" : "none",
+cor_mes: ativo("mes") ? "var(--fgs)" : "var(--mfg)", cor_ano: ativo("ano") ? "var(--fgs)" : "var(--mfg)",
+preco: ativo("ano") ? (t.lang === "en-US" ? "R$499" : "R$ 499") : t.preco,
+intervalo: ativo("ano") ? t.anoCurto : t.mesCurto,
+nota: ativo("ano") ? t.notaAnual : t.notaMensal
+};"""
 
-VALORES_PLANO_INICIAL = """starter: opcao("starter"),
-pro: opcao("pro"),
-acao: plano === "pro" ? t.comecarPro : t.comecarStarter,
-nota: plano === "pro" ? t.notaPro : t.notaStarter"""
+VALORES_PLANO_INICIAL = """per: per,
+pronto: !carregando,
+carregando: carregando"""
 
 
 ANTES_AJUSTE = """const LING = __LING__;
@@ -1517,15 +1566,16 @@ def montar(tela, tema):
 
 
 def _montar(tela, tema, sufixo):
-    web = lambda textos, corpo, antes='', valores='', props=None: casca(
+    web = lambda textos, corpo, antes='', valores='', props=None, css='': casca(
         tela['titulo'], corpo, logica(juntar(COMUM, textos), tema, antes, valores),
-        {**PROPS_IDIOMA, **props_tema(tema), **(props or {})})
+        {**PROPS_IDIOMA, **props_tema(tema), **(props or {})}, css)
     k = K
     if tela['id'] == 'competencia':
         return web(COMPETENCIA, tela_competencia(k))
     if tela['id'] == 'plano_inicial':
         textos = {l: {**PLANOS[l], **PLANO_INICIAL[l]} for l in PLANOS}
-        return web(textos, tela_plano_inicial(k, sufixo), ANTES_PLANO_INICIAL, VALORES_PLANO_INICIAL)
+        return web(textos, tela_plano_inicial(k, sufixo), ANTES_PLANO_INICIAL, VALORES_PLANO_INICIAL,
+                   {'estado': {'editor': 'enum', 'options': ['pronto', 'carregando'], 'default': 'pronto'}}, CSS_DIVIDER_SKELETON)
     if tela['id'] == 'ajuste':
         return web(AJUSTE, tela_ajuste(k, sufixo), ANTES_AJUSTE, 'ling: ling,\neng: eng,\ncontagem: contagem')
     if tela['id'] == 'playground':
