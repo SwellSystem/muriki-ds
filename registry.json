@@ -215,6 +215,26 @@
       "docs": "Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos."
     },
     {
+      "name": "otp-input",
+      "type": "registry:ui",
+      "title": "OTP Input",
+      "description": "O código de verificação, um quadrado por dígito (4 ou 6). Um <input> de verdade por cima dos quadrados recebe teclado, colar e o autocomplete one-time-code; o leitor de tela vê um campo só.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/otp-input.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "length 6 para TOTP, 4 para PIN. onComplete dispara quando o último quadrado enche: bom lugar para enviar. Dentro de <Field> o label e a descrição chegam sozinhos. Código de recuperação não é isto: use o Input comum."
+    },
+    {
       "name": "field",
       "type": "registry:ui",
       "title": "Field",
@@ -991,6 +1011,62 @@
         }
       ],
       "docs": "Agrupamento e ordenação são do caller: use renderGroupHeaderBefore + trailingRows para faixas de grupo (accordion), e o campo menu dos filtros da toolbar para as listagens. Agrupar por epic preserva a hierarquia; por status/responsável, achate a árvore."
+    },
+    {
+      "name": "resource-table",
+      "type": "registry:block",
+      "title": "Resource Table",
+      "description": "O molde do CRUD: cabeçalho com contagem e uma ação sólida, barra de busca com abas de status e filtros, tabela controlada com seleção, ordenação, ações da linha no hover, skeleton, vazio e paginação; criar e editar no mesmo sheet framed, e o que tira acesso ou apaga num alert-dialog que só fecha quando o caller manda.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/row-actions",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/checkbox",
+        "SwellSystem/muriki-ds/input",
+        "SwellSystem/muriki-ds/select",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/tabs",
+        "SwellSystem/muriki-ds/sheet",
+        "SwellSystem/muriki-ds/alert-dialog"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/resource-table/resource-table.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/resource-table.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/resource-table/resource-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/resource-page.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/resource-table/resource-form-sheet.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/resource-form-sheet.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/resource-table/labels.ts",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/labels.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/resource-table/types.ts",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/types.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/resource-table/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/index.ts"
+        }
+      ],
+      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app."
     },
     {
       "name": "task-timeline",

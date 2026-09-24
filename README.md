@@ -295,6 +295,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/button` | `registry:ui` | sete variantes, seis sem fill; raio = altura ÷ 4; `solid` é exceção declarada — uma por tela |
 | `@muriki/badge` | `registry:ui` | nove tons abafados, com ponto, contador e remoção |
 | `@muriki/input` | `registry:ui` | campo chapado com filete por dentro; `underline` é a voz editorial das telas de entrada |
+| `@muriki/otp-input` | `registry:ui` | código de verificação em quadrados, um por dígito (4 ou 6), com colar e autocomplete do sistema |
 | `@muriki/field` | `registry:ui` | label, controle, dica e erro amarrados por id e `aria-describedby` |
 | `@muriki/textarea` | `registry:ui` | o campo do Input, só que alto; divide as variantes com ele e cresce com o texto |
 | `@muriki/radio-group` | `registry:ui` | o checkbox redondo: vazio é encaixe, marcado é chapado |
@@ -313,6 +314,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/sonner` | `registry:ui` | toaster vestido com a paleta: info neutro, success e warning tingidos, error sólido |
 | `@muriki/row-actions` | `registry:block` | barra de ferramentas de linha, só ícone, com tooltip e `aria-label` obrigatórios na API |
 | `@muriki/task-table` | `registry:block` | tabela hierárquica de tasks (epic → task → sub) com toolbar de filtros com menu, seleção em massa, colapso e slots de composição |
+| `@muriki/resource-table` | `registry:block` | o molde do CRUD: cabeçalho com contagem, busca com abas de status, tabela controlada com seleção, ordenação, ações da linha e paginação, sheet de criar/editar e diálogo de confirmação |
 | `@muriki/task-timeline` | `registry:block` | gantt com sidebar sincronizada, marcos, dependências e barras arrastáveis (mover e redimensionar, snap por dia) |
 | `@muriki/kanban` | `registry:block` | board de colunas-bandeja com drag-drop, card editorial e o scroll de encaixe que só aparece enquanto rola |
 | `@muriki/skeleton` | `registry:ui` | um buraco na superfície afundada; a regra é ter a anatomia do que substitui |

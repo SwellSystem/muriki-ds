@@ -18,7 +18,9 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer size-4 shrink-0 rounded-[4px] outline-none transition-colors",
+        // inline-flex: o Root é um <span>; solto numa célula de tabela ou num
+        // texto, sem display ele é inline e o size-4 não pega — some.
+        "peer inline-flex size-4 shrink-0 items-center justify-center rounded-[4px] align-middle outline-none transition-colors",
         "after:absolute after:-inset-2.5",
         "relative",
         // vazio: encaixe
