@@ -75,6 +75,8 @@ export function LoginForm({
   busy = false,
   busyLabel,
   passwordMinLength = PASSWORD_MIN_LENGTH,
+  showRememberMe = true,
+  showTrustDevice = true,
   onPasswordVisibilityChange,
   className,
 }: LoginFormProps) {
@@ -126,7 +128,7 @@ export function LoginForm({
       setErrors({})
       setPending(true)
       try {
-        const result = await onVerifyCode({ code: trimmed, trustDevice })
+        const result = await onVerifyCode({ code: trimmed, trustDevice: showTrustDevice && trustDevice })
         if (!result.ok) applyFailure(result)
       } finally {
         setPending(false)
@@ -148,7 +150,7 @@ export function LoginForm({
     setErrors({})
     setPending(true)
     try {
-      const result = await onSubmit({ email: email.trim(), password, rememberMe })
+      const result = await onSubmit({ email: email.trim(), password, rememberMe: showRememberMe && rememberMe })
       if (!result.ok) {
         applyFailure(result)
         return
@@ -376,12 +378,14 @@ export function LoginForm({
                 />
                 {errors.code ? <FieldError>{errors.code}</FieldError> : null}
               </Field>
+              {showTrustDevice ? (
               <Field className="flex-row items-center gap-2.5">
                 <Checkbox checked={trustDevice} onCheckedChange={(checked) => setTrustDevice(checked)} />
                 <FieldLabel className="cursor-pointer text-xs font-normal text-muted-foreground">
                   {t("login.totp.trust_device")}
                 </FieldLabel>
               </Field>
+              ) : null}
               <button
                 type="button"
                 onClick={backToPassword}
@@ -394,7 +398,7 @@ export function LoginForm({
         ) : null}
 
         {/* lembrar de mim */}
-        {credenciais ? (
+        {credenciais && showRememberMe ? (
         <Field className="flex-row items-center gap-2.5">
           <Checkbox checked={rememberMe} onCheckedChange={(checked) => setRememberMe(checked)} />
           <FieldLabel className="cursor-pointer text-sm font-normal text-muted-foreground">
