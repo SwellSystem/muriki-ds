@@ -846,7 +846,7 @@
       "name": "muriki-logo",
       "type": "registry:ui",
       "title": "Muriki Logo",
-      "description": "O macaco da marca em SVG inline, gerado de design/logo.svg. O contorno troca de tinta no escuro; azul, amarelo e rosto não mudam.",
+      "description": "O macaco da marca, de olhos abertos ou fechados, vetorizado dos PNGs de public/assets na paleta chapada da marca. As cores não mudam com o tema.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -857,7 +857,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Tamanho por className (size-8 é o padrão; size-[30px] no rail, size-9 na tela de entrada). Decorativo por padrão; passe title=\"Muriki\" quando for o único nome do link."
+      "docs": "Tamanho por className (size-8 é o padrão; size-[30px] no rail, size-9 na tela de entrada). eyes=\"closed\" é o de olhos fechados — o login usa quando a senha fica visível. Decorativo por padrão; passe title=\"Muriki\" quando for o único nome do link."
     },
     {
       "name": "qr-code",

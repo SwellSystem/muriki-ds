@@ -111,8 +111,7 @@ function QrCode({
         {logo ? (
           <div
             aria-hidden
-            // a placa é branca nos dois temas: o contorno do logo fica na tinta do claro
-            className="absolute flex items-center justify-center [&>*]:size-full [&_[data-slot=muriki-logo]>path:first-child]:fill-[rgb(36,36,33)]"
+            className="absolute flex items-center justify-center [&>*]:size-full"
             style={{ left: origem + cel * 0.8, top: origem + cel * 0.8, width: lado - cel * 1.6, height: lado - cel * 1.6 }}
           >
             {logo}
