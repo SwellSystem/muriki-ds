@@ -843,6 +843,23 @@
       ]
     },
     {
+      "name": "muriki-logo",
+      "type": "registry:ui",
+      "title": "Muriki Logo",
+      "description": "O macaco da marca em SVG inline, gerado de design/logo.svg. O contorno troca de tinta no escuro; azul, amarelo e rosto não mudam.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/muriki-logo.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Tamanho por className (size-8 é o padrão; size-[30px] no rail, size-9 na tela de entrada). Decorativo por padrão; passe title=\"Muriki\" quando for o único nome do link."
+    },
+    {
       "name": "calendar",
       "type": "registry:ui",
       "title": "Calendar",
