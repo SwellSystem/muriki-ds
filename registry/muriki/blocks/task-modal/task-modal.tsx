@@ -223,7 +223,7 @@ export function TaskModal({
 
   // ── stacked body (central / drawer) ──────────────────────────────────────
   const stackedBody = (titleSize: "mid" | "big") => (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+    <div className="muriki-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
       {sections(titleSize)}
     </div>
   )
@@ -231,7 +231,7 @@ export function TaskModal({
   // ── fullscreen body (Notion page: main + side properties) ─────────────────
   const fullscreenBody = (
     <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1fr_312px]">
-      <div className="min-h-0 overflow-y-auto pb-10">
+      <div className="muriki-scroll min-h-0 overflow-y-auto pb-10">
         <TaskModalTitle
           value={value.title}
           onChange={(next) => onChange({ title: next })}
@@ -261,7 +261,7 @@ export function TaskModal({
           />
         )}
       </div>
-      <aside className="min-h-0 overflow-y-auto bg-sunken/60 shadow-[inset_0_1px_0_var(--border)] md:shadow-[inset_1px_0_0_var(--border)]">
+      <aside className="muriki-scroll min-h-0 overflow-y-auto bg-sunken/60 shadow-[inset_0_1px_0_var(--border)] md:shadow-[inset_1px_0_0_var(--border)]">
         <p className="px-5 pt-4 pb-1 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase">
           {t("task_modal.properties")}
         </p>

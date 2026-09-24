@@ -7,7 +7,7 @@
       "name": "theme",
       "type": "registry:theme",
       "title": "Tema Muriki",
-      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px).",
+      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover.",
       "cssVars": {
         "theme": {
           "radius": "14px"
@@ -143,6 +143,34 @@
           "radius-float": "12px",
           "chart-1": "oklch(0.79 0.17 70.25)",
           "chart-3": "oklch(0.56 0.21 269.11)"
+        }
+      },
+      "css": {
+        ".muriki-scroll": {
+          "scrollbar-width": "thin",
+          "scrollbar-color": "color-mix(in oklab, var(--foreground) 14%, transparent) transparent"
+        },
+        ".muriki-scroll:hover": {
+          "scrollbar-color": "color-mix(in oklab, var(--foreground) 32%, transparent) transparent"
+        },
+        ".muriki-scroll::-webkit-scrollbar": {
+          "width": "10px",
+          "height": "10px"
+        },
+        ".muriki-scroll::-webkit-scrollbar-track": {
+          "background": "transparent"
+        },
+        ".muriki-scroll::-webkit-scrollbar-corner": {
+          "background": "transparent"
+        },
+        ".muriki-scroll::-webkit-scrollbar-thumb": {
+          "background-color": "color-mix(in oklab, var(--foreground) 14%, transparent)",
+          "border": "3px solid transparent",
+          "border-radius": "999px",
+          "background-clip": "padding-box"
+        },
+        ".muriki-scroll:hover::-webkit-scrollbar-thumb": {
+          "background-color": "color-mix(in oklab, var(--foreground) 32%, transparent)"
         }
       }
     },
