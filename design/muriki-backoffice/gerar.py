@@ -70,10 +70,10 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 # subidas como assets do canvas. Papel não tem tema: um quadro A4 por página.
 A4_W, A4_H = 794, 1123
 PDFS = [
-    ('PdfCodigos.dc.html', 'PDF · códigos de recuperação', '/_blob/f9fc7fc01544ae146a27e0a318e6002d'),
-    ('PdfRelatorio1.dc.html', 'PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)', '/_blob/899d685408e139cdc2fd43e3210837f7'),
-    ('PdfRelatorio2.dc.html', 'PDF · relatório gerencial · página 2 (tabela e nota)', '/_blob/02f5b8960ae7c3a9879e79f092fdc223'),
-    ('PdfRelatorio3.dc.html', 'PDF · relatório gerencial · página 3 (tabela longa)', '/_blob/8a92b65facc10bb79de718f6f557a1ee'),
+    ('PdfCodigos.dc.html', 'PDF · códigos de recuperação', '/_blob/7d586bef4c42f395fb2a6498f82edaa1'),
+    ('PdfRelatorio1.dc.html', 'PDF · relatório gerencial · página 1 (capa, KPIs, gráfico)', '/_blob/1f40daf9b58ef27d3045dce0aae13a51'),
+    ('PdfRelatorio2.dc.html', 'PDF · relatório gerencial · página 2 (tabela e nota)', '/_blob/0eef546d6a948e94d9b0b4fe2bffcc19'),
+    ('PdfRelatorio3.dc.html', 'PDF · relatório gerencial · página 3 (tabela longa)', '/_blob/f610a9062d73cf1db08f126746de1e95'),
 ]
 LINHA_PDF = 8
 for n, (arquivo, titulo, blob) in enumerate(PDFS):
