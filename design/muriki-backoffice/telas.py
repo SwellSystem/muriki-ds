@@ -879,6 +879,8 @@ def tela_cupom_novo(k):
 # ── Auditoria: a linha do tempo da equipe ──────────────────────────────
 # GET /staff/audit-log: action (20 tipos), actorId (ausente na falha anônima), target, ip,
 # userAgent, requestId, details e occurredAt; filtros actorId, action, from/to; cursor.
+# O e-mail tentado NUNCA aparece: a API não grava (regra R28 da equipe, minimização da LGPD).
+# O motivo vem em details.reason: wrong_password, wrong_code, locked, suspended, unknown_account.
 # Log não é CRUD: é leitura em ordem. Agrupa por dia, a hora vem em mono, o evento vira frase
 # e a cor diz a família — neutro para rotina, laranja para falha, vermelho para bloqueio.
 FAMILIA = {
@@ -889,11 +891,12 @@ EVENTOS = [
     ('Hoje', 'quarta, 23 de setembro', [
         ('22:09', 'rotina', 'sair', 'AL', 'yellow', '<b>Ana Lima</b> entrou', 'Chrome · macOS', '189.40.12.7', 1),
         ('22:07', 'rotina', 'sair', 'AL', 'yellow', '<b>Ana Lima</b> saiu', 'Chrome · macOS', '189.40.12.7', 1),
-        ('22:06', 'bloqueio', 'cadeado', None, None, 'Conta de <b>bruno.melo@muriki.app</b> bloqueada por 15 minutos', 'Safari · iOS', '201.17.88.3', 1),
-        ('22:06', 'falha', 'aviso', None, None, 'Tentativa de entrar falhou para <b>bruno.melo@muriki.app</b>', 'Safari · iOS', '201.17.88.3', 3),
+        ('22:06', 'bloqueio', 'cadeado', None, None, 'Conta de <b>Bruno Melo</b> bloqueada por 15 minutos', 'Safari · iOS', '201.17.88.3', 1),
+        ('22:06', 'falha', 'aviso', None, None, 'Tentativa de entrar falhou para <b>Bruno Melo</b> · código errado', 'Safari · iOS', '201.17.88.3', 3),
+        ('22:03', 'falha', 'aviso', None, None, 'Tentativa de entrar com um e-mail sem acesso · conta inexistente', 'Chrome · Linux', '91.203.4.77', 1),
         ('22:00', 'protecao', 'escudo', 'BM', 'blue', '<b>Bruno Melo</b> ativou o autenticador', 'Chrome · Windows', '177.8.40.21', 1),
         ('21:58', 'convite', 'envelope', 'BM', 'blue', '<b>Bruno Melo</b> aceitou o convite', 'Chrome · Windows', '177.8.40.21', 1),
-        ('21:41', 'convite', 'envelope', 'AL', 'yellow', '<b>Ana Lima</b> convidou <b>bruno.melo@muriki.app</b> como Operação', 'Chrome · macOS', '189.40.12.7', 1),
+        ('21:41', 'convite', 'envelope', 'AL', 'yellow', '<b>Ana Lima</b> convidou <b>Bruno Melo</b> como Operação', 'Chrome · macOS', '189.40.12.7', 1),
     ]),
     ('Ontem', 'terça, 22 de setembro', [
         ('18:12', 'rotina', 'pessoa', 'AL', 'yellow', '<b>Ana Lima</b> mudou o papel de <b>Carla Dias</b>: Operação → Admin', 'Chrome · macOS', '189.40.12.7', 1),
@@ -959,11 +962,11 @@ def tela_auditoria(k, detalhe=False):
         tentativas = ''.join(
             f'<li style="display:flex;align-items:center;gap:10px;font-size:13px;color:{k["fg"]};">'
             f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};">{h}</span>{t}</li>'
-            for h, t in [('22:06:41', 'Código do autenticador errado'), ('22:06:18', 'Código do autenticador errado'), ('22:06:02', 'Senha errada')])
-        json_ = ('{\n  "email": "bruno.melo@muriki.app",\n  "reason": "invalid_totp",\n  "attempt": 3\n}')
+            for h, t in [('22:06:41', 'Código errado'), ('22:06:18', 'Código errado'), ('22:06:02', 'Senha errada')])
+        json_ = ('{\n  "reason": "wrong_code"\n}')
         corpo_s = (
             secao_sheet(k, 'Evento', campo_det('Ação', badge('Falha ao entrar', k, 'orange', ponto=True))
-                        + campo_det('Quem', 'Ninguém entrou: a tentativa foi com bruno.melo@muriki.app')
+                        + campo_det('Quem', 'Ninguém entrou: a tentativa foi na conta de Bruno Melo')
                         + campo_det('Alvo', '<a href="#">Bruno Melo</a> · membro da equipe')
                         + campo_det('Quando', '23/09/2026, 22:06:41 <span style="color:' + k['mfg'] + ';">· há 3 min</span>'))
             + secao_sheet(k, 'As 3 tentativas', f'<ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{tentativas}</ol>'
@@ -974,8 +977,8 @@ def tela_auditoria(k, detalhe=False):
             + secao_sheet(k, 'Detalhes', f'<pre style="margin:0;padding:12px 14px;border-radius:8px;background:{k["sunken"]};font-family:{MONO};'
                           f'font-size:12px;line-height:18px;color:{k["fg"]};white-space:pre-wrap;">{json_}</pre>'))
         rodape = (f'{link_botao(k, "Copiar ID do evento", "#", "ghost", 36, "copiar")}<span style="flex:1;"></span>'
-                  f'{link_botao(k, "Ver tudo de bruno.melo", "#", "outline", 36)}')
-        sobre = sheet(k, 'Tentativa de entrar falhou', 'bruno.melo@muriki.app · 3 vezes em 39 segundos', corpo_s, rodape, largura=500)
+                  f'{link_botao(k, "Ver tudo de Bruno Melo", "#", "outline", 36)}')
+        sobre = sheet(k, 'Tentativa de entrar falhou', 'Bruno Melo · 3 vezes em 39 segundos', corpo_s, rodape, largura=500)
     return app(k, 'auditoria', cab + filtros + lista, sobre=sobre, gap=16)
 
 
