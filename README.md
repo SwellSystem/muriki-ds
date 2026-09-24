@@ -325,7 +325,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/plan-card` | `registry:block` | card de plano por slots, com o skeleton que tem a anatomia dele |
 | `@muriki/onboarding-pricing` | `registry:block` | a tela de escolha de plano: trilha de passos, os dois segmentados e a grade com preço que rola os dígitos |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
-| `@muriki/muriki-logo` | `registry:ui` | o macaco da marca em SVG inline; o contorno troca de tinta no tema escuro |
+| `@muriki/muriki-logo` | `registry:ui` | o macaco da marca em SVG inline, de olhos abertos ou fechados |
 | `@muriki/qr-code` | `registry:ui` | QR escaneável com cara de marca: pontos, olhos arredondados e logo no meio; placa sempre branca |
 | `@muriki/calendar` | `registry:ui` | calendário de mês vestido com a paleta e o raio da casa |
 | `@muriki/status-pill` | `registry:block` | camada semântica sobre o Badge: cinco famílias de status, um mapa só |
