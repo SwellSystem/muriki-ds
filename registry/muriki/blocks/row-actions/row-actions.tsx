@@ -4,6 +4,7 @@ import * as React from "react"
 import { DotsThree } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
+import { Spinner } from "@/components/ui/spinner"
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger,
@@ -26,6 +27,11 @@ export type RowAction = {
   /** Vai para o fim, depois de um separador, com a cor destrutiva. */
   destructive?: boolean
   disabled?: boolean
+  /**
+   * A ação está rodando (reenviar, reconvidar): o spinner entra no lugar do
+   * ícone e a ação trava. A barra fica visível enquanto isso, mesmo sem hover.
+   */
+  loading?: boolean
 }
 
 export interface RowActionsProps extends React.ComponentProps<"div"> {
@@ -68,7 +74,7 @@ function RowActions({
           "opacity-0 transition-opacity focus-within:opacity-100 group-hover/row:opacity-100 data-[menu-open=true]:opacity-100",
         className
       )}
-      data-menu-open={menuOpen || undefined}
+      data-menu-open={menuOpen || actions.some((a) => a.loading) || undefined}
       {...props}
     >
       {inline.map((action) => (
@@ -79,11 +85,12 @@ function RowActions({
                 variant="ghost"
                 size="icon-sm"
                 aria-label={action.label}
-                disabled={action.disabled}
+                aria-busy={action.loading || undefined}
+                disabled={action.disabled || action.loading}
                 onClick={action.onSelect}
-                className="text-muted-foreground"
+                className="text-muted-foreground disabled:opacity-100"
               >
-                <action.icon className="size-[15px]" />
+                {action.loading ? <Spinner size="sm" /> : <action.icon className="size-[15px]" />}
               </Button>
             }
           />
@@ -116,11 +123,11 @@ function RowActions({
                     <DropdownMenuSeparator />
                   ) : null}
                   <DropdownMenuItem
-                    disabled={action.disabled}
+                    disabled={action.disabled || action.loading}
                     onClick={action.onSelect}
                     variant={action.destructive ? "destructive" : "default"}
                   >
-                    <action.icon className="size-4" />
+                    {action.loading ? <Spinner size="sm" className="size-4" /> : <action.icon className="size-4" />}
                     {action.label}
                     {action.shortcut ? (
                       <DropdownMenuShortcut>{action.shortcut}</DropdownMenuShortcut>
