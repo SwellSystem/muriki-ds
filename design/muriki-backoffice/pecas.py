@@ -410,7 +410,8 @@ def sheet(k, titulo, sub, corpo, rodape, largura=520):
             f'<h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:{k["fgs"]};">{titulo}</h2>'
             f'<p style="margin:0;font-size:13px;color:{k["mfg"]};">{sub}</p></div>'
             f'{botao_icone(k, "x", "Fechar", href_="#", tam=30)}</header>'
-            f'<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;">{corpo}</div>'
+            f'<div style="flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;scrollbar-width:thin;'
+            f'scrollbar-color:color-mix(in oklab, {k["fg"]} 14%, transparent) transparent;">{corpo}</div>'
             f'<footer style="display:flex;align-items:center;gap:8px;padding:14px 20px;box-shadow:inset 0 1px 0 {k["muted"]};">{rodape}</footer></aside>')
 
 
