@@ -1,0 +1,406 @@
+{
+ "v": 3,
+ "attachments": {},
+ "boards": {
+  "ClienteEditar.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · editar no sheet (criar é o mesmo, vazio)",
+   "w": 1440,
+   "x": 3040,
+   "y": 2640
+  },
+  "ClienteEditarEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · editar no sheet (criar é o mesmo, vazio) · escuro",
+   "w": 1440,
+   "x": 3040,
+   "y": 3960
+  },
+  "Clientes.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · o molde do CRUD",
+   "w": 1440,
+   "x": 1520,
+   "y": 2640
+  },
+  "ClientesEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · o molde do CRUD · escuro",
+   "w": 1440,
+   "x": 1520,
+   "y": 3960
+  },
+  "CupomNovo.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Cupons · novo cupom no sheet",
+   "w": 1440,
+   "x": 6080,
+   "y": 5280
+  },
+  "CupomNovoEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Cupons · novo cupom no sheet · escuro",
+   "w": 1440,
+   "x": 6080,
+   "y": 6600
+  },
+  "Cupons.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Cupons · lista",
+   "w": 1440,
+   "x": 4560,
+   "y": 5280
+  },
+  "CuponsEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Cupons · lista · escuro",
+   "w": 1440,
+   "x": 4560,
+   "y": 6600
+  },
+  "Entrar.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Entrar · e-mail e senha",
+   "w": 1440,
+   "x": 0,
+   "y": 0
+  },
+  "EntrarEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Entrar · e-mail e senha · escuro",
+   "w": 1440,
+   "x": 0,
+   "y": 1320
+  },
+  "Features.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Planos · matriz de features",
+   "w": 1440,
+   "x": 3040,
+   "y": 5280
+  },
+  "FeaturesEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Planos · matriz de features · escuro",
+   "w": 1440,
+   "x": 3040,
+   "y": 6600
+  },
+  "Inicio.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Início · clientes, vendido até agora e planos",
+   "w": 1440,
+   "x": 0,
+   "y": 2640
+  },
+  "InicioEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Início · clientes, vendido até agora e planos · escuro",
+   "w": 1440,
+   "x": 0,
+   "y": 3960
+  },
+  "Plano.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Plano · dados e features",
+   "w": 1440,
+   "x": 1520,
+   "y": 5280
+  },
+  "PlanoEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Plano · dados e features · escuro",
+   "w": 1440,
+   "x": 1520,
+   "y": 6600
+  },
+  "Planos.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Planos · lista",
+   "w": 1440,
+   "x": 0,
+   "y": 5280
+  },
+  "PlanosEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Planos · lista · escuro",
+   "w": 1440,
+   "x": 0,
+   "y": 6600
+  },
+  "Revogar.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · revogar acesso no alert-dialog",
+   "w": 1440,
+   "x": 4560,
+   "y": 2640
+  },
+  "RevogarEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Clientes · revogar acesso no alert-dialog · escuro",
+   "w": 1440,
+   "x": 4560,
+   "y": 3960
+  },
+  "SegundoFator.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Segundo fator · um quadrado por dígito",
+   "w": 1440,
+   "x": 1520,
+   "y": 0
+  },
+  "SegundoFatorEscuro.dc.html": {
+   "h": 900,
+   "is_interactive": true,
+   "title": "Segundo fator · um quadrado por dígito · escuro",
+   "w": 1440,
+   "x": 1520,
+   "y": 1320
+  },
+  "EsqueciSenha.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Esqueci a senha · o link por e-mail",
+   "is_interactive": true
+  },
+  "EsqueciSenhaEscuro.dc.html": {
+   "x": 3040,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Esqueci a senha · o link por e-mail · escuro",
+   "is_interactive": true
+  },
+  "NovaSenha.dc.html": {
+   "x": 4560,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Senha nova · vinda do link",
+   "is_interactive": true
+  },
+  "NovaSenhaEscuro.dc.html": {
+   "x": 4560,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Senha nova · vinda do link · escuro",
+   "is_interactive": true
+  },
+  "Convite.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · aceitar o convite",
+   "is_interactive": true
+  },
+  "ConviteEscuro.dc.html": {
+   "x": 6080,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · aceitar o convite · escuro",
+   "is_interactive": true
+  },
+  "Autenticador.dc.html": {
+   "x": 7600,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · configurar o autenticador",
+   "is_interactive": true
+  },
+  "AutenticadorEscuro.dc.html": {
+   "x": 7600,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · configurar o autenticador · escuro",
+   "is_interactive": true
+  },
+  "CodigosRecuperacao.dc.html": {
+   "x": 9120,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · dez códigos, uma vez",
+   "is_interactive": true
+  },
+  "CodigosRecuperacaoEscuro.dc.html": {
+   "x": 9120,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · dez códigos, uma vez · escuro",
+   "is_interactive": true
+  },
+  "Auditoria.dc.html": {
+   "x": 0,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · a linha do tempo da equipe",
+   "is_interactive": true
+  },
+  "AuditoriaEscuro.dc.html": {
+   "x": 0,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · a linha do tempo da equipe · escuro",
+   "is_interactive": true
+  },
+  "AuditoriaEvento.dc.html": {
+   "x": 1520,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · o evento no sheet",
+   "is_interactive": true
+  },
+  "AuditoriaEventoEscuro.dc.html": {
+   "x": 1520,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Auditoria · o evento no sheet · escuro",
+   "is_interactive": true
+  }
+ },
+ "createdOnFiles": {
+  "at": "2026-09-23T23:59:10Z",
+  "v": 1
+ },
+ "designSystems": [],
+ "launch": {
+  "view": "canvas"
+ },
+ "notes": {
+  "acesso": {
+   "kind": "title1",
+   "maxW": 10560,
+   "text": "Entrada: e-mail e senha, depois o código TOTP num POST só; senha esquecida; e o primeiro acesso, do convite aos códigos de recuperação",
+   "w": 240,
+   "x": 0,
+   "y": -300
+  },
+  "acessoEscuro": {
+   "kind": "title1",
+   "maxW": 10560,
+   "text": "Entrada no tema escuro",
+   "w": 240,
+   "x": 0,
+   "y": 1020
+  },
+  "clientes": {
+   "kind": "title1",
+   "maxW": 6000,
+   "text": "Início e clientes: a lista é o molde do CRUD, criar e editar no sheet, revogar no alert-dialog",
+   "w": 240,
+   "x": 0,
+   "y": 2340
+  },
+  "clientesEscuro": {
+   "kind": "title1",
+   "maxW": 6000,
+   "text": "Início e clientes no tema escuro",
+   "w": 240,
+   "x": 0,
+   "y": 3660
+  },
+  "planos": {
+   "kind": "title1",
+   "maxW": 7520,
+   "text": "Planos, features e cupons: o mesmo CRUD; feature nasce uma vez, o plano só escolhe o valor",
+   "w": 240,
+   "x": 0,
+   "y": 4980
+  },
+  "planosEscuro": {
+   "kind": "title1",
+   "maxW": 7520,
+   "text": "Planos, features e cupons no tema escuro",
+   "w": 240,
+   "x": 0,
+   "y": 6300
+  },
+  "equipe": {
+   "x": 0,
+   "y": 7620,
+   "text": "Equipe: a auditoria é leitura em ordem, não CRUD; o evento abre no sheet",
+   "kind": "title1",
+   "maxW": 2960
+  },
+  "equipeEscuro": {
+   "x": 0,
+   "y": 8940,
+   "text": "Equipe no tema escuro",
+   "kind": "title1",
+   "maxW": 2960
+  }
+ },
+ "order": [
+  "Entrar.dc.html",
+  "EntrarEscuro.dc.html",
+  "SegundoFator.dc.html",
+  "SegundoFatorEscuro.dc.html",
+  "Inicio.dc.html",
+  "InicioEscuro.dc.html",
+  "Clientes.dc.html",
+  "ClientesEscuro.dc.html",
+  "ClienteEditar.dc.html",
+  "ClienteEditarEscuro.dc.html",
+  "Revogar.dc.html",
+  "RevogarEscuro.dc.html",
+  "Planos.dc.html",
+  "PlanosEscuro.dc.html",
+  "Plano.dc.html",
+  "PlanoEscuro.dc.html",
+  "Features.dc.html",
+  "FeaturesEscuro.dc.html",
+  "Cupons.dc.html",
+  "CuponsEscuro.dc.html",
+  "CupomNovo.dc.html",
+  "CupomNovoEscuro.dc.html",
+  "EsqueciSenha.dc.html",
+  "EsqueciSenhaEscuro.dc.html",
+  "NovaSenha.dc.html",
+  "NovaSenhaEscuro.dc.html",
+  "Convite.dc.html",
+  "ConviteEscuro.dc.html",
+  "Autenticador.dc.html",
+  "AutenticadorEscuro.dc.html",
+  "CodigosRecuperacao.dc.html",
+  "CodigosRecuperacaoEscuro.dc.html",
+  "Auditoria.dc.html",
+  "AuditoriaEscuro.dc.html",
+  "AuditoriaEvento.dc.html",
+  "AuditoriaEventoEscuro.dc.html"
+ ],
+ "pages": [],
+ "title": "Muriki Backoffice"
+}
