@@ -303,7 +303,7 @@ def tela_competencia(k):
     chips = (badge(f'Senior {T("declaradoSuf")}', k, tracejado=True)
              + badge(f'{T("pleno")} {T("confirmadoPor")}', k, 'green')
              + badge(f'Senior {T("aConfirmarSuf")}', k, 'yellow', ponto=True))
-    cab = cabecalho(k, [T('evolucao'), 'Testing'], 'Testing', chips=chips,
+    cab = cabecalho(k, [(T('evolucao'), destino('evolucao')), ('Testing', '')], 'Testing', chips=chips,
                     direita=botao(T('editarDecl'), k, 'outline', 36, 'lapis'))
 
     def exercicio(n, titulo, proximo):
@@ -564,10 +564,7 @@ def tela_exercicio(k, primeira=False):
     realce = lambda n: f'position:relative;z-index:{{{{g.z{n}}}}};box-shadow:{{{{g.anel{n}}}}};' if primeira else ''
     chips = (badge('Testing', k, 'blue') + badge('Debugging', k, 'blue') + badge(T('nivel'), k, 'gray')
              + (badge(T('primeiroChip'), k, 'blue', ponto=True) if primeira else badge(T('andamento'), k, 'yellow', ponto=True)))
-    trilha = (f'<nav aria-label="{T("trilhaAria")}" style="display:flex;gap:8px;align-items:center;font-size:12.5px;">'
-              f'<a href="#" style="color:{k["mfg"]};">{T("exercicios")}</a><span style="color:{k["input"]};">/</span>'
-              f'<a href="#" style="color:{k["mfg"]};">Testing</a><span style="color:{k["input"]};">/</span>'
-              f'<span style="color:{k["fg"]};">parse-duration</span></nav>')
+    trilha = topo_detalhe(k, [(T('exercicios'), '#'), ('Testing', '#'), ('parse-duration', '')])
     salvo = '' if primeira else f'<span style="font-size:12px;color:{k["mfg"]};margin-right:6px;">{T("salvo")}</span>'
     cab = (f'<header style="display:flex;align-items:flex-end;gap:24px;">'
            f'<div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;">{trilha}'
@@ -721,7 +718,7 @@ def barra4(n, k, cor):
 def tela_avaliacao(k):
     chips = (badge('Testing', k, 'blue') + badge('Design Patterns', k, 'blue') + badge(T('nivelSenior'), k, 'gray')
              + badge(T('enviada'), k, 'gray'))
-    cab = cabecalho(k, [T('avaliacoes'), 'agenda-slots'], T('titulo'), chips=chips,
+    cab = cabecalho(k, [(T('avaliacoes'), '#'), ('agenda-slots', '')], T('titulo'), chips=chips,
                     direita=f'<div style="display:flex;gap:8px;">{botao(T("verSolucao"), k, "outline", 36)}</div>')
 
     cores = dict(green=k['ok'], yellow=k['warn'], red=k['bad'])

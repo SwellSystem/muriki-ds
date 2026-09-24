@@ -414,18 +414,32 @@ def topo(k, produto, email='rafael@moura.dev'):
             f'<span style="font-size:13px;color:{k["mfg"]};">{email}</span></span></header>')
 
 
+def voltar(k, rotulo_, href):
+    # o voltar da tela de detalhe (BackLink do DS): seta + para onde volta, um nível acima
+    return (f'<a href="{href}" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;height:28px;margin-left:-4px;'
+            f'padding:0 4px;border-radius:6px;font-size:13px;font-weight:500;color:{k["mfg"]};">'
+            f'<span style="display:flex;transform:rotate(180deg);">{ic("seta", 14)}</span>{rotulo_}</a>')
+
+
+def trilha_nav(k, trilha):
+    # trilha = [(rótulo, destino), ...]; o último é a página atual
+    partes = [f'<a href="{d}" style="color:{k["mfg"]};">{n}</a>' for n, d in trilha[:-1]]
+    partes.append(f'<span style="color:{k["fg"]};">{trilha[-1][0]}</span>')
+    sep = f'<span style="color:{k["input"]};">/</span>'
+    return (f'<nav aria-label="{T("trilhaAria")}" style="display:flex;gap:8px;align-items:center;font-size:12.5px;">'
+            f'{sep.join(partes)}</nav>')
+
+
+def topo_detalhe(k, trilha):
+    # dois níveis: só "← pai". Três ou mais: o voltar sobe um e a trilha fica ao lado
+    if len(trilha) <= 2:
+        return voltar(k, *trilha[0])
+    return (f'<div style="display:flex;align-items:center;gap:14px;">{voltar(k, *trilha[-2])}'
+            f'<span style="width:1px;height:14px;background:{k["input"]};"></span>{trilha_nav(k, trilha)}</div>')
+
+
 def cabecalho(k, trilha, titulo, sub='', direita='', chips=''):
-    t = ''
-    if trilha:
-        partes = []
-        for i, p in enumerate(trilha):
-            if i < len(trilha) - 1:
-                partes.append(f'<a href="#" style="color:{k["mfg"]};">{p}</a>')
-            else:
-                partes.append(f'<span style="color:{k["fg"]};">{p}</span>')
-        sep = f'<span style="color:{k["input"]};">/</span>'
-        t = (f'<nav aria-label="Trilha" style="display:flex;gap:8px;align-items:center;font-size:12.5px;">'
-             f'{sep.join(partes)}</nav>')
+    t = topo_detalhe(k, trilha) if trilha else ''
     s = f'<p style="margin:0;font-size:14px;color:{k["mfg"]};max-width:70ch;">{sub}</p>' if sub else ''
     c = f'<div style="display:flex;gap:6px;flex-wrap:wrap;">{chips}</div>' if chips else ''
     return (f'<header style="display:flex;align-items:flex-end;gap:24px;">'
