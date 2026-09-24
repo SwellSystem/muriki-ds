@@ -1019,12 +1019,16 @@ def tela_acesso(k, modo, sufixo):
         f'<div aria-hidden="true" style="position:absolute;right:0;bottom:0;width:420px;height:420px;border-radius:999px;'
         f'transform:translate(33.333%, 25%);background:color-mix(in oklch, {k["accent"]} 25%, transparent);filter:blur(120px);pointer-events:none;"></div>'
         f'<div aria-hidden="true" style="position:absolute;right:-40px;bottom:-64px;width:480px;height:480px;display:flex;'
-        f'opacity:0.08;transform:rotate(-6deg);pointer-events:none;">{LOGO}</div>')
+        f'opacity:0.08;transform:rotate(-6deg);pointer-events:none;">'
+        f'<span style="display:{{{{senha.olhoA}}}};width:100%;height:100%;">{LOGO}</span><span style="display:{{{{senha.olhoF}}}};width:100%;height:100%;">{LOGO_FECHADO}</span>'
+        f'</div>')
     painel = (
         f'<aside style="position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;'
         f'padding:64px;background:{k["sunken"]};box-shadow:inset -1px 0 0 {k["border"]};">{decoracao}'
         f'<div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">'
-        f'<span style="display:flex;width:36px;height:36px;">{LOGO}</span>{legenda("muriki / code", k)}</div>'
+        f'<span style="display:flex;width:36px;height:36px;">'
+        f'<span style="display:{{{{senha.olhoA}}}};width:100%;height:100%;">{LOGO}</span><span style="display:{{{{senha.olhoF}}}};width:100%;height:100%;">{LOGO_FECHADO}</span>'
+        f'</span>{legenda("muriki / code", k)}</div>'
         f'<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:24px;max-width:512px;">'
         f'<div style="display:flex;align-items:center;gap:12px;">{legenda(T("acesso"), k, "0.3em")}{linha(k["pri"], "width:64px;")}</div>'
         f'<h2 style="margin:0;font-size:72px;line-height:0.95;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
@@ -1146,6 +1150,7 @@ const cor = forca === "Fraca" ? "var(--bad)" : forca === "Media" ? "var(--warn)"
 const seg = (x) => (valor && x < feitos ? cor : "var(--sunken)");
 const senha = {{
 valor: valor, tipo: ver ? "text" : "password", verSenha: ver, naoVer: !ver,
+olhoA: ver ? "none" : "flex", olhoF: ver ? "flex" : "none",
 olhoRotulo: ver ? t.ocultarSenha : t.mostrarSenha,
 visivel: valor ? "visible" : "hidden", feitos: valor ? feitos : 0, rotulo: forca ? t["forca" + forca] : "",
 s1: seg(0), s2: seg(1), s3: seg(2), s4: seg(3),

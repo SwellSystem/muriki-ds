@@ -17,15 +17,15 @@ MONO = "'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace"
 W, H = 1440, 900
 
 
-def _logo():
-    svg = open(os.path.join(AQUI, '..', 'logo.svg')).read()
-    svg = re.sub(r'<svg[^>]*>', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 2000" width="100%" height="100%" aria-hidden="true">', svg, count=1)
-    # a única diferença entre logo.svg e logo-dark.svg é a tinta do primeiro traço
-    svg = svg.replace('fill="rgb(36,36,33)"', 'style="fill:var(--logo)"', 1)
-    return svg.strip()
+def _logo(nome='aberto'):
+    # o logo da marca: vetorizado dos PNGs de public/assets (design/logo-aberto.svg e
+    # logo-fechado.svg, os mesmos do muriki-logo do registry). As cores não mudam com o tema.
+    svg = open(os.path.join(AQUI, '..', f'logo-{nome}.svg')).read()
+    return svg.replace('<svg ', '<svg width="100%" height="100%" aria-hidden="true" ', 1).strip()
 
 
 LOGO = _logo()
+LOGO_FECHADO = _logo('fechado')
 
 
 def T(chave):
