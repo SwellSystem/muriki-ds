@@ -20,6 +20,14 @@
 
     "paths": {
       "@/lib/utils": ["./typecheck/utils.ts"],
+      "@/lib/pdf-themes/muriki": ["./registry/muriki/pdf/theme.ts"],
+      "@/lib/pdf-themes/*": ["./typecheck/pdfcn/lib/pdf-themes/*"],
+      "@/lib/pdf-primitives": ["./typecheck/pdfcn/lib/pdf-primitives.tsx"],
+      "@/lib/pdf-svg": ["./typecheck/pdfcn/lib/pdf-svg.tsx"],
+      "@/lib/resolve-color": ["./typecheck/pdfcn/lib/resolve-color.ts"],
+      "@/types/*": ["./typecheck/pdfcn/types/*"],
+      "@/components/pdf/*": ["./typecheck/pdfcn/components/pdf/*"],
+      "@/components/pdf-documents/*": ["./registry/muriki/pdf/*"],
       "@/lib/*": ["./registry/muriki/lib/*"],
       "@/components/ui/*": ["./registry/muriki/ui/*"],
       "@/components/blocks/*": ["./registry/muriki/blocks/*"],
@@ -27,5 +35,5 @@
       "@/components/acrylic/*": ["./registry/muriki/acrylic/*"]
     }
   },
-  "include": ["registry/**/*.ts", "registry/**/*.tsx", "typecheck/**/*.ts"]
+  "include": ["registry/**/*.ts", "registry/**/*.tsx", "typecheck/**/*.ts", "typecheck/**/*.tsx"]
 }
