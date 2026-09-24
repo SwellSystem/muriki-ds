@@ -52,10 +52,10 @@ const relatorio = (
   <ReportDocument {...meta} generatedBy="Ana Lima" generatedAt="2026-09-24T14:32:00Z"
     summary="Quanto entrou, por quais planos e com quais cupons. Valores já sem os descontos." motif="business">
     <ReportKpis items={[
-      { label: "Vendido", value: formatBRL(46416, false), delta: "+8,2%", trend: "up", hint: "contra agosto" },
-      { label: "Vendas", value: "381", delta: "+5,1%", trend: "up", hint: "contra agosto" },
-      { label: "Ticket médio", value: formatBRL(121.8), delta: "+2,9%", trend: "up" },
-      { label: "Descontos", value: formatBRL(3120, false), delta: "+14%", trend: "down", hint: "mais caro" },
+      { label: "Vendido", value: formatBRL(46416, false), delta: "+8,2%", tone: "good", hint: "contra agosto" },
+      { label: "Vendas", value: "381", delta: "+5,1%", tone: "good", hint: "contra agosto" },
+      { label: "Ticket médio", value: formatBRL(121.8), delta: "+2,9%", tone: "good" },
+      { label: "Descontos", value: formatBRL(3120, false), delta: "+14%", tone: "bad", hint: "mais caro" },
     ]} />
     <ReportSection title="Vendas por dia" description="Quanto entrou em cada dia do mês, em reais." keepTogether>
       <ReportBarChart data={dias} height={170} title="Vendas por dia" />
