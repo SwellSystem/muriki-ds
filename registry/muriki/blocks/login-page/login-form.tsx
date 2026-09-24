@@ -195,7 +195,7 @@ export function LoginForm({
       <div className="flex items-center gap-3">
         <span className={CAPTION}>{t("login.submit")}</span>
         <span className="h-px w-10 bg-primary" />
-        <span className="h-px flex-1 bg-border" />
+        <span className="h-px flex-1 bg-input/60 dark:bg-border" />
       </div>
 
       {/* título */}
@@ -267,9 +267,9 @@ export function LoginForm({
       {/* divisor */}
       {credenciais ? (
         <div className="flex items-center gap-3">
-          <span className="h-px flex-1 bg-border" />
+          <span className="h-px flex-1 bg-input/60 dark:bg-border" />
           <span className={CAPTION}>{t("login.section_or")}</span>
-          <span className="h-px flex-1 bg-border" />
+          <span className="h-px flex-1 bg-input/60 dark:bg-border" />
         </div>
       ) : null}
 
