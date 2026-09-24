@@ -1107,8 +1107,9 @@ def tela_acesso(k, modo, sufixo):
                    f'text-transform:uppercase;color:{k["mfg"]};">{T("esqueci")}</a>')
         campos = (campo('email', T('emailLabel'), 'envelope', 'email', 'email', 'mudarEmail', T('emailPh'), auto='email webauthn')
                   + campo('senha', T('senhaLabel'), 'cadeado', h('senha.tipo'), 'senha.valor', 'mudarSenha', T('senhaPh'),
-                          cabeca=esqueci, depois=forca, olho=True, auto='current-password'))
-        fim = caixa(T('lembrar')) + enviar(T('entrar'), f'Main{sufixo}.dc.html')
+                          cabeca=esqueci, olho=True, auto='current-password'))
+        # sem "lembrar de mim": todo login do Code já é persistente
+        fim = enviar(T('entrar'), f'Main{sufixo}.dc.html')
         gap_form = 24
     if modo == 'passkey':
         rotulo_, hero_a, hero_b, sub = T('rotuloPasskey'), T('heroPasskeyA'), T('heroPasskeyB'), T('subPasskey')

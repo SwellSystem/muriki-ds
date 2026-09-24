@@ -48,6 +48,12 @@ export interface LoginFormProps {
   busy?: boolean
   busyLabel?: string
   passwordMinLength?: number
+  /** Barra de força embaixo da senha (reserva a altura desde o início). `false` tira a barra e o espaço dela. Padrão: true. */
+  showPasswordStrength?: boolean
+  /** Caixa "Lembrar de mim". `false` esconde e envia `rememberMe: false`. Padrão: true. */
+  showRememberMe?: boolean
+  /** Caixa "Confiar neste dispositivo" no segundo fator. `false` esconde e envia `trustDevice: false`. Padrão: true. */
+  showTrustDevice?: boolean
   onPasswordVisibilityChange?: (visible: boolean) => void
   className?: string
 }
