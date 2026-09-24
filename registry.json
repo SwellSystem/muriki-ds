@@ -860,6 +860,28 @@
       "docs": "Tamanho por className (size-8 é o padrão; size-[30px] no rail, size-9 na tela de entrada). Decorativo por padrão; passe title=\"Muriki\" quando for o único nome do link."
     },
     {
+      "name": "qr-code",
+      "type": "registry:ui",
+      "title": "QR Code",
+      "description": "O QR com cara de marca e ainda escaneável: correção de erro H, módulos em ponto, olhos arredondados no azul da marca e um logo no meio. Placa sempre branca, nos dois temas.",
+      "dependencies": [
+        "qrcode"
+      ],
+      "devDependencies": [
+        "@types/qrcode"
+      ],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/qr-code.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Para o 2FA: <QrCode value={otpauthUri} logo={<MurikiLogo />} label=\"QR code para o app autenticador\" />. O logo é opcional (instale muriki-logo à parte). Sempre mostre a chave manual ao lado: nem todo mundo consegue escanear. Testado com ZXing (o leitor por trás da câmera do Android e dos apps autenticadores): lê com e sem logo, nos dois temas. Leitores fracos (jsQR) podem falhar com o logo, porque ele cobre o padrão de alinhamento do centro; a chave manual resolve."
+    },
+    {
       "name": "calendar",
       "type": "registry:ui",
       "title": "Calendar",
