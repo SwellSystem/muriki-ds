@@ -12,6 +12,7 @@ import * as React from "react"
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
 
 import { Input } from "@/components/ui/input"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { cn } from "@/lib/utils"
 
@@ -119,6 +120,67 @@ export function ResourceToolbar({
           </TabsList>
         </Tabs>
       ) : null}
+    </div>
+  )
+}
+
+export interface ResourcePageSkeletonProps {
+  /** Quantas abas de status desenhar; 0 esconde a faixa. */
+  tabs?: number
+  /** Quantas colunas depois da primeira. */
+  columns?: number
+  rows?: number
+  className?: string
+}
+
+/**
+ * A tela de recurso inteira enquanto a rota carrega — o `pendingComponent`
+ * do router. Mesma anatomia da página pronta: título com contagem, a ação
+ * à direita, busca e filtros, abas, e a tabela com as linhas de skeleton do
+ * próprio ResourceTable. Nada pula quando o conteúdo entra.
+ */
+export function ResourcePageSkeleton({ tabs = 4, columns = 4, rows = 8, className }: ResourcePageSkeletonProps) {
+  const larguras = ["w-3/5", "w-2/3", "w-1/2", "w-3/4"]
+  return (
+    <div data-slot="resource-page-skeleton" aria-busy className={cn("flex flex-col gap-4", className)}>
+      <div className="flex items-end gap-6">
+        <div className="flex flex-1 flex-col gap-2">
+          <Skeleton className="h-7 w-44" />
+        </div>
+        <Skeleton className="h-9 w-32" />
+      </div>
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-8 w-full sm:w-80" />
+        <Skeleton className="hidden h-8 w-20 sm:block" />
+        <Skeleton className="hidden h-8 w-24 sm:block" />
+      </div>
+      {tabs > 0 ? (
+        <div className="flex gap-5 pb-2">
+          {Array.from({ length: tabs }, (_, i) => (
+            <Skeleton key={i} className={cn("h-4", i === 0 ? "w-14" : "w-20")} />
+          ))}
+        </div>
+      ) : null}
+      <div className="overflow-hidden rounded-[12px] bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_0_1px_var(--border)]">
+        <div className="flex h-[38px] items-center gap-4 bg-rail px-4 shadow-[inset_0_-1px_0_var(--border)]">
+          <Skeleton className="h-3 w-24" />
+          {Array.from({ length: columns }, (_, i) => (
+            <Skeleton key={i} className="ml-auto h-3 w-16 first-of-type:ml-auto" />
+          ))}
+        </div>
+        {Array.from({ length: rows }, (_, i) => (
+          <div key={i} className="flex h-[52px] items-center gap-4 px-4 shadow-[inset_0_-1px_0_var(--border)]">
+            <Skeleton className="size-7 shrink-0 rounded-full" />
+            <div className="flex flex-1 flex-col gap-1.5">
+              <Skeleton className={cn("h-3", larguras[i % larguras.length])} />
+              <Skeleton className="h-2.5 w-1/3" />
+            </div>
+            {Array.from({ length: columns }, (_, j) => (
+              <Skeleton key={j} className="hidden h-3 w-16 md:block" />
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
