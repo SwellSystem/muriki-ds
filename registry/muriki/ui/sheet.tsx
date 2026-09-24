@@ -52,6 +52,27 @@ const SIDE: Record<SheetSide, string> = {
   ].join(" "),
 }
 
+/**
+ * O segundo eixo, o mesmo do sidebar: encostado (padrão) ou flutuando. Flutuando, o painel
+ * se solta 8px das três bordas e ganha raio nos quatro cantos: vira um objeto sobre a
+ * página, não uma parede. É o que o backoffice desenhou para os sheets de CRUD e de
+ * detalhe. A saída anda o próprio tamanho mais o respiro, para sumir inteiro.
+ */
+const SIDE_FLOATING: Record<SheetSide, string> = {
+  right: [
+    "inset-y-2 right-2 h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-md rounded-[var(--radius-float)]",
+    "data-[starting-style]:translate-x-[calc(100%+0.5rem)] data-[ending-style]:translate-x-[calc(100%+0.5rem)]",
+  ].join(" "),
+  left: [
+    "inset-y-2 left-2 h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-md rounded-[var(--radius-float)]",
+    "data-[starting-style]:-translate-x-[calc(100%+0.5rem)] data-[ending-style]:-translate-x-[calc(100%+0.5rem)]",
+  ].join(" "),
+  bottom: [
+    "inset-x-2 bottom-2 max-h-[85dvh] w-auto rounded-[var(--radius-float)]",
+    "data-[starting-style]:translate-y-[calc(100%+0.5rem)] data-[ending-style]:translate-y-[calc(100%+0.5rem)]",
+  ].join(" "),
+}
+
 function Sheet(props: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="sheet" {...props} />
 }
@@ -70,6 +91,8 @@ interface SheetContentProps extends DialogPrimitive.Popup.Props {
   closeLabel?: string
   /** `padded` (padrão) é solto; `framed` divide em faixas com filete. */
   anatomy?: SheetAnatomy
+  /** Solto 8px das bordas e com raio nos quatro cantos. Padrão: encostado. */
+  floating?: boolean
 }
 
 function SheetContent({
@@ -79,6 +102,7 @@ function SheetContent({
   showClose = true,
   closeLabel = "Fechar",
   anatomy = "padded",
+  floating = false,
   ...props
 }: SheetContentProps) {
   const framed = anatomy === "framed"
@@ -97,12 +121,13 @@ function SheetContent({
         data-slot="sheet-content"
         data-side={side}
         data-anatomy={anatomy}
+        data-floating={floating || undefined}
         className={cn(
           "fixed z-50 flex flex-col bg-popover text-popover-foreground outline-none",
           framed ? "gap-0 overflow-hidden" : "gap-4 p-5",
           "shadow-[var(--float-strong)]",
           "transition-transform duration-200 ease-out",
-          SIDE[side],
+          floating ? SIDE_FLOATING[side] : SIDE[side],
           className
         )}
         {...props}

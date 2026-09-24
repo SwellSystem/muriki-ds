@@ -52,6 +52,8 @@ export interface ResourceFormSheetProps {
   footerNote?: React.ReactNode
   /** Largura do painel em telas grandes. */
   size?: "default" | "lg"
+  /** Solto das bordas, como no desenho do backoffice. Padrão: true. */
+  floating?: boolean
 }
 
 export function ResourceFormSheet({
@@ -67,11 +69,12 @@ export function ResourceFormSheet({
   submitDisabled = false,
   footerNote,
   size = "default",
+  floating = true,
 }: ResourceFormSheetProps) {
   const t = useResourceLabel()
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent anatomy="framed" className={cn(size === "lg" ? "sm:max-w-xl" : "sm:max-w-[520px]")}>
+      <SheetContent anatomy="framed" floating={floating} className={cn(size === "lg" ? "sm:max-w-xl" : "sm:max-w-[520px]")}>
         <form
           className="flex min-h-0 flex-1 flex-col"
           onSubmit={(e) => {
