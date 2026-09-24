@@ -2,7 +2,7 @@ IDIOMAS = ['pt-BR', 'en-US', 'es-ES']
 
 COMUM = {
     'pt-BR': dict(
-        lang='pt-BR', idiomaCurto='PT', idiomaNome='Português', trocarIdioma='Idioma: português. Trocar idioma',
+        lang='pt-BR', idiomaCurto='PT', idiomaNome='Português', idiomaMenu='Idioma', trocarIdioma='Idioma: português. Trocar idioma',
         paraEscuro='Tema claro. Mudar para o escuro', paraClaro='Tema escuro. Mudar para o claro',
         evolucao='Evolução', trilhas='Trilhas', exercicios='Exercícios', avaliacoes='Avaliações',
         peer='Peer na IDE', plano='Plano', trilhaAria='Trilha', aprender='Aprender',
@@ -10,7 +10,7 @@ COMUM = {
         pleno='Pleno', playground='Playground',
     ),
     'en-US': dict(
-        lang='en-US', idiomaCurto='EN', idiomaNome='English', trocarIdioma='Language: English. Change language',
+        lang='en-US', idiomaCurto='EN', idiomaNome='English', idiomaMenu='Language', trocarIdioma='Language: English. Change language',
         paraEscuro='Light theme. Switch to dark', paraClaro='Dark theme. Switch to light',
         evolucao='Progress', trilhas='Tracks', exercicios='Exercises', avaliacoes='Evaluations',
         peer='Peer in your IDE', plano='Plan', trilhaAria='Breadcrumb', aprender='Learn',
@@ -18,7 +18,7 @@ COMUM = {
         pleno='Mid-level', playground='Playground',
     ),
     'es-ES': dict(
-        lang='es-ES', idiomaCurto='ES', idiomaNome='Español', trocarIdioma='Idioma: español. Cambiar idioma',
+        lang='es-ES', idiomaCurto='ES', idiomaNome='Español', idiomaMenu='Idioma', trocarIdioma='Idioma: español. Cambiar idioma',
         paraEscuro='Tema claro. Cambiar a oscuro', paraClaro='Tema oscuro. Cambiar a claro',
         evolucao='Evolución', trilhas='Rutas', exercicios='Ejercicios', avaliacoes='Evaluaciones',
         peer='Peer en el IDE', plano='Plan', trilhaAria='Ruta de navegación', aprender='Aprender',
