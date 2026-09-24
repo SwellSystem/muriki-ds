@@ -45,7 +45,7 @@ export interface ResourceFormSheetProps {
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void
   submitLabel?: string
   cancelLabel?: string
-  /** Trava o botão e troca o rótulo enquanto salva. */
+  /** Trava o botão e põe o spinner nele enquanto salva; o rótulo fica. */
   submitting?: boolean
   submitDisabled?: boolean
   /** À esquerda do rodapé: "Editado por Ana há 3 dias". */
@@ -92,8 +92,8 @@ export function ResourceFormSheet({
             <Button type="button" variant="ghost" size="lg" onClick={() => onOpenChange(false)}>
               {cancelLabel ?? t("resource.cancel")}
             </Button>
-            <Button type="submit" variant="solid" size="lg" disabled={submitting || submitDisabled}>
-              {submitting ? t("resource.saving") : (submitLabel ?? t("resource.save"))}
+            <Button type="submit" variant="solid" size="lg" loading={submitting} disabled={submitDisabled}>
+              {submitLabel ?? t("resource.save")}
             </Button>
           </SheetFooter>
         </form>
@@ -163,7 +163,7 @@ export function ResourceConfirmDialog({
           <Button
             variant="solid"
             size="lg"
-            disabled={pending}
+            loading={pending}
             onClick={() => void onConfirm()}
             className={cn(
               destructive &&
@@ -171,7 +171,7 @@ export function ResourceConfirmDialog({
               "sm:w-auto"
             )}
           >
-            {pending ? t("resource.confirming") : (confirmLabel ?? t("resource.confirm"))}
+            {confirmLabel ?? t("resource.confirm")}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
