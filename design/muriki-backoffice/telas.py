@@ -210,24 +210,33 @@ def tela_convite(k):
     return _entrada(k, 'Convite', 'Boas-vindas', 'à equipe.', 'Crie seu acesso ao Backoffice. É rápido: nome, senha e o autenticador.', corpo)
 
 
-def _qr(k, tam=132):
-    # QR de mentira, fixo: três marcadores de canto e módulos por semente — o de verdade vem do otpauthUri
+def _qr(k, tam=156):
+    # o estilo do componente qr-code do DS: módulos em ponto, olhos arredondados na tinta da
+    # marca e o logo no meio (correção H aguenta ~30% coberto). Placa sempre branca: leitor
+    # de QR precisa de fundo claro, no tema escuro também. Aqui a matriz é de mentira, fixa.
     import random
-    r, N = random.Random(7), 25
+    r, N = random.Random(11), 29
     cel = tam / N
-    mods = ''
-    marc = lambda x, y: ((x < 7 and y < 7) or (x >= N - 7 and y < 7) or (x < 7 and y >= N - 7))
+    olho = lambda x, y: (x < 8 and y < 8) or (x >= N - 8 and y < 8) or (x < 8 and y >= N - 8)
+    c0, c1 = N // 2 - 4, N // 2 + 4
+    meio = lambda x, y: c0 <= x <= c1 and c0 <= y <= c1
+    pontos = ''
     for y in range(N):
         for x in range(N):
-            if marc(x, y) or r.random() > 0.52:
+            if olho(x, y) or meio(x, y) or r.random() > 0.5:
                 continue
-            mods += f'<rect x="{x * cel:.2f}" y="{y * cel:.2f}" width="{cel:.2f}" height="{cel:.2f}"/>'
+            pontos += f'<circle cx="{(x + .5) * cel:.2f}" cy="{(y + .5) * cel:.2f}" r="{cel * .42:.2f}"/>'
     def canto(x, y):
-        return (f'<rect x="{x * cel + cel / 2:.2f}" y="{y * cel + cel / 2:.2f}" width="{6 * cel:.2f}" height="{6 * cel:.2f}" fill="none" stroke-width="{cel:.2f}"/>'
-                f'<rect x="{(x + 2) * cel:.2f}" y="{(y + 2) * cel:.2f}" width="{3 * cel:.2f}" height="{3 * cel:.2f}"/>')
-    return (f'<div style="padding:10px;border-radius:10px;background:#fff;box-shadow:inset 0 0 0 1px {k["input"]};flex:0 0 auto;">'
+        return (f'<rect x="{(x + .5) * cel:.2f}" y="{(y + .5) * cel:.2f}" width="{6 * cel:.2f}" height="{6 * cel:.2f}" rx="{2.1 * cel:.2f}" '
+                f'fill="none" stroke="#1B50C0" stroke-width="{cel:.2f}"/>'
+                f'<rect x="{(x + 2) * cel:.2f}" y="{(y + 2) * cel:.2f}" width="{3 * cel:.2f}" height="{3 * cel:.2f}" rx="{1.1 * cel:.2f}" fill="#1B50C0"/>')
+    lado = (c1 - c0 + 1) * cel
+    logo = (f'<rect x="{c0 * cel:.2f}" y="{c0 * cel:.2f}" width="{lado:.2f}" height="{lado:.2f}" rx="{lado * .28:.2f}" fill="#fff"/>'
+            f'<svg x="{(c0 + .9) * cel:.2f}" y="{(c0 + .9) * cel:.2f}" width="{lado - 1.8 * cel:.2f}" height="{lado - 1.8 * cel:.2f}" viewBox="0 0 2000 2000">'
+            + LOGO.split('>', 1)[1].rsplit('</svg>', 1)[0].replace('style="fill:var(--logo)"', 'fill="rgb(36,36,33)"') + '</svg>')
+    return (f'<div style="padding:12px;border-radius:14px;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,0.06), inset 0 0 0 1px {k["border"]};flex:0 0 auto;">'
             f'<svg role="img" aria-label="QR code para o app autenticador" viewBox="0 0 {tam} {tam}" width="{tam}" height="{tam}" '
-            f'style="display:block;fill:#141413;stroke:#141413;">{mods}{canto(0, 0)}{canto(N - 7, 0)}{canto(0, N - 7)}</svg></div>')
+            f'style="display:block;fill:#1C252E;">{pontos}{canto(0, 0)}{canto(N - 7, 0)}{canto(0, N - 7)}{logo}</svg></div>')
 
 
 def tela_autenticador(k):
