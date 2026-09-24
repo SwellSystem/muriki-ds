@@ -1,7 +1,8 @@
 /**
  * Muriki Separator.
  *
- * O filete do sistema, na cor `--border`. Nas superfícies que já carregam
+ * O traço solto do sistema, na cor `--divider` (o `--border` some sobre a
+ * página no claro). Nas superfícies que já carregam
  * filete por sombra interna (diálogo estruturado, sheet), prefira aquele:
  * dois meios de desenhar a mesma linha acabam divergindo de espessura.
  *
@@ -17,7 +18,7 @@
  * canto.
  *
  * A dissolução é máscara, não gradiente de cor: o filete continua sendo
- * `--border` no meio, então não perde contraste onde precisa ser lido.
+ * `--divider` no meio, então não perde contraste onde precisa ser lido.
  */
 import { Separator as SeparatorPrimitive } from "@base-ui/react/separator"
 
@@ -61,7 +62,7 @@ function Separator({
           : style
       }
       className={cn(
-        "shrink-0 bg-border",
+        "shrink-0 bg-divider",
         "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full",
         "data-[orientation=vertical]:w-px data-[orientation=vertical]:self-stretch",
         className

@@ -68,7 +68,7 @@ const tabsListVariants = cva(
          */
         line: [
           "relative gap-4",
-          "before:pointer-events-none before:absolute before:bg-border",
+          "before:pointer-events-none before:absolute before:bg-divider",
           "group-data-[orientation=horizontal]/tabs:before:inset-x-0 group-data-[orientation=horizontal]/tabs:before:bottom-0 group-data-[orientation=horizontal]/tabs:before:h-px",
           "group-data-[orientation=horizontal]/tabs:before:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]",
           "group-data-[orientation=vertical]/tabs:gap-1",

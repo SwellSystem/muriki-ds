@@ -106,7 +106,7 @@ function RowActions({
       {overflow.length > 0 ? (
         <>
           {inline.length > 0 ? (
-            <span aria-hidden className="mx-1 h-4 w-px bg-border" />
+            <span aria-hidden className="mx-1 h-4 w-px bg-divider" />
           ) : null}
           <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger
