@@ -10,11 +10,11 @@ TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · conta Muriki', 0, 0, 1),
     ('criar', 'CriarConta', 'Criar conta', 'Criar conta', 1, 0, 1),
     ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 9, 0, 1),
-    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · 1 · escolha do plano', 2, 0, 1),
-    ('verificacao', 'Verificacao', 'Confirme seu email', 'Primeiro acesso · 2 · código por email', 3, 0, 1),
-    ('perfil', 'Perfil', 'Seu perfil', 'Primeiro acesso · 3 · perfil (o mesmo do Platform)', 4, 0, 1),
-    ('preferencias', 'Preferencias', 'Preferências', 'Primeiro acesso · 4 · experiência, linguagens e objetivos', 5, 0, 1),
-    ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 6, 0, 1),
+    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · 3 · plano e cupom', 4, 0, 1),
+    ('verificacao', 'Verificacao', 'Confirme seu email', 'Primeiro acesso · 1 · código por email', 2, 0, 1),
+    ('perfil', 'Perfil', 'Seu perfil', 'Primeiro acesso · 2 · perfil (conclui o onboarding; 7 dias de Pro)', 3, 0, 1),
+    ('preferencias', 'Preferencias', 'Perfil de aprendizado', 'Primeiro acesso · perfil de aprendizado (opcional)', 6, 0, 1),
+    ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 5, 0, 1),
     ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 7, 0, 1),
     ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 8, 0, 1),
     ('evolucao', 'Main', 'Evolução', 'Evolução · declarado, observado e estado', 0, 2, 3),
@@ -25,6 +25,10 @@ TELAS = [
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
     ('planos', 'Planos', 'Planos', 'Planos · Starter e Pro', 2, 4, 5),
+    ('codigo', 'SegundoFator', 'Segundo fator', 'Entrar · segundo fator (app ou código de backup)', 0, 6, 7),
+    ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
+    ('criarSenha', 'CriarSenha', 'Criar senha', 'Conta · criar senha (link do email)', 2, 6, 7),
+    ('redefinir', 'RedefinirSenha', 'Redefinir senha', 'Conta · redefinir senha (link do email)', 3, 6, 7),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -65,12 +69,14 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('jornada', 0, 10, 'Entrada e primeiro acesso: plano, código por email, perfil, preferências, pagamento e o primeiro exercício'),
+    ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
     ('web', 2, 5, 'Code web: perfil, competência, exercício, avaliação e playground'),
     ('webEscuro', 3, 5, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
+    ('conta', 6, 4, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email'),
+    ('contaEscuro', 7, 4, 'Conta no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 

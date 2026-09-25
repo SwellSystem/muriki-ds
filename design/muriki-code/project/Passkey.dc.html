@@ -49,6 +49,16 @@ const valor = s.senha == null ? "" : s.senha;
 const ver = !!s.verSenha;
 const REQ = [["req8", valor.length >= 8], ["reqNum", /\d/.test(valor)], ["reqMin", /[a-z]/.test(valor)], ["reqMai", /[A-Z]/.test(valor)]];
 const feitos = REQ.filter((r) => r[1]).length;
+const est = s.estado || this.props.estado || "formulario";
+const DIG = est === "invalido" ? ["4", "8", "2", "9", "1", "7"] : ["4", "8", "2", "9", "1", ""];
+const e = {
+formulario: est === "formulario" || est === "vazada", enviado: est === "enviado", vazada: est === "vazada", expirado: est === "expirado",
+totp: est !== "backup", backup: est === "backup", invalido: est === "invalido",
+anel: est === "invalido" ? "inset 0 0 0 1.5px var(--bad)" : "inset 0 0 0 1px var(--input)",
+d0: DIG[0], d1: DIG[1], d2: DIG[2], d3: DIG[3], d4: DIG[4], d5: DIG[5],
+enviarForm: () => this.setState({ estado: "enviado" }), voltarForm: () => this.setState({ estado: "formulario" }),
+modoBackup: () => this.setState({ estado: "backup" }), modoApp: () => this.setState({ estado: "totp" })
+};
 const forca = !valor ? "" : feitos <= 1 ? "Fraca" : feitos === 2 ? "Media" : feitos === 3 ? "Forte" : "MuitoForte";
 const cor = forca === "Fraca" ? "var(--bad)" : forca === "Media" ? "var(--warn)" : "var(--ok)";
 const seg = (x) => (valor && x < feitos ? cor : "var(--sunken)");
@@ -68,6 +78,7 @@ trocarTema: () => this.setState({ tema: tema === "escuro" ? "claro" : "escuro" }
 menuIdioma: !!s.menuIdioma,
 abrirIdioma: () => this.setState({ menuIdioma: !s.menuIdioma }),
 idiomas: ORDEM.map((l) => ({ lang: l, nome: TEXTOS[l].idiomaNome, atual: l === idioma, escolher: () => this.setState({ idioma: l, menuIdioma: false }) })),
+e: e,
 nome: nome,
 email: email,
 senha: senha,

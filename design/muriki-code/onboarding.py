@@ -1,10 +1,12 @@
-# Onboarding do Code no contrato da muriki-api, na ordem que o usuário escolheu:
-# Criar conta → 1 Plano (só a escolha) → 2 Verificação → 3 Perfil → 4 Preferências
-# → pagamento no Stripe, se escolheu Pro → Primeiro exercício.
+# Onboarding do Code no contrato da muriki-api (develop @ 789252c):
+# 1 Código por email → 2 Perfil (conclui o onboarding e começa os 7 dias de Pro para todos)
+# → 3 Plano (Starter ou Pro, com cupom) → pagamento no Stripe, se Pro.
+# Depois, fora do onboarding e sem contador: o perfil de aprendizado do primeiro acesso
+# (experiência, linguagens e objetivos, tudo opcional) → Primeiro exercício.
 # O cabeçalho de passo é o OnboardingStepHeader do DS (o mesmo da PricingScreen).
 from base import *  # noqa: F401,F403
 
-TOTAL = 4
+TOTAL = 3
 h = lambda caminho: '{{' + caminho + '}}'
 
 
@@ -81,7 +83,7 @@ def tela_verificacao(k, sufixo):
              f'<button type="button" aria-disabled="{h("v.esperando")}" style="border:0;padding:0;background:transparent;'
              f'font-family:{FONTE};font-size:13px;line-height:20px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button>'
              f'<br>{T("spam")}</p>')
-    corpo = (cabecalho_passo(k, 2, T('titulo'),
+    corpo = (cabecalho_passo(k, 1, T('titulo'),
                              f'{T("sub")}<br><b style="font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b>', tamanho=40, centro=True)
              + f'<div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;">'
                f'{codigo}{validade}{aviso}<div style="height:6px;"></div>{botao}{ajuda}</div>')
@@ -121,26 +123,64 @@ def tela_perfil(k, sufixo):
                 f'{pre}<input id="{id_}" value="{valor}" placeholder="{ph}" style="flex:1;min-width:0;height:100%;padding:0 14px;border:0;'
                 f'background:transparent;font-family:{MONO if mono else FONTE};font-size:15px;color:{k["fgs"]};outline:0;"></div>{n}</div>')
     opcional = f'<span style="font-size:12.5px;font-weight:400;color:{k["mfg"]};">{T("opcional")}</span>'
-    grupo = lambda leg, filhos: (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:20px;">'
-                                 f'{legenda_campo(k, leg)}{filhos}</fieldset>')
+    # dois campos por linha dentro dos 672px: o formulário inteiro cabe sem rolar
+    grupo = lambda leg, filhos, colunas=2: (f'<fieldset style="margin:0;padding:0;border:0;display:grid;'
+                                            f'grid-template-columns:repeat({colunas}, minmax(0, 1fr));gap:16px 20px;align-items:start;">'
+                                            f'{legenda_campo(k, leg)}{filhos}</fieldset>')
     voce = grupo(T('grupoVoce'), campo('apelido', T('apelido'), 'Rafael', T('apelidoPh'))
                  + campo('nome', T('nome'), 'Rafael Moura', T('nomePh')))
     contato = grupo(T('grupoDocs'), campo('cpf', T('cpf'), '123.456.789-09', T('cpfPh'), nota=T('cpfNota'), mono=True)
                     + campo('telefone', T('telefone'), '', T('telefonePh'), extra=opcional, prefixo='+55'))
+    # como conheceu (referralSource) é opcional: um select, com as origens que a API aceita
+    origem = (f'<div style="display:flex;flex-direction:column;gap:8px;">'
+              f'<label for="origem" style="display:flex;align-items:baseline;gap:6px;font-size:13.5px;font-weight:500;color:{k["fgs"]};">'
+              f'{T("origem")}{opcional}</label>'
+              f'<div style="position:relative;display:flex;align-items:center;height:44px;border-radius:11px;background:{k["card"]};'
+              f'box-shadow:inset 0 0 0 1px {k["input"]};">'
+              f'<span id="origem" role="combobox" aria-expanded="false" style="flex:1;padding:0 14px;font-size:15px;color:{k["mfg"]};">{T("origemPh")}</span>'
+              f'<span style="display:flex;margin-right:14px;color:{k["mfg"]};">{ic("baixo", 14)}</span></div></div>')
     termos = (f'<label style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:20px;color:{k["mfg"]};cursor:pointer;">'
               f'<input type="checkbox" checked style="width:16px;height:16px;margin:2px 0 0;flex:0 0 auto;accent-color:{k["pri"]};">'
               f'<span>{T("termosA")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("termos")}</a> {T("termosE")} '
               f'<a href="#" style="color:{k["fg"]};font-weight:500;">{T("privacidade")}</a>.</span></label>')
-    corpo = (cabecalho_passo(k, 3, T('titulo'), T('sub'))
-             + f'<form style="margin:0;display:flex;flex-direction:column;gap:28px;">{voce}{contato}{termos}'
-               f'{botao_touch(k, T("continuar"), f"Preferencias{sufixo}.dc.html")}</form>')
+    teste = (f'<p style="margin:0;display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:19px;color:{k["mfg"]};">'
+             f'{badge(T("teste"), k, "green", mono=True)}<span>{T("testeNota")}</span></p>')
+    rodape = f'<div style="display:flex;flex-direction:column;gap:14px;">{botao_touch(k, T("continuar"), f"PlanoInicial{sufixo}.dc.html")}{teste}</div>'
+    formulario = (f'<form style="margin:0;display:flex;flex-direction:column;gap:22px;">'
+                  f'{voce}{contato}{grupo(T("grupoOrigem"), origem, 1)}{termos}{rodape}</form>')
+    # quem já tem perfil (vindo do Platform) só confirma: POST /onboarding/code/complete, sem formulário
+    linha = lambda r, v, mono=False: (f'<div style="display:flex;justify-content:space-between;gap:16px;padding:12px 0;'
+                                      f'border-top:1px solid var(--divider);font-size:14px;">'
+                                      f'<span style="color:{k["mfg"]};">{r}</span>'
+                                      f'<span style="color:{k["fgs"]};font-weight:500;{"font-family:" + MONO + ";" if mono else ""}">{v}</span></div>')
+    resumo = (f'<div style="display:flex;flex-direction:column;padding:4px 18px;border-radius:12px;background:{k["card"]};'
+              f'box-shadow:inset 0 0 0 1px {k["border"]}, {k["sombra"]};">'
+              f'<div style="margin:0 -18px;padding:0 18px;">'
+              # a API expõe do perfil existente só o nome e o email; CPF e telefone ficam onde estão
+              + linha(T('nome'), 'Rafael Moura').replace('border-top:1px solid var(--divider);', '', 1)
+              + linha(T('emailRotulo'), 'rafael@moura.dev', True)
+              + '</div></div>')
+    confirmar = (f'<div style="display:flex;flex-direction:column;gap:24px;">{resumo}'
+                 f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("confirmarNota")}</p>'
+                 f'<div style="display:flex;flex-direction:column;gap:14px;">'
+                 f'{botao_touch(k, T("confirmar"), f"PlanoInicial{sufixo}.dc.html")}{teste}</div></div>')
+    se = lambda chave, html, padrao=False: (f'<sc-if value="{h("pf." + chave)}" hint-placeholder-val="{{{{ {"true" if padrao else "false"} }}}}">'
+                                            f'{html}</sc-if>')
+    corpo = (se('novo', cabecalho_passo(k, 2, T('titulo'), T('sub')) + formulario, True)
+             + se('confirmar', cabecalho_passo(k, 2, T('tituloConfirmar'), T('subConfirmar')) + confirmar))
     return pagina_passo(k, corpo, FORM)
 
 
-# ── 4 · Preferências: conclui o onboarding ─────────────────────────────
-# POST /onboarding/code/preferences: experience (4 valores), languages (slugs de
-# GET /onboarding/code/languages, supported=false aparece "em breve") e goals (1 a 3).
-EXPERIENCIAS = ['learning', 'beginner', 'intermediate', 'advanced']
+ANTES_PERFIL = """const est = s.estado || this.props.estado || "novo";
+const pf = { novo: est === "novo", confirmar: est === "confirmar" };"""
+PROPS_PERFIL = {'estado': {'editor': 'enum', 'options': ['novo', 'confirmar'], 'default': 'novo'}}
+
+
+# ── Primeiro acesso: o perfil de aprendizado (fora do onboarding, sem contador) ──
+# Tudo opcional: experience (junior, mid, senior, tech_lead, architect ou unknown = "ainda não
+# sei"), languages (0 a 30, de GET /code/languages; supported=false aparece "em breve") e goals
+# (0 a 3). "Pular por agora" não grava nada; o declarado do perfil vem da experience.
+EXPERIENCIAS = ['junior', 'mid', 'senior', 'tech_lead', 'architect', 'unknown']
 OBJETIVOS = ['learn', 'ship_faster', 'review_code']
 # exemplo do que GET /onboarding/code/languages devolve: (nome, categoria, supported)
 LINGUAGENS_API = [
@@ -153,8 +193,8 @@ LINGUAGENS_API = [
 
 
 def tela_preferencias(k, sufixo):
-    exp = (f'<div role="radiogroup" aria-label="{T("experiencia")}" style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:12px;">'
-           f'<sc-for list="{h("exps")}" as="e" hint-placeholder-count="4">'
+    exp = (f'<div role="radiogroup" aria-label="{T("experiencia")}" style="display:grid;grid-template-columns:repeat(6, minmax(0, 1fr));gap:10px;">'
+           f'<sc-for list="{h("exps")}" as="e" hint-placeholder-count="6">'
            f'<button type="button" role="radio" aria-checked="{h("e.marcado")}" onClick="{h("e.escolher")}" '
            f'style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:0;border-radius:12px;background:{k["card"]};'
            f'box-shadow:{h("e.borda")};text-align:left;font-family:{FONTE};cursor:pointer;">'
@@ -186,12 +226,16 @@ def tela_preferencias(k, sufixo):
            f'<span style="display:flex;flex-direction:column;gap:3px;">'
            f'<span style="font-size:14.5px;font-weight:600;color:{k["fgs"]};">{h("o.nome")}</span>'
            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{h("o.desc")}</span></span></button></sc-for></div>')
-    rodape = (f'<div style="display:flex;align-items:center;gap:16px;">'
-              f'<a href="{h("fim.destino")}" style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;'
-              f'background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">{h("fim.acao")}{ic("seta", 15)}</a>'
-              f'<span style="font-size:12.5px;color:{k["mfg"]};">{h("fim.nota")}</span></div>')
+    rodape = (f'<div style="display:flex;align-items:center;gap:8px;">'
+              f'{botao_touch(k, T("comecar"), f"PrimeiroExercicio{sufixo}.dc.html")}'
+              f'{botao_ir(k, T("pular"), f"PrimeiroExercicio{sufixo}.dc.html", False)}'
+              f'<span style="margin-left:8px;font-size:12.5px;color:{k["mfg"]};">{T("nadaObrigatorio")}</span></div>')
     contador = f'<span style="margin-left:auto;font-size:12px;color:{k["mfg"]};">{T("umATres")}</span>'
-    corpo = (cabecalho_passo(k, 4, T('titulo'), T('sub'))
+    # sem barra de passos: o onboarding acabou; é o primeiro acesso, e tudo aqui é opcional
+    cabeca = (f'<header style="display:flex;flex-direction:column;gap:12px;">{rotulo(T("rotuloAprendizado"), k["mfg"])}'
+              f'<h1 style="margin:0;font-size:44px;line-height:1.04;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{T("titulo")}</h1>'
+              f'<p style="margin:0;max-width:70ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{T("sub")}</p></header>')
+    corpo = (cabeca
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("experiencia"))}{exp}</div>'
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("linguagens"))}{ling}</div>'
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("objetivos"), contador)}{obj}</div>'
@@ -203,10 +247,9 @@ ANTES_PREFERENCIAS = """const EXP = __EXP__;
 const OBJ = __OBJ__;
 const LING = __LING__;
 const CATS = ["mainstream", "web", "mobile", "systems"];
-const exp = s.exp || "intermediate";
+const exp = s.exp || "mid";
 const langs = s.langs || ["TypeScript", "Python"];
 const objs = s.objs || ["learn", "ship_faster"];
-const plano = s.plano || this.props.plano || "starter";
 const exps = EXP.map((id) => ({
 nome: t[id], desc: t[id + "Desc"], marcado: id === exp,
 borda: id === exp ? "0 0 0 1.5px var(--pri), var(--sombra)" : "inset 0 0 0 1px var(--border), var(--sombra)",
@@ -233,20 +276,14 @@ nome: t[id], desc: t[id + "Desc"], marcado: on,
 borda: on ? "0 0 0 1.5px var(--pri), var(--sombra)" : "inset 0 0 0 1px var(--border), var(--sombra)",
 caixa: on ? "var(--pri)" : "var(--card)", caixaBorda: on ? "none" : "inset 0 0 0 1.5px var(--input)",
 alternar: () => {
-if (on && objs.length === 1) return;
 if (!on && objs.length === 3) return;
 this.setState({ objs: on ? objs.filter((x) => x !== id) : objs.concat([id]) });
 }
 };
 });
-const fim = {
-acao: plano === "pro" ? t.irPagamento : t.comecar,
-nota: plano === "pro" ? t.notaPro : t.notaStarter,
-destino: plano === "pro" ? "Pagamento__SUF__.dc.html" : "PrimeiroExercicio__SUF__.dc.html"
-};""".replace('__EXP__', json.dumps(EXPERIENCIAS)).replace('__OBJ__', json.dumps(OBJETIVOS)).replace(
+""".replace('__EXP__', json.dumps(EXPERIENCIAS)).replace('__OBJ__', json.dumps(OBJETIVOS)).replace(
     '__LING__', json.dumps(LINGUAGENS_API))
-VALORES_PREFERENCIAS = 'exps: exps,\ngrupos: grupos,\nobjs: objsV,\nfim: fim'
-PROPS_PREFERENCIAS = {'plano': {'editor': 'enum', 'options': ['starter', 'pro'], 'default': 'starter'}}
+VALORES_PREFERENCIAS = 'exps: exps,\ngrupos: grupos,\nobjs: objsV'
 
 
 # ── Volta do Stripe ────────────────────────────────────────────────────
@@ -262,9 +299,9 @@ def tela_pagamento(k, sufixo):
                 f'<p style="margin:0;font-size:15px;line-height:23px;color:{k["mfg"]};">{T(chave + "Sub")}</p></div>'
                 f'<div style="display:flex;align-items:center;gap:8px;">{acoes}</div></div></sc-if>')
     confirmado = estado('confirmado', 'check', k['ok'], k['tgreen'],
-                        botao_ir(k, T('comecarPrimeiro'), f'PrimeiroExercicio{sufixo}.dc.html'))
+                        botao_ir(k, T('comecarPrimeiro'), f'Preferencias{sufixo}.dc.html'))
     cancelado = estado('cancelado', 'x', k['warn'], k['torange'],
-                       botao_ir(k, T('tentarDeNovo'), '#') + botao_ir(k, T('seguirStarter'), f'PrimeiroExercicio{sufixo}.dc.html', False))
+                       botao_ir(k, T('tentarDeNovo'), '#') + botao_ir(k, T('seguirStarter'), f'Preferencias{sufixo}.dc.html', False))
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
             f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 80px;">'
             f'{confirmado}{cancelado}</main></div>')

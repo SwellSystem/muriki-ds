@@ -30,8 +30,8 @@ COMUM = {
 EVOLUCAO = {
     'pt-BR': dict(
         titulo='Seu perfil de competência',
-        sub='Calculado a partir de 219 evidências. O declarado vem da experiência que você escolheu (Intermediário, '
-            'Pleno em tudo); o observado só muda com evidência forte, e nunca por um exercício ruim.',
+        sub='Calculado a partir de 219 evidências. O declarado vem da experiência que você escolheu (Pleno, '
+            'em todas as competências); o observado só muda com evidência forte, e nunca por um exercício ruim.',
         trajetoria='Trajetória', comoMedido='Como o nível é medido', competencias='Competências',
         colComp='Competência', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Linguagens', grupoEng='Engenharia',
@@ -53,8 +53,8 @@ EVOLUCAO = {
     ),
     'en-US': dict(
         titulo='Your competency profile',
-        sub='Calculated from 219 pieces of evidence. Declared comes from the experience you chose (Intermediate, '
-            'Mid-level everywhere); observed only changes with strong evidence, never from one bad exercise.',
+        sub='Calculated from 219 pieces of evidence. Declared comes from the experience you chose (Mid-level, '
+            'in every competency); observed only changes with strong evidence, never from one bad exercise.',
         trajetoria='Trajectory', comoMedido='How the level is measured', competencias='Competencies',
         colComp='Competency', colEscala='Scale', colDecl='Declared', colObs='Observed', colEstado='Status',
         grupoLing='Languages', grupoEng='Engineering',
@@ -77,7 +77,7 @@ EVOLUCAO = {
     'es-ES': dict(
         titulo='Tu perfil de competencias',
         sub='Calculado a partir de 219 evidencias. El declarado viene de la experiencia que elegiste (Intermedio, '
-            'Intermedio en todo); el observado solo cambia con evidencia fuerte, nunca por un mal ejercicio.',
+            'en todas las competencias); el observado solo cambia con evidencia fuerte, nunca por un mal ejercicio.',
         trajetoria='Trayectoria', comoMedido='Cómo se mide el nivel', competencias='Competencias',
         colComp='Competencia', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Lenguajes', grupoEng='Ingeniería',
@@ -373,8 +373,8 @@ PRIMEIRO = {
 
 PERFIL_VAZIO = {
     'pt-BR': dict(
-        subVazio='Ainda sem evidência. O ponto de partida vem da experiência que você escolheu (Intermediário, '
-                 'Pleno em tudo), e cada exercício enviado confirma ou ajusta uma competência.',
+        subVazio='Ainda sem evidência. O ponto de partida vem da experiência que você escolheu (Pleno, '
+                 'em todas as competências), e cada exercício enviado confirma ou ajusta uma competência.',
         trocarJornada='Mudar preferências', entraPrimeiro='entra no 1º exercício',
         primeiroTitulo='Converter duração em texto para minutos',
         primeiroTxt='Seu primeiro exercício: tem testes, dicas sob pedido e uma pergunta para você explicar a solução.',
@@ -382,8 +382,8 @@ PERFIL_VAZIO = {
         trajVazio='A trajetória compara você com você mesmo: a primeira solução enviada vira o ponto de comparação das próximas.',
     ),
     'en-US': dict(
-        subVazio='No evidence yet. The starting point comes from the experience you chose (Intermediate, '
-                 'Mid-level everywhere), and each exercise you submit confirms or adjusts a competency.',
+        subVazio='No evidence yet. The starting point comes from the experience you chose (Mid-level, '
+                 'in every competency), and each exercise you submit confirms or adjusts a competency.',
         trocarJornada='Change preferences', entraPrimeiro='in your first exercise',
         primeiroTitulo='Convert a text duration into minutes',
         primeiroTxt='Your first exercise: it has tests, hints on request and a question for you to explain your solution.',
@@ -392,7 +392,7 @@ PERFIL_VAZIO = {
     ),
     'es-ES': dict(
         subVazio='Aún sin evidencias. El punto de partida viene de la experiencia que elegiste (Intermedio, '
-                 'Intermedio en todo), y cada ejercicio enviado confirma o ajusta una competencia.',
+                 'en todas las competencias), y cada ejercicio enviado confirma o ajusta una competencia.',
         trocarJornada='Cambiar preferencias', entraPrimeiro='entra en el 1.er ejercicio',
         primeiroTitulo='Convertir una duración en texto a minutos',
         primeiroTxt='Tu primer ejercicio: tiene pruebas, pistas a demanda y una pregunta para que expliques tu solución.',
@@ -414,7 +414,7 @@ COMPETENCIA = {
         historicoTit='Histórico do nível',
         d1='12 set', h1d='O próximo nível abriu: três exercícios de Senior com rubrica alta confirmam.',
         d3='5 set', h3d='3 submissões de nível Pleno com rubrica alta:',
-        d4='20 ago', h4d='No primeiro acesso, pela experiência: Intermediário.',
+        d4='20 ago', h4d='No primeiro acesso, pela experiência: Pleno.',
         fontesTit='Evidências por fonte', fonteExercicio='Exercício', fonteExplicacao='Explicação',
         fontePeer='Peer na IDE', fontePlayground='Playground', pesoForte='forte', pesoLeve='leve', total='Total',
         fontesNota='Evidência leve ajusta a confiança e orienta o Peer. Sozinha, não muda o nível.',
@@ -433,7 +433,7 @@ COMPETENCIA = {
         historicoTit='Level history',
         d1='Sep 12', h1d='The next level opened: three Senior exercises with a high rubric confirm it.',
         d3='Sep 5', h3d='3 Mid-level submissions with a high rubric score:',
-        d4='Aug 20', h4d='At first access, from your experience: Intermediate.',
+        d4='Aug 20', h4d='At first access, from your experience: Mid-level.',
         fontesTit='Evidence by source', fonteExercicio='Exercise', fonteExplicacao='Explanation',
         fontePeer='Peer in your IDE', fontePlayground='Playground', pesoForte='strong', pesoLeve='light', total='Total',
         fontesNota='Light evidence adjusts confidence and guides the Peer. On its own, it never changes a level.',
@@ -465,34 +465,34 @@ COMPETENCIA = {
 # passo 1 do primeiro acesso (só a escolha): a PricingScreen do DS (onboarding-pricing); soma-se ao PLANOS
 PLANO_INICIAL = {
     'pt-BR': dict(
-        tituloInicial='Como você quer começar?',
-        subInicial='O Starter é grátis e não pede cartão. O Pro põe o Peer na sua IDE e explica cada nota, com 7 dias grátis. '
+        tituloInicial='Como continuar depois dos 7 dias?',
+        subInicial='Você já está nos 7 dias de Pro grátis. Escolha como continuar depois deles: o Starter é grátis e não pede cartão. '
                    'Dá para trocar quando quiser, sem perder nada.',
         secaoPlanos='Planos', economia='-17%', mesCurto='mês', anoCurto='ano',
         descStarter='Para praticar com testes e ver onde você está.',
         descPro='Para ter o Peer junto e o porquê de cada nota.',
         notaStarter='para sempre, sem cartão', notaMensal='ou R$ 499 por ano', notaAnual='R$ 41,58 por mês',
-        tudoStarter='Tudo do Starter, mais', ctaStarter='Continuar com o Starter', ctaPro='Continuar com o Pro', teste='7 dias grátis',
+        tudoStarter='Tudo do Starter, mais', temCupom='Tem um cupom?', cupomLabel='Cupom', cupomPh='CÓDIGO', aplicar='Aplicar', cupomDesc='20% no Pro nos 3 primeiros meses', remover='Remover', cupomInvalido='Esse cupom não existe ou já expirou.', ctaStarter='Seguir no Starter depois', ctaPro='Assinar o Pro', teste='7 dias grátis',
     ),
     'en-US': dict(
-        tituloInicial='How do you want to start?',
-        subInicial='Starter is free and needs no card. Pro puts the Peer in your IDE and explains every grade, with 7 days free. '
+        tituloInicial='How to continue after the 7 days?',
+        subInicial='You’re already in your 7 free days of Pro. Choose how to continue after them: Starter is free and needs no card. '
                    'You can switch anytime without losing anything.',
         secaoPlanos='Plans', economia='-17%', mesCurto='month', anoCurto='year',
         descStarter='To practice with tests and see where you stand.',
         descPro='To have the Peer alongside and the why behind every grade.',
         notaStarter='forever, no card', notaMensal='or R$499 a year', notaAnual='R$41.58 a month',
-        tudoStarter='Everything in Starter, plus', ctaStarter='Continue with Starter', ctaPro='Continue with Pro', teste='7 days free',
+        tudoStarter='Everything in Starter, plus', temCupom='Have a coupon?', cupomLabel='Coupon', cupomPh='CODE', aplicar='Apply', cupomDesc='20% off Pro for the first 3 months', remover='Remove', cupomInvalido='This coupon doesn’t exist or has expired.', ctaStarter='Stay on Starter after', ctaPro='Subscribe to Pro', teste='7 days free',
     ),
     'es-ES': dict(
-        tituloInicial='¿Cómo quieres empezar?',
-        subInicial='Starter es gratis y no pide tarjeta. Pro pone el Peer en tu IDE y explica cada nota, con 7 días gratis. '
+        tituloInicial='¿Cómo seguir después de los 7 días?',
+        subInicial='Ya estás en tus 7 días de Pro gratis. Elige cómo seguir después: Starter es gratis y no pide tarjeta. '
                    'Puedes cambiar cuando quieras, sin perder nada.',
         secaoPlanos='Planes', economia='-17%', mesCurto='mes', anoCurto='año',
         descStarter='Para practicar con pruebas y ver dónde estás.',
         descPro='Para tener el Peer contigo y el porqué de cada nota.',
         notaStarter='para siempre, sin tarjeta', notaMensal='o R$ 499 al año', notaAnual='R$ 41,58 al mes',
-        tudoStarter='Todo lo de Starter, más', ctaStarter='Continuar con Starter', ctaPro='Continuar con Pro', teste='7 días gratis',
+        tudoStarter='Todo lo de Starter, más', temCupom='¿Tienes un cupón?', cupomLabel='Cupón', cupomPh='CÓDIGO', aplicar='Aplicar', cupomDesc='20% en Pro los 3 primeros meses', remover='Quitar', cupomInvalido='Ese cupón no existe o ya caducó.', ctaStarter='Seguir en Starter después', ctaPro='Suscribirme a Pro', teste='7 días gratis',
     ),
 }
 
