@@ -48,7 +48,12 @@ export interface OnboardingStepProps {
   action?: OnboardingStepAction
   /** Ao lado da ação: o que saber antes de clicar. */
   note?: ReactNode
-  /** Largura do conteúdo. O cabeçalho acompanha. Padrão: 64rem. */
+  /**
+   * `form` (672px) para passos de formulário — verificação, perfil — como o
+   * AccountScreen do Platform; `wide` (1024px) quando o conteúdo é grade de
+   * opções. O cabeçalho acompanha: barra e conteúdo terminam no mesmo lugar.
+   */
+  width?: "form" | "wide"
   className?: string
   children?: ReactNode
 }
@@ -64,6 +69,7 @@ export function OnboardingStep({
   utilities,
   action,
   note,
+  width = "form",
   className,
   children,
 }: OnboardingStepProps) {
@@ -78,7 +84,8 @@ export function OnboardingStep({
 
       <main
         className={cn(
-          "mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 px-4 pt-2 pb-10 md:px-6",
+          "mx-auto flex w-full flex-1 flex-col gap-9 px-4 pt-8 pb-10 md:px-6",
+          width === "form" ? "max-w-2xl" : "max-w-5xl",
           className
         )}
       >
@@ -100,7 +107,7 @@ export function OnboardingStep({
                 type={action.type ?? "button"}
                 form={action.form}
                 variant="solid"
-                size="lg"
+                size="touch"
                 onClick={action.onClick}
                 disabled={action.disabled || action.loading}
                 aria-disabled={action.disabled || action.loading}
