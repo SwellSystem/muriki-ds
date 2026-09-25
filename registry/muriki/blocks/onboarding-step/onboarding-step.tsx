@@ -48,6 +48,13 @@ export interface OnboardingStepProps {
   action?: OnboardingStepAction
   /** Ao lado da ação: o que saber antes de clicar. */
   note?: ReactNode
+  /** Embaixo da ação, em linha própria: um selo com uma frase, ex.: "7 dias de Pro · …". */
+  footer?: ReactNode
+  /**
+   * Tira o rótulo e a barra de passos, para a tela que vem depois do
+   * onboarding (o perfil de aprendizado). Padrão: false.
+   */
+  hideStepper?: boolean
   /**
    * `form` (672px) para passos de formulário — verificação, perfil — como o
    * AccountScreen do Platform; `wide` (1024px) quando o conteúdo é grade de
@@ -73,6 +80,8 @@ export function OnboardingStep({
   utilities,
   action,
   note,
+  footer,
+  hideStepper = false,
   width = "form",
   className,
   children,
@@ -103,6 +112,7 @@ export function OnboardingStep({
           title={title}
           subtitle={subtitle}
           align={width === "narrow" ? "center" : "start"}
+          showStepper={!hideStepper}
         />
 
         {children}
@@ -135,6 +145,8 @@ export function OnboardingStep({
             {note ? <p className="text-[12.5px] leading-[18px] text-muted-foreground">{note}</p> : null}
           </div>
         ) : null}
+
+        {footer ? <div className="-mt-5 text-[13px] leading-[19px] text-muted-foreground">{footer}</div> : null}
       </main>
     </div>
   )

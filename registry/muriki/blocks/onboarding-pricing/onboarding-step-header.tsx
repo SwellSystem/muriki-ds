@@ -22,6 +22,12 @@ export interface OnboardingStepHeaderProps {
    * (40px) para caber em 480px sem quebrar. Padrão: `start`.
    */
   align?: "start" | "center"
+  /**
+   * `false` tira o rótulo e a barra de passos: a tela que vem DEPOIS do
+   * onboarding (o perfil de aprendizado do primeiro acesso) usa o mesmo
+   * cabeçalho sem prometer um passo que não existe. Padrão: true.
+   */
+  showStepper?: boolean
 }
 
 export function OnboardingStepHeader({
@@ -32,16 +38,19 @@ export function OnboardingStepHeader({
   title,
   subtitle,
   align = "start",
+  showStepper = true,
 }: OnboardingStepHeaderProps) {
   const centro = align === "center"
   return (
     <header className={cn("flex flex-col gap-4", centro && "items-stretch text-center")}>
-      <OnboardingStepper
-        step={step}
-        total={total}
-        label={stepperLabel}
-        ariaLabel={stepperAriaLabel}
-      />
+      {showStepper ? (
+        <OnboardingStepper
+          step={step}
+          total={total}
+          label={stepperLabel}
+          ariaLabel={stepperAriaLabel}
+        />
+      ) : null}
       <div className="flex flex-col gap-3">
         <h1
           className={cn(

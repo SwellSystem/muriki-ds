@@ -1036,7 +1036,7 @@
           "target": "components/blocks/onboarding-step/onboarding-step.tsx"
         }
       ],
-      "docs": "<OnboardingStep width=\"narrow\" step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen. width: narrow (480px no centro da tela, cabeçalho centralizado e ação larga: o código por email), form (672px: perfil) ou wide (1024px: grade de opções como as preferências)."
+      "docs": "<OnboardingStep width=\"narrow\" step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen. width: narrow (480px no centro da tela, cabeçalho centralizado e ação larga: o código por email), form (672px: perfil) ou wide (1024px: grade de opções como as preferências). hideStepper tira o rótulo e a barra (o perfil de aprendizado, depois do onboarding); footer põe uma linha embaixo da ação (o selo \"7 dias de Pro\" com a frase)."
     },
     {
       "name": "avatar",
