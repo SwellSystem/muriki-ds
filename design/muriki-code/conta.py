@@ -10,7 +10,8 @@
 #   encerrar uma e encerrar as outras.
 # Pedido à API em 2026-09-25 e em implementação (nomes finais quando sair o commit): PATCH
 #   /onboarding/profile; /auth/email-change/request (step-up, 202 sempre) e /confirm (todas as sessões
-#   caem); pendingEmailChange no GET; POST /auth/two-factor/backup-codes; PATCH /auth/passkeys/:id.
+#   caem; DELETE /auth/email-change cancela a pendente); pendingEmailChange no GET do perfil;
+#   POST /auth/two-factor/backup-codes (só com TOTP ativo); PATCH /auth/passkeys/:id.
 # - Plano: GET /billing/subscriptions/code; cartão, faturas e cancelar só no portal do Stripe.
 from base import *  # noqa: F401,F403
 from onboarding import campos_preferencias
@@ -122,7 +123,8 @@ def tela_conta_dados(k):
                 f'<span style="display:flex;flex-direction:column;gap:4px;flex:1;font-size:13px;line-height:19px;">'
                 f'<span>{T("pendenteA")} <b style="font-family:{MONO};font-weight:500;">rafael@muriki.dev</b></span>'
                 f'<span style="opacity:0.85;">{T("pendenteB")}</span></span>'
-                f'{botao(T("reenviar"), k, "outline", 28)}</div>')
+                f'<span style="display:flex;gap:6px;">{botao(T("cancelarTroca"), k, "ghost", 28, acao="emailAtual")}'
+                f'{botao(T("reenviar"), k, "outline", 28)}</span></div>')
     email = _cartao(k, T('emailTit'), T('emailSub'),
                     atual + se('em.trocando', trocando) + se('em.pendente', pendente),
                     direita=se('em.atual', botao(T('trocarEmail'), k, 'outline', 32, acao='emailTrocar'), True))
