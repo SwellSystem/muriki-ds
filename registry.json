@@ -1039,6 +1039,59 @@
       "docs": "<OnboardingStep width=\"narrow\" step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen. width: narrow (480px no centro da tela, cabeçalho centralizado e ação larga: o código por email), form (672px: perfil) ou wide (1024px: grade de opções como as preferências). hideStepper tira o rótulo e a barra (o perfil de aprendizado, depois do onboarding); footer põe uma linha embaixo da ação (o selo \"7 dias de Pro\" com a frase)."
     },
     {
+      "name": "app-shell",
+      "type": "registry:block",
+      "title": "App Shell",
+      "description": "A moldura dos apps do hub: rail com a troca de produto no topo, grupos de navegação com rótulo mono, o pé com Peer e Plano, idioma e tema, e o usuário com a engrenagem. Recolhido vira a coluna de ícones, e no celular vira gaveta. Sem roteador e sem API.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/sidebar"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/app-shell/app-shell.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/app-shell/app-shell.tsx"
+        }
+      ],
+      "docs": "<AppShell product={{ name: \"Muriki Code\", detail: \"conta Muriki\", logo: <MurikiLogo />, onSwitch, switchLabel: \"Trocar de produto Muriki\" }} groups={[{ label: \"Aprender\", items: [{ key: \"evolucao\", label: \"Evolução\", icon: <TrendUpIcon />, active, render: <Link to=\"/\" /> }] }]} footerItems={[{ key: \"plano\", label: \"Plano\", icon: <StackIcon />, trailing: <Badge tone=\"blue\" size=\"sm\">Pro</Badge>, render: <Link to=\"/plans\" /> }]} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} user={{ name, detail: email, avatar: <Avatar …/>, render: <Link to=\"/account\" /> }} settings={{ label: \"Configurações\", render: <Link to=\"/account\" /> }}>{children}</AppShell>. O item ativo ganha o fundo tingido e a barrinha de 3px do SidebarMenuButton; o trailing some quando o rail recolhe."
+    },
+    {
+      "name": "plans-page",
+      "type": "registry:block",
+      "title": "Plans Page",
+      "description": "A tela de Planos de dentro do app: título com o seletor mensal/anual à direita, o estado da assinatura acima dos cards (SubscriptionStatus: teste, em dia, cancelamento marcado, em atraso), o plano atual marcado com o botão desligado, as features ainda sem número com o selo tracejado e as regras embaixo.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/view-toggle",
+        "SwellSystem/muriki-ds/plan-card",
+        "SwellSystem/muriki-ds/onboarding-pricing"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/plans-page/plans-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plans-page/plans-page.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/plans-page/subscription-status.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plans-page/subscription-status.tsx"
+        }
+      ],
+      "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O preço, as features e o card são os do onboarding-pricing e do plan-card."
+    },
+    {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",
