@@ -17,8 +17,8 @@ TELAS = [
     ('codigos', 'CodigosRecuperacao', 'Códigos de recuperação', 'Primeiro acesso · dez códigos, uma vez', 6, 0, 1),
     ('inicio', 'Inicio', 'Início', 'Início · clientes, vendido até agora e planos', 0, 2, 3),
     ('clientes', 'Clientes', 'Clientes', 'Clientes · o molde do CRUD', 1, 2, 3),
-    ('cliente', 'ClienteEditar', 'Editar cliente', 'Clientes · editar no sheet (criar é o mesmo, vazio)', 2, 2, 3),
-    ('revogar', 'Revogar', 'Revogar acesso', 'Clientes · revogar acesso no alert-dialog', 3, 2, 3),
+    ('cliente', 'ClienteDetalhe', 'Marina Costa', 'Clientes · detalhe: um cartão por produto, pagamentos e histórico', 2, 2, 3),
+    ('inativar', 'Inativar', 'Inativar no produto', 'Clientes · inativar em um produto só, no alert-dialog', 3, 2, 3),
     ('planos', 'Planos', 'Planos', 'Planos · lista', 0, 4, 5),
     ('plano', 'Plano', 'Pro', 'Plano · dados e features', 1, 4, 5),
     ('features', 'Features', 'Matriz de features', 'Planos · matriz de features', 2, 4, 5),
@@ -46,7 +46,9 @@ canvas.setdefault('designSystems', [])
 boards = canvas.setdefault('boards', {})
 order = canvas.setdefault('order', [])
 
-for velho in ('Passkey.dc.html', 'PasskeyEscuro.dc.html'):
+# o Backoffice não edita cliente, e revogar virou inativar por produto
+for velho in ('Passkey.dc.html', 'PasskeyEscuro.dc.html', 'ClienteEditar.dc.html', 'ClienteEditarEscuro.dc.html',
+              'Revogar.dc.html', 'RevogarEscuro.dc.html'):
     boards.pop(velho, None)
     if velho in order:
         order.remove(velho)
@@ -112,7 +114,7 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('acesso', 0, 7, 'Entrada: e-mail e senha, depois o código TOTP num POST só; senha esquecida; e o primeiro acesso, do convite aos códigos de recuperação'),
     ('acessoEscuro', 1, 7, 'Entrada no tema escuro'),
-    ('clientes', 2, 4, 'Início e clientes: a lista é o molde do CRUD, criar e editar no sheet, revogar no alert-dialog'),
+    ('clientes', 2, 4, 'Início e clientes: a lista é de um produto por vez; o detalhe tem um cartão por produto, e inativar é num produto só'),
     ('clientesEscuro', 3, 4, 'Início e clientes no tema escuro'),
     ('planos', 4, 7, 'Planos, cupons e relatórios: o mesmo CRUD; feature nasce uma vez; relatório é PDF do pdf-report'),
     ('planosEscuro', 5, 7, 'Planos, features e cupons no tema escuro'),

@@ -344,7 +344,7 @@ CLIENTES = [
     ('TA', 'yellow', 'Tiago Albuquerque', 'tiago@albuquerque.com', 'Pro', 'Em teste', 'ontem', 'set 2026', 0),
     ('LF', 'blue', 'Lucas Ferraz', 'lucas.ferraz@gmail.com', 'Starter', 'Ativo', 'há 3 dias', 'jul 2026', 0),
     ('CR', 'green', 'Camila Rocha', 'camila@rocha.design', 'Team', 'Ativo', 'há 1 h', 'out 2025', 1788),
-    ('JL', 'gray', 'João Pedro Lima', 'jp@lima.dev', 'Pro', 'Revogado', 'há 2 meses', 'fev 2026', 196),
+    ('JL', 'gray', 'João Pedro Lima', 'jp@lima.dev', 'Pro', 'Inativo', 'há 2 meses', 'fev 2026', 196),
     ('HD', 'yellow', 'Helena Duarte', 'helena@duarte.app', 'Pro', 'Ativo', 'agora', 'abr 2026', 470),
     ('OP', 'orange', 'Otávio Prado', 'otavio.prado@outlook.com', 'Starter', 'Ativo', 'há 5 h', 'ago 2026', 0),
     ('SM', 'blue', 'Sofia Martins', 'sofia@martins.co', 'Pro', 'Em teste', 'há 12 min', 'set 2026', 0),
@@ -477,29 +477,32 @@ def tela_inicio(k):
 
 # ── Clientes: a tela que vira o molde do CRUD ──────────────────────────
 COLS_CLIENTES = '16px minmax(0,2.4fr) 96px 132px 120px 96px 110px 100px'
+# A lista é sempre de um produto: o seletor Platform | Code no topo (o ProductTabs do app) decide, e
+# as abas, as contagens e as linhas seguem. Por isso a linha não leva selo de produto; ele aparece no
+# detalhe, onde o cliente tem os dois. O Backoffice não cria nem edita cliente.
+PRODUTO = 'Muriki Platform'
 
 
 def tela_clientes(k, hover=2, sobre=''):
     cab = cabecalho(k, 'Clientes', contagem=milhar(TOTAL_CLIENTES),
-                    direita=link_botao(k, 'Novo cliente', href('ClienteEditar'), 'solid', 36, 'mais'))
-    barra = barra_recurso(k, 'Buscar por nome, e-mail ou documento',
-                          [('Todos', '1.284'), ('Ativos', '1.108'), ('Em teste', '96'), ('Inadimplentes', '41'), ('Revogados', '39')],
+                    direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto'))
+    barra = barra_recurso(k, 'Buscar por nome ou e-mail',
+                          [('Todos', '1.284'), ('Ativos', '1.108'), ('Em teste', '96'), ('Inadimplentes', '41'), ('Inativos', '39')],
                           'Todos', filtro_chip(k, 'Plano') + filtro_chip(k, 'Último acesso'))
     cab_t = [(caixa(k, False, 'Selecionar todos'), 'esq', False), ('Cliente', 'esq', True), ('Plano', 'esq', True),
              ('Status', 'esq', True), ('Último acesso', 'esq', True), ('Desde', 'esq', True), ('Total pago', 'dir', True), ('', 'dir', False)]
     linhas = ''
     for i, (ini, tom, nome, email, plano, status, acesso, desde, pago) in enumerate(CLIENTES):
-        revogado = status == 'Revogado'
-        cor = k['mfg'] if revogado else k['fgs']
-        if revogado:
-            itens = [('chave', 'Devolver acesso', '#', False), ('lapis', 'Editar', href('ClienteEditar'), False), ('pontos', 'Mais ações', None, False)]
-        else:
-            itens = [('lapis', 'Editar', href('ClienteEditar'), False), ('bloqueio', 'Revogar acesso', href('Revogar'), True),
-                     ('pontos', 'Mais ações', None, False)]
+        inativo = status == 'Inativo'
+        cor = k['mfg'] if inativo else k['fgs']
+        # os atalhos da linha: ver, pagamentos e, no menu, o que tira acesso (o row-actions manda o destrutivo para o overflow)
+        itens = [('olho', 'Ver cliente', href('ClienteDetalhe'), False), ('lista', 'Ver pagamentos', href('ClienteDetalhe'), False)]
+        itens += ([('chave', f'Reativar no {PRODUTO}', '#', False)] if inativo
+                  else [('bloqueio', f'Inativar no {PRODUTO}', href('Inativar'), True)])
         cel = [
             caixa(k, False, f'Selecionar {nome}'),
-            f'<a href="{href("ClienteEditar")}" style="display:flex;align-items:center;gap:10px;min-width:0;color:inherit;">'
-            f'{avatar(ini, k, "gray" if revogado else tom)}<span style="display:flex;flex-direction:column;min-width:0;">'
+            f'<a href="{href("ClienteDetalhe")}" style="display:flex;align-items:center;gap:10px;min-width:0;color:inherit;">'
+            f'{avatar(ini, k, "gray" if inativo else tom)}<span style="display:flex;flex-direction:column;min-width:0;">'
             f'<span style="font-size:13.5px;font-weight:500;color:{cor};">{nome}</span>'
             f'<span style="font-size:12px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{email}</span></span></a>',
             f'<span style="font-size:13px;color:{k["fg"]};">{plano}</span>',
@@ -514,52 +517,99 @@ def tela_clientes(k, hover=2, sobre=''):
     return app(k, 'clientes', cab + barra + t, sobre=sobre, gap=16)
 
 
-def tela_cliente_editar(k):
-    duas = lambda a, b: f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">{a}{b}</div>'
-    dados = secao_sheet(k, 'Dados', (
-        duas(campo(k, 'Nome', 'Marina Costa', id_='nome'), campo(k, 'E-mail', 'marina@costa.dev', id_='email'))
-        + f'<span style="margin-top:-6px;font-size:12px;color:{k["mfg"]};">O e-mail é também o login. Mudar pede confirmação no endereço novo.</span>'
-        + duas(campo(k, 'CPF ou CNPJ', '412.887.310-54', monoespaco=True, id_='doc'),
-               campo(k, 'Telefone', '+55 11 98812-4471', id_='tel'))))
-    plano = secao_sheet(k, 'Assinatura', (
-        duas(seletor(k, 'Plano', 'Pro · R$ 49/mês'), seletor(k, 'Ciclo', 'Mensal'))
-        + campo(k, 'Cupom', 'BEMVINDO20', monoespaco=True, dica='20% nos 3 primeiros meses · falta 1 mês', id_='cupom',
-                sufixo='')
-        + f'<span style="font-size:12px;color:{k["mfg"]};">Próxima cobrança em 12 de outubro, {brl(39.2)}. '
-          f'Troca de plano vale no próximo ciclo.</span>'))
-
-    def linha_acesso(rot, sub, controle):
-        return (f'<div style="display:flex;align-items:center;gap:12px;">'
-                f'<span style="display:flex;flex-direction:column;gap:1px;flex:1;"><span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">{rot}</span>'
-                f'<span style="font-size:12px;color:{k["mfg"]};">{sub}</span></span>{controle}</div>')
-    acesso = secao_sheet(k, 'Acesso', (
-        linha_acesso('Acesso ao produto', 'Último acesso há 2 h · Chrome no macOS', badge('Liberado', k, 'green', ponto=True))
-        + linha_acesso('Verificação em duas etapas', 'App autenticador desde abril', badge('Ativa', k, 'gray'))
-        + linha_acesso('Sessões abertas', '2 dispositivos', link_botao(k, 'Encerrar sessões', '#', 'ghost', 28))
-        + f'<div style="display:flex;gap:8px;">{link_botao(k, "Enviar redefinição de senha", "#", "outline", 32, "envelope")}</div>'
-        + f'<div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:9px;box-shadow:inset 0 0 0 1px {k["tred"]};">'
-          f'<span style="display:flex;flex-direction:column;gap:1px;flex:1;"><span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">Revogar acesso</span>'
-          f'<span style="font-size:12px;color:{k["mfg"]};">Derruba as sessões e bloqueia o login. A assinatura fica como está.</span></span>'
-          f'<a href="{href("Revogar")}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;'
-          f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["bad"]};font-size:13px;font-weight:500;">'
-          f'{ic("bloqueio", 14)}Revogar</a></div>'))
-    rodape = (f'<span style="font-size:12px;color:{k["mfg"]};flex:1;">Editado por Ana Lima há 3 dias</span>'
-              f'{link_botao(k, "Cancelar", href("Clientes"), "ghost", 36)}{link_botao(k, "Salvar alterações", href("Clientes"), "solid", 36)}')
-    s = sheet(k, 'Editar cliente', 'Marina Costa · cliente desde março de 2026', dados + acesso + plano, rodape)
-    return tela_clientes(k, hover=0, sobre=s)
+# ── Detalhe do cliente ──────────────────────────────────────────────────
+# Quem é, e um cartão por produto que a pessoa tem: o selo do produto, o plano, o status, a próxima
+# cobrança, o acesso e o inativar daquele produto. Embaixo, os pagamentos dos dois produtos e o
+# histórico. Nada aqui edita dado do cliente. Contrato combinado com a muriki-api (em implementação):
+# o último acesso é da conta, não por produto; os pagamentos vêm do webhook, só daqui para frente;
+# inativar não derruba sessão (ela é da conta): as rotas do produto passam a responder
+# 403 PRODUCT_DEACTIVATED. Só owner e admin inativam, com step-up, e fica na auditoria.
+PAGAMENTOS = [
+    # data, produto, descrição, valor, status
+    ('12 set 2026', 'Muriki Code', 'Pro · mensal', 49.0, 'Pago'),
+    ('3 set 2026', 'Muriki Platform', 'Pro · mensal', 49.0, 'Pago'),
+    ('12 ago 2026', 'Muriki Code', 'Pro · mensal', 49.0, 'Pago'),
+    ('3 ago 2026', 'Muriki Platform', 'Pro · mensal', 49.0, 'Falhou'),
+    ('4 ago 2026', 'Muriki Platform', 'Pro · mensal · nova tentativa', 49.0, 'Pago'),
+    ('12 jul 2026', 'Muriki Code', 'Pro · mensal · cupom BEMVINDO20', 39.2, 'Pago'),
+]
+COLS_PAGAMENTOS = '120px 150px minmax(0,1fr) 110px 120px 90px'
 
 
-def tela_revogar(k):
-    corpo = (seletor(k, 'Motivo', 'Pedido do próprio cliente', dica='Fica no histórico do cliente, junto com seu nome.')
+def selo_produto(k, nome):
+    # identidade, não estado: neutro e em mono, para não disputar com a cor do status
+    return badge(nome, k, 'gray', mono=True)
+
+
+def _cartao_produto(k, produto, plano, status, linhas, acao):
+    dl = ''.join(f'<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;box-shadow:inset 0 -1px 0 {k["muted"]};font-size:13px;">'
+                 f'<span style="color:{k["mfg"]};">{r}</span><span style="color:{k["fgs"]};text-align:right;">{v}</span></div>' for r, v in linhas)
+    return (f'<section aria-label="{produto}" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+            f'padding:16px 20px;display:flex;flex-direction:column;gap:12px;">'
+            f'<div style="display:flex;align-items:center;gap:8px;">{selo_produto(k, produto)}<span style="flex:1;"></span>{selo_status(k, status)}</div>'
+            f'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:20px;font-weight:600;color:{k["fgs"]};">{plano[0]}</span>'
+            f'<span style="font-size:13px;color:{k["mfg"]};">{plano[1]}</span></div>'
+            f'<div style="display:flex;flex-direction:column;">{dl}</div>'
+            f'<div style="display:flex;justify-content:flex-end;">{acao}</div></section>')
+
+
+def _inativar_link(k, produto):
+    return (f'<a href="{href("Inativar")}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;'
+            f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["bad"]};font-size:13px;font-weight:500;">'
+            f'{ic("bloqueio", 14)}Inativar no {produto.replace("Muriki ", "")}</a>')
+
+
+def tela_cliente_detalhe(k, sobre=''):
+    cab = cabecalho(k, 'Marina Costa', f'<span style="font-family:{MONO};">m***@costa.dev</span> · cliente desde março de 2026 · último acesso há 2 h',
+                    trilha=[('Clientes', 'Clientes'), ('Marina Costa', 'ClienteDetalhe')],
+                    direita=link_botao(k, 'Copiar ID', '#', 'ghost', 32, 'copiar'))
+    code = _cartao_produto(k, 'Muriki Code', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
+        ('Próxima cobrança', '12 de outubro'), ('Último pagamento', '12 de setembro · R$ 49,00'),
+        ('Desde', 'março de 2026')], _inativar_link(k, 'Muriki Code'))
+    plat = _cartao_produto(k, 'Muriki Platform', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
+        ('Próxima cobrança', '3 de outubro'), ('Último pagamento', '4 de agosto · R$ 49,00 (2ª tentativa)'),
+        ('Desde', 'abril de 2026')], _inativar_link(k, 'Muriki Platform'))
+    abas = ''.join(
+        f'<button type="button" role="tab" aria-selected="{"true" if at else "false"}" style="display:flex;align-items:center;gap:6px;height:36px;'
+        f'padding:0 2px;border:0;background:transparent;font-family:{FONTE};font-size:13px;cursor:pointer;'
+        + (f'color:{k["fgs"]};font-weight:500;box-shadow:inset 0 -2px 0 {k["pri"]};' if at else f'color:{k["mfg"]};')
+        + f'">{n}<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{c}</span></button>'
+        for n, c, at in [('Pagamentos', '14', True), ('Histórico', '23', False)])
+    abas = f'<div role="tablist" aria-label="Detalhe do cliente" style="display:flex;gap:20px;box-shadow:inset 0 -1px 0 {k["muted"]};">{abas}</div>'
+    cab_t = [('Data', 'esq', True), ('Produto', 'esq', False), ('Descrição', 'esq', False), ('Valor', 'dir', True),
+             ('Status', 'esq', False), ('Recibo', 'dir', False)]
+    linhas = ''.join(linha_tabela(k, COLS_PAGAMENTOS, [
+        f'<span style="font-size:13px;color:{k["fg"]};">{d}</span>',
+        f'<span style="display:flex;">{selo_produto(k, p)}</span>',
+        f'<span style="font-size:13px;color:{k["mfg"]};">{desc}</span>',
+        f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};text-align:right;">{brl(v)}</span>',
+        selo_status(k, st),
+        (f'<span style="display:flex;justify-content:flex-end;"><a href="#" style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;">'
+         f'Abrir{ic("seta", 12)}</a></span>' if st == 'Pago' else f'<span style="text-align:right;color:{k["mfg"]};">—</span>'),
+    ], altura=44) for d, p, desc, v, st in PAGAMENTOS)
+    t = tabela(k, COLS_PAGAMENTOS, cab_t, linhas, paginacao(k, 1))
+    nota = (f'<p style="margin:-6px 0 0;font-size:12px;color:{k["mfg"]};">Os pagamentos aparecem daqui para frente, conforme o Stripe avisa. '
+            f'Os anteriores ficam no Stripe.</p>')
+    corpo = (cab + f'<div style="display:flex;gap:16px;">{code}{plat}</div>' + abas + nota + t)
+    return app(k, 'clientes', corpo, sobre=sobre, gap=16)
+
+
+def tela_inativar(k):
+    # inativar é por produto: bloqueia o acesso àquele produto e só a ele, sem derrubar a sessão (que é da
+    # conta). A assinatura não muda sozinha; cancelar é uma escolha à parte, aqui mesmo. Motivos da API:
+    # fraud, abuse, chargeback, customer_request, overdue, other (com nota obrigatória).
+    corpo = (seletor(k, 'Motivo', 'Pedido do cliente', dica='Fraude, abuso ou violação dos termos, chargeback, pedido do cliente, inadimplência ou outro.')
+             + campo(k, 'Nota', '', ph='Contexto para quem ler depois', id_='nota', extra_rotulo=f'<span style="font-size:12px;color:{k["mfg"]};">opcional; obrigatória em “Outro”</span>',
+                     dica='Fica só no histórico do cliente, não na auditoria.')
              + f'<label style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:19px;color:{k["fg"]};cursor:pointer;">'
                f'<span style="margin-top:2px;display:flex;">{caixa(k, False, "Cancelar a assinatura")}</span>'
-               f'<span>Cancelar também a assinatura no fim do ciclo <span style="color:{k["mfg"]};">(12 de outubro)</span></span></label>')
-    rodape = (link_botao(k, 'Cancelar', href('Clientes'), 'outline', 36)
-              + link_botao(k, 'Revogar acesso', href('Clientes'), 'destrutivo', 36))
-    a = alerta(k, 'Revogar o acesso de Marina Costa?',
-               'Ela sai de todas as sessões agora e não entra de novo até alguém devolver o acesso. '
-               'Assinatura, faturas e histórico ficam como estão.', corpo, rodape, icone='bloqueio')
-    return tela_clientes(k, hover=0, sobre=a)
+               f'<span>Cancelar também a assinatura do Platform no fim do ciclo <span style="color:{k["mfg"]};">(3 de outubro)</span></span></label>')
+    rodape = (link_botao(k, 'Cancelar', href('ClienteDetalhe'), 'outline', 36)
+              + link_botao(k, 'Inativar no Platform', href('ClienteDetalhe'), 'destrutivo', 36))
+    a = alerta(k, 'Inativar Marina Costa no Muriki Platform?',
+               'A partir de agora ela não usa o Platform até alguém reativar. Ela continua conectada, e o Muriki Code '
+               'segue normal. A assinatura do Platform continua, a menos que você marque abaixo.', corpo, rodape, icone='bloqueio')
+    return tela_cliente_detalhe(k, sobre=a)
 
 
 # ── Planos e features ──────────────────────────────────────────────────
@@ -1278,9 +1328,9 @@ def _montar(tela, tema):
     if i == 'clientes':
         return pagina(t, tela_clientes(k), tema)
     if i == 'cliente':
-        return pagina(t, tela_cliente_editar(k), tema)
-    if i == 'revogar':
-        return pagina(t, tela_revogar(k), tema)
+        return pagina(t, tela_cliente_detalhe(k), tema)
+    if i == 'inativar':
+        return pagina(t, tela_inativar(k), tema)
     if i == 'planos':
         return pagina(t, tela_planos(k), tema)
     if i == 'plano':
