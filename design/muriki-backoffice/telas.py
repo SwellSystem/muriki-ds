@@ -520,8 +520,10 @@ def tela_clientes(k, hover=2, sobre=''):
 # ── Detalhe do cliente ──────────────────────────────────────────────────
 # Quem é, e um cartão por produto que a pessoa tem: o selo do produto, o plano, o status, a próxima
 # cobrança, o acesso e o inativar daquele produto. Embaixo, os pagamentos dos dois produtos e o
-# histórico. Nada aqui edita dado do cliente. Pede à API: detalhe do cliente, pagamentos por cliente,
-# inativar e reativar por produto, e o histórico por cliente (hoje só há o audit-log da equipe).
+# histórico. Nada aqui edita dado do cliente. Contrato combinado com a muriki-api (em implementação):
+# o último acesso é da conta, não por produto; os pagamentos vêm do webhook, só daqui para frente;
+# inativar não derruba sessão (ela é da conta): as rotas do produto passam a responder
+# 403 PRODUCT_DEACTIVATED. Só owner e admin inativam, com step-up, e fica na auditoria.
 PAGAMENTOS = [
     # data, produto, descrição, valor, status
     ('12 set 2026', 'Muriki Code', 'Pro · mensal', 49.0, 'Pago'),
@@ -558,15 +560,15 @@ def _inativar_link(k, produto):
 
 
 def tela_cliente_detalhe(k, sobre=''):
-    cab = cabecalho(k, 'Marina Costa', f'<span style="font-family:{MONO};">m***@costa.dev</span> · cliente desde março de 2026 · 2 produtos',
+    cab = cabecalho(k, 'Marina Costa', f'<span style="font-family:{MONO};">m***@costa.dev</span> · cliente desde março de 2026 · último acesso há 2 h',
                     trilha=[('Clientes', 'Clientes'), ('Marina Costa', 'ClienteDetalhe')],
                     direita=link_botao(k, 'Copiar ID', '#', 'ghost', 32, 'copiar'))
     code = _cartao_produto(k, 'Muriki Code', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
         ('Próxima cobrança', '12 de outubro'), ('Último pagamento', '12 de setembro · R$ 49,00'),
-        ('Último acesso', 'há 2 h'), ('Desde', 'março de 2026')], _inativar_link(k, 'Muriki Code'))
+        ('Desde', 'março de 2026')], _inativar_link(k, 'Muriki Code'))
     plat = _cartao_produto(k, 'Muriki Platform', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
         ('Próxima cobrança', '3 de outubro'), ('Último pagamento', '4 de agosto · R$ 49,00 (2ª tentativa)'),
-        ('Último acesso', 'ontem'), ('Desde', 'abril de 2026')], _inativar_link(k, 'Muriki Platform'))
+        ('Desde', 'abril de 2026')], _inativar_link(k, 'Muriki Platform'))
     abas = ''.join(
         f'<button type="button" role="tab" aria-selected="{"true" if at else "false"}" style="display:flex;align-items:center;gap:6px;height:36px;'
         f'padding:0 2px;border:0;background:transparent;font-family:{FONTE};font-size:13px;cursor:pointer;'
@@ -586,22 +588,27 @@ def tela_cliente_detalhe(k, sobre=''):
          f'Abrir{ic("seta", 12)}</a></span>' if st == 'Pago' else f'<span style="text-align:right;color:{k["mfg"]};">—</span>'),
     ], altura=44) for d, p, desc, v, st in PAGAMENTOS)
     t = tabela(k, COLS_PAGAMENTOS, cab_t, linhas, paginacao(k, 1))
-    corpo = (cab + f'<div style="display:flex;gap:16px;">{code}{plat}</div>' + abas + t)
+    nota = (f'<p style="margin:-6px 0 0;font-size:12px;color:{k["mfg"]};">Os pagamentos aparecem daqui para frente, conforme o Stripe avisa. '
+            f'Os anteriores ficam no Stripe.</p>')
+    corpo = (cab + f'<div style="display:flex;gap:16px;">{code}{plat}</div>' + abas + nota + t)
     return app(k, 'clientes', corpo, sobre=sobre, gap=16)
 
 
 def tela_inativar(k):
-    # inativar é por produto: bloqueia o acesso àquele produto e só a ele. A assinatura não muda sozinha;
-    # cancelar é uma escolha à parte, aqui mesmo
-    corpo = (seletor(k, 'Motivo', 'Pedido do próprio cliente', dica='Fica no histórico do cliente, junto com seu nome.')
+    # inativar é por produto: bloqueia o acesso àquele produto e só a ele, sem derrubar a sessão (que é da
+    # conta). A assinatura não muda sozinha; cancelar é uma escolha à parte, aqui mesmo. Motivos da API:
+    # fraud, abuse, chargeback, customer_request, overdue, other (com nota obrigatória).
+    corpo = (seletor(k, 'Motivo', 'Pedido do cliente', dica='Fraude, abuso ou violação dos termos, chargeback, pedido do cliente, inadimplência ou outro.')
+             + campo(k, 'Nota', '', ph='Contexto para quem ler depois', id_='nota', extra_rotulo=f'<span style="font-size:12px;color:{k["mfg"]};">opcional; obrigatória em “Outro”</span>',
+                     dica='Fica só no histórico do cliente, não na auditoria.')
              + f'<label style="display:flex;align-items:flex-start;gap:10px;font-size:13px;line-height:19px;color:{k["fg"]};cursor:pointer;">'
                f'<span style="margin-top:2px;display:flex;">{caixa(k, False, "Cancelar a assinatura")}</span>'
                f'<span>Cancelar também a assinatura do Platform no fim do ciclo <span style="color:{k["mfg"]};">(3 de outubro)</span></span></label>')
     rodape = (link_botao(k, 'Cancelar', href('ClienteDetalhe'), 'outline', 36)
               + link_botao(k, 'Inativar no Platform', href('ClienteDetalhe'), 'destrutivo', 36))
     a = alerta(k, 'Inativar Marina Costa no Muriki Platform?',
-               'Ela sai do Platform agora e não entra de novo até alguém reativar. O Muriki Code continua como está, '
-               'e a assinatura, as faturas e o histórico do Platform também.', corpo, rodape, icone='bloqueio')
+               'A partir de agora ela não usa o Platform até alguém reativar. Ela continua conectada, e o Muriki Code '
+               'segue normal. A assinatura do Platform continua, a menos que você marque abaixo.', corpo, rodape, icone='bloqueio')
     return tela_cliente_detalhe(k, sobre=a)
 
 
