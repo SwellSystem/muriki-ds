@@ -74,7 +74,7 @@ PREFERENCIAS = {
         ship_faster='Entregar mais rápido', ship_fasterDesc='Menos ida e volta entre teste e revisão.',
         review_code='Revisar código', review_codeDesc='Ler o código dos outros com critério.',
         comecar='Começar', irPagamento='Ir para o pagamento',
-        notaStarter='Você começa no Starter. O Pro fica no menu Plano.',
+        notaStarter='Você começa no Starter e pode assinar o Pro quando quiser.',
         notaPro='7 dias grátis do Pro. A cobrança só começa depois.',
     ),
     'en-US': dict(
@@ -91,7 +91,7 @@ PREFERENCIAS = {
         ship_faster='Ship faster', ship_fasterDesc='Less back and forth between tests and review.',
         review_code='Review code', review_codeDesc='Read other people’s code with judgment.',
         comecar='Start', irPagamento='Go to checkout',
-        notaStarter='You start on Starter. Pro is in the Plan menu.',
+        notaStarter='You start on Starter and can subscribe to Pro anytime.',
         notaPro='7 days of Pro for free. Billing only starts after that.',
     ),
     'es-ES': dict(
@@ -108,7 +108,7 @@ PREFERENCIAS = {
         ship_faster='Entregar más rápido', ship_fasterDesc='Menos idas y vueltas entre pruebas y revisión.',
         review_code='Revisar código', review_codeDesc='Leer el código de otros con criterio.',
         comecar='Empezar', irPagamento='Ir al pago',
-        notaStarter='Empiezas en Starter. Pro está en el menú Plan.',
+        notaStarter='Empiezas en Starter y puedes suscribirte a Pro cuando quieras.',
         notaPro='7 días de Pro gratis. El cobro empieza después.',
     ),
 }
@@ -117,19 +117,19 @@ PAGAMENTO = {
     'pt-BR': dict(
         confirmadoTitulo='Pagamento confirmado', confirmadoSub='O Pro está ativo. Os 7 dias grátis vão até 1º de outubro; a primeira cobrança vem depois disso.',
         comecarPrimeiro='Começar o primeiro exercício',
-        canceladoTitulo='O pagamento não foi concluído', canceladoSub='Nada foi cobrado. Tente de novo, ou siga no Starter e assine o Pro depois, pelo menu Plano.',
+        canceladoTitulo='O pagamento não foi concluído', canceladoSub='Nada foi cobrado. Tente de novo, ou siga no Starter e assine o Pro quando quiser.',
         tentarDeNovo='Tentar de novo', seguirStarter='Seguir no Starter',
     ),
     'en-US': dict(
         confirmadoTitulo='Payment confirmed', confirmadoSub='Pro is active. Your 7 free days run until October 1; the first charge comes after that.',
         comecarPrimeiro='Start the first exercise',
-        canceladoTitulo='The payment didn’t go through', canceladoSub='Nothing was charged. Try again, or stay on Starter and subscribe to Pro later from the Plan menu.',
+        canceladoTitulo='The payment didn’t go through', canceladoSub='Nothing was charged. Try again, or stay on Starter and subscribe to Pro anytime.',
         tentarDeNovo='Try again', seguirStarter='Stay on Starter',
     ),
     'es-ES': dict(
         confirmadoTitulo='Pago confirmado', confirmadoSub='Pro está activo. Tus 7 días gratis van hasta el 1 de octubre; el primer cobro llega después.',
         comecarPrimeiro='Empezar el primer ejercicio',
-        canceladoTitulo='El pago no se completó', canceladoSub='No se cobró nada. Inténtalo de nuevo, o sigue en Starter y suscríbete a Pro después desde el menú Plan.',
+        canceladoTitulo='El pago no se completó', canceladoSub='No se cobró nada. Inténtalo de nuevo, o sigue en Starter y suscríbete a Pro cuando quieras.',
         tentarDeNovo='Intentar de nuevo', seguirStarter='Seguir en Starter',
     ),
 }
