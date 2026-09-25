@@ -70,14 +70,14 @@ def tela_verificacao(k, sufixo):
               f'{caixa(3)}{caixa(4)}{caixa(5)}</div>')
     aviso = (f'<sc-if value="{h("v.temErro")}" hint-placeholder-val="{{{{ false }}}}">'
              f'<p role="alert" style="margin:0;font-size:12.5px;line-height:18px;color:{k["bad"]};">{h("v.erro")}</p></sc-if>')
-    rodape_codigo = (f'<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
-                     f'<span>{T("expira")}</span>'
-                     f'<button type="button" aria-disabled="{h("v.esperando")}" style="margin-left:auto;border:0;padding:0;background:transparent;'
-                     f'font-family:{FONTE};font-size:12.5px;line-height:18px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button></div>')
-    campo = (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:10px;width:fit-content;min-width:344px;">'
-             f'{legenda_campo(k, T("codigoLegenda"))}{codigo}{rodape_codigo}{aviso}</fieldset>')
-    ajuda = (f'<p style="margin:0;padding-top:20px;border-top:1px solid var(--divider);font-size:13px;line-height:20px;color:{k["mfg"]};">'
-             f'{T("naoChegou")}</p>')
+    campo = (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:10px;">'
+             f'{legenda_campo(k, T("codigoLegenda"))}{codigo}'
+             f'<p style="margin:0;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("expira")}</p>{aviso}</fieldset>')
+    # a ajuda é uma frase só: o reenviar mora junto do "não chegou?", que é quando ele serve
+    ajuda = (f'<p style="margin:0;font-size:13px;line-height:20px;color:{k["mfg"]};">{T("naoChegou")} '
+             f'<button type="button" aria-disabled="{h("v.esperando")}" style="border:0;padding:0;background:transparent;'
+             f'font-family:{FONTE};font-size:13px;line-height:20px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button>'
+             f' · {T("spam")}</p>')
     corpo = (cabecalho_passo(k, 2, T('titulo'),
                              f'{T("sub")} <b style="font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b>.')
              + f'<div style="display:flex;flex-direction:column;gap:24px;">{campo}'

@@ -12,26 +12,26 @@ VERIFICACAO = {
     'pt-BR': dict(
         titulo='Confirme seu email', sub='Enviamos um código de 6 dígitos para',
         codigoAria='Código de verificação, 6 dígitos', codigoLegenda='Código', verificar='Verificar',
-        expira='Vale por 10 minutos.', reenviarEm='Reenviar em 0:48', reenviar='Reenviar código',
+        expira='O código vale por 10 minutos.', reenviarEm='Reenviar em 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Confira os dígitos e tente de novo.',
         bloqueado='Muitas tentativas com este código. Peça um novo para continuar.',
-        naoChegou='Não chegou? Olhe o spam ou as promoções.',
+        naoChegou='Não chegou?', spam='olhe também o spam e as promoções.',
     ),
     'en-US': dict(
         titulo='Confirm your email', sub='We sent a 6-digit code to',
         codigoAria='Verification code, 6 digits', codigoLegenda='Code', verificar='Verify',
-        expira='Valid for 10 minutes.', reenviarEm='Resend in 0:48', reenviar='Resend code',
+        expira='The code is valid for 10 minutes.', reenviarEm='Resend in 0:48', reenviar='Resend code',
         invalido='Invalid code. Check the digits and try again.',
         bloqueado='Too many attempts with this code. Ask for a new one to continue.',
-        naoChegou='Didn’t get it? Check spam or promotions.',
+        naoChegou='Didn’t get it?', spam='also check spam and promotions.',
     ),
     'es-ES': dict(
         titulo='Confirma tu email', sub='Enviamos un código de 6 dígitos a',
         codigoAria='Código de verificación, 6 dígitos', codigoLegenda='Código', verificar='Verificar',
-        expira='Vale 10 minutos.', reenviarEm='Reenviar en 0:48', reenviar='Reenviar código',
+        expira='El código vale 10 minutos.', reenviarEm='Reenviar en 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Revisa los dígitos e inténtalo de nuevo.',
         bloqueado='Demasiados intentos con este código. Pide uno nuevo para continuar.',
-        naoChegou='¿No te llegó? Mira en spam o promociones.',
+        naoChegou='¿No te llegó?', spam='mira también en spam y promociones.',
     ),
 }
 
