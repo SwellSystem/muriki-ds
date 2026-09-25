@@ -7,7 +7,7 @@
       "name": "theme",
       "type": "registry:theme",
       "title": "Tema Muriki",
-      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover.",
+      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover. Ícone em movimento: no item da sidebar o ícone sobe e cresce no hover; data-motion=\"turn|swing|nudge\" dá o movimento com significado em qualquer botão ou link; nada se mexe com prefers-reduced-motion.",
       "cssVars": {
         "theme": {
           "radius": "14px"
@@ -173,6 +173,31 @@
         },
         ".muriki-scroll:hover::-webkit-scrollbar-thumb": {
           "background-color": "color-mix(in oklab, var(--foreground) 32%, transparent)"
+        },
+        "[data-slot=\"sidebar-menu-button\"] svg, [data-motion]": {
+          "transition": "transform 180ms cubic-bezier(0.16, 1, 0.3, 1)"
+        },
+        "[data-slot=\"sidebar-menu-button\"]:hover svg": {
+          "transform": "translateY(-1px) scale(1.06)"
+        },
+        "[data-slot=\"sidebar-menu-button\"]:active svg": {
+          "transform": "scale(0.92)",
+          "transition-duration": "80ms"
+        },
+        ":is(a, button, [role=\"button\"], [data-slot=\"sidebar-menu-button\"]):hover [data-motion=\"turn\"]": {
+          "transform": "rotate(60deg)"
+        },
+        ":is(a, button, [role=\"button\"], [data-slot=\"sidebar-menu-button\"]):hover [data-motion=\"swing\"]": {
+          "transform": "rotate(-14deg)"
+        },
+        ":is(a, button, [role=\"button\"], [data-slot=\"sidebar-menu-button\"]):hover [data-motion=\"nudge\"]": {
+          "transform": "translateX(2px)"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          "[data-slot=\"sidebar-menu-button\"] svg, [data-motion]": {
+            "transition": "none",
+            "transform": "none !important"
+          }
         }
       }
     },
