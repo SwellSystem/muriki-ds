@@ -385,7 +385,7 @@ export function LoginForm({
                   onValueChange={(value) =>
                     setCode(
                       backup
-                        ? value.toLowerCase().replace(/[^0-9a-z-]/g, "").slice(0, 32)
+                        ? value.replace(/[^0-9A-Za-z-]/g, "").slice(0, 11)
                         : value.replace(/\D/g, "").slice(0, 8)
                     )
                   }
