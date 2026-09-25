@@ -385,9 +385,9 @@ def rail(k, ativo):
         f'<span style="display:flex;flex-direction:column;min-width:0;flex:1;">'
         f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">Rafael Moura</span>'
         f'<span style="font-size:11px;color:{k["mfg"]};">rafael@moura.dev</span></span>'
-        f'<button type="button" aria-label="{T("config")}" title="{T("config")}" style="display:flex;align-items:center;justify-content:center;'
-        f'width:28px;height:28px;padding:0;border:0;border-radius:8px;background:transparent;color:{k["mfg"]};cursor:pointer;">'
-        f'{ic("engrenagem", 15)}</button></div></div></nav>'
+        f'<a href="ContaDados__SUF__.dc.html" aria-label="{T("config")}" title="{T("config")}" style="display:flex;align-items:center;justify-content:center;'
+        f'width:28px;height:28px;border-radius:8px;color:{k["mfg"]};">'
+        f'{ic("engrenagem", 15)}</a></div></div></nav>'
     )
 
 

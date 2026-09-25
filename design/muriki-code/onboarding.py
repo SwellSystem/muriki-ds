@@ -192,7 +192,8 @@ LINGUAGENS_API = [
 ]
 
 
-def tela_preferencias(k, sufixo):
+def campos_preferencias(k):
+    # experiência, linguagens e objetivos: os mesmos no primeiro acesso e na aba Aprendizado de Minha conta
     exp = (f'<div role="radiogroup" aria-label="{T("experiencia")}" style="display:grid;grid-template-columns:repeat(6, minmax(0, 1fr));gap:10px;">'
            f'<sc-for list="{h("exps")}" as="e" hint-placeholder-count="6">'
            f'<button type="button" role="radio" aria-checked="{h("e.marcado")}" onClick="{h("e.escolher")}" '
@@ -226,6 +227,11 @@ def tela_preferencias(k, sufixo):
            f'<span style="display:flex;flex-direction:column;gap:3px;">'
            f'<span style="font-size:14.5px;font-weight:600;color:{k["fgs"]};">{h("o.nome")}</span>'
            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{h("o.desc")}</span></span></button></sc-for></div>')
+    return exp, ling, obj
+
+
+def tela_preferencias(k, sufixo):
+    exp, ling, obj = campos_preferencias(k)
     rodape = (f'<div style="display:flex;align-items:center;gap:8px;">'
               f'{botao_touch(k, T("comecar"), f"PrimeiroExercicio{sufixo}.dc.html")}'
               f'{botao_ir(k, T("pular"), f"PrimeiroExercicio{sufixo}.dc.html", False)}'
