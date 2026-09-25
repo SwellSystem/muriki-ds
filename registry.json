@@ -1058,13 +1058,13 @@
           "target": "components/blocks/app-shell/app-shell.tsx"
         }
       ],
-      "docs": "<AppShell product={{ name: \"Muriki Code\", detail: \"conta Muriki\", logo: <MurikiLogo />, onSwitch, switchLabel: \"Trocar de produto Muriki\" }} groups={[{ label: \"Aprender\", items: [{ key: \"evolucao\", label: \"Evolução\", icon: <TrendUpIcon />, active, render: <Link to=\"/\" /> }] }]} footerItems={[{ key: \"plano\", label: \"Plano\", icon: <StackIcon />, trailing: <Badge tone=\"blue\" size=\"sm\">Pro</Badge>, render: <Link to=\"/plans\" /> }]} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} user={{ name, detail: email, avatar: <Avatar …/>, render: <Link to=\"/account\" /> }} settings={{ label: \"Configurações\", render: <Link to=\"/account\" /> }}>{children}</AppShell>. O item ativo ganha o fundo tingido e a barrinha de 3px do SidebarMenuButton; o trailing some quando o rail recolhe."
+      "docs": "<AppShell product={{ name: \"Muriki Code\", detail: \"conta Muriki\", logo: <MurikiLogo />, onSwitch, switchLabel: \"Trocar de produto Muriki\" }} groups={[{ label: \"Aprender\", items: [{ key: \"evolucao\", label: \"Evolução\", icon: <TrendUpIcon />, active, render: <Link to=\"/\" /> }] }]} footerItems={[{ key: \"plano\", label: \"Plano\", icon: <StackIcon />, trailing: <Badge tone=\"blue\" size=\"sm\">Pro</Badge>, render: <Link to=\"/plans\" /> }]} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} user={{ name, detail: email, avatar: <Avatar …/>, render: <Link to=\"/account\" /> }} settings={{ label: \"Configurações\", render: <Link to=\"/account\" /> }}>{children}</AppShell>. O item ativo ganha o fundo tingido e a barrinha de 3px do SidebarMenuButton; o trailing some quando o rail recolhe. O palco já tem o padding do desenho (32px em cima e 40px dos lados no desktop); stageClassName ajusta. O botão de recolher fica no topo do rail."
     },
     {
       "name": "plans-page",
       "type": "registry:block",
       "title": "Plans Page",
-      "description": "A tela de Planos de dentro do app: título com o seletor mensal/anual à direita, o estado da assinatura acima dos cards (SubscriptionStatus: teste, em dia, cancelamento marcado, em atraso), o plano atual marcado com o botão desligado, as features ainda sem número com o selo tracejado e as regras embaixo.",
+      "description": "A tela de Planos de dentro do app: título com o seletor mensal/anual à direita, o estado da assinatura acima dos cards (SubscriptionStatus: teste, em dia, cancelamento marcado, em atraso), o card de quem já tem plano (nome pequeno com o selo atual, preço de 34px, teste em verde, botão no contorno), as features ainda sem número com o selo tracejado e as regras embaixo, tudo na mesma largura.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
@@ -1073,9 +1073,8 @@
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/button",
-        "SwellSystem/muriki-ds/view-toggle",
-        "SwellSystem/muriki-ds/plan-card",
-        "SwellSystem/muriki-ds/onboarding-pricing"
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/view-toggle"
       ],
       "files": [
         {
@@ -1089,7 +1088,7 @@
           "target": "components/blocks/plans-page/subscription-status.tsx"
         }
       ],
-      "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O preço, as features e o card são os do onboarding-pricing e do plan-card."
+      "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O card é próprio, não o PlanCard: aquele tem a hierarquia de quem escolhe o primeiro plano. emphasized deixa o botão sólido (um por tela, ex.: o Pro para quem está no Starter). O trial vira texto verde depois do priceNote."
     },
     {
       "name": "avatar",
