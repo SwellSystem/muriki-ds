@@ -30,8 +30,8 @@ COMUM = {
 EVOLUCAO = {
     'pt-BR': dict(
         titulo='Seu perfil de competência',
-        sub='Calculado a partir de 219 evidências. O declarado é o seu ponto de partida; o observado só muda com '
-            'evidência forte, e nunca por um exercício ruim.',
+        sub='Calculado a partir de 219 evidências. O declarado vem da experiência que você escolheu (Intermediário, '
+            'Pleno em tudo); o observado só muda com evidência forte, e nunca por um exercício ruim.',
         trajetoria='Trajetória', comoMedido='Como o nível é medido', competencias='Competências',
         colComp='Competência', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Linguagens', grupoEng='Engenharia',
@@ -53,8 +53,8 @@ EVOLUCAO = {
     ),
     'en-US': dict(
         titulo='Your competency profile',
-        sub='Calculated from 219 pieces of evidence. Declared is your starting point; observed only changes with '
-            'strong evidence, and never because of one bad exercise.',
+        sub='Calculated from 219 pieces of evidence. Declared comes from the experience you chose (Intermediate, '
+            'Mid-level everywhere); observed only changes with strong evidence, never from one bad exercise.',
         trajetoria='Trajectory', comoMedido='How the level is measured', competencias='Competencies',
         colComp='Competency', colEscala='Scale', colDecl='Declared', colObs='Observed', colEstado='Status',
         grupoLing='Languages', grupoEng='Engineering',
@@ -76,8 +76,8 @@ EVOLUCAO = {
     ),
     'es-ES': dict(
         titulo='Tu perfil de competencias',
-        sub='Calculado a partir de 219 evidencias. El declarado es tu punto de partida; el observado solo cambia con '
-            'evidencia fuerte, y nunca por un ejercicio malo.',
+        sub='Calculado a partir de 219 evidencias. El declarado viene de la experiencia que elegiste (Intermedio, '
+            'Intermedio en todo); el observado solo cambia con evidencia fuerte, nunca por un mal ejercicio.',
         trajetoria='Trayectoria', comoMedido='Cómo se mide el nivel', competencias='Competencias',
         colComp='Competencia', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Lenguajes', grupoEng='Ingeniería',
@@ -373,8 +373,8 @@ PRIMEIRO = {
 
 PERFIL_VAZIO = {
     'pt-BR': dict(
-        subVazio='Ainda sem evidência. O ponto de partida é o que você declarou no primeiro acesso, '
-                 'e cada exercício enviado confirma ou ajusta uma competência.',
+        subVazio='Ainda sem evidência. O ponto de partida vem da experiência que você escolheu (Intermediário, '
+                 'Pleno em tudo), e cada exercício enviado confirma ou ajusta uma competência.',
         trocarJornada='Mudar preferências', entraPrimeiro='entra no 1º exercício',
         primeiroTitulo='Converter duração em texto para minutos',
         primeiroTxt='Seu primeiro exercício: tem testes, dicas sob pedido e uma pergunta para você explicar a solução.',
@@ -382,8 +382,8 @@ PERFIL_VAZIO = {
         trajVazio='A trajetória compara você com você mesmo: a primeira solução enviada vira o ponto de comparação das próximas.',
     ),
     'en-US': dict(
-        subVazio='No evidence yet. The starting point is what you declared at first access, '
-                 'and each exercise you submit confirms or adjusts a competency.',
+        subVazio='No evidence yet. The starting point comes from the experience you chose (Intermediate, '
+                 'Mid-level everywhere), and each exercise you submit confirms or adjusts a competency.',
         trocarJornada='Change preferences', entraPrimeiro='in your first exercise',
         primeiroTitulo='Convert a text duration into minutes',
         primeiroTxt='Your first exercise: it has tests, hints on request and a question for you to explain your solution.',
@@ -391,8 +391,8 @@ PERFIL_VAZIO = {
         trajVazio='The trajectory compares you with yourself: your first submitted solution becomes the baseline for the next ones.',
     ),
     'es-ES': dict(
-        subVazio='Aún sin evidencias. El punto de partida es lo que declaraste en el primer acceso, '
-                 'y cada ejercicio enviado confirma o ajusta una competencia.',
+        subVazio='Aún sin evidencias. El punto de partida viene de la experiencia que elegiste (Intermedio, '
+                 'Intermedio en todo), y cada ejercicio enviado confirma o ajusta una competencia.',
         trocarJornada='Cambiar preferencias', entraPrimeiro='entra en el 1.er ejercicio',
         primeiroTitulo='Convertir una duración en texto a minutos',
         primeiroTxt='Tu primer ejercicio: tiene pruebas, pistas a demanda y una pregunta para que expliques tu solución.',
@@ -403,19 +403,18 @@ PERFIL_VAZIO = {
 
 COMPETENCIA = {
     'pt-BR': dict(
-        declaradoSuf='declarado', confirmadoSuf='confirmado', aConfirmarSuf='a confirmar',
-        confirmadoPor='confirmado por 12 evidências', editarDecl='Editar declarado',
+        declaradoSuf='declarado', confirmadoSuf='confirmado', aConfirmarSuf='a confirmar', emProgressoSuf='em progresso',
+        confirmadoPor='confirmado por 12 evidências', mudarExp='Mudar experiência',
         caminhoTit='Caminho para confirmar',
         caminhoTxt='3 exercícios de nível Senior com rubrica de 4 de 5 ou mais confirmam. '
-                   'O Learning escolhe os que cobrem o que falta nas suas soluções.',
+                   'O Code escolhe os que cobrem o que falta nas suas soluções.',
         zeroDeTres='0 de 3', exA='Slots com relógio injetado', exB='Cache com expiração testável',
         exC='Retentativas com tempo simulado', proximo='próximo', comecar='Começar',
         agendaNota='ficou em 3 de 5 e não contou: a rubrica de Senior pede 4 de 5.',
         historicoTit='Histórico do nível',
-        d1='12 set', h1d='O declarado ficou acima do observado. Três exercícios de Senior confirmam.',
-        h2d='Você mudou o declarado no perfil.',
+        d1='12 set', h1d='O próximo nível abriu: três exercícios de Senior com rubrica alta confirmam.',
         d3='5 set', h3d='3 submissões de nível Pleno com rubrica alta:',
-        d4='20 ago', h4d='No primeiro acesso, pela jornada.',
+        d4='20 ago', h4d='No primeiro acesso, pela experiência: Intermediário.',
         fontesTit='Evidências por fonte', fonteExercicio='Exercício', fonteExplicacao='Explicação',
         fontePeer='Peer na IDE', fontePlayground='Playground', pesoForte='forte', pesoLeve='leve', total='Total',
         fontesNota='Evidência leve ajusta a confiança e orienta o Peer. Sozinha, não muda o nível.',
@@ -423,19 +422,18 @@ COMPETENCIA = {
         junho='junho', hoje='hoje', trajMetric='Asserts por teste', trajAntes='1,4', trajDepois='2,6',
     ),
     'en-US': dict(
-        declaradoSuf='declared', confirmadoSuf='confirmed', aConfirmarSuf='to confirm',
-        confirmadoPor='confirmed by 12 pieces of evidence', editarDecl='Edit declared level',
+        declaradoSuf='declared', confirmadoSuf='confirmed', aConfirmarSuf='to confirm', emProgressoSuf='in progress',
+        confirmadoPor='confirmed by 12 pieces of evidence', mudarExp='Change experience',
         caminhoTit='Path to confirm',
         caminhoTxt='3 Senior-level exercises with a rubric of 4 of 5 or more would confirm it. '
-                   'Learning picks the ones that cover what your solutions are missing.',
+                   'Code picks the ones that cover what your solutions are missing.',
         zeroDeTres='0 of 3', exA='Slots with an injected clock', exB='Cache with testable expiry',
         exC='Retries with simulated time', proximo='next', comecar='Start',
         agendaNota='scored 3 of 5 and didn’t count: the Senior rubric asks for 4 of 5.',
         historicoTit='Level history',
-        d1='Sep 12', h1d='Declared moved above observed. Three Senior exercises would confirm it.',
-        h2d='You changed the declared level in your profile.',
+        d1='Sep 12', h1d='The next level opened: three Senior exercises with a high rubric confirm it.',
         d3='Sep 5', h3d='3 Mid-level submissions with a high rubric score:',
-        d4='Aug 20', h4d='At first access, from your journey.',
+        d4='Aug 20', h4d='At first access, from your experience: Intermediate.',
         fontesTit='Evidence by source', fonteExercicio='Exercise', fonteExplicacao='Explanation',
         fontePeer='Peer in your IDE', fontePlayground='Playground', pesoForte='strong', pesoLeve='light', total='Total',
         fontesNota='Light evidence adjusts confidence and guides the Peer. On its own, it never changes a level.',
@@ -443,19 +441,18 @@ COMPETENCIA = {
         junho='June', hoje='today', trajMetric='Asserts per test', trajAntes='1.4', trajDepois='2.6',
     ),
     'es-ES': dict(
-        declaradoSuf='declarado', confirmadoSuf='confirmado', aConfirmarSuf='por confirmar',
-        confirmadoPor='confirmado por 12 evidencias', editarDecl='Editar el declarado',
+        declaradoSuf='declarado', confirmadoSuf='confirmado', aConfirmarSuf='por confirmar', emProgressoSuf='en progreso',
+        confirmadoPor='confirmado por 12 evidencias', mudarExp='Cambiar experiencia',
         caminhoTit='Camino para confirmar',
         caminhoTxt='3 ejercicios de nivel Senior con una rúbrica de 4 de 5 o más lo confirman. '
-                   'Learning elige los que cubren lo que falta en tus soluciones.',
+                   'Code elige los que cubren lo que falta en tus soluciones.',
         zeroDeTres='0 de 3', exA='Slots con reloj inyectado', exB='Caché con caducidad comprobable',
         exC='Reintentos con tiempo simulado', proximo='siguiente', comecar='Empezar',
         agendaNota='se quedó en 3 de 5 y no contó: la rúbrica de Senior pide 4 de 5.',
         historicoTit='Historial del nivel',
-        d1='12 sept', h1d='El declarado quedó por encima del observado. Tres ejercicios de Senior lo confirman.',
-        h2d='Has cambiado el declarado en tu perfil.',
+        d1='12 sept', h1d='Se abrió el siguiente nivel: tres ejercicios de Senior con rúbrica alta lo confirman.',
         d3='5 sept', h3d='3 envíos de nivel Intermedio con una rúbrica alta:',
-        d4='20 ago', h4d='En el primer acceso, desde la trayectoria.',
+        d4='20 ago', h4d='En el primer acceso, por la experiencia: Intermedio.',
         fontesTit='Evidencias por fuente', fonteExercicio='Ejercicio', fonteExplicacao='Explicación',
         fontePeer='Peer en el IDE', fontePlayground='Playground', pesoForte='fuerte', pesoLeve='ligera', total='Total',
         fontesNota='La evidencia ligera ajusta la confianza y orienta al Peer. Por sí sola, no cambia el nivel.',
