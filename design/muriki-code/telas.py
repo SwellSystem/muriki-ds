@@ -529,7 +529,7 @@ def tela_exercicio(k, primeira=False):
 
     area = (f'<div style="flex:1;min-height:0;padding:14px 0;font-family:{MONO};font-size:13px;line-height:24px;color:{k["fg"]};'
             f'background:{k["card"]};{realce(1)}">{codigo}'
-            + (balao_guia(k, 1, 'top:16px;right:16px;') if primeira else '') + '</div>')
+            + (balao_guia(k, 1, 'top:164px;left:56px;') if primeira else '') + '</div>')
     posicao = 'src/parse-duration.ts · 4:3' if primeira else 'src/parse-duration.ts · 11:18'
     editor = (
         f'<section aria-label="{T("editor")}" style="flex:1;min-width:0;display:flex;background:{k["card"]};'
@@ -861,18 +861,17 @@ def tela_planos(k):
         + item(T('s3'))
         + item(T('s4'), tracejado=True)
         + item(T('peer'), tracejado=True),
-        botao(T('atualBotao'), k, 'outline', 40, largura='100%', desativado=True),
-        selo=badge(T('atual'), k, 'gray'))
+        botao(T('mudarStarter'), k, 'outline', 40, largura='100%'))
     pro = plano(
         'Pro', T('ariaPro'), f'{T("preco")}<span style="font-size:15px;font-weight:500;color:{k["mfg"]};">{T("porMes")}</span>',
-        T('porAno'),
+        f'{T("porAno")} · <b style="font-weight:500;color:{k["ok"]};">{T("testeAte")}</b>',
         item(T('p1'))
         + item(T('p2'))
         + item(T('p3'))
         + item(T('p4'))
         + item(T('p5'), tracejado=True),
-        botao(T('assinar'), k, 'solid', 40, largura='100%'),
-        destaque=True, selo=badge(T('recomendado'), k, 'blue'))
+        botao(T('atualBotao'), k, 'outline', 40, largura='100%', desativado=True),
+        destaque=True, selo=badge(T('atual'), k, 'blue'))
 
     regra = lambda icone, t: (f'<li style="display:flex;gap:10px;align-items:flex-start;flex:1;font-size:13px;line-height:20px;color:{k["mfg"]};">'
                               f'<span style="margin-top:2px;">{ic(icone, 15, k["mfg"])}</span><span>{t}</span></li>')
@@ -1314,7 +1313,7 @@ def tela_playground(k):
 
     saidas = ''.join(
         f'<sc-if value="{h("lg." + chave)}" hint-placeholder-val="{{{{ {"true" if chave == "py" else "false"} }}}}">'
-        + ''.join(f'<span style="white-space:pre;{"color:" + k["bad"] + ";" if chave == "py" and i == len(ls) - 1 else ""}">{l}</span>'
+        + ''.join(f'<span style="white-space:pre-wrap;overflow-wrap:anywhere;{"color:" + k["bad"] + ";" if chave == "py" and i == len(ls) - 1 else ""}">{l}</span>'
                   for i, l in enumerate(ls)) + '</sc-if>'
         for chave, ls in SAIDAS.items())
     saida = cartao(

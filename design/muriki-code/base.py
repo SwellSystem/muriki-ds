@@ -171,7 +171,8 @@ I = dict(
     github=('<svg viewBox="0 0 16 16" fill="currentColor" width="100%" height="100%" aria-hidden="true">'
             '<path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>'),
     terminal=svg('<rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.8"/><path d="M4.6 6.4L6.8 8l-2.2 1.6"/><path d="M8.4 10h3"/>'),
-    engrenagem=svg('<circle cx="8" cy="8" r="2.2"/><path d="M8 1.6v1.8M8 12.6v1.8M14.4 8h-1.8M3.4 8H1.6M12.5 3.5l-1.3 1.3M4.8 11.2l-1.3 1.3M12.5 12.5l-1.3-1.3M4.8 4.8L3.5 3.5"/>'),
+    # engrenagem com dentes de verdade: os raios soltos liam como sol, ao lado do sol do tema
+    engrenagem=svg('<circle cx="8" cy="8" r="2"/><path d="M8 1.5l1.05 1.55 1.8-.5.5 1.8L13 5.4l-.5 1.8L13.5 8l-1 .8.5 1.8-1.65.85-.5 1.8-1.8-.5L8 14.5l-1.05-1.55-1.8.5-.5-1.8L3 10.6l.5-1.8L2.5 8l1-.8L3 5.4l1.65-.85.5-1.8 1.8.5z"/>'),
 )
 
 
@@ -346,7 +347,7 @@ def rail(k, ativo):
     nav = ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS)
     ponto = f'<span style="width:7px;height:7px;border-radius:999px;background:{k["ok"]};"></span>'
     base = (item('peer', 'peer', ativo == 'peer', ponto)
-            + item('plano', 'plano', ativo == 'plano', badge('Starter', k, 'gray')))
+            + item('plano', 'plano', ativo == 'plano', badge('Pro', k, 'blue')))
     return (
         f'<nav aria-label="Muriki Code" style="width:232px;flex:0 0 232px;background:{k["rail"]};display:flex;'
         f'flex-direction:column;box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);">'
