@@ -105,6 +105,7 @@ import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
 
+import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -368,6 +369,7 @@ function Sidebar({
     floating,
     setFloating,
   } = useSidebar()
+  const t = useTranslate()
   const containerRef = React.useRef<HTMLDivElement>(null)
 
   // Re-avalia o hide do overlay desafixado: se o mouse não voltou para a
@@ -432,8 +434,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Menu</SheetTitle>
-            <SheetDescription>Navegação principal.</SheetDescription>
+            <SheetTitle>{t("sidebar.mobile_title")}</SheetTitle>
+            <SheetDescription>{t("sidebar.mobile_description")}</SheetDescription>
           </SheetHeader>
           <div className="flex h-full w-full flex-col">{children}</div>
         </SheetContent>
@@ -542,6 +544,7 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
+  const t = useTranslate()
 
   return (
     <Button
@@ -557,7 +560,7 @@ function SidebarTrigger({
       {...props}
     >
       <SidebarIcon />
-      <span className="sr-only">Recolher menu</span>
+      <span className="sr-only">{t("sidebar.collapse")}</span>
     </Button>
   )
 }
@@ -565,6 +568,8 @@ function SidebarTrigger({
 function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
   const { toggleSidebar, togglePin, pinned, state, isMobile, enablePinning } =
     useSidebar()
+
+  const t = useTranslate()
 
   if (isMobile) return null
   const colapsado = state === "collapsed"
@@ -583,8 +588,8 @@ function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
         variant="ghost"
         size="icon-sm"
         onClick={toggleSidebar}
-        aria-label={colapsado ? "Expandir menu" : "Recolher menu"}
-        title={colapsado ? "Expandir menu" : "Recolher menu"}
+        aria-label={t(colapsado ? "sidebar.expand" : "sidebar.collapse")}
+        title={t(colapsado ? "sidebar.expand" : "sidebar.collapse")}
         className="text-muted-foreground"
       >
         <SidebarSimpleIcon aria-hidden size={16} />
@@ -595,8 +600,8 @@ function SidebarControls({ className, ...props }: React.ComponentProps<"div">) {
         variant="ghost"
         size="icon-sm"
         onClick={togglePin}
-        aria-label={pinned ? "Soltar menu" : "Fixar menu"}
-        title={pinned ? "Soltar menu" : "Fixar menu"}
+        aria-label={t(pinned ? "sidebar.unpin" : "sidebar.pin")}
+        title={t(pinned ? "sidebar.unpin" : "sidebar.pin")}
         className={cn("text-muted-foreground", !pinned && "text-primary")}
       >
         {pinned ? (

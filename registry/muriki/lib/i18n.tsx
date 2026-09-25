@@ -192,6 +192,14 @@ const STRINGS: Record<string, unknown> = {
       esc_hint: "Esc para fechar · ⌘↵ para criar",
     },
   },
+  sidebar: {
+    collapse: "Recolher menu",
+    expand: "Expandir menu",
+    pin: "Fixar menu",
+    unpin: "Soltar menu",
+    mobile_title: "Menu",
+    mobile_description: "Navegação principal.",
+  },
   password_strength: {
     meter: "Força da senha",
     requirements: "Requisitos da senha",

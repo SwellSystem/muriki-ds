@@ -15,6 +15,7 @@
 import { useId, type ReactNode } from "react"
 import { CheckIcon, SpinnerGap } from "@phosphor-icons/react"
 
+import { RollingPrice } from "@/components/blocks/onboarding-pricing/plan-price"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -29,6 +30,8 @@ export interface PlansPagePlan {
   name: string
   /** Valor em centavos no período selecionado. Zero cai no rótulo grátis. */
   amountInCents: number
+  /** O preço cheio quando um cupom baixou o valor: aparece riscado acima. */
+  originalAmountInCents?: number
   currency?: PlansPageCurrency
   /** A linha de baixo do preço, ex.: "ou R$ 499 por ano", "para sempre, sem cartão". */
   priceNote?: string
@@ -223,14 +226,26 @@ function PlanTile({
       </div>
 
       <div className="flex flex-col gap-1">
-        <span className="text-[34px] leading-10 font-semibold tracking-[-0.02em] text-foreground-strong">
-          {gratis ? labels.free : preco(plan.amountInCents, plan.currency ?? "BRL", locale)}
-          {gratis ? null : (
-            <span className="text-[15px] font-medium tracking-normal text-muted-foreground">
-              {` /${intervalo}`}
-            </span>
+        {!gratis &&
+        plan.originalAmountInCents !== undefined &&
+        plan.originalAmountInCents > plan.amountInCents ? (
+          <s className="text-sm text-muted-foreground tabular-nums">
+            {preco(plan.originalAmountInCents, plan.currency ?? "BRL", locale)}
+          </s>
+        ) : null}
+        {/* O preço rola os dígitos na troca Mensal/Anual, o mesmo do onboarding. */}
+        <p className="flex flex-wrap items-baseline gap-x-1.5 text-[34px] leading-10 font-semibold tracking-[-0.02em] text-foreground-strong">
+          {gratis ? (
+            labels.free
+          ) : (
+            <>
+              <RollingPrice value={preco(plan.amountInCents, plan.currency ?? "BRL", locale)} />
+              <span className="text-[15px] font-medium tracking-normal text-muted-foreground">
+                /{intervalo}
+              </span>
+            </>
           )}
-        </span>
+        </p>
         {plan.priceNote || plan.trial ? (
           <span className="text-[13px] text-muted-foreground">
             {plan.priceNote}
