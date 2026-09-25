@@ -23,6 +23,8 @@ export interface LoginCredentials {
 export interface LoginCodeInput {
   code: string
   trustDevice: boolean
+  /** `backup` quando a pessoa usou um código de backup em vez do app. */
+  kind: "totp" | "backup"
 }
 
 /**
@@ -50,6 +52,12 @@ export interface LoginFormProps {
   passwordMinLength?: number
   /** Barra de força embaixo da senha (reserva a altura desde o início). `false` tira a barra e o espaço dela. Padrão: true. */
   showPasswordStrength?: boolean
+  /**
+   * "Usar um código de backup" no passo do código: o campo troca para o
+   * formato do backup (letras e números, vale uma vez) e `onVerifyCode`
+   * recebe `kind: "backup"`. Padrão: false.
+   */
+  allowBackupCode?: boolean
   /** Caixa "Lembrar de mim". `false` esconde e envia `rememberMe: false`. Padrão: true. */
   showRememberMe?: boolean
   /** Caixa "Confiar neste dispositivo" no segundo fator. `false` esconde e envia `trustDevice: false`. Padrão: true. */

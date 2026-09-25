@@ -8,6 +8,8 @@ export interface PricingPlan {
   description?: string
   /** Valor em centavos no período selecionado. Zero cai no rótulo grátis. */
   amountInCents: number
+  /** O preço cheio quando um cupom baixou o valor: aparece riscado. */
+  originalAmountInCents?: number
   currency?: PlanCurrency
   /** Linha pequena abaixo do preço, ex.: "por usuário, cobrado mensal". */
   priceNote?: string

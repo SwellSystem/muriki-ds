@@ -80,6 +80,11 @@ export interface PricingScreenProps {
   onAccountTypeChange?: (next: AccountType) => void
   /** Faixa acima da grade, ex.: o banner de retomar onboarding. */
   banner?: ReactNode
+  /**
+   * À esquerda na linha do período, ex.: o CouponField. Fica perto dos
+   * preços que muda, sem empurrar a grade.
+   */
+  toolbar?: ReactNode
   loading?: boolean
   /** Quantos esqueletos mostrar enquanto carrega. Padrão 3. */
   loadingCount?: number
@@ -102,6 +107,7 @@ export function PricingScreen({
   accountType = "personal",
   onAccountTypeChange,
   banner,
+  toolbar,
   loading = false,
   loadingCount = 3,
   locale = "pt-BR",
@@ -136,7 +142,8 @@ export function PricingScreen({
         {/* Os dois segmentados moram na mesma linha mas em pontas opostas.
             Lado a lado com o gap de sempre eles liam como UM controle de
             quatro segmentos, e a conta parecia um filtro do período. */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-start gap-3">
+          {toolbar}
           {onAccountTypeChange ? (
             <ViewToggle<AccountType>
               ariaLabel={labels.accountAria}
@@ -197,6 +204,7 @@ export function PricingScreen({
                   priceSlot={
                     <PlanPrice
                       amountInCents={plan.amountInCents}
+                      originalAmountInCents={plan.originalAmountInCents}
                       currency={plan.currency}
                       intervalLabel={intervalLabel}
                       noteLabel={plan.priceNote}

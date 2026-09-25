@@ -15,6 +15,11 @@ export type PlanInterval = "month" | "year"
 export interface PlanPriceProps {
   /** Valor em centavos. Zero cai no `freeLabel`. */
   amountInCents: number
+  /**
+   * O preço cheio, quando um cupom baixou o `amountInCents`: aparece
+   * riscado acima, e o preço com desconto rola para o lugar dele.
+   */
+  originalAmountInCents?: number
   currency?: PlanCurrency
   /** Sufixo do preço, ex.: "mês". Vira "/mês". */
   intervalLabel: string
@@ -39,6 +44,7 @@ const format = (cents: number, currency: PlanCurrency, locale: string) =>
 
 export function PlanPrice({
   amountInCents,
+  originalAmountInCents,
   currency = "BRL",
   intervalLabel,
   noteLabel,
@@ -65,6 +71,11 @@ export function PlanPrice({
 
   return (
     <div className={cn("flex flex-col gap-1", className)}>
+      {originalAmountInCents !== undefined && originalAmountInCents > amountInCents ? (
+        <s className="text-sm text-muted-foreground tabular-nums">
+          {format(originalAmountInCents, currency, locale)}
+        </s>
+      ) : null}
       {/* flex-wrap para o "/mês" não ser cortado pelo overflow do card
           quando o preço anual fica longo (ex.: R$ 1.200,00). */}
       <p className="flex flex-wrap items-baseline gap-x-1.5">
