@@ -15,7 +15,7 @@ VERIFICACAO = {
         expira='O código vale por 10 minutos.', reenviarEm='Reenviar em 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Confira os dígitos e tente de novo.',
         bloqueado='Muitas tentativas com este código. Peça um novo para continuar.',
-        naoChegou='Não chegou?', spam='olhe também o spam e as promoções.',
+        naoChegou='Não chegou?', spam='Olhe também o spam e as promoções.',
     ),
     'en-US': dict(
         titulo='Confirm your email', sub='We sent a 6-digit code to',
@@ -23,7 +23,7 @@ VERIFICACAO = {
         expira='The code is valid for 10 minutes.', reenviarEm='Resend in 0:48', reenviar='Resend code',
         invalido='Invalid code. Check the digits and try again.',
         bloqueado='Too many attempts with this code. Ask for a new one to continue.',
-        naoChegou='Didn’t get it?', spam='also check spam and promotions.',
+        naoChegou='Didn’t get it?', spam='Also check spam and promotions.',
     ),
     'es-ES': dict(
         titulo='Confirma tu email', sub='Enviamos un código de 6 dígitos a',
@@ -31,7 +31,7 @@ VERIFICACAO = {
         expira='El código vale 10 minutos.', reenviarEm='Reenviar en 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Revisa los dígitos e inténtalo de nuevo.',
         bloqueado='Demasiados intentos con este código. Pide uno nuevo para continuar.',
-        naoChegou='¿No te llegó?', spam='mira también en spam y promociones.',
+        naoChegou='¿No te llegó?', spam='Mira también en spam y promociones.',
     ),
 }
 

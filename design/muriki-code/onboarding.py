@@ -8,16 +8,17 @@ TOTAL = 4
 h = lambda caminho: '{{' + caminho + '}}'
 
 
-def cabecalho_passo(k, n, titulo, sub):
+def cabecalho_passo(k, n, titulo, sub, tamanho=52, centro=False):
     passos = ''.join(f'<span style="height:4px;flex:1;border-radius:2px;background:{k["pri"] if i < n else k["sunken"]};"></span>'
                      for i in range(TOTAL))
     legenda_ = f'{T("passoRotulo")} · {n} {T("de")} {TOTAL}'
-    return (f'<header style="display:flex;flex-direction:column;gap:16px;">'
-            f'<div style="display:flex;flex-direction:column;gap:8px;">{rotulo(legenda_, k["mfg"])}'
+    alinha = 'text-align:center;align-items:center;' if centro else ''
+    return (f'<header style="display:flex;flex-direction:column;gap:16px;{alinha}">'
+            f'<div style="display:flex;flex-direction:column;gap:8px;width:100%;{alinha}">{rotulo(legenda_, k["mfg"])}'
             f'<div role="progressbar" aria-valuemin="1" aria-valuemax="{TOTAL}" aria-valuenow="{n}" '
-            f'aria-label="{T("passosAria")} {n} {T("de")} {TOTAL}" style="display:flex;gap:6px;">{passos}</div></div>'
-            f'<div style="display:flex;flex-direction:column;gap:12px;">'
-            f'<h1 style="margin:0;font-size:52px;line-height:1.02;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{titulo}</h1>'
+            f'aria-label="{T("passosAria")} {n} {T("de")} {TOTAL}" style="display:flex;gap:6px;width:100%;">{passos}</div></div>'
+            f'<div style="display:flex;flex-direction:column;gap:12px;{alinha}">'
+            f'<h1 style="margin:0;font-size:{tamanho}px;line-height:1.02;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{titulo}</h1>'
             f'<p style="margin:0;max-width:65ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div></header>')
 
 
@@ -61,28 +62,32 @@ def secao(k, titulo, extra=''):
 # POST /onboarding/code/challenge manda o código; /verify troca por um onboardingToken.
 # `estado` mostra os três casos da API: digitando, código inválido e muitas tentativas.
 def tela_verificacao(k, sufixo):
-    # os quadrados do otp-input no tamanho lg (48 × 56), 3 + traço + 3
-    caixa = lambda i: (f'<span style="display:flex;align-items:center;justify-content:center;width:48px;height:56px;border-radius:12px;'
-                       f'background:{k["card"]};box-shadow:{h(f"v.anel{i}")};font-family:{MONO};font-size:24px;font-weight:500;'
+    # Pouco conteúdo pede o centro: uma coluna de 480px no meio da tela, o código na largura toda,
+    # o botão largo e a ajuda embaixo. É o formato de tela de código; à esquerda, numa coluna
+    # larga, ele virava um canto ocupado e o resto vazio.
+    caixa = lambda i: (f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:60px;border-radius:12px;'
+                       f'background:{k["card"]};box-shadow:{h(f"v.anel{i}")};font-family:{MONO};font-size:26px;font-weight:500;'
                        f'color:{h("v.cor")};">{h(f"v.d{i}")}</span>')
-    codigo = (f'<div role="group" aria-label="{T("codigoAria")}" style="display:flex;align-items:center;gap:8px;">'
-              f'{caixa(0)}{caixa(1)}{caixa(2)}<span style="width:12px;height:2px;border-radius:1px;background:{k["input"]};"></span>'
+    codigo = (f'<div role="group" aria-label="{T("codigoAria")}" style="display:flex;align-items:center;gap:8px;width:100%;">'
+              f'{caixa(0)}{caixa(1)}{caixa(2)}<span style="width:12px;flex:0 0 12px;height:2px;border-radius:1px;background:{k["input"]};"></span>'
               f'{caixa(3)}{caixa(4)}{caixa(5)}</div>')
     aviso = (f'<sc-if value="{h("v.temErro")}" hint-placeholder-val="{{{{ false }}}}">'
-             f'<p role="alert" style="margin:0;font-size:12.5px;line-height:18px;color:{k["bad"]};">{h("v.erro")}</p></sc-if>')
-    campo = (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:10px;">'
-             f'{legenda_campo(k, T("codigoLegenda"))}{codigo}'
-             f'<p style="margin:0;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("expira")}</p>{aviso}</fieldset>')
-    # a ajuda é uma frase só: o reenviar mora junto do "não chegou?", que é quando ele serve
+             f'<p role="alert" style="margin:0;font-size:13px;line-height:19px;color:{k["bad"]};">{h("v.erro")}</p></sc-if>')
+    validade = f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("expira")}</p>'
+    botao = (f'<a href="Perfil{sufixo}.dc.html" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;'
+             f'height:44px;border-radius:11px;background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">'
+             f'{T("verificar")}{ic("seta", 15)}</a>')
     ajuda = (f'<p style="margin:0;font-size:13px;line-height:20px;color:{k["mfg"]};">{T("naoChegou")} '
              f'<button type="button" aria-disabled="{h("v.esperando")}" style="border:0;padding:0;background:transparent;'
              f'font-family:{FONTE};font-size:13px;line-height:20px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button>'
-             f' · {T("spam")}</p>')
+             f'<br>{T("spam")}</p>')
     corpo = (cabecalho_passo(k, 2, T('titulo'),
-                             f'{T("sub")} <b style="font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b>.')
-             + f'<div style="display:flex;flex-direction:column;gap:24px;">{campo}'
-               f'{botao_touch(k, T("verificar"), f"Perfil{sufixo}.dc.html")}{ajuda}</div>')
-    return pagina_passo(k, corpo, FORM)
+                             f'{T("sub")}<br><b style="font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b>', tamanho=40, centro=True)
+             + f'<div style="display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;">'
+               f'{codigo}{validade}{aviso}<div style="height:6px;"></div>{botao}{ajuda}</div>')
+    return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:36px;width:528px;'
+            f'align-self:center;padding:0 24px 96px;">{corpo}</main></div>')
 
 
 ANTES_VERIFICACAO = """const estado = s.estado || this.props.estado || "digitando";

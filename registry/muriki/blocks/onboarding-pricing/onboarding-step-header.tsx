@@ -5,6 +5,8 @@
 // ao herói da tela de entrada.
 import type { ReactNode } from "react"
 
+import { cn } from "@/lib/utils"
+
 import { OnboardingStepper } from "./onboarding-stepper"
 
 export interface OnboardingStepHeaderProps {
@@ -14,6 +16,12 @@ export interface OnboardingStepHeaderProps {
   stepperAriaLabel: string
   title: string
   subtitle?: ReactNode
+  /**
+   * `center` para passo de pouco conteúdo numa coluna estreita (o código por
+   * email): rótulo, título e subtítulo no eixo, e o título um degrau menor
+   * (40px) para caber em 480px sem quebrar. Padrão: `start`.
+   */
+  align?: "start" | "center"
 }
 
 export function OnboardingStepHeader({
@@ -23,9 +31,11 @@ export function OnboardingStepHeader({
   stepperAriaLabel,
   title,
   subtitle,
+  align = "start",
 }: OnboardingStepHeaderProps) {
+  const centro = align === "center"
   return (
-    <header className="flex flex-col gap-4">
+    <header className={cn("flex flex-col gap-4", centro && "items-stretch text-center")}>
       <OnboardingStepper
         step={step}
         total={total}
@@ -33,11 +43,16 @@ export function OnboardingStepHeader({
         ariaLabel={stepperAriaLabel}
       />
       <div className="flex flex-col gap-3">
-        <h1 className="text-[clamp(2rem,6vw,3.25rem)] leading-[1.02] font-semibold tracking-[-0.03em] text-foreground-strong">
+        <h1
+          className={cn(
+            "leading-[1.02] font-semibold tracking-[-0.03em] text-foreground-strong",
+            centro ? "text-[clamp(2rem,6vw,2.5rem)]" : "text-[clamp(2rem,6vw,3.25rem)]"
+          )}
+        >
           {title}
         </h1>
         {subtitle ? (
-          <p className="max-w-prose text-sm text-muted-foreground md:text-base">
+          <p className={cn("max-w-prose text-sm text-muted-foreground md:text-base", centro && "mx-auto")}>
             {subtitle}
           </p>
         ) : null}
