@@ -10,11 +10,11 @@ TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · conta Muriki', 0, 0, 1),
     ('criar', 'CriarConta', 'Criar conta', 'Criar conta', 1, 0, 1),
     ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 9, 0, 1),
-    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · 1 · escolha do plano', 2, 0, 1),
-    ('verificacao', 'Verificacao', 'Confirme seu email', 'Primeiro acesso · 2 · código por email', 3, 0, 1),
-    ('perfil', 'Perfil', 'Seu perfil', 'Primeiro acesso · 3 · perfil (o mesmo do Platform)', 4, 0, 1),
-    ('preferencias', 'Preferencias', 'Preferências', 'Primeiro acesso · 4 · experiência, linguagens e objetivos', 5, 0, 1),
-    ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 6, 0, 1),
+    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · 3 · plano e cupom', 4, 0, 1),
+    ('verificacao', 'Verificacao', 'Confirme seu email', 'Primeiro acesso · 1 · código por email', 2, 0, 1),
+    ('perfil', 'Perfil', 'Seu perfil', 'Primeiro acesso · 2 · perfil (conclui o onboarding; 7 dias de Pro)', 3, 0, 1),
+    ('preferencias', 'Preferencias', 'Perfil de aprendizado', 'Primeiro acesso · perfil de aprendizado (opcional)', 6, 0, 1),
+    ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 5, 0, 1),
     ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 7, 0, 1),
     ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 8, 0, 1),
     ('evolucao', 'Main', 'Evolução', 'Evolução · declarado, observado e estado', 0, 2, 3),
@@ -69,7 +69,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('jornada', 0, 10, 'Entrada e primeiro acesso: plano, código por email, perfil, preferências, pagamento e o primeiro exercício'),
+    ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
     ('web', 2, 5, 'Code web: perfil, competência, exercício, avaliação e playground'),
     ('webEscuro', 3, 5, 'Code web no tema escuro'),

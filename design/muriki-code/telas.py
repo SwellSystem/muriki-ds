@@ -7,7 +7,7 @@ from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
                         ANTES_VERIFICACAO, PROPS_VERIFICACAO, ANTES_PREFERENCIAS, VALORES_PREFERENCIAS,
-                        PROPS_PREFERENCIAS, ANTES_PAGAMENTO, VALORES_PAGAMENTO, PROPS_PAGAMENTO)
+                        ANTES_PERFIL, PROPS_PERFIL, ANTES_PAGAMENTO, VALORES_PAGAMENTO, PROPS_PAGAMENTO)
 from logos import logo_linguagem
 
 
@@ -23,10 +23,10 @@ ENGENHARIA = ['Testing', 'Debugging', 'Architecture', 'APIs', 'Databases', 'Secu
               'Design Patterns', 'System Design', 'DDD', 'Observability']
 
 # nome: (declarado, observado, evidências, estado, alvo)  — declarado None = não uso; observado 0 = sem confirmação
-# O declarado nasce da experiência escolhida nas Preferências e vale para todas as competências: a API
-# guarda um nível só (experience), não um por competência. Aprendendo e Iniciante → Junior,
-# Intermediário → Pleno, Avançado → Senior; Tech Lead e Architect só se observam. O Rafael escolheu
-# Intermediário, então tudo começa em Pleno, e o que passa disso vem das evidências.
+# O declarado nasce da experiência do perfil de aprendizado e vale para todas as competências: a API
+# guarda um nível só (experience: junior, mid, senior, tech_lead, architect), não um por competência;
+# "ainda não sei" (unknown) ou pular deixa o declarado vazio. O Rafael escolheu Pleno, então tudo
+# começa em Pleno, e o que passa disso vem das evidências.
 PERFIL = {
     'TypeScript': (2, 3, 64, 'confirmado', None),
     'Python': (2, 0, 3, 'declarado', None),
@@ -1199,9 +1199,9 @@ def tela_perfil_vazio(k, sufixo):
     return app(k, 'evolucao', cab + f'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;min-height:0;">{tabela}{lado}</div>', gap=20)
 
 
-# ── Primeiro acesso, passo 1: o plano (só a escolha) ───────────────────
-# Vem logo depois de criar a conta. A API só cobra depois das preferências (checkout exige o
-# onboarding concluído), então aqui é só a escolha; quem escolheu Pro paga no fim, com 7 dias grátis.
+# ── Primeiro acesso, passo 3: o plano ──────────────────────────────────
+# Vem depois do perfil, que conclui o onboarding e já dá 7 dias de Pro a todos. Aqui a pessoa
+# escolhe como continuar depois deles: fica no Starter (sem cartão) ou assina o Pro, com cupom.
 # A PricingScreen do DS (onboarding-pricing + plan-card), a mesma do Platform: barra de passos,
 # título de display, rótulo de seção, período à direita e os cards com a CTA de cada um. O Starter
 # é tingido e o Pro, recomendado, é o único sólido. `estado: carregando` mostra o skeleton do plan-card.
@@ -1212,7 +1212,7 @@ def tela_plano_inicial(k, sufixo):
              f'-webkit-mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);'
              f'mask-image:linear-gradient(to right,transparent,black 12%,black 88%,transparent);"></span>')
 
-    cab = cabecalho_passo(k, 1, T('tituloInicial'), T('subInicial'))
+    cab = cabecalho_passo(k, 3, T('tituloInicial'), T('subInicial'))
 
     secao = (f'<div style="display:flex;align-items:center;gap:12px;">'
              f'<span style="font-family:{MONO};font-size:10px;letter-spacing:0.3em;text-transform:uppercase;color:{k["mfg"]};">{T("secaoPlanos")}</span>'
@@ -1238,7 +1238,7 @@ def tela_plano_inicial(k, sufixo):
         return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;color:{k["fg"]};">'
                 f'<span style="margin-top:2px;display:flex;color:{k["ok"]};">{ic("check", 14)}</span><span>{t}</span></li>')
 
-    def card(nome, desc, selo, preco, nota, feats, titulo_feats, cta, destaque, teste=''):
+    def card(nome, desc, selo, preco, nota, feats, titulo_feats, cta, destaque, teste='', destino=''):
         borda = (f'border:1px solid {k["pri"]};box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:scale(1.03);' if destaque
                  else f'border:1px solid {k["border"]};box-shadow:{k["sombra"]};')
         botao_ = (f'background:{k["pri"]};color:{k["prifg"]};' if destaque
@@ -1255,18 +1255,20 @@ def tela_plano_inicial(k, sufixo):
                 f'<span style="font-size:12.5px;color:{k["mfg"]};">{nota}</span></div>'
                 f'{regua}<div style="flex:1;display:flex;flex-direction:column;gap:8px;">{tf}'
                 f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{feats}</ul></div>'
-                f'<a href="Verificacao{sufixo}.dc.html" style="display:flex;align-items:center;justify-content:center;height:36px;'
+                f'<a href="{destino}" style="display:flex;align-items:center;justify-content:center;height:36px;'
                 f'border-radius:9px;{botao_}font-size:14px;font-weight:500;">{cta}</a></article>')
 
     valor = lambda v: f'<span style="font-size:30px;line-height:1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{v}</span>'
     starter = card('Starter', T('descStarter'), '', valor(T('gratis')), T('notaStarter'),
-                   feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False)
+                   feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False,
+                   destino=f'Preferencias{sufixo}.dc.html')
     pro = card('Pro', T('descPro'), badge(T('recomendado'), k, 'blue'),
                f'<sc-if value="{h("cp.aplicado")}" hint-placeholder-val="{{{{ false }}}}">'
                f'<s style="width:100%;font-size:14px;color:{k["mfg"]};">{h("per.cheio")}</s></sc-if>'
                + valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
                feature(T('p2'), True) + feature(T('p3'), True) + feature(T('p4'), True), T('tudoStarter'), T('ctaPro'), True,
-               teste=(f'<span style="align-self:flex-start;">{badge(T("teste"), k, "green", mono=True)}</span>'))
+               teste=(f'<span style="align-self:flex-start;">{badge(T("teste"), k, "green", mono=True)}</span>'),
+               destino=f'Pagamento{sufixo}.dc.html')
 
     def esqueleto(destaque):
         borda = f'border:1px solid {k["pri"]};' if destaque else f'border:1px solid {k["border"]};'
@@ -1533,10 +1535,10 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'verificacao':
         return web(onb(VERIFICACAO), tela_verificacao(k, sufixo), ANTES_VERIFICACAO, 'v: v', PROPS_VERIFICACAO, CSS_DIVIDER_SKELETON)
     if tela['id'] == 'perfil':
-        return web(onb(PERFIL_ONB), tela_perfil(k, sufixo), css=CSS_DIVIDER_SKELETON)
+        return web(onb(PERFIL_ONB), tela_perfil(k, sufixo), ANTES_PERFIL, 'pf: pf', PROPS_PERFIL, CSS_DIVIDER_SKELETON)
     if tela['id'] == 'preferencias':
         return web(onb(PREFERENCIAS), tela_preferencias(k, sufixo), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS,
-                   PROPS_PREFERENCIAS, CSS_DIVIDER_SKELETON)
+                   css=CSS_DIVIDER_SKELETON)
     if tela['id'] == 'pagamento':
         return web(onb(PAGAMENTO), tela_pagamento(k, sufixo), ANTES_PAGAMENTO, VALORES_PAGAMENTO, PROPS_PAGAMENTO)
     if tela['id'] == 'playground':
