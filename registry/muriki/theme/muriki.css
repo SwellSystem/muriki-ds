@@ -282,8 +282,11 @@
    encolhe — 180ms na curva do preço rolante (a mesma saída suave do resto
    do sistema). Movimentos com SIGNIFICADO vêm por `data-motion` no ícone,
    em qualquer botão ou link: `turn` gira (engrenagem), `swing` balança
-   (sol e lua do tema), `nudge` anda para a frente (seta). Com
-   prefers-reduced-motion, nada se mexe. */
+   (sol e lua do tema), `nudge` anda para a frente (seta), `tick` avança
+   um passo como ponteiro (relógio, auditoria), `hop` dá um pulo curto
+   (casa, início) e `stamp` bate como carimbo (o selo do plano). Um gesto
+   por ícone, que conta o que ele é; ícone sem gesto fica no sobe-e-cresce.
+   Com prefers-reduced-motion, nada se mexe. */
 [data-slot="sidebar-menu-button"] svg,
 [data-motion] {
   transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -304,11 +307,35 @@
 :is(a, button, [role="button"], [data-slot="sidebar-menu-button"]):hover [data-motion="nudge"] {
   transform: translateX(2px);
 }
+:is(a, button, [role="button"], [data-slot="sidebar-menu-button"]):hover [data-motion="tick"] {
+  transform: rotate(30deg);
+}
+/* hop e stamp são gestos com ida e volta: keyframes que rodam uma vez por
+   entrada do ponteiro, e o ícone termina onde começou. */
+:is(a, button, [role="button"], [data-slot="sidebar-menu-button"]):hover [data-motion="hop"] {
+  transform: none;
+  animation: muriki-hop 420ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+:is(a, button, [role="button"], [data-slot="sidebar-menu-button"]):hover [data-motion="stamp"] {
+  transform: none;
+  animation: muriki-stamp 460ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes muriki-hop {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+  70% { transform: translateY(0.5px); }
+}
+@keyframes muriki-stamp {
+  0%, 100% { transform: none; }
+  35% { transform: rotate(-10deg) scale(0.86); }
+  65% { transform: rotate(-4deg) scale(1.06); }
+}
 @media (prefers-reduced-motion: reduce) {
   [data-slot="sidebar-menu-button"] svg,
   [data-motion] {
     transition: none;
     transform: none !important;
+    animation: none !important;
   }
 }
 

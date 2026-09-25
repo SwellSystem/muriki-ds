@@ -15,7 +15,7 @@
 // O palco já vem com o respiro do desenho (32px em cima, 40px dos lados no
 // desktop): as telas não resolvem isso cada uma. `stageClassName` ajusta,
 // ex.: um max-width.
-import type { ReactElement, ReactNode } from "react"
+import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react"
 import { ArrowsLeftRightIcon, GearSixIcon } from "@phosphor-icons/react"
 
 import {
@@ -49,6 +49,12 @@ export interface AppShellNavItem {
   onClick?: () => void
   /** À direita do rótulo: o ponto do Peer, o selo do plano. Some recolhido. */
   trailing?: ReactNode
+  /**
+   * O ícone em destaque, no amarelo da marca: o ícone do Phosphor vira
+   * duotone e a camada de fundo ganha o --accent cheio, com o traço na cor
+   * do texto. Amarelo só no traço sumiria no tema claro. Um item por rail.
+   */
+  accent?: boolean
 }
 
 export interface AppShellNavGroup {
@@ -105,6 +111,11 @@ function navega(item: { render?: ReactElement; href?: string }) {
   return item.href ? <a href={item.href} /> : undefined
 }
 
+function iconeDoItem(item: AppShellNavItem) {
+  if (!item.accent || !isValidElement<{ weight?: string }>(item.icon)) return item.icon
+  return cloneElement(item.icon, { weight: "duotone" })
+}
+
 function Item({ item }: { item: AppShellNavItem }) {
   return (
     <SidebarMenuItem>
@@ -114,9 +125,13 @@ function Item({ item }: { item: AppShellNavItem }) {
         aria-current={item.active ? "page" : undefined}
         onClick={item.onClick}
         render={navega(item)}
-        className={cn(!item.active && "text-muted-foreground")}
+        className={cn(
+          !item.active && "text-muted-foreground",
+          // a camada duotone do Phosphor é o path com opacity: vira o amarelo cheio
+          item.accent && "[&_svg_[opacity]]:fill-accent [&_svg_[opacity]]:opacity-100"
+        )}
       >
-        {item.icon}
+        {iconeDoItem(item)}
         <span className="flex-1">{item.label}</span>
         {item.trailing}
       </SidebarMenuButton>
