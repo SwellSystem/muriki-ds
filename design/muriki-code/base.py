@@ -59,7 +59,14 @@ body:has(.mc.escuro){{background:{e["bg"]};}}
 .mc{{color-scheme:light;{_vars(c)}}}
 .mc.escuro{{color-scheme:dark;{_vars(e)}}}
 .mc a{{color:var(--pri);text-decoration:none;}}
-.mc a:hover{{color:var(--prisubfg);}}{css}
+.mc a:hover{{color:var(--prisubfg);}}
+.mc nav a svg,.mc [data-motion]{{transition:transform 180ms cubic-bezier(0.16,1,0.3,1);}}
+.mc nav a:hover svg{{transform:translateY(-1px) scale(1.06);}}
+.mc nav a:active svg{{transform:scale(0.92);transition-duration:80ms;}}
+.mc :is(a,button):hover [data-motion="turn"]{{transform:rotate(60deg);}}
+.mc :is(a,button):hover [data-motion="swing"]{{transform:rotate(-14deg);}}
+.mc :is(a,button):hover [data-motion="nudge"]{{transform:translateX(2px);}}
+@media (prefers-reduced-motion: reduce){{.mc nav a svg,.mc [data-motion]{{transition:none;transform:none !important;}}}}{css}
 .mc.escuro .so-claro,.mc:not(.escuro) .so-escuro{{display:none !important;}}
 </style>
 </helmet>
@@ -176,9 +183,14 @@ I = dict(
 )
 
 
+# o movimento com significado do tema do DS (data-motion): engrenagem gira, sol e lua balançam, seta anda
+MOVIMENTO = dict(engrenagem='turn', sol='swing', lua='swing', seta='nudge')
+
+
 def ic(nome, tam=16, cor=None):
     c = f'color:{cor};' if cor else ''
-    return f'<span style="display:flex;width:{tam}px;height:{tam}px;flex:0 0 auto;{c}">{I[nome]}</span>'
+    m = f' data-motion="{MOVIMENTO[nome]}"' if nome in MOVIMENTO else ''
+    return f'<span{m} style="display:flex;width:{tam}px;height:{tam}px;flex:0 0 auto;{c}">{I[nome]}</span>'
 
 
 def legenda(t, k, espaco='0.25em'):
@@ -373,7 +385,9 @@ def rail(k, ativo):
         f'<span style="display:flex;flex-direction:column;min-width:0;flex:1;">'
         f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">Rafael Moura</span>'
         f'<span style="font-size:11px;color:{k["mfg"]};">rafael@moura.dev</span></span>'
-        f'<span title="{T("config")}" style="display:flex;">{ic("engrenagem", 15, k["mfg"])}</span></div></div></nav>'
+        f'<button type="button" aria-label="{T("config")}" title="{T("config")}" style="display:flex;align-items:center;justify-content:center;'
+        f'width:28px;height:28px;padding:0;border:0;border-radius:8px;background:transparent;color:{k["mfg"]};cursor:pointer;">'
+        f'{ic("engrenagem", 15)}</button></div></div></nav>'
     )
 
 
