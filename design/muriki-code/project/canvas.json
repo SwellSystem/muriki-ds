@@ -353,6 +353,166 @@
    "h": 900,
    "title": "Conta · redefinir senha (link do email) · escuro",
    "is_interactive": true
+  },
+  "ContaDados.dc.html": {
+   "x": 0,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · meus dados, email e excluir conta",
+   "is_interactive": true
+  },
+  "ContaDadosEscuro.dc.html": {
+   "x": 0,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · meus dados, email e excluir conta · escuro",
+   "is_interactive": true
+  },
+  "ContaAprendizado.dc.html": {
+   "x": 1520,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · perfil de aprendizado",
+   "is_interactive": true
+  },
+  "ContaAprendizadoEscuro.dc.html": {
+   "x": 1520,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · perfil de aprendizado · escuro",
+   "is_interactive": true
+  },
+  "ContaSeguranca.dc.html": {
+   "x": 3040,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · senha, segundo fator, passkeys e sessões",
+   "is_interactive": true
+  },
+  "ContaSegurancaEscuro.dc.html": {
+   "x": 3040,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · senha, segundo fator, passkeys e sessões · escuro",
+   "is_interactive": true
+  },
+  "ContaPlano.dc.html": {
+   "x": 4560,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · plano e portal do Stripe",
+   "is_interactive": true
+  },
+  "ContaPlanoEscuro.dc.html": {
+   "x": 4560,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · plano e portal do Stripe · escuro",
+   "is_interactive": true
+  },
+  "ConfirmarEmail.dc.html": {
+   "x": 6080,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · confirmar o email novo (link do email)",
+   "is_interactive": true
+  },
+  "ConfirmarEmailEscuro.dc.html": {
+   "x": 6080,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · confirmar o email novo (link do email) · escuro",
+   "is_interactive": true
+  },
+  "ContaPasskey.dc.html": {
+   "x": 7600,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · adicionar passkey",
+   "is_interactive": true
+  },
+  "ContaPasskeyEscuro.dc.html": {
+   "x": 7600,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · adicionar passkey · escuro",
+   "is_interactive": true
+  },
+  "ContaAtivar2FA.dc.html": {
+   "x": 9120,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · ativar a verificação em duas etapas",
+   "is_interactive": true
+  },
+  "ContaAtivar2FAEscuro.dc.html": {
+   "x": 9120,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · ativar a verificação em duas etapas · escuro",
+   "is_interactive": true
+  },
+  "ContaCodigos.dc.html": {
+   "x": 10640,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · códigos de backup novos",
+   "is_interactive": true
+  },
+  "ContaCodigosEscuro.dc.html": {
+   "x": 10640,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · códigos de backup novos · escuro",
+   "is_interactive": true
+  },
+  "ContaPasskeyEditar.dc.html": {
+   "x": 12160,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · renomear e remover passkey",
+   "is_interactive": true
+  },
+  "ContaPasskeyEditarEscuro.dc.html": {
+   "x": 12160,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · renomear e remover passkey · escuro",
+   "is_interactive": true
+  },
+  "ContaSessoes.dc.html": {
+   "x": 13680,
+   "y": 10560,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · encerrar sessões",
+   "is_interactive": true
+  },
+  "ContaSessoesEscuro.dc.html": {
+   "x": 13680,
+   "y": 11880,
+   "w": 1440,
+   "h": 900,
+   "title": "Minha conta · encerrar sessões · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -425,6 +585,20 @@
    "text": "Conta no tema escuro",
    "kind": "title1",
    "maxW": 6000
+  },
+  "minhaConta": {
+   "x": 0,
+   "y": 10260,
+   "text": "Minha conta: meus dados, aprendizado, segurança, plano, confirmar o email novo e os fluxos da segurança",
+   "kind": "title1",
+   "maxW": 15120
+  },
+  "minhaContaEscuro": {
+   "x": 0,
+   "y": 11580,
+   "text": "Minha conta no tema escuro",
+   "kind": "title1",
+   "maxW": 15120
   }
  },
  "order": [
@@ -471,7 +645,27 @@
   "CriarSenha.dc.html",
   "CriarSenhaEscuro.dc.html",
   "RedefinirSenha.dc.html",
-  "RedefinirSenhaEscuro.dc.html"
+  "RedefinirSenhaEscuro.dc.html",
+  "ContaDados.dc.html",
+  "ContaDadosEscuro.dc.html",
+  "ContaAprendizado.dc.html",
+  "ContaAprendizadoEscuro.dc.html",
+  "ContaSeguranca.dc.html",
+  "ContaSegurancaEscuro.dc.html",
+  "ContaPlano.dc.html",
+  "ContaPlanoEscuro.dc.html",
+  "ConfirmarEmail.dc.html",
+  "ConfirmarEmailEscuro.dc.html",
+  "ContaPasskey.dc.html",
+  "ContaPasskeyEscuro.dc.html",
+  "ContaAtivar2FA.dc.html",
+  "ContaAtivar2FAEscuro.dc.html",
+  "ContaCodigos.dc.html",
+  "ContaCodigosEscuro.dc.html",
+  "ContaPasskeyEditar.dc.html",
+  "ContaPasskeyEditarEscuro.dc.html",
+  "ContaSessoes.dc.html",
+  "ContaSessoesEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

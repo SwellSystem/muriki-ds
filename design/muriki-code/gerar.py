@@ -29,6 +29,16 @@ TELAS = [
     ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
     ('criarSenha', 'CriarSenha', 'Criar senha', 'Conta · criar senha (link do email)', 2, 6, 7),
     ('redefinir', 'RedefinirSenha', 'Redefinir senha', 'Conta · redefinir senha (link do email)', 3, 6, 7),
+    ('conta_dados', 'ContaDados', 'Minha conta', 'Minha conta · meus dados, email e excluir conta', 0, 8, 9),
+    ('conta_aprendizado', 'ContaAprendizado', 'Minha conta', 'Minha conta · perfil de aprendizado', 1, 8, 9),
+    ('conta_seguranca', 'ContaSeguranca', 'Minha conta', 'Minha conta · senha, segundo fator, passkeys e sessões', 2, 8, 9),
+    ('conta_plano', 'ContaPlano', 'Minha conta', 'Minha conta · plano e portal do Stripe', 3, 8, 9),
+    ('confirmar_email', 'ConfirmarEmail', 'Confirmar email', 'Minha conta · confirmar o email novo (link do email)', 4, 8, 9),
+    ('conta_passkey', 'ContaPasskey', 'Minha conta', 'Minha conta · adicionar passkey', 5, 8, 9),
+    ('conta_2fa', 'ContaAtivar2FA', 'Minha conta', 'Minha conta · ativar a verificação em duas etapas', 6, 8, 9),
+    ('conta_codigos', 'ContaCodigos', 'Minha conta', 'Minha conta · códigos de backup novos', 7, 8, 9),
+    ('conta_passkey_editar', 'ContaPasskeyEditar', 'Minha conta', 'Minha conta · renomear e remover passkey', 8, 8, 9),
+    ('conta_sessoes', 'ContaSessoes', 'Minha conta', 'Minha conta · encerrar sessões', 9, 8, 9),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -77,6 +87,8 @@ for chave, lin, n, texto in [
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
     ('conta', 6, 4, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email'),
     ('contaEscuro', 7, 4, 'Conta no tema escuro'),
+    ('minhaConta', 8, 10, 'Minha conta: meus dados, aprendizado, segurança, plano, confirmar o email novo e os fluxos da segurança'),
+    ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 
