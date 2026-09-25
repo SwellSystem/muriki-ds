@@ -264,7 +264,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "length 6 para TOTP, 4 para PIN. onComplete dispara quando o último quadrado enche: bom lugar para enviar. Dentro de <Field> o label e a descrição chegam sozinhos. Código de recuperação não é isto: use o Input comum. groupSize={3} desenha 3 + traço + 3 (só desenho, o campo continua um só)."
+      "docs": "length 6 para TOTP, 4 para PIN. onComplete dispara quando o último quadrado enche: bom lugar para enviar. Dentro de <Field> o label e a descrição chegam sozinhos. Código de recuperação não é isto: use o Input comum. groupSize={3} desenha 3 + traço + 3 (só desenho, o campo continua um só). fullWidth faz os quadrados dividirem a largura do pai (a coluna narrow do onboarding-step, alinhada ao botão)."
     },
     {
       "name": "field",

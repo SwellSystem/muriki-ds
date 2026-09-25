@@ -65,7 +65,7 @@ def tela_verificacao(k, sufixo):
     # Pouco conteúdo pede o centro: uma coluna de 480px no meio da tela, o código na largura toda,
     # o botão largo e a ajuda embaixo. É o formato de tela de código; à esquerda, numa coluna
     # larga, ele virava um canto ocupado e o resto vazio.
-    caixa = lambda i: (f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:60px;border-radius:12px;'
+    caixa = lambda i: (f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:56px;border-radius:12px;'
                        f'background:{k["card"]};box-shadow:{h(f"v.anel{i}")};font-family:{MONO};font-size:26px;font-weight:500;'
                        f'color:{h("v.cor")};">{h(f"v.d{i}")}</span>')
     codigo = (f'<div role="group" aria-label="{T("codigoAria")}" style="display:flex;align-items:center;gap:8px;width:100%;">'
