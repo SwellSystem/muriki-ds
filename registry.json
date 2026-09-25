@@ -264,7 +264,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "length 6 para TOTP, 4 para PIN. onComplete dispara quando o último quadrado enche: bom lugar para enviar. Dentro de <Field> o label e a descrição chegam sozinhos. Código de recuperação não é isto: use o Input comum."
+      "docs": "length 6 para TOTP, 4 para PIN. onComplete dispara quando o último quadrado enche: bom lugar para enviar. Dentro de <Field> o label e a descrição chegam sozinhos. Código de recuperação não é isto: use o Input comum. groupSize={3} desenha 3 + traço + 3 (só desenho, o campo continua um só)."
     },
     {
       "name": "field",
@@ -940,7 +940,72 @@
           "target": "components/blocks/onboarding-pricing/index.ts"
         }
       ],
-      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador."
+      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador. showPeriodToggle={false} tira o seletor de período quando só há um período à venda."
+    },
+    {
+      "name": "choice-card",
+      "type": "registry:ui",
+      "title": "Choice Card",
+      "description": "A opção que é um cartão: título e uma linha que explica. single é radio (uma marcada, setas navegam), multiple é checkbox com min e max visíveis (no teto as desmarcadas travam, no piso a última não sai).",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/choice-card.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "<ChoiceCardGroup type=\"multiple\" min={1} max={3} value={goals} onValueChange={setGoals} aria-label=\"Objetivos\"><ChoiceCard value=\"learn\" title=\"Aprender\" description=\"Entender o porquê, não só fazer passar.\" /></ChoiceCardGroup>. Sem type é single. A grade se ajusta sozinha (auto-fit, mínimo 12rem)."
+    },
+    {
+      "name": "choice-chips",
+      "type": "registry:ui",
+      "title": "Choice Chips",
+      "description": "Escolha múltipla em chips agrupados por categoria (linguagens, áreas). Marcado ganha tinta e check; soon aparece travado com o selo \"em breve\" em vez de sumir.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/choice-chips.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "groups vem pronto do app: [{ label: \"Principais\", items: [{ value: \"typescript\", label: \"TypeScript\" }, { value: \"csharp\", label: \"C#\", soon: true }] }]. soonLabel é o \"em breve\" no idioma do app. O valor é a lista de todos os marcados, de todos os grupos."
+    },
+    {
+      "name": "onboarding-step",
+      "type": "registry:block",
+      "title": "Onboarding Step",
+      "description": "A página de um passo do onboarding: barra do topo com marca e utilities, o cabeçalho do passo (o mesmo da PricingScreen), o conteúdo e a ação principal com loading e uma nota ao lado.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/onboarding-pricing"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/onboarding-step/onboarding-step.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-step/onboarding-step.tsx"
+        }
+      ],
+      "docs": "<OnboardingStep step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen."
     },
     {
       "name": "avatar",

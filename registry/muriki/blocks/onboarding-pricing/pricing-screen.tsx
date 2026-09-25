@@ -69,6 +69,12 @@ export interface PricingScreenProps {
   onSecondaryCta?: (planId: string) => void
   period: PlanInterval
   onPeriodChange: (next: PlanInterval) => void
+  /**
+   * `false` tira o seletor de período. Serve quando só há um período à
+   * venda (ex.: o plano ainda não tem anual): um segmentado com uma opção
+   * morta é um controle que não controla nada. Padrão: true.
+   */
+  showPeriodToggle?: boolean
   /** Sem `onAccountTypeChange` o segmentado de conta não aparece. */
   accountType?: AccountType
   onAccountTypeChange?: (next: AccountType) => void
@@ -92,6 +98,7 @@ export function PricingScreen({
   onSecondaryCta,
   period,
   onPeriodChange,
+  showPeriodToggle = true,
   accountType = "personal",
   onAccountTypeChange,
   banner,
@@ -141,6 +148,7 @@ export function PricingScreen({
               ]}
             />
           ) : null}
+          {showPeriodToggle ? (
           <ViewToggle<PlanInterval>
             className="md:ml-auto"
             ariaLabel={labels.periodAria}
@@ -161,6 +169,7 @@ export function PricingScreen({
               },
             ]}
           />
+          ) : null}
         </div>
 
         <PlanGrid>

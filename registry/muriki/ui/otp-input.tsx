@@ -34,6 +34,12 @@ export interface OtpInputProps
   mode?: "numeric" | "alphanumeric"
   invalid?: boolean
   size?: "default" | "lg"
+  /**
+   * Um traço a cada N quadrados: `3` desenha 3 + traço + 3. O código de 6
+   * dígitos lido em dois pedaços é o que a pessoa copia do email sem errar.
+   * Só desenho — o campo continua um só.
+   */
+  groupSize?: number
 }
 
 const LIMPA = {
@@ -50,6 +56,7 @@ function OtpInput({
   mode = "numeric",
   invalid = false,
   size = "default",
+  groupSize,
   disabled,
   className,
   onFocus,
@@ -77,9 +84,11 @@ function OtpInput({
     >
       {Array.from({ length }, (_, i) => {
         const ativo = foco && i === vez && atual.length < length
+        const traco = groupSize && i > 0 && i % groupSize === 0
         return (
+          <React.Fragment key={i}>
+          {traco ? <span aria-hidden className="h-0.5 w-3 self-center rounded-full bg-input" /> : null}
           <div
-            key={i}
             aria-hidden
             data-active={ativo || undefined}
             data-filled={atual[i] ? true : undefined}
@@ -95,6 +104,7 @@ function OtpInput({
           >
             {atual[i] ?? (ativo ? <span className="h-5 w-px animate-pulse bg-foreground" /> : null)}
           </div>
+          </React.Fragment>
         )
       })}
       <InputPrimitive
