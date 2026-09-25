@@ -22,11 +22,15 @@ ENGENHARIA = ['Testing', 'Debugging', 'Architecture', 'APIs', 'Databases', 'Secu
               'Design Patterns', 'System Design', 'DDD', 'Observability']
 
 # nome: (declarado, observado, evidências, estado, alvo)  — declarado None = não uso; observado 0 = sem confirmação
+# O declarado nasce da experiência escolhida nas Preferências e vale para todas as competências: a API
+# guarda um nível só (experience), não um por competência. Aprendendo e Iniciante → Junior,
+# Intermediário → Pleno, Avançado → Senior; Tech Lead e Architect só se observam. O Rafael escolheu
+# Intermediário, então tudo começa em Pleno, e o que passa disso vem das evidências.
 PERFIL = {
-    'TypeScript': (3, 3, 64, 'confirmado', None),
+    'TypeScript': (2, 3, 64, 'confirmado', None),
     'Python': (2, 0, 3, 'declarado', None),
     'Go': (None, 0, 0, 'naoUso', None),
-    'Testing': (3, 2, 41, 'aConfirmar', 3),
+    'Testing': (2, 2, 41, 'progresso', 3),
     'Debugging': (2, 2, 37, 'progresso', 3),
     'Architecture': (2, 1, 9, 'aConfirmar', 2),
     'APIs': (2, 2, 28, 'confirmado', None),
@@ -37,9 +41,9 @@ PERFIL = {
     'DDD': (2, 0, 0, 'declarado', None),
     'Observability': (2, 0, 3, 'declarado', None),
 }
-# o dia do primeiro acesso: só o declarado, que a pessoa ajustou no passo 2
+# o dia do primeiro acesso: só o declarado, Pleno em tudo (Intermediário), e Go fora das linguagens marcadas
 PERFIL_INICIAL = {nome: (2, 0, 0, 'declarado', None) for nome in LINGUAGENS + ENGENHARIA}
-PERFIL_INICIAL.update(TypeScript=(3, 0, 0, 'declarado', None), Go=(None, 0, 0, 'naoUso', None))
+PERFIL_INICIAL.update(Go=(None, 0, 0, 'naoUso', None))
 
 COLUNAS_PERFIL = '160px 112px 92px 116px minmax(0,1fr)'
 
@@ -77,7 +81,11 @@ def tabela_perfil(k, perfil, dica=None):
                        f'{T(chave)}{ic("direita", 12)}</a>')
         elif estado == 'progresso':
             selo = badge(f'{nivel_nome(alvo)} {T("emProgresso")}', k, 'blue', ponto=True)
-            segunda = f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{T("doisDeTres")}</span>'
+            if link_nome != '#':
+                segunda = (f'<a href="{link_nome}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;">'
+                           f'{T("confirmam3")}{ic("direita", 12)}</a>')
+            else:
+                segunda = f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{T("doisDeTres")}</span>'
         elif estado == 'naoUso':
             selo = badge(T('estNaoUso'), k, tracejado=True)
             segunda = f'<a href="#" style="font-size:12px;">{T("adicionar")}</a>'
@@ -176,11 +184,12 @@ def tela_evolucao(k):
 
 # ── 1b · Uma competência: o caminho para confirmar, o histórico e a trajetória ──
 def tela_competencia(k):
-    chips = (badge(f'Senior {T("declaradoSuf")}', k, tracejado=True)
+    chips = (badge(f'{T("pleno")} {T("declaradoSuf")}', k, tracejado=True)
              + badge(f'{T("pleno")} {T("confirmadoPor")}', k, 'green')
-             + badge(f'Senior {T("aConfirmarSuf")}', k, 'yellow', ponto=True))
+             + badge(f'Senior {T("emProgressoSuf")}', k, 'blue', ponto=True))
+    # o declarado não se edita por competência (a API guarda uma experiência só): muda nas Preferências
     cab = cabecalho(k, [(T('evolucao'), destino('evolucao')), ('Testing', '')], 'Testing', chips=chips,
-                    direita=botao(T('editarDecl'), k, 'outline', 36, 'lapis'))
+                    direita=botao_link(T('mudarExp'), 'Preferencias__SUF__.dc.html', k, 'outline', 36, 'lapis'))
 
     def exercicio(n, titulo, proximo):
         numero = (f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 auto;'
@@ -207,7 +216,7 @@ def tela_competencia(k):
                      f'background:{k["muted"]};font-family:{MONO};font-size:11.5px;color:{k["fgs"]};">{t}</a>')
 
     def marco(data, titulo, tom, desc, refs='', ultimo=False):
-        ponto = {'yellow': f'background:{k["warn"]};', 'green': f'background:{k["ok"]};',
+        ponto = {'yellow': f'background:{k["warn"]};', 'green': f'background:{k["ok"]};', 'blue': f'background:{k["pri"]};',
                  'dashed': f'box-shadow:inset 0 0 0 1.5px {k["mfg"]};'}[tom]
         trilho = '' if ultimo else f'<span style="flex:1;width:1px;background:{k["input"]};margin-top:4px;"></span>'
         return (f'<li style="display:grid;grid-template-columns:56px 14px minmax(0,1fr);gap:12px;">'
@@ -223,8 +232,7 @@ def tela_competencia(k):
     historico = cartao(
         f'{rotulo(T("historicoTit"), k["mfg"])}'
         f'<ol style="margin:0;padding:0;list-style:none;">'
-        f'{marco(T("d1"), "Senior " + T("aConfirmarSuf"), "yellow", T("h1d"))}'
-        f'{marco(T("d1"), "Senior " + T("declaradoSuf"), "dashed", T("h2d"))}'
+        f'{marco(T("d1"), "Senior " + T("emProgressoSuf"), "blue", T("h1d"))}'
         f'{marco(T("d3"), T("pleno") + " " + T("confirmadoSuf"), "green", T("h3d"), ref("fila-emails") + ref("cadastro-usuarios") + ref("parse-duration"))}'
         f'{marco(T("d4"), T("pleno") + " " + T("declaradoSuf"), "dashed", T("h4d"), ultimo=True)}'
         f'</ol>', k, pad='18px 22px', extra='gap:14px;')
