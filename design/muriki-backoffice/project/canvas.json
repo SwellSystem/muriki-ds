@@ -50,22 +50,6 @@
       "x": 7600,
       "y": 1320
     },
-    "ClienteEditar.dc.html": {
-      "h": 900,
-      "is_interactive": true,
-      "title": "Clientes · editar no sheet (criar é o mesmo, vazio)",
-      "w": 1440,
-      "x": 3040,
-      "y": 2640
-    },
-    "ClienteEditarEscuro.dc.html": {
-      "h": 900,
-      "is_interactive": true,
-      "title": "Clientes · editar no sheet (criar é o mesmo, vazio) · escuro",
-      "w": 1440,
-      "x": 3040,
-      "y": 3960
-    },
     "Clientes.dc.html": {
       "h": 900,
       "is_interactive": true,
@@ -258,22 +242,6 @@
       "x": 0,
       "y": 6600
     },
-    "Revogar.dc.html": {
-      "h": 900,
-      "is_interactive": true,
-      "title": "Clientes · revogar acesso no alert-dialog",
-      "w": 1440,
-      "x": 4560,
-      "y": 2640
-    },
-    "RevogarEscuro.dc.html": {
-      "h": 900,
-      "is_interactive": true,
-      "title": "Clientes · revogar acesso no alert-dialog · escuro",
-      "w": 1440,
-      "x": 4560,
-      "y": 3960
-    },
     "SegundoFator.dc.html": {
       "h": 900,
       "is_interactive": true,
@@ -397,6 +365,38 @@
       "w": 794,
       "h": 1123,
       "title": "PDF · relatório gerencial · página 3 (tabela longa)"
+    },
+    "ClienteDetalhe.dc.html": {
+      "x": 3040,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · detalhe: um cartão por produto, pagamentos e histórico",
+      "is_interactive": true
+    },
+    "ClienteDetalheEscuro.dc.html": {
+      "x": 3040,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · detalhe: um cartão por produto, pagamentos e histórico · escuro",
+      "is_interactive": true
+    },
+    "Inativar.dc.html": {
+      "x": 4560,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · inativar em um produto só, no alert-dialog",
+      "is_interactive": true
+    },
+    "InativarEscuro.dc.html": {
+      "x": 4560,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · inativar em um produto só, no alert-dialog · escuro",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -427,7 +427,7 @@
     "clientes": {
       "kind": "title1",
       "maxW": 6000,
-      "text": "Início e clientes: a lista é o molde do CRUD, criar e editar no sheet, revogar no alert-dialog",
+      "text": "Início e clientes: a lista é de um produto por vez; o detalhe tem um cartão por produto, e inativar é num produto só",
       "w": 240,
       "x": 0,
       "y": 2340
@@ -489,10 +489,6 @@
     "InicioEscuro.dc.html",
     "Clientes.dc.html",
     "ClientesEscuro.dc.html",
-    "ClienteEditar.dc.html",
-    "ClienteEditarEscuro.dc.html",
-    "Revogar.dc.html",
-    "RevogarEscuro.dc.html",
     "Planos.dc.html",
     "PlanosEscuro.dc.html",
     "Plano.dc.html",
@@ -530,7 +526,11 @@
     "PdfCodigos.dc.html",
     "PdfRelatorio1.dc.html",
     "PdfRelatorio2.dc.html",
-    "PdfRelatorio3.dc.html"
+    "PdfRelatorio3.dc.html",
+    "ClienteDetalhe.dc.html",
+    "ClienteDetalheEscuro.dc.html",
+    "Inativar.dc.html",
+    "InativarEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"
