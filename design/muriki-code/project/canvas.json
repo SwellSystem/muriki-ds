@@ -50,22 +50,6 @@
    "y": 5280,
    "is_interactive": true
   },
-  "Jornada.dc.html": {
-   "x": 4560,
-   "y": 0,
-   "w": 1440,
-   "h": 900,
-   "title": "Primeiro acesso · escolha da jornada",
-   "is_interactive": true
-  },
-  "JornadaEscuro.dc.html": {
-   "x": 4560,
-   "y": 1320,
-   "w": 1440,
-   "h": 900,
-   "title": "Primeiro acesso · escolha da jornada · escuro",
-   "is_interactive": true
-  },
   "MainEscuro.dc.html": {
    "x": 0,
    "y": 3960,
@@ -147,7 +131,7 @@
    "is_interactive": true
   },
   "PrimeiroExercicio.dc.html": {
-   "x": 7600,
+   "x": 10640,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -155,7 +139,7 @@
    "is_interactive": true
   },
   "PrimeiroExercicioEscuro.dc.html": {
-   "x": 7600,
+   "x": 10640,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -163,7 +147,7 @@
    "is_interactive": true
   },
   "PerfilVazio.dc.html": {
-   "x": 9120,
+   "x": 12160,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -171,27 +155,11 @@
    "is_interactive": true
   },
   "PerfilVazioEscuro.dc.html": {
-   "x": 9120,
+   "x": 12160,
    "y": 1320,
    "w": 1440,
    "h": 900,
    "title": "Evolução · perfil antes da primeira evidência · escuro",
-   "is_interactive": true
-  },
-  "Ajuste.dc.html": {
-   "x": 6080,
-   "y": 0,
-   "w": 1440,
-   "h": 900,
-   "title": "Primeiro acesso · declarado por competência",
-   "is_interactive": true
-  },
-  "AjusteEscuro.dc.html": {
-   "x": 6080,
-   "y": 1320,
-   "w": 1440,
-   "h": 900,
-   "title": "Primeiro acesso · declarado por competência · escuro",
    "is_interactive": true
   },
   "Competencia.dc.html": {
@@ -227,7 +195,7 @@
    "is_interactive": true
   },
   "Passkey.dc.html": {
-   "x": 10640,
+   "x": 13680,
    "y": 0,
    "w": 1440,
    "h": 900,
@@ -235,7 +203,7 @@
    "is_interactive": true
   },
   "PasskeyEscuro.dc.html": {
-   "x": 10640,
+   "x": 13680,
    "y": 1320,
    "w": 1440,
    "h": 900,
@@ -247,7 +215,7 @@
    "y": 0,
    "w": 1440,
    "h": 900,
-   "title": "Primeiro acesso · escolha do plano",
+   "title": "Primeiro acesso · 1 · escolha do plano",
    "is_interactive": true
   },
   "PlanoInicialEscuro.dc.html": {
@@ -255,7 +223,71 @@
    "y": 1320,
    "w": 1440,
    "h": 900,
-   "title": "Primeiro acesso · escolha do plano · escuro",
+   "title": "Primeiro acesso · 1 · escolha do plano · escuro",
+   "is_interactive": true
+  },
+  "Verificacao.dc.html": {
+   "x": 4560,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 2 · código por email",
+   "is_interactive": true
+  },
+  "VerificacaoEscuro.dc.html": {
+   "x": 4560,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 2 · código por email · escuro",
+   "is_interactive": true
+  },
+  "Perfil.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 3 · perfil (o mesmo do Platform)",
+   "is_interactive": true
+  },
+  "PerfilEscuro.dc.html": {
+   "x": 6080,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 3 · perfil (o mesmo do Platform) · escuro",
+   "is_interactive": true
+  },
+  "Preferencias.dc.html": {
+   "x": 7600,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 4 · experiência, linguagens e objetivos",
+   "is_interactive": true
+  },
+  "PreferenciasEscuro.dc.html": {
+   "x": 7600,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Primeiro acesso · 4 · experiência, linguagens e objetivos · escuro",
+   "is_interactive": true
+  },
+  "Pagamento.dc.html": {
+   "x": 9120,
+   "y": 0,
+   "w": 1440,
+   "h": 900,
+   "title": "Volta do pagamento · confirmado ou cancelado",
+   "is_interactive": true
+  },
+  "PagamentoEscuro.dc.html": {
+   "x": 9120,
+   "y": 1320,
+   "w": 1440,
+   "h": 900,
+   "title": "Volta do pagamento · confirmado ou cancelado · escuro",
    "is_interactive": true
   }
  },
@@ -287,9 +319,9 @@
   "jornada": {
    "x": 0,
    "y": -300,
-   "text": "Entrada e primeiro acesso: entrar, criar conta, plano, jornada, ajuste, primeiro exercício, perfil vazio e passkey",
+   "text": "Entrada e primeiro acesso: plano, código por email, perfil, preferências, pagamento e o primeiro exercício",
    "kind": "title1",
-   "maxW": 12080,
+   "maxW": 15120,
    "w": 240
   },
   "webEscuro": {
@@ -313,7 +345,7 @@
    "y": 1020,
    "text": "Entrada e primeiro acesso no tema escuro",
    "kind": "title1",
-   "maxW": 12080,
+   "maxW": 15120,
    "w": 240
   }
  },
@@ -324,8 +356,6 @@
   "Peer.dc.html",
   "Conectar.dc.html",
   "Planos.dc.html",
-  "Jornada.dc.html",
-  "JornadaEscuro.dc.html",
   "MainEscuro.dc.html",
   "ExercicioEscuro.dc.html",
   "AvaliacaoEscuro.dc.html",
@@ -340,8 +370,6 @@
   "PrimeiroExercicioEscuro.dc.html",
   "PerfilVazio.dc.html",
   "PerfilVazioEscuro.dc.html",
-  "Ajuste.dc.html",
-  "AjusteEscuro.dc.html",
   "Competencia.dc.html",
   "CompetenciaEscuro.dc.html",
   "Playground.dc.html",
@@ -349,7 +377,15 @@
   "Passkey.dc.html",
   "PasskeyEscuro.dc.html",
   "PlanoInicial.dc.html",
-  "PlanoInicialEscuro.dc.html"
+  "PlanoInicialEscuro.dc.html",
+  "Verificacao.dc.html",
+  "VerificacaoEscuro.dc.html",
+  "Perfil.dc.html",
+  "PerfilEscuro.dc.html",
+  "Preferencias.dc.html",
+  "PreferenciasEscuro.dc.html",
+  "Pagamento.dc.html",
+  "PagamentoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
