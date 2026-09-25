@@ -31,7 +31,7 @@ import {
 import { PasswordStrengthBar } from "@/components/blocks/password-strength/password-strength-bar"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Field, FieldError, FieldHeader, FieldLabel } from "@/components/ui/field"
+import { Field, FieldDescription, FieldError, FieldHeader, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -76,6 +76,7 @@ export function LoginForm({
   busyLabel,
   passwordMinLength = PASSWORD_MIN_LENGTH,
   showPasswordStrength = true,
+  allowBackupCode = false,
   showRememberMe = true,
   showTrustDevice = true,
   onPasswordVisibilityChange,
@@ -88,6 +89,7 @@ export function LoginForm({
   const [showPassword, setShowPassword] = useState(false)
   const [step, setStep] = useState<Step>("credentials")
   const [code, setCode] = useState("")
+  const [backup, setBackup] = useState(false)
   const [trustDevice, setTrustDevice] = useState(true)
   const [pending, setPending] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
@@ -121,7 +123,7 @@ export function LoginForm({
 
     if (step === "code") {
       const trimmed = code.trim()
-      if (trimmed.length < 6) {
+      if (backup ? trimmed.length === 0 : trimmed.length < 6) {
         setErrors({ code: t("login.totp.code_invalid") })
         return
       }
@@ -129,7 +131,7 @@ export function LoginForm({
       setErrors({})
       setPending(true)
       try {
-        const result = await onVerifyCode({ code: trimmed, trustDevice: showTrustDevice && trustDevice })
+        const result = await onVerifyCode({ code: trimmed, trustDevice: showTrustDevice && trustDevice, kind: backup ? "backup" : "totp" })
         if (!result.ok) applyFailure(result)
       } finally {
         setPending(false)
@@ -159,6 +161,7 @@ export function LoginForm({
       if (result.twoFactor) {
         setStep("code")
         setCode("")
+        setBackup(false)
       }
     } finally {
       setPending(false)
@@ -168,6 +171,7 @@ export function LoginForm({
   const backToPassword = () => {
     setStep("credentials")
     setCode("")
+    setBackup(false)
     setErrors({})
   }
 
@@ -368,19 +372,41 @@ export function LoginForm({
                 ) : null}
               </div>
               <Field variant="editorial" invalid={!!errors.code}>
-                <FieldLabel>{t("login.totp.code_label")}</FieldLabel>
+                <FieldLabel>{t(backup ? "login.totp.backup_label" : "login.totp.code_label")}</FieldLabel>
                 <Input
+                  key={backup ? "backup" : "totp"}
                   size="lg"
                   autoFocus
-                  inputMode="numeric"
+                  inputMode={backup ? "text" : "numeric"}
                   autoComplete="one-time-code"
-                  placeholder={t("login.totp.code_placeholder")}
+                  spellCheck={false}
+                  placeholder={t(backup ? "login.totp.backup_placeholder" : "login.totp.code_placeholder")}
                   value={code}
-                  onValueChange={(value) => setCode(value.replace(/\D/g, "").slice(0, 8))}
+                  onValueChange={(value) =>
+                    setCode(
+                      backup
+                        ? value.toLowerCase().replace(/[^0-9a-z-]/g, "").slice(0, 32)
+                        : value.replace(/\D/g, "").slice(0, 8)
+                    )
+                  }
                   className="font-mono tracking-[0.25em]"
                 />
+                {backup ? <FieldDescription>{t("login.totp.backup_description")}</FieldDescription> : null}
                 {errors.code ? <FieldError>{errors.code}</FieldError> : null}
               </Field>
+              {allowBackupCode ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBackup(!backup)
+                    setCode("")
+                    setErrors({})
+                  }}
+                  className="cursor-pointer self-start text-xs font-medium text-primary transition-colors hover:text-primary/80"
+                >
+                  {t(backup ? "login.totp.use_app" : "login.totp.use_backup")}
+                </button>
+              ) : null}
               {showTrustDevice ? (
               <Field className="flex-row items-center gap-2.5">
                 <Checkbox checked={trustDevice} onCheckedChange={(checked) => setTrustDevice(checked)} />

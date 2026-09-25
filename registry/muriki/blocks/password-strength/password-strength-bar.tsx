@@ -25,6 +25,7 @@ import {
   checkPasswordRequirements,
   getPasswordStrength,
   getStrengthSegments,
+  PASSWORD_MIN_LENGTH,
   type PasswordStrength,
 } from "./password-strength"
 
@@ -42,16 +43,23 @@ export interface PasswordStrengthBarProps {
   password: string
   /** Mostra a fileira de requisitos abaixo da barra. */
   requirements?: boolean
+  /** Tamanho mínimo. Padrão: 8. */
+  minLength?: number
+  /** Cobra número, minúscula e maiúscula. `false`: a régua é só o tamanho. Padrão: true. */
+  composition?: boolean
   className?: string
 }
 
 export function PasswordStrengthBar({
   password,
   requirements = false,
+  minLength = PASSWORD_MIN_LENGTH,
+  composition = true,
   className,
 }: PasswordStrengthBarProps) {
   const t = useTranslate()
-  const strength = getPasswordStrength(password)
+  const policy = { minLength, composition }
+  const strength = getPasswordStrength(password, policy)
   const filled = getStrengthSegments(strength)
   const vazio = strength === "empty"
 
@@ -87,7 +95,7 @@ export function PasswordStrengthBar({
           className="flex flex-wrap gap-x-2.5 gap-y-1"
           aria-label={t("password_strength.requirements")}
         >
-          {checkPasswordRequirements(password).map((req) => (
+          {checkPasswordRequirements(password, policy).map((req) => (
             <li
               key={req.id}
               className={cn(
@@ -104,7 +112,7 @@ export function PasswordStrengthBar({
                   <path d="M6 6l12 12M18 6 6 18" />
                 </svg>
               )}
-              <span>{t(`password_strength.requirement.${req.id}`)}</span>
+              <span>{t(`password_strength.requirement.${req.id}`, { min: minLength })}</span>
             </li>
           ))}
         </ul>

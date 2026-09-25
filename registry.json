@@ -916,7 +916,8 @@
         "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/view-toggle",
-        "SwellSystem/muriki-ds/plan-card"
+        "SwellSystem/muriki-ds/plan-card",
+        "SwellSystem/muriki-ds/input"
       ],
       "files": [
         {
@@ -963,9 +964,14 @@
           "path": "registry/muriki/blocks/onboarding-pricing/index.ts",
           "type": "registry:component",
           "target": "components/blocks/onboarding-pricing/index.ts"
+        },
+        {
+          "path": "registry/muriki/blocks/onboarding-pricing/coupon-field.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/onboarding-pricing/coupon-field.tsx"
         }
       ],
-      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador. showPeriodToggle={false} tira o seletor de período quando só há um período à venda."
+      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador. showPeriodToggle={false} tira o seletor de período quando só há um período à venda. Cupom: <PricingScreen toolbar={<CouponField labels={…} onApply={validar} applied={cupom} error={erro} pending={validando} onRemove={…} />} />, e o plano com desconto leva originalAmountInCents (o preço cheio aparece riscado)."
     },
     {
       "name": "choice-card",
@@ -1030,7 +1036,7 @@
           "target": "components/blocks/onboarding-step/onboarding-step.tsx"
         }
       ],
-      "docs": "<OnboardingStep width=\"narrow\" step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen. width: narrow (480px no centro da tela, cabeçalho centralizado e ação larga: o código por email), form (672px: perfil) ou wide (1024px: grade de opções como as preferências)."
+      "docs": "<OnboardingStep width=\"narrow\" step={2} total={4} stepperLabel=\"Primeiro acesso · 2 de 4\" stepperAriaLabel=\"Passo 2 de 4\" title=\"Confirme seu email\" subtitle={…} brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} action={{ label: \"Verificar\", onClick, loading }} note=\"Não chegou? Olhe o spam.\">…conteúdo…</OnboardingStep>. A tela de plano continua sendo a PricingScreen. width: narrow (480px no centro da tela, cabeçalho centralizado e ação larga: o código por email), form (672px: perfil) ou wide (1024px: grade de opções como as preferências). hideStepper tira o rótulo e a barra (o perfil de aprendizado, depois do onboarding); footer põe uma linha embaixo da ação (o selo \"7 dias de Pro\" com a frase)."
     },
     {
       "name": "avatar",
@@ -1510,6 +1516,26 @@
       "docs": "A mesma régua serve login, cadastro e troca de senha — mantenha o backend com o mesmo checklist."
     },
     {
+      "name": "auth-page",
+      "type": "registry:block",
+      "title": "Auth Page",
+      "description": "A moldura das telas de conta, a mesma do LoginPage: painel editorial com o pitch e o mascote à esquerda, a coluna de 440px à direita. AuthHeading (legenda, título de duas linhas, subtítulo) e AuthNotice (o estado \"mandamos um email\").",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/auth-page/auth-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/auth-page/auth-page.tsx"
+        }
+      ],
+      "docs": "Criar senha, redefinir senha, esqueci a senha, o segundo fator: <AuthPage brand={…} utilities={…} hidden={senhaVisivel}><AuthHeading label=\"Criar senha\" title=\"Falta só\" titleAccent=\"a sua senha.\" subtitle=\"Para a conta …\" /> …formulário… </AuthPage>. O estado de email enviado: <AuthNotice actions={<Button variant=\"outline\">Reenviar</Button>} note=\"Não chegou? Olhe o spam.\" back={…} />. Senha nova com a régua só de tamanho: <PasswordStrengthBar password={v} requirements minLength={12} composition={false} />."
+    },
+    {
       "name": "login-page",
       "type": "registry:block",
       "title": "Login Page",
@@ -1525,7 +1551,8 @@
         "SwellSystem/muriki-ds/input",
         "SwellSystem/muriki-ds/field",
         "SwellSystem/muriki-ds/password-strength",
-        "SwellSystem/muriki-ds/i18n"
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/auth-page"
       ],
       "files": [
         {

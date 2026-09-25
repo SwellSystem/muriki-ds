@@ -5,6 +5,11 @@
  * um número, uma minúscula, uma maiúscula. Quatro requisitos, quatro
  * degraus, quatro segmentos na barra. Não é medida de entropia — é o
  * checklist que o servidor vai exigir, mostrado antes do erro.
+ *
+ * Nem toda API cobra a composição. `{ minLength, composition: false }` é a
+ * régua de quem só pede tamanho (a do Code: 12 a 128, fora de vazamentos):
+ * o requisito vira só o tamanho e a força sobe com ele — no mínimo é média,
+ * quatro a mais é forte, oito a mais é muito forte.
  */
 export type PasswordStrength = "empty" | "weak" | "medium" | "strong" | "very-strong"
 
@@ -24,15 +29,33 @@ export const PASSWORD_REQUIREMENTS: readonly PasswordRequirement[] = [
   { id: "uppercase", test: (p) => /[A-Z]/.test(p) },
 ]
 
-export function checkPasswordRequirements(
-  password: string
-): Array<{ id: PasswordRequirementId; met: boolean }> {
-  return PASSWORD_REQUIREMENTS.map((req) => ({ id: req.id, met: req.test(password) }))
+export interface PasswordPolicy {
+  /** Tamanho mínimo. Padrão: 8. */
+  minLength?: number
+  /** Cobra número, minúscula e maiúscula. Padrão: true. */
+  composition?: boolean
 }
 
-export function getPasswordStrength(password: string): PasswordStrength {
+function requisitos({ minLength = PASSWORD_MIN_LENGTH, composition = true }: PasswordPolicy = {}) {
+  const tamanho: PasswordRequirement = { id: "length", test: (p) => p.length >= minLength }
+  return composition ? [tamanho, ...PASSWORD_REQUIREMENTS.slice(1)] : [tamanho]
+}
+
+export function checkPasswordRequirements(
+  password: string,
+  policy?: PasswordPolicy
+): Array<{ id: PasswordRequirementId; met: boolean }> {
+  return requisitos(policy).map((req) => ({ id: req.id, met: req.test(password) }))
+}
+
+export function getPasswordStrength(password: string, policy?: PasswordPolicy): PasswordStrength {
   if (!password) return "empty"
-  const met = PASSWORD_REQUIREMENTS.filter((req) => req.test(password)).length
+  if (policy?.composition === false) {
+    const min = policy.minLength ?? PASSWORD_MIN_LENGTH
+    const n = password.length
+    return n < min ? "weak" : n < min + 4 ? "medium" : n < min + 8 ? "strong" : "very-strong"
+  }
+  const met = requisitos(policy).filter((req) => req.test(password)).length
   if (met <= 1) return "weak"
   if (met === 2) return "medium"
   if (met === 3) return "strong"

@@ -202,7 +202,7 @@ const STRINGS: Record<string, unknown> = {
     // Rótulos curtos: os requisitos são uma fileira só embaixo da barra,
     // e a frase inteira ("Pelo menos 1 número") quebraria em duas linhas.
     requirement: {
-      length: "8 caracteres",
+      length: "{{min}} caracteres",
       number: "1 número",
       lowercase: "1 minúscula",
       uppercase: "1 maiúscula",
@@ -246,6 +246,11 @@ const STRINGS: Record<string, unknown> = {
       code_invalid: "Informe um código válido do app autenticador.",
       trust_device: "Confiar neste dispositivo por 30 dias",
       back_to_password: "Voltar para senha",
+      use_backup: "Usar um código de backup",
+      use_app: "Usar o app autenticador",
+      backup_label: "Código de backup",
+      backup_placeholder: "xxxx-xxxx",
+      backup_description: "Cada código de backup vale uma vez.",
       verify_submit: "Verificar código",
       verifying: "Verificando...",
     },
