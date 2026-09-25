@@ -9,12 +9,14 @@ os.makedirs(SAIDA, exist_ok=True)
 TELAS = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · conta Muriki', 0, 0, 1),
     ('criar', 'CriarConta', 'Criar conta', 'Criar conta', 1, 0, 1),
-    ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 7, 0, 1),
-    ('jornada', 'Jornada', 'Primeiro acesso', 'Primeiro acesso · escolha da jornada', 3, 0, 1),
-    ('ajuste', 'Ajuste', 'Ajuste por competência', 'Primeiro acesso · declarado por competência', 4, 0, 1),
-    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · escolha do plano', 2, 0, 1),
-    ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 5, 0, 1),
-    ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 6, 0, 1),
+    ('passkey', 'Passkey', 'Passkey', 'Entrar · passkey', 9, 0, 1),
+    ('plano_inicial', 'PlanoInicial', 'Escolha do plano', 'Primeiro acesso · 1 · escolha do plano', 2, 0, 1),
+    ('verificacao', 'Verificacao', 'Confirme seu email', 'Primeiro acesso · 2 · código por email', 3, 0, 1),
+    ('perfil', 'Perfil', 'Seu perfil', 'Primeiro acesso · 3 · perfil (o mesmo do Platform)', 4, 0, 1),
+    ('preferencias', 'Preferencias', 'Preferências', 'Primeiro acesso · 4 · experiência, linguagens e objetivos', 5, 0, 1),
+    ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 6, 0, 1),
+    ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 7, 0, 1),
+    ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 8, 0, 1),
     ('evolucao', 'Main', 'Evolução', 'Evolução · declarado, observado e estado', 0, 2, 3),
     ('competencia', 'Competencia', 'Testing', 'Competência · Testing: caminho, histórico e trajetória', 1, 2, 3),
     ('exercicio', 'Exercicio', 'Exercício', 'Exercício · editor, testes e explicação', 2, 2, 3),
@@ -38,6 +40,14 @@ canvas.setdefault('designSystems', [])
 boards = canvas.setdefault('boards', {})
 order = canvas.setdefault('order', [])
 
+# a Jornada e o Ajuste viraram as Preferências (a API guarda experiência, linguagens e objetivos)
+for velho in ('Jornada.dc.html', 'JornadaEscuro.dc.html', 'Ajuste.dc.html', 'AjusteEscuro.dc.html'):
+    boards.pop(velho, None)
+    if velho in order:
+        order.remove(velho)
+    if os.path.exists(os.path.join(SAIDA, velho)):
+        os.remove(os.path.join(SAIDA, velho))
+
 gerados = []
 for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
     for tema in ('claro', 'escuro'):
@@ -55,8 +65,8 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: n * W + (n - 1) * 80
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('jornada', 0, 8, 'Entrada e primeiro acesso: entrar, criar conta, plano, jornada, ajuste, primeiro exercício, perfil vazio e passkey'),
-    ('jornadaEscuro', 1, 8, 'Entrada e primeiro acesso no tema escuro'),
+    ('jornada', 0, 10, 'Entrada e primeiro acesso: plano, código por email, perfil, preferências, pagamento e o primeiro exercício'),
+    ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
     ('web', 2, 5, 'Code web: perfil, competência, exercício, avaliação e playground'),
     ('webEscuro', 3, 5, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),

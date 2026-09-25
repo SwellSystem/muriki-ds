@@ -261,95 +261,6 @@ PLANOS = {
     ),
 }
 
-JORNADA = {
-    'pt-BR': dict(
-        rotulo='Primeiro acesso · 2 de 3', titulo='Por onde você quer começar?',
-        sub='Escolha o nível que mais parece com o seu momento. É só o ponto de partida: '
-            'cada competência se ajusta com o que você faz nos exercícios e no Peer.',
-        jornadas='Jornadas', aprofundar='aprofundar',
-        j1desc='Você já programa e quer autonomia: testar, depurar e entregar sem alguém do lado.',
-        j2desc='Você entrega sozinho. A jornada trabalha as decisões: testes, arquitetura, dados e segurança.',
-        j3desc='Você decide bem no código. A jornada leva as decisões para o time: desenho de sistemas, observabilidade e revisão.',
-        j4desc='Você lidera um time. A jornada é sobre os limites entre sistemas e como eles evoluem.',
-        j5desc='Você desenha sistemas. A jornada é rever decisões com evidência e manter o rigor.',
-        j6nome='Ainda não sei',
-        j6desc='Faça três exercícios curtos e o Code sugere a jornada pelo que você fizer.',
-        painel='O que essa escolha muda', partida='Ponto de partida',
-        partidaA='Todas as competências começam em', partidaB='. No próximo passo você ajusta o que for diferente.',
-        partidaNaoSei='Nenhum nível antes dos três exercícios. Depois, cada competência começa onde eles mostrarem.',
-        semNivel='sem nível ainda', foco='Onde a trilha começa', primeiroEx='Primeiro exercício',
-        ex1='Validar o formulário de cadastro', ex2='Converter duração em texto para minutos',
-        ex3='Revisar um PR que muda o schema de pedidos', ex4='Onde fica o limite de pagamentos no monólito?',
-        ex5='Rever uma decisão de arquitetura de dois anos atrás', ex6='Três exercícios curtos, um de cada competência',
-        peerTit='Como o Peer começa',
-        peer1='Pergunta antes de você rodar os testes e explica quando você travar.',
-        peer2='Pergunta pelas decisões e só dá dica quando você pede.',
-        peer3='Fica quieto no código e questiona o desenho.',
-        peer4='Intervém pouco. Quando fala, é sobre trade-offs entre sistemas.',
-        peer5='Só aparece quando você chama.',
-        peer6='Só observa até a jornada ser escolhida.',
-        comecar='Continuar', comecarTres='Começar os três exercícios',
-        trocarDepois='Dá para trocar de jornada quando quiser, sem perder o que já fez.',
-    ),
-    'en-US': dict(
-        rotulo='Getting started · 2 of 3', titulo='Where do you want to start?',
-        sub='Pick the level that feels closest to where you are now. It’s just the starting point: '
-            'each competency adjusts to what you do in exercises and with the Peer.',
-        jornadas='Journeys', aprofundar='go deeper',
-        j1desc='You already code and want autonomy: testing, debugging and shipping without someone beside you.',
-        j2desc='You ship on your own. The journey works on your decisions: tests, architecture, data and security.',
-        j3desc='You make good calls in code. The journey takes them to the team: system design, observability and review.',
-        j4desc='You lead a team. The journey is about the boundaries between systems and how they evolve.',
-        j5desc='You design systems. The journey is about revisiting decisions with evidence and staying rigorous.',
-        j6nome='Not sure yet',
-        j6desc='Do three short exercises and Code suggests a journey based on what you do.',
-        painel='What this choice changes', partida='Starting point',
-        partidaA='Every competency starts at', partidaB='. In the next step you adjust what’s different.',
-        partidaNaoSei='No level before the three exercises. After that, each competency starts where they show.',
-        semNivel='no level yet', foco='Where the track starts', primeiroEx='First exercise',
-        ex1='Validate the sign-up form', ex2='Convert a text duration into minutes',
-        ex3='Review a PR that changes the orders schema', ex4='Where does the payments boundary sit in the monolith?',
-        ex5='Revisit an architecture decision from two years ago', ex6='Three short exercises, one per competency',
-        peerTit='How the Peer starts',
-        peer1='Asks before you run the tests and explains when you get stuck.',
-        peer2='Asks about your decisions and only gives hints when you ask.',
-        peer3='Stays quiet in the code and questions the design.',
-        peer4='Rarely steps in. When it does, it’s about trade-offs between systems.',
-        peer5='Only shows up when you call it.',
-        peer6='Only watches until a journey is chosen.',
-        comecar='Continue', comecarTres='Start the three exercises',
-        trocarDepois='You can switch journeys any time without losing what you’ve done.',
-    ),
-    'es-ES': dict(
-        rotulo='Primeros pasos · 2 de 3', titulo='¿Por dónde quieres empezar?',
-        sub='Elige el nivel que más se parece a tu momento. Es solo el punto de partida: '
-            'cada competencia se ajusta con lo que haces en los ejercicios y con el Peer.',
-        jornadas='Trayectorias', aprofundar='profundizar',
-        j1desc='Ya programas y quieres autonomía: probar, depurar y entregar sin alguien al lado.',
-        j2desc='Entregas por tu cuenta. La trayectoria trabaja las decisiones: pruebas, arquitectura, datos y seguridad.',
-        j3desc='Decides bien en el código. La trayectoria lleva las decisiones al equipo: diseño de sistemas, observabilidad y revisión.',
-        j4desc='Lideras un equipo. La trayectoria trata de los límites entre sistemas y de cómo evolucionan.',
-        j5desc='Diseñas sistemas. La trayectoria consiste en revisar decisiones con evidencias y mantener el rigor.',
-        j6nome='Aún no lo sé',
-        j6desc='Haz tres ejercicios cortos y Code te sugiere una trayectoria según lo que hagas.',
-        painel='Qué cambia con esta elección', partida='Punto de partida',
-        partidaA='Todas las competencias empiezan en', partidaB='. En el siguiente paso ajustas lo que sea diferente.',
-        partidaNaoSei='Ningún nivel antes de los tres ejercicios. Después, cada competencia empieza donde ellos indiquen.',
-        semNivel='sin nivel aún', foco='Dónde empieza la ruta', primeiroEx='Primer ejercicio',
-        ex1='Validar el formulario de registro', ex2='Convertir una duración en texto a minutos',
-        ex3='Revisar un PR que cambia el schema de pedidos', ex4='¿Dónde está el límite de pagos en el monolito?',
-        ex5='Revisar una decisión de arquitectura de hace dos años', ex6='Tres ejercicios cortos, uno por competencia',
-        peerTit='Cómo empieza el Peer',
-        peer1='Pregunta antes de que ejecutes las pruebas y explica cuando te atascas.',
-        peer2='Pregunta por las decisiones y solo da pistas cuando las pides.',
-        peer3='Se queda callado en el código y cuestiona el diseño.',
-        peer4='Interviene poco. Cuando habla, es sobre trade-offs entre sistemas.',
-        peer5='Solo aparece cuando lo llamas.',
-        peer6='Solo observa hasta que se elige la trayectoria.',
-        comecar='Continuar', comecarTres='Empezar los tres ejercicios',
-        trocarDepois='Puedes cambiar de trayectoria cuando quieras, sin perder lo que ya has hecho.',
-    ),
-}
 
 
 ACESSO = {
@@ -369,7 +280,6 @@ ACESSO = {
         forcaAria='Força da senha', reqAria='Requisitos da senha',
         forcaFraca='Fraca', forcaMedia='Média', forcaForte='Forte', forcaMuitoForte='Muito forte',
         req8='8 caracteres', reqNum='1 número', reqMin='1 minúscula', reqMai='1 maiúscula',
-        termosA='Li e aceito os', termos='termos de uso', termosE='e a', privacidade='política de privacidade',
         semTreino='Seu código não é usado para treinar modelos de IA.', criarBotao='Criar conta',
         rotuloPasskey='Passkey', heroPasskeyA='Confirme no', heroPasskeyB='seu dispositivo.',
         subPasskey='O navegador abriu o pedido da sua chave de acesso.', aguardando='Aguardando a confirmação',
@@ -393,7 +303,6 @@ ACESSO = {
         forcaAria='Password strength', reqAria='Password requirements',
         forcaFraca='Weak', forcaMedia='Medium', forcaForte='Strong', forcaMuitoForte='Very strong',
         req8='8 characters', reqNum='1 number', reqMin='1 lowercase', reqMai='1 uppercase',
-        termosA='I have read and accept the', termos='terms of use', termosE='and the', privacidade='privacy policy',
         semTreino='Your code is never used to train AI models.', criarBotao='Create account',
         rotuloPasskey='Passkey', heroPasskeyA='Confirm on', heroPasskeyB='your device.',
         subPasskey='Your browser opened the request for your passkey.', aguardando='Waiting for confirmation',
@@ -417,7 +326,6 @@ ACESSO = {
         forcaAria='Seguridad de la contraseña', reqAria='Requisitos de la contraseña',
         forcaFraca='Débil', forcaMedia='Media', forcaForte='Fuerte', forcaMuitoForte='Muy fuerte',
         req8='8 caracteres', reqNum='1 número', reqMin='1 minúscula', reqMai='1 mayúscula',
-        termosA='He leído y acepto los', termos='términos de uso', termosE='y la', privacidade='política de privacidad',
         semTreino='Tu código nunca se usa para entrenar modelos de IA.', criarBotao='Crear cuenta',
         rotuloPasskey='Passkey', heroPasskeyA='Confirma en', heroPasskeyB='tu dispositivo.',
         subPasskey='El navegador abrió la solicitud de tu llave de acceso.', aguardando='Esperando la confirmación',
@@ -467,7 +375,7 @@ PERFIL_VAZIO = {
     'pt-BR': dict(
         subVazio='Ainda sem evidência. O ponto de partida é o que você declarou no primeiro acesso, '
                  'e cada exercício enviado confirma ou ajusta uma competência.',
-        trocarJornada='Trocar de jornada', entraPrimeiro='entra no 1º exercício',
+        trocarJornada='Mudar preferências', entraPrimeiro='entra no 1º exercício',
         primeiroTitulo='Converter duração em texto para minutos',
         primeiroTxt='Seu primeiro exercício: tem testes, dicas sob pedido e uma pergunta para você explicar a solução.',
         nadaAinda='Nada ainda. Cada solução, explicação e conversa com o Peer aparece aqui, com a fonte e o peso.',
@@ -476,7 +384,7 @@ PERFIL_VAZIO = {
     'en-US': dict(
         subVazio='No evidence yet. The starting point is what you declared at first access, '
                  'and each exercise you submit confirms or adjusts a competency.',
-        trocarJornada='Switch journey', entraPrimeiro='in your first exercise',
+        trocarJornada='Change preferences', entraPrimeiro='in your first exercise',
         primeiroTitulo='Convert a text duration into minutes',
         primeiroTxt='Your first exercise: it has tests, hints on request and a question for you to explain your solution.',
         nadaAinda='Nothing yet. Every solution, explanation and conversation with the Peer shows up here, with its source and weight.',
@@ -485,7 +393,7 @@ PERFIL_VAZIO = {
     'es-ES': dict(
         subVazio='Aún sin evidencias. El punto de partida es lo que declaraste en el primer acceso, '
                  'y cada ejercicio enviado confirma o ajusta una competencia.',
-        trocarJornada='Cambiar de trayectoria', entraPrimeiro='entra en el 1.er ejercicio',
+        trocarJornada='Cambiar preferencias', entraPrimeiro='entra en el 1.er ejercicio',
         primeiroTitulo='Convertir una duración en texto a minutos',
         primeiroTxt='Tu primer ejercicio: tiene pruebas, pistas a demanda y una pregunta para que expliques tu solución.',
         nadaAinda='Nada todavía. Cada solución, explicación y conversación con el Peer aparece aquí, con su fuente y su peso.',
@@ -556,67 +464,38 @@ COMPETENCIA = {
     ),
 }
 
-AJUSTE = {
-    'pt-BR': dict(
-        rotulo='Primeiro acesso · 3 de 3', titulo='Onde você é diferente?',
-        sub='A jornada marcou tudo como Pleno. Ajuste o que não for verdade e diga quais linguagens você usa. '
-            'É só o ponto de partida: as evidências confirmam ou ajustam depois.',
-        grupoLing='Linguagens', grupoEng='Engenharia', naoUso='Não uso', ajustado='ajustado',
-        ajuste1='ajuste', ajustes='ajustes', semAjuste='nenhum ajuste', niveisAria='Nível declarado em',
-        voltar='Voltar à jornada', continuar='Começar o primeiro exercício',
-        mudarDepois='Dá para mudar o declarado depois, no perfil.',
-    ),
-    'en-US': dict(
-        rotulo='Getting started · 3 of 3', titulo='Where are you different?',
-        sub='Your journey set everything to Mid-level. Change what isn’t true and tell us which languages you use. '
-            'It’s only the starting point: evidence confirms or adjusts it later.',
-        grupoLing='Languages', grupoEng='Engineering', naoUso='Don’t use', ajustado='adjusted',
-        ajuste1='adjustment', ajustes='adjustments', semAjuste='no adjustments', niveisAria='Declared level in',
-        voltar='Back to journeys', continuar='Start the first exercise',
-        mudarDepois='You can change it later in your profile.',
-    ),
-    'es-ES': dict(
-        rotulo='Primeros pasos · 3 de 3', titulo='¿Dónde eres diferente?',
-        sub='La trayectoria marcó todo como Intermedio. Ajusta lo que no sea verdad y dinos qué lenguajes usas. '
-            'Es solo el punto de partida: las evidencias lo confirman o lo ajustan después.',
-        grupoLing='Lenguajes', grupoEng='Ingeniería', naoUso='No lo uso', ajustado='ajustado',
-        ajuste1='ajuste', ajustes='ajustes', semAjuste='ningún ajuste', niveisAria='Nivel declarado en',
-        voltar='Volver a las trayectorias', continuar='Empezar el primer ejercicio',
-        mudarDepois='Puedes cambiarlo después, en tu perfil.',
-    ),
-}
 
-# passo 1 do primeiro acesso: a PricingScreen do DS (onboarding-pricing); soma-se ao PLANOS
+# passo 1 do primeiro acesso (só a escolha): a PricingScreen do DS (onboarding-pricing); soma-se ao PLANOS
 PLANO_INICIAL = {
     'pt-BR': dict(
-        rotuloInicial='Primeiro acesso · 1 de 3', passosAria='Passo 1 de 3', tituloInicial='Como você quer começar?',
-        subInicial='O Starter é grátis e não pede cartão. O Pro põe o Peer na sua IDE e explica cada nota. '
+        tituloInicial='Como você quer começar?',
+        subInicial='O Starter é grátis e não pede cartão. O Pro põe o Peer na sua IDE e explica cada nota, com 7 dias grátis. '
                    'Dá para trocar quando quiser, sem perder nada.',
         secaoPlanos='Planos', economia='-17%', mesCurto='mês', anoCurto='ano',
         descStarter='Para praticar com testes e ver onde você está.',
         descPro='Para ter o Peer junto e o porquê de cada nota.',
         notaStarter='para sempre, sem cartão', notaMensal='ou R$ 499 por ano', notaAnual='R$ 41,58 por mês',
-        tudoStarter='Tudo do Starter, mais', ctaStarter='Começar com o Starter', ctaPro='Assinar o Pro',
+        tudoStarter='Tudo do Starter, mais', ctaStarter='Continuar com o Starter', ctaPro='Continuar com o Pro', teste='7 dias grátis',
     ),
     'en-US': dict(
-        rotuloInicial='Getting started · 1 of 3', passosAria='Step 1 of 3', tituloInicial='How do you want to start?',
-        subInicial='Starter is free and needs no card. Pro puts the Peer in your IDE and explains every grade. '
+        tituloInicial='How do you want to start?',
+        subInicial='Starter is free and needs no card. Pro puts the Peer in your IDE and explains every grade, with 7 days free. '
                    'You can switch anytime without losing anything.',
         secaoPlanos='Plans', economia='-17%', mesCurto='month', anoCurto='year',
         descStarter='To practice with tests and see where you stand.',
         descPro='To have the Peer alongside and the why behind every grade.',
         notaStarter='forever, no card', notaMensal='or R$499 a year', notaAnual='R$41.58 a month',
-        tudoStarter='Everything in Starter, plus', ctaStarter='Start with Starter', ctaPro='Subscribe to Pro',
+        tudoStarter='Everything in Starter, plus', ctaStarter='Continue with Starter', ctaPro='Continue with Pro', teste='7 days free',
     ),
     'es-ES': dict(
-        rotuloInicial='Primeros pasos · 1 de 3', passosAria='Paso 1 de 3', tituloInicial='¿Cómo quieres empezar?',
-        subInicial='Starter es gratis y no pide tarjeta. Pro pone el Peer en tu IDE y explica cada nota. '
+        tituloInicial='¿Cómo quieres empezar?',
+        subInicial='Starter es gratis y no pide tarjeta. Pro pone el Peer en tu IDE y explica cada nota, con 7 días gratis. '
                    'Puedes cambiar cuando quieras, sin perder nada.',
         secaoPlanos='Planes', economia='-17%', mesCurto='mes', anoCurto='año',
         descStarter='Para practicar con pruebas y ver dónde estás.',
         descPro='Para tener el Peer contigo y el porqué de cada nota.',
         notaStarter='para siempre, sin tarjeta', notaMensal='o R$ 499 al año', notaAnual='R$ 41,58 al mes',
-        tudoStarter='Todo lo de Starter, más', ctaStarter='Empezar con Starter', ctaPro='Suscribirme a Pro',
+        tudoStarter='Todo lo de Starter, más', ctaStarter='Continuar con Starter', ctaPro='Continuar con Pro', teste='7 días gratis',
     ),
 }
 
