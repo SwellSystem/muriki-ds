@@ -6,8 +6,9 @@
 // linha, preço de 34px, o teste como texto verde na linha de baixo, a
 // lista com filete em cima e o botão no contorno.
 //
-// Cards, faixa de status e regras dividem a mesma largura (980px) e
-// começam e terminam juntos.
+// Cabeçalho, faixa de status, cards e regras moram numa coluna só, de até
+// 1200px, que cresce com o palco: o seletor de período termina alinhado
+// com a borda do último card, e não sobra faixa morta à direita.
 //
 // Controlada e sem API: recebe os planos já precificados no período e
 // devolve a escolha por `onSelectPlan`.
@@ -112,7 +113,7 @@ export function PlansPage({
   const intervalo = period === "year" ? labels.intervalYear : labels.intervalMonth
 
   return (
-    <div className={cn("flex w-full flex-col gap-6", className)}>
+    <div className={cn("flex w-full max-w-[1200px] flex-col gap-6", className)}>
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <h1 className="text-[28px] leading-[34px] font-semibold tracking-[-0.01em] text-foreground-strong">
@@ -145,7 +146,7 @@ export function PlansPage({
         ) : null}
       </header>
 
-      <div className="flex w-full max-w-[980px] flex-col gap-6">
+      <div className="flex w-full flex-col gap-6">
         {status}
 
         <div className="grid gap-6 md:grid-cols-2">

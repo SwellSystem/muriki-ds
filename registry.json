@@ -1064,7 +1064,7 @@
       "name": "plans-page",
       "type": "registry:block",
       "title": "Plans Page",
-      "description": "A tela de Planos de dentro do app: título com o seletor mensal/anual à direita, o estado da assinatura acima dos cards (SubscriptionStatus: teste, em dia, cancelamento marcado, em atraso), o card de quem já tem plano (nome pequeno com o selo atual, preço de 34px, teste em verde, botão no contorno), as features ainda sem número com o selo tracejado e as regras embaixo, tudo na mesma largura.",
+      "description": "A tela de Planos de dentro do app: título com o seletor mensal/anual à direita, o estado da assinatura acima dos cards (SubscriptionStatus: teste, em dia, cancelamento marcado, em atraso), o card de quem já tem plano (nome pequeno com o selo atual, preço de 34px, teste em verde, botão no contorno), as features ainda sem número com o selo tracejado e as regras embaixo, tudo numa coluna só de até 1200px, com o seletor alinhado à borda do último card.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
