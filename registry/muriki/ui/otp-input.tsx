@@ -40,6 +40,12 @@ export interface OtpInputProps
    * Só desenho — o campo continua um só.
    */
   groupSize?: number
+  /**
+   * Os quadrados dividem a largura do pai em vez de ter largura fixa. É o
+   * código de uma coluna estreita e centrada (onboarding-step `narrow`): o
+   * código ocupa a mesma largura do botão embaixo dele.
+   */
+  fullWidth?: boolean
 }
 
 const LIMPA = {
@@ -57,6 +63,7 @@ function OtpInput({
   invalid = false,
   size = "default",
   groupSize,
+  fullWidth = false,
   disabled,
   className,
   onFocus,
@@ -80,14 +87,14 @@ function OtpInput({
       data-slot="otp-input"
       data-invalid={invalid || undefined}
       data-disabled={disabled || undefined}
-      className={cn("relative flex w-fit gap-2", disabled && "opacity-60", className)}
+      className={cn("relative flex gap-2", fullWidth ? "w-full" : "w-fit", disabled && "opacity-60", className)}
     >
       {Array.from({ length }, (_, i) => {
         const ativo = foco && i === vez && atual.length < length
         const traco = groupSize && i > 0 && i % groupSize === 0
         return (
           <React.Fragment key={i}>
-          {traco ? <span aria-hidden className="h-0.5 w-3 self-center rounded-full bg-input" /> : null}
+          {traco ? <span aria-hidden className="h-0.5 w-3 shrink-0 self-center rounded-full bg-input" /> : null}
           <div
             aria-hidden
             data-active={ativo || undefined}
@@ -96,6 +103,7 @@ function OtpInput({
               "flex items-center justify-center bg-field font-mono font-medium text-foreground-strong",
               "transition-[box-shadow] duration-100",
               size === "lg" ? "h-14 w-12 rounded-[12px] text-2xl" : "h-12 w-10 rounded-[10px] text-xl",
+              fullWidth && "w-auto min-w-0 flex-1",
               "shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--input)_45%,var(--field))]",
               "data-[filled]:shadow-[inset_0_0_0_1px_var(--input)]",
               "data-[active]:shadow-[inset_0_0_0_1px_var(--primary)] data-[active]:ring-[3px] data-[active]:ring-ring/20",
