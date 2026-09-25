@@ -8,13 +8,20 @@
 // Não sabe de roteador nem de API. Cada item chega pronto: rótulo, ícone,
 // se está ativo, e o elemento que navega em `render` (o <Link> do app) ou
 // um `href`. Recolhido, o rail vira a coluna de ícones do rail_compacto —
-// é o eixo `collapsible="icon"` do Sidebar, com o tooltip de cada item.
+// é o eixo `collapsible="icon"` do Sidebar, com o tooltip de cada item. O
+// botão de recolher mora no topo do rail (o SidebarControls da casa); no
+// celular, o rail vira gaveta e o gatilho vai para o topo do palco.
+//
+// O palco já vem com o respiro do desenho (32px em cima, 40px dos lados no
+// desktop): as telas não resolvem isso cada uma. `stageClassName` ajusta,
+// ex.: um max-width.
 import type { ReactElement, ReactNode } from "react"
 import { ArrowsLeftRightIcon, GearSixIcon } from "@phosphor-icons/react"
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarControls,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
@@ -88,6 +95,8 @@ export interface AppShellProps {
   menuLabel?: string
   defaultOpen?: boolean
   className?: string
+  /** O palco: padding do desenho por padrão; aqui entra um max-width, por exemplo. */
+  stageClassName?: string
   children: ReactNode
 }
 
@@ -125,6 +134,7 @@ export function AppShell({
   menuLabel = "Menu",
   defaultOpen = true,
   className,
+  stageClassName,
   children,
 }: AppShellProps) {
   const marca = (
@@ -149,25 +159,29 @@ export function AppShell({
     <SidebarProvider defaultOpen={defaultOpen} className={className}>
       <Sidebar collapsible="icon">
         <SidebarHeader className="px-2.5 pt-3 pb-1.5">
-          {product.onSwitch ? (
-            <SidebarMenuButton
-              size="lg"
-              tooltip={product.switchLabel ?? product.name}
-              aria-label={product.switchLabel}
-              onClick={product.onSwitch}
-              className="h-12"
-            >
-              {marca}
-              <ArrowsLeftRightIcon
-                aria-hidden
-                className="text-muted-foreground"
-              />
-            </SidebarMenuButton>
-          ) : (
-            <div className="flex h-12 items-center gap-2.5 px-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
-              {marca}
-            </div>
-          )}
+          {/* Marca e recolher na mesma linha; recolhido, empilham. */}
+          <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
+            {product.onSwitch ? (
+              <SidebarMenuButton
+                size="lg"
+                tooltip={product.switchLabel ?? product.name}
+                aria-label={product.switchLabel}
+                onClick={product.onSwitch}
+                className="h-12 min-w-0 flex-1"
+              >
+                {marca}
+                <ArrowsLeftRightIcon
+                  aria-hidden
+                  className="text-muted-foreground"
+                />
+              </SidebarMenuButton>
+            ) : (
+              <div className="flex h-12 min-w-0 flex-1 items-center gap-2.5 px-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+                {marca}
+              </div>
+            )}
+            <SidebarControls />
+          </div>
         </SidebarHeader>
 
         <SidebarContent>
@@ -219,7 +233,15 @@ export function AppShell({
         <header className="flex h-12 items-center gap-2 px-4 md:hidden">
           <SidebarTrigger aria-label={menuLabel} />
         </header>
-        {children}
+        <div
+          data-slot="app-shell-stage"
+          className={cn(
+            "flex w-full min-w-0 flex-1 flex-col gap-6 px-4 pt-4 pb-8 md:px-10 md:pt-8",
+            stageClassName
+          )}
+        >
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )
