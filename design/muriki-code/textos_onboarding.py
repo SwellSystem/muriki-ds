@@ -11,24 +11,24 @@ COMUM_ONB = {
 VERIFICACAO = {
     'pt-BR': dict(
         titulo='Confirme seu email', sub='Enviamos um código de 6 dígitos para',
-        codigoAria='Código de verificação, 6 dígitos', verificar='Verificar',
-        expira='O código vale por 10 minutos.', reenviarEm='Reenviar código em 0:48', reenviar='Reenviar código',
+        codigoAria='Código de verificação, 6 dígitos', codigoLegenda='Código', verificar='Verificar',
+        expira='Vale por 10 minutos.', reenviarEm='Reenviar em 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Confira os dígitos e tente de novo.',
         bloqueado='Muitas tentativas com este código. Peça um novo para continuar.',
         naoChegou='Não chegou? Olhe o spam ou as promoções.',
     ),
     'en-US': dict(
         titulo='Confirm your email', sub='We sent a 6-digit code to',
-        codigoAria='Verification code, 6 digits', verificar='Verify',
-        expira='The code is valid for 10 minutes.', reenviarEm='Resend code in 0:48', reenviar='Resend code',
+        codigoAria='Verification code, 6 digits', codigoLegenda='Code', verificar='Verify',
+        expira='Valid for 10 minutes.', reenviarEm='Resend in 0:48', reenviar='Resend code',
         invalido='Invalid code. Check the digits and try again.',
         bloqueado='Too many attempts with this code. Ask for a new one to continue.',
         naoChegou='Didn’t get it? Check spam or promotions.',
     ),
     'es-ES': dict(
         titulo='Confirma tu email', sub='Enviamos un código de 6 dígitos a',
-        codigoAria='Código de verificación, 6 dígitos', verificar='Verificar',
-        expira='El código vale 10 minutos.', reenviarEm='Reenviar código en 0:48', reenviar='Reenviar código',
+        codigoAria='Código de verificación, 6 dígitos', codigoLegenda='Código', verificar='Verificar',
+        expira='Vale 10 minutos.', reenviarEm='Reenviar en 0:48', reenviar='Reenviar código',
         invalido='Código inválido. Revisa los dígitos e inténtalo de nuevo.',
         bloqueado='Demasiados intentos con este código. Pide uno nuevo para continuar.',
         naoChegou='¿No te llegó? Mira en spam o promociones.',
@@ -37,21 +37,21 @@ VERIFICACAO = {
 
 PERFIL = {
     'pt-BR': dict(
-        titulo='Um pouco sobre você', sub='Estes dados valem para a sua conta Muriki inteira, no Code e no Platform.',
+        grupoVoce='Você', grupoDocs='Documento e contato', titulo='Um pouco sobre você', sub='Estes dados valem para a sua conta Muriki inteira, no Code e no Platform.',
         apelido='Como quer ser chamado', apelidoPh='Rafael', nome='Nome completo', nomePh='Rafael Moura',
         cpf='CPF', cpfPh='000.000.000-00', cpfNota='Um teste grátis do Pro por CPF.',
         telefone='Telefone', opcional='opcional', telefonePh='(11) 91234-5678',
         termosA='Li e aceito os', termos='termos de uso', termosE='e a', privacidade='política de privacidade',
     ),
     'en-US': dict(
-        titulo='A little about you', sub='This applies to your whole Muriki account, in Code and in Platform.',
+        grupoVoce='You', grupoDocs='ID and contact', titulo='A little about you', sub='This applies to your whole Muriki account, in Code and in Platform.',
         apelido='What should we call you', apelidoPh='Rafael', nome='Full name', nomePh='Rafael Moura',
         cpf='CPF (Brazilian tax ID)', cpfPh='000.000.000-00', cpfNota='One free Pro trial per CPF.',
         telefone='Phone', opcional='optional', telefonePh='(11) 91234-5678',
         termosA='I have read and accept the', termos='terms of use', termosE='and the', privacidade='privacy policy',
     ),
     'es-ES': dict(
-        titulo='Un poco sobre ti', sub='Estos datos valen para toda tu cuenta Muriki, en Code y en Platform.',
+        grupoVoce='Tú', grupoDocs='Documento y contacto', titulo='Un poco sobre ti', sub='Estos datos valen para toda tu cuenta Muriki, en Code y en Platform.',
         apelido='Cómo quieres que te llamemos', apelidoPh='Rafael', nome='Nombre completo', nomePh='Rafael Moura',
         cpf='CPF (identificación fiscal de Brasil)', cpfPh='000.000.000-00', cpfNota='Una prueba gratis de Pro por CPF.',
         telefone='Teléfono', opcional='opcional', telefonePh='(11) 91234-5678',

@@ -1171,7 +1171,7 @@ def tela_plano_inicial(k, sufixo):
     planos = (f'<sc-if value="{h("pronto")}" hint-placeholder-val="{{{{ true }}}}">{grade(starter + pro)}</sc-if>'
               f'<sc-if value="{h("carregando")}" hint-placeholder-val="{{{{ false }}}}">{grade(esqueleto(False) + esqueleto(True))}</sc-if>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:8px 24px 32px;">'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:32px 24px 40px;">'
             f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles}{planos}</div></main></div>')
 
 

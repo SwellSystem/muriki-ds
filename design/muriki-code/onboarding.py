@@ -17,14 +17,29 @@ def cabecalho_passo(k, n, titulo, sub):
             f'<div role="progressbar" aria-valuemin="1" aria-valuemax="{TOTAL}" aria-valuenow="{n}" '
             f'aria-label="{T("passosAria")} {n} {T("de")} {TOTAL}" style="display:flex;gap:6px;">{passos}</div></div>'
             f'<div style="display:flex;flex-direction:column;gap:12px;">'
-            f'<h1 style="margin:0;font-size:44px;line-height:1.04;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{titulo}</h1>'
+            f'<h1 style="margin:0;font-size:52px;line-height:1.02;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{titulo}</h1>'
             f'<p style="margin:0;max-width:65ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div></header>')
 
 
 def pagina_passo(k, corpo, largura=1024):
+    # a largura vale para o cabeçalho e o conteúdo juntos: barra de passos e campos terminam no mesmo lugar
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:32px;width:{largura}px;align-self:center;padding:8px 24px 32px;">'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:{largura}px;align-self:center;padding:32px 24px 40px;">'
             f'{corpo}</main></div>')
+
+
+FORM = 720  # 672px de conteúdo + 24px de cada lado: o max-w-2xl do Platform
+
+
+def legenda_campo(k, texto):
+    return (f'<legend style="padding:0 0 4px;font-family:{MONO};font-size:10px;letter-spacing:0.25em;text-transform:uppercase;'
+            f'color:{k["mfg"]};">{texto}</legend>')
+
+
+def botao_touch(k, txt, href):
+    return (f'<a href="{href}" style="align-self:flex-start;display:inline-flex;align-items:center;justify-content:center;gap:8px;'
+            f'height:44px;padding:0 18px;border-radius:11px;background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">'
+            f'{txt}{ic("seta", 15)}</a>')
 
 
 def botao_ir(k, txt, href, solido=True):
@@ -46,26 +61,28 @@ def secao(k, titulo, extra=''):
 # POST /onboarding/code/challenge manda o código; /verify troca por um onboardingToken.
 # `estado` mostra os três casos da API: digitando, código inválido e muitas tentativas.
 def tela_verificacao(k, sufixo):
-    caixa = lambda i: (f'<span style="display:flex;align-items:center;justify-content:center;width:52px;height:60px;border-radius:12px;'
-                       f'background:{k["card"]};box-shadow:{h(f"v.anel{i}")};font-family:{MONO};font-size:26px;font-weight:500;'
+    # os quadrados do otp-input no tamanho lg (48 × 56), 3 + traço + 3
+    caixa = lambda i: (f'<span style="display:flex;align-items:center;justify-content:center;width:48px;height:56px;border-radius:12px;'
+                       f'background:{k["card"]};box-shadow:{h(f"v.anel{i}")};font-family:{MONO};font-size:24px;font-weight:500;'
                        f'color:{h("v.cor")};">{h(f"v.d{i}")}</span>')
-    codigo = (f'<div role="group" aria-label="{T("codigoAria")}" style="display:flex;align-items:center;gap:10px;">'
+    codigo = (f'<div role="group" aria-label="{T("codigoAria")}" style="display:flex;align-items:center;gap:8px;">'
               f'{caixa(0)}{caixa(1)}{caixa(2)}<span style="width:12px;height:2px;border-radius:1px;background:{k["input"]};"></span>'
               f'{caixa(3)}{caixa(4)}{caixa(5)}</div>')
     aviso = (f'<sc-if value="{h("v.temErro")}" hint-placeholder-val="{{{{ false }}}}">'
-             f'<p role="alert" style="margin:0;display:flex;align-items:center;gap:8px;font-size:13.5px;color:{k["bad"]};">'
-             f'{ic("x", 14)}{h("v.erro")}</p></sc-if>')
-    reenviar = (f'<div style="display:flex;align-items:center;gap:14px;font-size:13px;color:{k["mfg"]};">'
-                f'<span>{T("expira")}</span><span style="width:3px;height:3px;border-radius:999px;background:{k["input"]};"></span>'
-                f'<button type="button" aria-disabled="{h("v.esperando")}" style="border:0;padding:0;background:transparent;font-family:{FONTE};'
-                f'font-size:13px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button></div>')
+             f'<p role="alert" style="margin:0;font-size:12.5px;line-height:18px;color:{k["bad"]};">{h("v.erro")}</p></sc-if>')
+    rodape_codigo = (f'<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
+                     f'<span>{T("expira")}</span>'
+                     f'<button type="button" aria-disabled="{h("v.esperando")}" style="margin-left:auto;border:0;padding:0;background:transparent;'
+                     f'font-family:{FONTE};font-size:12.5px;line-height:18px;font-weight:500;color:{h("v.reenviarCor")};">{h("v.reenviar")}</button></div>')
+    campo = (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:10px;width:fit-content;min-width:344px;">'
+             f'{legenda_campo(k, T("codigoLegenda"))}{codigo}{rodape_codigo}{aviso}</fieldset>')
+    ajuda = (f'<p style="margin:0;padding-top:20px;border-top:1px solid var(--divider);font-size:13px;line-height:20px;color:{k["mfg"]};">'
+             f'{T("naoChegou")}</p>')
     corpo = (cabecalho_passo(k, 2, T('titulo'),
                              f'{T("sub")} <b style="font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b>.')
-             + f'<div style="display:flex;flex-direction:column;gap:18px;">{codigo}{aviso}{reenviar}'
-               f'<div style="display:flex;align-items:center;gap:16px;padding-top:8px;">'
-               f'{botao_ir(k, T("verificar"), f"Perfil{sufixo}.dc.html")}'
-               f'<span style="font-size:12.5px;color:{k["mfg"]};">{T("naoChegou")}</span></div></div>')
-    return pagina_passo(k, corpo)
+             + f'<div style="display:flex;flex-direction:column;gap:24px;">{campo}'
+               f'{botao_touch(k, T("verificar"), f"Perfil{sufixo}.dc.html")}{ajuda}</div>')
+    return pagina_passo(k, corpo, FORM)
 
 
 ANTES_VERIFICACAO = """const estado = s.estado || this.props.estado || "digitando";
@@ -88,30 +105,31 @@ PROPS_VERIFICACAO = {'estado': {'editor': 'enum', 'options': ['digitando', 'inva
 # POST /onboarding/code/profile: displayName, fullName, cpf, phone opcional e o aceite das versões
 # atuais dos termos e da privacidade. Com o perfil já completo no Platform, o passo é pulado.
 def tela_perfil(k, sufixo):
+    # o DataPane do Platform: campos empilhados no tamanho touch (44px), legenda mono por grupo
     def campo(id_, rotulo_, valor, ph, extra='', nota='', prefixo='', mono=False):
-        pre = (f'<span style="display:flex;align-items:center;height:100%;padding:0 10px 0 12px;margin-right:2px;'
-               f'border-right:1px solid {k["input"]};font-size:14px;color:{k["mfg"]};">{prefixo}</span>') if prefixo else ''
-        n = f'<span style="font-size:12px;color:{k["mfg"]};">{nota}</span>' if nota else ''
-        return (f'<div style="display:flex;flex-direction:column;gap:6px;">'
-                f'<label for="{id_}" style="display:flex;align-items:baseline;gap:6px;font-size:13px;font-weight:500;color:{k["fgs"]};">{rotulo_}{extra}</label>'
-                f'<div style="display:flex;align-items:center;height:40px;border-radius:10px;background:{k["card"]};box-shadow:inset 0 0 0 1px {k["input"]};">'
-                f'{pre}<input id="{id_}" value="{valor}" placeholder="{ph}" style="flex:1;min-width:0;height:100%;padding:0 12px;border:0;'
-                f'background:transparent;font-family:{MONO if mono else FONTE};font-size:14px;color:{k["fgs"]};outline:0;"></div>{n}</div>')
-    opcional = f'<span style="font-size:12px;font-weight:400;color:{k["mfg"]};">{T("opcional")}</span>'
-    grade = (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:20px 24px;max-width:720px;">'
-             + campo('apelido', T('apelido'), 'Rafael', T('apelidoPh'))
-             + campo('nome', T('nome'), 'Rafael Moura', T('nomePh'))
-             + campo('cpf', T('cpf'), '123.456.789-09', T('cpfPh'), nota=T('cpfNota'), mono=True)
-             + campo('telefone', T('telefone'), '', T('telefonePh'), extra=opcional, prefixo='+55')
-             + '</div>')
+        pre = (f'<span style="display:flex;align-items:center;height:100%;padding:0 12px 0 14px;'
+               f'box-shadow:inset -1px 0 0 {k["input"]};font-size:15px;color:{k["mfg"]};">{prefixo}</span>') if prefixo else ''
+        n = f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{nota}</span>' if nota else ''
+        return (f'<div style="display:flex;flex-direction:column;gap:8px;">'
+                f'<label for="{id_}" style="display:flex;align-items:baseline;gap:6px;font-size:13.5px;font-weight:500;color:{k["fgs"]};">{rotulo_}{extra}</label>'
+                f'<div style="display:flex;align-items:center;height:44px;border-radius:11px;background:{k["card"]};box-shadow:inset 0 0 0 1px {k["input"]};overflow:hidden;">'
+                f'{pre}<input id="{id_}" value="{valor}" placeholder="{ph}" style="flex:1;min-width:0;height:100%;padding:0 14px;border:0;'
+                f'background:transparent;font-family:{MONO if mono else FONTE};font-size:15px;color:{k["fgs"]};outline:0;"></div>{n}</div>')
+    opcional = f'<span style="font-size:12.5px;font-weight:400;color:{k["mfg"]};">{T("opcional")}</span>'
+    grupo = lambda leg, filhos: (f'<fieldset style="margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:20px;">'
+                                 f'{legenda_campo(k, leg)}{filhos}</fieldset>')
+    voce = grupo(T('grupoVoce'), campo('apelido', T('apelido'), 'Rafael', T('apelidoPh'))
+                 + campo('nome', T('nome'), 'Rafael Moura', T('nomePh')))
+    contato = grupo(T('grupoDocs'), campo('cpf', T('cpf'), '123.456.789-09', T('cpfPh'), nota=T('cpfNota'), mono=True)
+                    + campo('telefone', T('telefone'), '', T('telefonePh'), extra=opcional, prefixo='+55'))
     termos = (f'<label style="display:flex;align-items:flex-start;gap:10px;font-size:14px;line-height:20px;color:{k["mfg"]};cursor:pointer;">'
               f'<input type="checkbox" checked style="width:16px;height:16px;margin:2px 0 0;flex:0 0 auto;accent-color:{k["pri"]};">'
               f'<span>{T("termosA")} <a href="#" style="color:{k["fg"]};font-weight:500;">{T("termos")}</a> {T("termosE")} '
               f'<a href="#" style="color:{k["fg"]};font-weight:500;">{T("privacidade")}</a>.</span></label>')
     corpo = (cabecalho_passo(k, 3, T('titulo'), T('sub'))
-             + f'<div style="display:flex;flex-direction:column;gap:24px;">{grade}{termos}'
-               f'<div>{botao_ir(k, T("continuar"), f"Preferencias{sufixo}.dc.html")}</div></div>')
-    return pagina_passo(k, corpo)
+             + f'<form style="margin:0;display:flex;flex-direction:column;gap:28px;">{voce}{contato}{termos}'
+               f'{botao_touch(k, T("continuar"), f"Preferencias{sufixo}.dc.html")}</form>')
+    return pagina_passo(k, corpo, FORM)
 
 
 # ── 4 · Preferências: conclui o onboarding ─────────────────────────────
@@ -164,8 +182,8 @@ def tela_preferencias(k, sufixo):
            f'<span style="font-size:14.5px;font-weight:600;color:{k["fgs"]};">{h("o.nome")}</span>'
            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{h("o.desc")}</span></span></button></sc-for></div>')
     rodape = (f'<div style="display:flex;align-items:center;gap:16px;">'
-              f'<a href="{h("fim.destino")}" style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:10px;'
-              f'background:{k["pri"]};color:{k["prifg"]};font-size:14px;font-weight:500;">{h("fim.acao")}{ic("seta", 14)}</a>'
+              f'<a href="{h("fim.destino")}" style="display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;'
+              f'background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">{h("fim.acao")}{ic("seta", 15)}</a>'
               f'<span style="font-size:12.5px;color:{k["mfg"]};">{h("fim.nota")}</span></div>')
     contador = f'<span style="margin-left:auto;font-size:12px;color:{k["mfg"]};">{T("umATres")}</span>'
     corpo = (cabecalho_passo(k, 4, T('titulo'), T('sub'))
@@ -173,7 +191,7 @@ def tela_preferencias(k, sufixo):
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("linguagens"))}{ling}</div>'
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("objetivos"), contador)}{obj}</div>'
              + rodape)
-    return pagina_passo(k, corpo).replace('gap:32px;width:1024px', 'gap:24px;width:1024px')
+    return pagina_passo(k, corpo)
 
 
 ANTES_PREFERENCIAS = """const EXP = __EXP__;
