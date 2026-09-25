@@ -249,7 +249,7 @@ const STRINGS: Record<string, unknown> = {
       use_backup: "Usar um código de backup",
       use_app: "Usar o app autenticador",
       backup_label: "Código de backup",
-      backup_placeholder: "xxxx-xxxx",
+      backup_placeholder: "xxxxx-xxxxx",
       backup_description: "Cada código de backup vale uma vez.",
       verify_submit: "Verificar código",
       verifying: "Verificando...",
