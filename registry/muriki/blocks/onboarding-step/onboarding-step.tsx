@@ -52,8 +52,12 @@ export interface OnboardingStepProps {
    * `form` (672px) para passos de formulário — verificação, perfil — como o
    * AccountScreen do Platform; `wide` (1024px) quando o conteúdo é grade de
    * opções. O cabeçalho acompanha: barra e conteúdo terminam no mesmo lugar.
+   * `narrow` (480px) é o passo de pouco conteúdo — o código por email —:
+   * coluna no meio da tela, na vertical e na horizontal, cabeçalho
+   * centralizado e a ação na largura toda. À esquerda numa coluna larga,
+   * esse conteúdo vira um canto ocupado e o resto vazio.
    */
-  width?: "form" | "wide"
+  width?: "form" | "wide" | "narrow"
   className?: string
   children?: ReactNode
 }
@@ -85,7 +89,9 @@ export function OnboardingStep({
       <main
         className={cn(
           "mx-auto flex w-full flex-1 flex-col gap-9 px-4 pt-8 pb-10 md:px-6",
-          width === "form" ? "max-w-2xl" : "max-w-5xl",
+          width === "form" && "max-w-2xl",
+          width === "wide" && "max-w-5xl",
+          width === "narrow" && "max-w-[32rem] justify-center pb-24 text-center",
           className
         )}
       >
@@ -96,12 +102,18 @@ export function OnboardingStep({
           stepperAriaLabel={stepperAriaLabel}
           title={title}
           subtitle={subtitle}
+          align={width === "narrow" ? "center" : "start"}
         />
 
         {children}
 
         {action || note ? (
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div
+            className={cn(
+              "flex flex-wrap items-center gap-x-4 gap-y-2",
+              width === "narrow" && "flex-col [&>button]:w-full"
+            )}
+          >
             {action ? (
               <Button
                 type={action.type ?? "button"}
