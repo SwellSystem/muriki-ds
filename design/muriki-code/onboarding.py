@@ -156,8 +156,9 @@ def tela_perfil(k, sufixo):
     resumo = (f'<div style="display:flex;flex-direction:column;padding:4px 18px;border-radius:12px;background:{k["card"]};'
               f'box-shadow:inset 0 0 0 1px {k["border"]}, {k["sombra"]};">'
               f'<div style="margin:0 -18px;padding:0 18px;">'
-              + linha(T('apelido'), 'Rafael').replace('border-top:1px solid var(--divider);', '', 1)
-              + linha(T('nome'), 'Rafael Moura') + linha(T('cpf'), '•••.456.789-••', True) + linha(T('telefone'), '+55 (11) 91234-5678')
+              # a API expõe do perfil existente só o nome e o email; CPF e telefone ficam onde estão
+              + linha(T('nome'), 'Rafael Moura').replace('border-top:1px solid var(--divider);', '', 1)
+              + linha(T('emailRotulo'), 'rafael@moura.dev', True)
               + '</div></div>')
     confirmar = (f'<div style="display:flex;flex-direction:column;gap:24px;">{resumo}'
                  f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("confirmarNota")}</p>'
