@@ -847,6 +847,7 @@
       ],
       "registryDependencies": [
         "utils",
+        "SwellSystem/muriki-ds/i18n",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/input",
@@ -861,7 +862,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Os dois eixos não são a mesma lista: colapsar um rail flutuante é a combinação mais útil em tela apertada. A superfície é o token --rail, e o tooltip aparece sozinho sempre que o rail está em ícones. Os oito tokens --sidebar-* do shadcn não existem aqui: eram cópias das cores base."
+      "docs": "Os dois eixos não são a mesma lista: colapsar um rail flutuante é a combinação mais útil em tela apertada. A superfície é o token --rail, e o tooltip aparece sozinho sempre que o rail está em ícones. Os oito tokens --sidebar-* do shadcn não existem aqui: eram cópias das cores base. Os rótulos (recolher, expandir, fixar, soltar e o título da gaveta no celular) vêm do i18n da casa: sidebar.collapse, sidebar.expand, sidebar.pin, sidebar.unpin, sidebar.mobile_title, sidebar.mobile_description."
     },
     {
       "name": "plan-card",
@@ -1074,7 +1075,8 @@
         "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/skeleton",
-        "SwellSystem/muriki-ds/view-toggle"
+        "SwellSystem/muriki-ds/view-toggle",
+        "SwellSystem/muriki-ds/onboarding-pricing"
       ],
       "files": [
         {

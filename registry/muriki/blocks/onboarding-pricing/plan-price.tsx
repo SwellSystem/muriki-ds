@@ -92,7 +92,9 @@ export function PlanPrice({
 
 const DIGITOS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-function RollingPrice({
+// Exportada para a tela de Planos de dentro do app (plans-page), que tem o
+// próprio card mas o mesmo preço que rola.
+export function RollingPrice({
   value,
   className,
 }: {
