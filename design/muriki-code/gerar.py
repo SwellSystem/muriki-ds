@@ -25,6 +25,10 @@ TELAS = [
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
     ('planos', 'Planos', 'Planos', 'Planos · Starter e Pro', 2, 4, 5),
+    ('codigo', 'SegundoFator', 'Segundo fator', 'Entrar · segundo fator (app ou código de backup)', 0, 6, 7),
+    ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
+    ('criarSenha', 'CriarSenha', 'Criar senha', 'Conta · criar senha (link do email)', 2, 6, 7),
+    ('redefinir', 'RedefinirSenha', 'Redefinir senha', 'Conta · redefinir senha (link do email)', 3, 6, 7),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -71,6 +75,8 @@ for chave, lin, n, texto in [
     ('webEscuro', 3, 5, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
+    ('conta', 6, 4, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email'),
+    ('contaEscuro', 7, 4, 'Conta no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 

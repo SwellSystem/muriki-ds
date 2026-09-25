@@ -3,6 +3,7 @@ from base import *
 from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL, ACESSO, PRIMEIRO, PERFIL_VAZIO,
                     COMPETENCIA, PLAYGROUND, juntar)
 from textos_exercicio import TEXTOS as EXERCICIO
+from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
                         ANTES_VERIFICACAO, PROPS_VERIFICACAO, ANTES_PREFERENCIAS, VALORES_PREFERENCIAS,
@@ -965,20 +966,13 @@ def tela_acesso(k, modo, sufixo):
         rotulo_, hero_a, hero_b = T('rotuloCriar'), T('heroCriarA'), T('heroCriarB')
         sub = f'{T("subCriar")} <a href="Entrar{sufixo}.dc.html" style="font-weight:500;color:{k["fg"]};">{T("entrarLink")}</a>'
         com = T('criarCom')
-        campos = (campo('nome', T('nomeLabel'), 'pessoa', 'text', 'nome', 'mudarNome', T('nomePh'), auto='name')
-                  + campo('email', T('emailLabel'), 'envelope', 'email', 'email', 'mudarEmail', T('emailPh'), auto='email')
-                  + campo('senha', T('senhaLabel'), 'cadeado', h('senha.tipo'), 'senha.valor', 'mudarSenha', T('senhaNovaPh'),
-                          depois=forca, olho=True, auto='new-password'))
-        # o aceite dos termos mora no Perfil: é onde a API o registra
-        fim = (enviar(T('criarBotao'), f'PlanoInicial{sufixo}.dc.html')
-               + f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
-                 f'{ic("cadeado", 13)}{T("semTreino")}</span>')
-        gap_form = 20
+        # o formulário do criar conta é montado no modo 'criar', mais abaixo (sem senha: ela vem pelo email)
+        campos, fim, gap_form = '', '', 20
     else:
         rotulo_, hero_a, hero_b = T('entrar'), T('heroA'), T('heroB')
         sub = f'{T("subEntrar")} <a href="CriarConta{sufixo}.dc.html" style="font-weight:500;color:{k["fg"]};">{T("criarLink")}</a>'
         com = T('entrarCom')
-        esqueci = (f'<a href="#" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.2em;'
+        esqueci = (f'<a href="EsqueciSenha{sufixo}.dc.html" style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.2em;'
                    f'text-transform:uppercase;color:{k["mfg"]};">{T("esqueci")}</a>')
         campos = (campo('email', T('emailLabel'), 'envelope', 'email', 'email', 'mudarEmail', T('emailPh'), auto='email webauthn')
                   + campo('senha', T('senhaLabel'), 'cadeado', h('senha.tipo'), 'senha.valor', 'mudarSenha', T('senhaPh'),
@@ -1023,14 +1017,107 @@ def tela_acesso(k, modo, sufixo):
                 f'<div style="display:flex;align-items:center;gap:12px;">{linha(k["input"], "flex:1;")}{legenda(T("ou"), k)}{linha(k["input"], "flex:1;")}</div>')
         corpo = f'{entrada}<form style="display:flex;flex-direction:column;gap:{gap_form}px;margin:0;">{campos}{fim}</form>'
 
-    formulario = (
-        f'<div style="grid-column:2;display:flex;flex-direction:column;gap:20px;">'
-        f'<div style="display:flex;align-items:center;gap:12px;">{legenda(rotulo_, k)}{linha(k["pri"], "width:40px;")}{linha(k["input"], "flex:1;")}</div>'
-        f'<div style="display:flex;flex-direction:column;gap:12px;">'
-        f'<h1 style="margin:0;font-size:36px;line-height:1;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
-        f'{hero_a}<br><span style="color:{k["pri"]};">{hero_b}</span></h1>'
-        f'<p style="margin:0;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div>'
-        f'{corpo}</div>')
+    def formulario_de(rotulo_, hero_a, hero_b, sub, corpo):
+        segunda = f'<br><span style="color:{k["pri"]};">{hero_b}</span>' if hero_b else ''
+        return (
+            f'<div style="grid-column:2;display:flex;flex-direction:column;gap:20px;">'
+            f'<div style="display:flex;align-items:center;gap:12px;">{legenda(rotulo_, k)}{linha(k["pri"], "width:40px;")}{linha(k["input"], "flex:1;")}</div>'
+            f'<div style="display:flex;flex-direction:column;gap:12px;">'
+            f'<h1 style="margin:0;font-size:36px;line-height:1;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
+            f'{hero_a}{segunda}</h1>'
+            f'<p style="margin:0;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div>'
+            f'{corpo}</div>')
+
+    se = lambda chave, html, padrao=False: (f'<sc-if value="{h("e." + chave)}" hint-placeholder-val="{{{{ {"true" if padrao else "false"} }}}}">'
+                                            f'{html}</sc-if>')
+    enviar_acao = lambda txt, acao: (
+        f'<button type="button" onClick="{h(acao)}" style="display:flex;align-items:center;justify-content:space-between;width:100%;height:44px;'
+        f'padding:0 20px;border:0;border-radius:10px;background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:15px;'
+        f'font-weight:500;letter-spacing:0.025em;cursor:pointer;">'
+        f'<span>{txt}</span><span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:999px;'
+        f'background:color-mix(in oklch, {k["prifg"]} 15%, transparent);">{ic("seta", 14)}</span></button>')
+    nota = lambda txt, icone=None: (f'<span style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
+                                   + (f'<span style="display:flex;margin-top:2px;">{ic(icone, 13)}</span>' if icone else '') + f'<span>{txt}</span></span>')
+    link_voltar = lambda txt, href='', acao='': (
+        f'<a href="{href or "#"}"' + (f' onClick="{h(acao)}"' if acao else '') + f' style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;'
+        f'font-size:13px;font-weight:500;color:{k["mfg"]};"><span style="display:flex;transform:rotate(180deg);">{ic("seta", 13)}</span>{txt}</a>')
+    botao_sec = lambda txt, acao='', icone='troca': (
+        f'<button type="button"' + (f' onClick="{h(acao)}"' if acao else '') + f' style="display:inline-flex;align-items:center;justify-content:center;gap:8px;'
+        f'height:44px;padding:0 16px;border:0;border-radius:10px;box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};'
+        f'color:{k["fgs"]};font-family:{FONTE};font-size:14px;font-weight:500;cursor:pointer;">{ic(icone, 15)}{txt}</button>')
+    email_b = f'<b style="font-weight:500;color:{k["fgs"]};">{h("email")}</b>'
+    erro = lambda txt: (f'<p role="alert" style="margin:0;display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:19px;color:{k["bad"]};">'
+                        f'<span style="display:flex;margin-top:3px;">{ic("x", 12)}</span><span>{txt}</span></p>')
+
+    if modo == 'criar':
+        # a API cria a conta sem senha: nome, email e o captcha; a senha vem pelo link do email
+        captcha = (f'<div aria-label="{T("captcha")}" style="display:flex;align-items:center;gap:12px;height:64px;padding:0 14px;border-radius:8px;'
+                   f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};">'
+                   f'<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;'
+                   f'background:{k["tgreen"]};color:{k["ok"]};">{ic("check", 13)}</span>'
+                   f'<span style="font-size:14px;color:{k["fgs"]};">{T("captchaOk")}</span>'
+                   f'<span style="margin-left:auto;font-family:{MONO};font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;color:{k["mfg"]};'
+                   f'text-align:right;">Cloudflare Turnstile</span></div>')
+        form_corpo = (f'<form style="display:flex;flex-direction:column;gap:20px;margin:0;">'
+                      + campo('nome', T('nomeLabel'), 'pessoa', 'text', 'nome', 'mudarNome', T('nomePh'), auto='name')
+                      + campo('email', T('emailLabel'), 'envelope', 'email', 'email', 'mudarEmail', T('emailPh'), auto='email')
+                      + captcha + enviar_acao(T('criarEnviar'), 'e.enviarForm') + nota(T('semTreino'), 'cadeado') + '</form>')
+        enviado_corpo = (f'<div style="display:flex;flex-direction:column;gap:14px;">'
+                         f'<div style="display:flex;gap:8px;flex-wrap:wrap;">{botao_sec(T("reenviar"))}</div>'
+                         f'{nota(T("naoChegou"))}{link_voltar(T("outroEmail"), acao="e.voltarForm")}</div>')
+        sub_criar = f'{T("subCriar")} <a href="Entrar{sufixo}.dc.html" style="font-weight:500;color:{k["fg"]};">{T("entrarLink")}</a>'
+        formulario = (se('formulario', formulario_de(T('rotuloCriar'), T('heroCriarA'), T('heroCriarB'), sub_criar, form_corpo), True)
+                      + se('enviado', formulario_de(T('enviadoRotulo'), T('enviadoA'), T('enviadoB'),
+                                                    f'{T("enviadoSub")} {email_b} {T("enviadoTxt")}', enviado_corpo)))
+    elif modo in ('criarSenha', 'redefinir'):
+        # 12 a 128 caracteres e fora de vazamentos (PASSWORD_COMPROMISED); o link vale 24 h e uma vez
+        rot = T('criarSenhaRotulo') if modo == 'criarSenha' else T('redefinirRotulo')
+        ha, hb = (T('criarSenhaA'), T('criarSenhaB')) if modo == 'criarSenha' else (T('redefinirA'), T('redefinirB'))
+        form_corpo = (f'<form style="display:flex;flex-direction:column;gap:20px;margin:0;">'
+                      + campo('senha', T('novaSenha'), 'cadeado', h('senha.tipo'), 'senha.valor', 'mudarSenha', T('novaSenhaPh'),
+                              depois=forca, olho=True, auto='new-password')
+                      + se('vazada', erro(T('vazada')))
+                      + enviar(T('salvarSenha'), f'Entrar{sufixo}.dc.html') + nota(T('depoisEntrar')) + '</form>')
+        expirado_corpo = (f'<div style="display:flex;flex-direction:column;gap:14px;">'
+                          f'{enviar(T("pedirNovo"), f"EsqueciSenha{sufixo}.dc.html")}{link_voltar(T("voltarEntrar"), f"Entrar{sufixo}.dc.html")}</div>')
+        formulario = (se('formulario', formulario_de(rot, ha, hb, f'{T("criarSenhaSub")} {email_b}.', form_corpo), True)
+                      + se('expirado', formulario_de(rot, T('expiradoTit'), '', T('expiradoTxt'), expirado_corpo)))
+    elif modo == 'esqueci':
+        form_corpo = (f'<form style="display:flex;flex-direction:column;gap:20px;margin:0;">'
+                      + campo('email', T('emailLabel'), 'envelope', 'email', 'email', 'mudarEmail', T('emailPh'), auto='email')
+                      + enviar_acao(T('enviarLink'), 'e.enviarForm') + link_voltar(T('voltarEntrar'), f'Entrar{sufixo}.dc.html') + '</form>')
+        enviado_corpo = (f'<div style="display:flex;flex-direction:column;gap:14px;">'
+                         f'<div style="display:flex;gap:8px;flex-wrap:wrap;">{botao_sec(T("reenviar"))}</div>'
+                         f'{nota(T("naoChegou"))}{link_voltar(T("voltarEntrar"), f"Entrar{sufixo}.dc.html")}</div>')
+        formulario = (se('formulario', formulario_de(T('esqueciRotulo'), T('esqueciA'), T('esqueciB'), T('esqueciSub'), form_corpo), True)
+                      + se('enviado', formulario_de(T('esqueciRotulo'), T('esqueciEnviadoA'), T('esqueciEnviadoB'), T('esqueciEnviadoTxt'), enviado_corpo)))
+    elif modo == 'codigo':
+        # o passo do código no login: 6 dígitos do app, ou um código de backup (vale uma vez)
+        caixa = lambda i: (f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:56px;border-radius:12px;'
+                           f'background:{k["card"]};box-shadow:{h("e.anel")};font-family:{MONO};font-size:24px;font-weight:500;color:{k["fgs"]};">'
+                           f'{h(f"e.d{i}")}</span>')
+        quadros = (f'<div role="group" aria-label="{T("codigoLegenda")}" style="display:flex;align-items:center;gap:8px;">'
+                   f'{caixa(0)}{caixa(1)}{caixa(2)}<span style="width:12px;flex:0 0 12px;height:2px;border-radius:1px;background:{k["input"]};"></span>'
+                   f'{caixa(3)}{caixa(4)}{caixa(5)}</div>')
+        leg = lambda t: (f'<span style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.25em;text-transform:uppercase;'
+                         f'color:{k["mfg"]};">{t}</span>')
+        troca = lambda txt, acao: (f'<button type="button" onClick="{h(acao)}" style="align-self:flex-start;border:0;padding:0;background:transparent;'
+                                   f'font-family:{FONTE};font-size:13px;font-weight:500;color:{k["pri"]};cursor:pointer;">{txt}</button>')
+        totp = (f'<div style="display:flex;flex-direction:column;gap:10px;">{leg(T("codigoLegenda"))}{quadros}'
+                + se('invalido', erro(T('codigoInvalido'))) + f'</div>'
+                + enviar(T('verificar'), f'Main{sufixo}.dc.html') + troca(T('usarBackup'), 'e.modoBackup') + nota(T('naoConsegue')))
+        backup = (f'<div style="display:flex;flex-direction:column;gap:10px;">{leg(T("backupLegenda"))}'
+                  f'<input aria-label="{T("backupLegenda")}" autocomplete="one-time-code" spellcheck="false" value="8f3k-2m9q" placeholder="{T("backupPh")}" '
+                  f'style="height:56px;padding:0 16px;border:0;border-radius:12px;box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};'
+                  f'font-family:{MONO};font-size:22px;letter-spacing:0.12em;color:{k["fgs"]};outline:0;">'
+                  f'{nota(T("backupNota"))}</div>'
+                  + enviar(T('verificar'), f'Main{sufixo}.dc.html') + troca(T('usarApp'), 'e.modoApp'))
+        corpo_codigo = (f'<div style="display:flex;flex-direction:column;gap:18px;">'
+                        + se('totp', totp, True) + se('backup', backup) + '</div>')
+        formulario = formulario_de(T('codigoRotulo'), T('codigoA'), T('codigoB'),
+                                   f'{T("codigoSub")} <span style="font-family:{MONO};font-size:13px;color:{k["fg"]};">rafael@moura.dev</span>', corpo_codigo)
+    else:
+        formulario = formulario_de(rotulo_, hero_a, hero_b, sub, corpo)
 
     lado = (f'<main style="position:relative;display:flex;flex-direction:column;min-width:0;">'
             f'<header style="display:flex;justify-content:flex-end;align-items:center;gap:4px;padding:32px 48px 0;">'
@@ -1040,13 +1127,28 @@ def tela_acesso(k, modo, sufixo):
     return f'{raiz(k, "display:grid;grid-template-columns:1.05fr 1fr;")}{painel}{lado}</div>'
 
 
-def antes_acesso(nome, email, senha):
+def antes_acesso(nome, email, senha, modo='entrar', estado='formulario'):
+    # senha nova (criar e redefinir): a régua da API é só o tamanho, 12 a 128; a força sobe com ele
+    nova = modo in ('criarSenha', 'redefinir')
+    regua = ("""const REQ = [["req12", valor.length >= 12]];
+const feitos = !valor ? 0 : valor.length >= 20 ? 4 : valor.length >= 16 ? 3 : valor.length >= 12 ? 2 : 1;""" if nova else
+             """const REQ = [["req8", valor.length >= 8], ["reqNum", /\\d/.test(valor)], ["reqMin", /[a-z]/.test(valor)], ["reqMai", /[A-Z]/.test(valor)]];
+const feitos = REQ.filter((r) => r[1]).length;""")
     return f"""const nome = s.nome == null ? {json.dumps(nome)} : s.nome;
 const email = s.email == null ? {json.dumps(email)} : s.email;
 const valor = s.senha == null ? {json.dumps(senha)} : s.senha;
 const ver = !!s.verSenha;
-const REQ = [["req8", valor.length >= 8], ["reqNum", /\\d/.test(valor)], ["reqMin", /[a-z]/.test(valor)], ["reqMai", /[A-Z]/.test(valor)]];
-const feitos = REQ.filter((r) => r[1]).length;
+{regua}
+const est = s.estado || this.props.estado || {json.dumps(estado)};
+const DIG = est === "invalido" ? ["4", "8", "2", "9", "1", "7"] : ["4", "8", "2", "9", "1", ""];
+const e = {{
+formulario: est === "formulario" || est === "vazada", enviado: est === "enviado", vazada: est === "vazada", expirado: est === "expirado",
+totp: est !== "backup", backup: est === "backup", invalido: est === "invalido",
+anel: est === "invalido" ? "inset 0 0 0 1.5px var(--bad)" : "inset 0 0 0 1px var(--input)",
+d0: DIG[0], d1: DIG[1], d2: DIG[2], d3: DIG[3], d4: DIG[4], d5: DIG[5],
+enviarForm: () => this.setState({{ estado: "enviado" }}), voltarForm: () => this.setState({{ estado: "formulario" }}),
+modoBackup: () => this.setState({{ estado: "backup" }}), modoApp: () => this.setState({{ estado: "totp" }})
+}};
 const forca = !valor ? "" : feitos <= 1 ? "Fraca" : feitos === 2 ? "Media" : feitos === 3 ? "Forte" : "MuitoForte";
 const cor = forca === "Fraca" ? "var(--bad)" : forca === "Media" ? "var(--warn)" : "var(--ok)";
 const seg = (x) => (valor && x < feitos ? cor : "var(--sunken)");
@@ -1060,7 +1162,8 @@ req: REQ.map((r) => ({{ txt: t[r[0]], ok: r[1], nao: !r[1], cor: r[1] ? "var(--o
 }};"""
 
 
-VALORES_ACESSO = """nome: nome,
+VALORES_ACESSO = """e: e,
+nome: nome,
 email: email,
 senha: senha,
 mudarNome: (e) => this.setState({ nome: e.target.value }),
@@ -1123,9 +1226,10 @@ def tela_plano_inicial(k, sufixo):
     periodo = (f'<div role="tablist" aria-label="{T("periodo")}" style="margin-left:auto;display:inline-flex;gap:2px;padding:3px;'
                f'border-radius:999px;background:{k["sunken"]};">'
                f'{seg("mes", T("mensal"))}{seg("ano", T("anual"), badge(T("economia"), k, "green"))}</div>')
-    # o Pro pode ter só mensal (GET /plans): com um período só, o seletor some
-    controles = (f'<div style="display:flex;align-items:center;gap:12px;min-height:36px;">'
-                 f'<sc-if value="{h("doisPeriodos")}" hint-placeholder-val="{{{{ true }}}}">{periodo}</sc-if></div>')
+    # o Pro pode ter só mensal (GET /plans): com um período só, o seletor some. O cupom mora na mesma
+    # linha, à esquerda: perto dos preços que ele muda, sem empurrar a grade
+    controles = lambda cupom_: (f'<div style="display:flex;align-items:flex-start;gap:12px;min-height:36px;">{cupom_}'
+                                f'<span style="margin-left:auto;"><sc-if value="{h("doisPeriodos")}" hint-placeholder-val="{{{{ true }}}}">{periodo}</sc-if></span></div>')
 
     def feature(t, faisca=False):
         if faisca:
@@ -1158,7 +1262,9 @@ def tela_plano_inicial(k, sufixo):
     starter = card('Starter', T('descStarter'), '', valor(T('gratis')), T('notaStarter'),
                    feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False)
     pro = card('Pro', T('descPro'), badge(T('recomendado'), k, 'blue'),
-               valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
+               f'<sc-if value="{h("cp.aplicado")}" hint-placeholder-val="{{{{ false }}}}">'
+               f'<s style="width:100%;font-size:14px;color:{k["mfg"]};">{h("per.cheio")}</s></sc-if>'
+               + valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
                feature(T('p2'), True) + feature(T('p3'), True) + feature(T('p4'), True), T('tudoStarter'), T('ctaPro'), True,
                teste=(f'<span style="align-self:flex-start;">{badge(T("teste"), k, "green", mono=True)}</span>'))
 
@@ -1175,15 +1281,42 @@ def tela_plano_inicial(k, sufixo):
                 + sk(f'height:40px;width:100%;' + (f'background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);' if destaque else '')) + '</div>')
 
     grade = lambda filhos: (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;width:672px;margin:0 auto;">{filhos}</div>')
+    # o cupom vale para o Pro (POST /billing/checkout aceita coupon): fica embaixo da grade, na largura dela
+    campo_cupom = lambda borda: (f'<div style="display:flex;gap:8px;">'
+                                 f'<input aria-label="{T("cupomLabel")}" value="{h("cp.codigo")}" placeholder="{T("cupomPh")}" spellcheck="false" '
+                                 f'style="width:220px;height:36px;padding:0 12px;border:0;border-radius:9px;box-shadow:inset 0 0 0 1px {borda};'
+                                 f'background:{k["card"]};font-family:{MONO};font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:{k["fgs"]};outline:0;">'
+                                 f'<button type="button" onClick="{h("cp.aplicar")}" style="height:36px;padding:0 14px;border:0;border-radius:9px;'
+                                 f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["fgs"]};font-family:{FONTE};font-size:13px;'
+                                 f'font-weight:500;cursor:pointer;">{T("aplicar")}</button></div>')
+    cupom = (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+             f'<sc-if value="{h("cp.fechado")}" hint-placeholder-val="{{{{ true }}}}">'
+             f'<button type="button" onClick="{h("cp.abrir")}" style="align-self:flex-start;height:36px;border:0;padding:0;background:transparent;'
+             f'font-family:{FONTE};font-size:13px;font-weight:500;color:{k["pri"]};cursor:pointer;">{T("temCupom")}</button></sc-if>'
+             f'<sc-if value="{h("cp.aberto")}" hint-placeholder-val="{{{{ false }}}}">{campo_cupom(k["input"])}</sc-if>'
+             f'<sc-if value="{h("cp.invalido")}" hint-placeholder-val="{{{{ false }}}}">{campo_cupom(k["bad"])}'
+             f'<p role="alert" style="margin:0;font-size:12.5px;color:{k["bad"]};">{T("cupomInvalido")}</p></sc-if>'
+             f'<sc-if value="{h("cp.aplicado")}" hint-placeholder-val="{{{{ false }}}}">'
+             f'<div style="display:flex;align-items:center;gap:10px;min-height:36px;font-size:13px;color:{k["fg"]};">'
+             f'{badge("MURIKI20", k, "green", mono=True)}<span>{T("cupomDesc")}</span>'
+             f'<button type="button" onClick="{h("cp.remover")}" style="border:0;padding:0;background:transparent;font-family:{FONTE};'
+             f'font-size:13px;font-weight:500;color:{k["mfg"]};cursor:pointer;">{T("remover")}</button></div></sc-if></div>')
     planos = (f'<sc-if value="{h("pronto")}" hint-placeholder-val="{{{{ true }}}}">{grade(starter + pro)}</sc-if>'
               f'<sc-if value="{h("carregando")}" hint-placeholder-val="{{{{ false }}}}">{grade(esqueleto(False) + esqueleto(True))}</sc-if>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
             f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:32px 24px 40px;">'
-            f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles}{planos}</div></main></div>')
+            f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles(cupom)}{planos}</div></main></div>')
 
 
 ANTES_PLANO_INICIAL = """const per0 = (s.periodos || this.props.periodos) === "só mensal" ? "mes" : (s.periodo || "mes");
 const carregando = (s.estado || this.props.estado) === "carregando";
+const cupom = s.cupom || this.props.cupom || "fechado";
+const cp = {
+fechado: cupom === "fechado", aberto: cupom === "aberto", invalido: cupom === "invalido", aplicado: cupom === "aplicado",
+codigo: cupom === "invalido" ? "NATAL10" : "MURIKI20",
+abrir: () => this.setState({ cupom: "aberto" }), aplicar: () => this.setState({ cupom: "aplicado" }),
+remover: () => this.setState({ cupom: "fechado" })
+};
 const ativo = (v) => per0 === v;
 const per = {
 mes: ativo("mes"), ano: ativo("ano"),
@@ -1191,12 +1324,15 @@ ir_mes: () => this.setState({ periodo: "mes" }), ir_ano: () => this.setState({ p
 fundo_mes: ativo("mes") ? "var(--card)" : "transparent", fundo_ano: ativo("ano") ? "var(--card)" : "transparent",
 sombra_mes: ativo("mes") ? "var(--sombra)" : "none", sombra_ano: ativo("ano") ? "var(--sombra)" : "none",
 cor_mes: ativo("mes") ? "var(--fgs)" : "var(--mfg)", cor_ano: ativo("ano") ? "var(--fgs)" : "var(--mfg)",
-preco: ativo("ano") ? (t.lang === "en-US" ? "R$499" : "R$ 499") : t.preco,
+cheio: ativo("ano") ? (t.lang === "en-US" ? "R$499" : "R$ 499") : t.preco,
+preco: cupom === "aplicado" ? (ativo("ano") ? (t.lang === "en-US" ? "R$399.20" : "R$ 399,20") : (t.lang === "en-US" ? "R$39.92" : "R$ 39,92"))
+  : (ativo("ano") ? (t.lang === "en-US" ? "R$499" : "R$ 499") : t.preco),
 intervalo: ativo("ano") ? t.anoCurto : t.mesCurto,
 nota: ativo("ano") ? t.notaAnual : t.notaMensal
 };"""
 
 VALORES_PLANO_INICIAL = """per: per,
+cp: cp,
 doisPeriodos: (s.periodos || this.props.periodos) !== "só mensal",
 pronto: !carregando,
 carregando: carregando"""
@@ -1390,7 +1526,8 @@ def _montar(tela, tema, sufixo):
         textos = {l: {**COMUM_ONB[l], **PLANOS[l], **PLANO_INICIAL[l]} for l in PLANOS}
         return web(textos, tela_plano_inicial(k, sufixo), ANTES_PLANO_INICIAL, VALORES_PLANO_INICIAL,
                    {'estado': {'editor': 'enum', 'options': ['pronto', 'carregando'], 'default': 'pronto'},
-                    'periodos': {'editor': 'enum', 'options': ['mensal e anual', 'só mensal'], 'default': 'mensal e anual'}},
+                    'periodos': {'editor': 'enum', 'options': ['mensal e anual', 'só mensal'], 'default': 'mensal e anual'},
+                    'cupom': {'editor': 'enum', 'options': ['fechado', 'aberto', 'aplicado', 'invalido'], 'default': 'fechado'}},
                    CSS_DIVIDER_SKELETON)
     onb = lambda textos: {l: {**COMUM_ONB[l], **textos[l]} for l in textos}
     if tela['id'] == 'verificacao':
@@ -1408,8 +1545,20 @@ def _montar(tela, tema, sufixo):
         return web(ACESSO, tela_acesso(k, 'entrar', sufixo), antes_acesso('', '', ''), VALORES_ACESSO)
     if tela['id'] == 'passkey':
         return web(ACESSO, tela_acesso(k, 'passkey', sufixo), antes_acesso('', '', ''), VALORES_ACESSO)
+    conta = {l: {**ACESSO[l], **CONTA[l]} for l in ACESSO}
+    estados = lambda *o: {'estado': {'editor': 'enum', 'options': list(o), 'default': o[0]}}
     if tela['id'] == 'criar':
-        return web(ACESSO, tela_acesso(k, 'criar', sufixo), antes_acesso('Rafael Moura', 'rafael@moura.dev', 'murikicode26'), VALORES_ACESSO)
+        return web(conta, tela_acesso(k, 'criar', sufixo), antes_acesso('Rafael Moura', 'rafael@moura.dev', '', 'criar'),
+                   VALORES_ACESSO, estados('formulario', 'enviado'))
+    if tela['id'] in ('criarSenha', 'redefinir'):
+        return web(conta, tela_acesso(k, tela['id'], sufixo), antes_acesso('', 'rafael@moura.dev', 'murikicode2026', tela['id']),
+                   VALORES_ACESSO, estados('formulario', 'vazada', 'expirado'))
+    if tela['id'] == 'esqueci':
+        return web(conta, tela_acesso(k, 'esqueci', sufixo), antes_acesso('', 'rafael@moura.dev', '', 'esqueci'),
+                   VALORES_ACESSO, estados('formulario', 'enviado'))
+    if tela['id'] == 'codigo':
+        return web(conta, tela_acesso(k, 'codigo', sufixo), antes_acesso('', 'rafael@moura.dev', '', 'codigo', 'totp'),
+                   VALORES_ACESSO, estados('totp', 'invalido', 'backup'))
     if tela['id'] == 'primeiro':
         return web(juntar(EXERCICIO, PRIMEIRO), tela_exercicio(k, primeira=True), ANTES_PRIMEIRO, VALORES_PRIMEIRO, PROPS_PRIMEIRO)
     if tela['id'] == 'vazio':

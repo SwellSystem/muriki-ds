@@ -289,6 +289,70 @@
    "h": 900,
    "title": "Volta do pagamento · confirmado ou cancelado · escuro",
    "is_interactive": true
+  },
+  "SegundoFator.dc.html": {
+   "x": 0,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · segundo fator (app ou código de backup)",
+   "is_interactive": true
+  },
+  "SegundoFatorEscuro.dc.html": {
+   "x": 0,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Entrar · segundo fator (app ou código de backup) · escuro",
+   "is_interactive": true
+  },
+  "EsqueciSenha.dc.html": {
+   "x": 1520,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · esqueci a senha",
+   "is_interactive": true
+  },
+  "EsqueciSenhaEscuro.dc.html": {
+   "x": 1520,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · esqueci a senha · escuro",
+   "is_interactive": true
+  },
+  "CriarSenha.dc.html": {
+   "x": 3040,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · criar senha (link do email)",
+   "is_interactive": true
+  },
+  "CriarSenhaEscuro.dc.html": {
+   "x": 3040,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · criar senha (link do email) · escuro",
+   "is_interactive": true
+  },
+  "RedefinirSenha.dc.html": {
+   "x": 4560,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · redefinir senha (link do email)",
+   "is_interactive": true
+  },
+  "RedefinirSenhaEscuro.dc.html": {
+   "x": 4560,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · redefinir senha (link do email) · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -347,6 +411,20 @@
    "kind": "title1",
    "maxW": 15120,
    "w": 240
+  },
+  "conta": {
+   "x": 0,
+   "y": 7620,
+   "text": "Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email",
+   "kind": "title1",
+   "maxW": 6000
+  },
+  "contaEscuro": {
+   "x": 0,
+   "y": 8940,
+   "text": "Conta no tema escuro",
+   "kind": "title1",
+   "maxW": 6000
   }
  },
  "order": [
@@ -385,7 +463,15 @@
   "Preferencias.dc.html",
   "PreferenciasEscuro.dc.html",
   "Pagamento.dc.html",
-  "PagamentoEscuro.dc.html"
+  "PagamentoEscuro.dc.html",
+  "SegundoFator.dc.html",
+  "SegundoFatorEscuro.dc.html",
+  "EsqueciSenha.dc.html",
+  "EsqueciSenhaEscuro.dc.html",
+  "CriarSenha.dc.html",
+  "CriarSenhaEscuro.dc.html",
+  "RedefinirSenha.dc.html",
+  "RedefinirSenhaEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

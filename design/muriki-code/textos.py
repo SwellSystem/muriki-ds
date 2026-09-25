@@ -472,7 +472,7 @@ PLANO_INICIAL = {
         descStarter='Para praticar com testes e ver onde você está.',
         descPro='Para ter o Peer junto e o porquê de cada nota.',
         notaStarter='para sempre, sem cartão', notaMensal='ou R$ 499 por ano', notaAnual='R$ 41,58 por mês',
-        tudoStarter='Tudo do Starter, mais', ctaStarter='Continuar com o Starter', ctaPro='Continuar com o Pro', teste='7 dias grátis',
+        tudoStarter='Tudo do Starter, mais', temCupom='Tem um cupom?', cupomLabel='Cupom', cupomPh='CÓDIGO', aplicar='Aplicar', cupomDesc='20% no Pro nos 3 primeiros meses', remover='Remover', cupomInvalido='Esse cupom não existe ou já expirou.', ctaStarter='Continuar com o Starter', ctaPro='Continuar com o Pro', teste='7 dias grátis',
     ),
     'en-US': dict(
         tituloInicial='How do you want to start?',
@@ -482,7 +482,7 @@ PLANO_INICIAL = {
         descStarter='To practice with tests and see where you stand.',
         descPro='To have the Peer alongside and the why behind every grade.',
         notaStarter='forever, no card', notaMensal='or R$499 a year', notaAnual='R$41.58 a month',
-        tudoStarter='Everything in Starter, plus', ctaStarter='Continue with Starter', ctaPro='Continue with Pro', teste='7 days free',
+        tudoStarter='Everything in Starter, plus', temCupom='Have a coupon?', cupomLabel='Coupon', cupomPh='CODE', aplicar='Apply', cupomDesc='20% off Pro for the first 3 months', remover='Remove', cupomInvalido='This coupon doesn’t exist or has expired.', ctaStarter='Continue with Starter', ctaPro='Continue with Pro', teste='7 days free',
     ),
     'es-ES': dict(
         tituloInicial='¿Cómo quieres empezar?',
@@ -492,7 +492,7 @@ PLANO_INICIAL = {
         descStarter='Para practicar con pruebas y ver dónde estás.',
         descPro='Para tener el Peer contigo y el porqué de cada nota.',
         notaStarter='para siempre, sin tarjeta', notaMensal='o R$ 499 al año', notaAnual='R$ 41,58 al mes',
-        tudoStarter='Todo lo de Starter, más', ctaStarter='Continuar con Starter', ctaPro='Continuar con Pro', teste='7 días gratis',
+        tudoStarter='Todo lo de Starter, más', temCupom='¿Tienes un cupón?', cupomLabel='Cupón', cupomPh='CÓDIGO', aplicar='Aplicar', cupomDesc='20% en Pro los 3 primeros meses', remover='Quitar', cupomInvalido='Ese cupón no existe o ya caducó.', ctaStarter='Continuar con Starter', ctaPro='Continuar con Pro', teste='7 días gratis',
     ),
 }
 
