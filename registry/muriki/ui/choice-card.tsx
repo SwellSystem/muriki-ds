@@ -11,8 +11,13 @@
  * coisa: o indicador é a bolinha do radio ou o quadrado do checkbox, para
  * que "escolha uma" e "escolha várias" se leiam antes de clicar.
  *
- * `min` e `max` valem no múltiplo: no teto, as desmarcadas travam; no piso,
- * a última marcada não sai. A regra fica visível em vez de virar erro.
+ * `min` e `max` valem no múltiplo: no teto, as desmarcadas travam (e
+ * esmaecem: não estão disponíveis); no piso, a última marcada não sai, mas
+ * continua com a cara de marcada — esmaecer uma escolha feita a faria
+ * parecer desligada. A regra fica visível em vez de virar erro.
+ *
+ * No single, `value={null}` é controlado e vazio: nada escolhido ainda, sem
+ * o grupo trocar de não controlado para controlado quando a pessoa escolhe.
  *
  * Marcado, o cartão ganha o anel da marca por fora — o mesmo destaque do
  * plan-card escolhido — e não um fundo tingido, que em grade de quatro
@@ -45,7 +50,7 @@ type Base = {
 }
 
 export type ChoiceCardGroupProps =
-  | (Base & { type?: "single"; value?: string; defaultValue?: string; onValueChange?: (value: string) => void })
+  | (Base & { type?: "single"; value?: string | null; defaultValue?: string; onValueChange?: (value: string) => void })
   | (Base & {
       type: "multiple"
       value?: string[]
@@ -67,10 +72,9 @@ function ChoiceCardGroup(props: ChoiceCardGroupProps) {
   if (props.type === "multiple") {
     const { value, onValueChange, min = 0, max = Infinity } = props
     const atual = value ?? interno
-    const travadas = (v: string) => {
-      const marcada = atual.includes(v)
-      return (marcada && atual.length <= min) || (!marcada && atual.length >= max)
-    }
+    // só as desmarcadas travam (no teto); a marcada no piso fica livre e
+    // o onValueChange abaixo recusa a saída dela
+    const travadas = (v: string) => !atual.includes(v) && atual.length >= max
     return (
       <ChoiceCardContext.Provider value={{ tipo: "multiple", travadas }}>
         <CheckboxGroupPrimitive
