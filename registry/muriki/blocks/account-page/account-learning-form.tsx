@@ -57,13 +57,6 @@ export function AccountLearningForm({ values, languageGroups, onSubmit, saving =
     setGoals(values.goals)
   }
 
-  const Rotulo = ({ children, extra }: { children: string; extra?: string }) => (
-    <div className="flex items-center gap-3">
-      <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{children}</span>
-      {extra ? <span className="ml-auto text-xs text-muted-foreground">{extra}</span> : null}
-    </div>
-  )
-
   return (
     <AccountCard title={t("account.learning.title")} description={t("account.learning.description")} className={className}>
       <form onSubmit={enviar} className="flex flex-col gap-4.5">
@@ -109,5 +102,16 @@ export function AccountLearningForm({ values, languageGroups, onSubmit, saving =
         </div>
       </form>
     </AccountCard>
+  )
+}
+
+// fora do render: um componente criado dentro de outro é recriado a cada
+// render e perde o estado e o foco dos filhos
+function Rotulo({ children, extra }: { children: string; extra?: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{children}</span>
+      {extra ? <span className="ml-auto text-xs text-muted-foreground">{extra}</span> : null}
+    </div>
   )
 }
