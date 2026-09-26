@@ -1595,7 +1595,8 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'conta_seguranca':
         return web(MINHA_CONTA, tela_conta_seguranca(k), ANTES_CONTA_SEGURANCA, VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA)
     if tela['id'] in SISTEMA_TELAS:
-        return web(SISTEMA, tela_sistema(k, SISTEMA_TELAS[tela['id']], sufixo))
+        qual, produto, idiomas, email = SISTEMA_TELAS[tela['id']]
+        return web(SISTEMA, tela_sistema(k, qual, sufixo, produto, idiomas, email))
     if tela['id'] == 'inicio':
         return web(INICIO, tela_inicio_primeiro_dia(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)
     if tela['id'] == 'suspenso':

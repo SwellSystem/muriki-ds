@@ -599,7 +599,7 @@
    "y": 13200,
    "w": 1440,
    "h": 900,
-   "title": "Sistema · sessão expirada",
+   "title": "Sistema · sessão expirada (401)",
    "is_interactive": true
   },
   "SessaoExpiradaEscuro.dc.html": {
@@ -607,7 +607,7 @@
    "y": 14520,
    "w": 1440,
    "h": 900,
-   "title": "Sistema · sessão expirada · escuro",
+   "title": "Sistema · sessão expirada (401) · escuro",
    "is_interactive": true
   },
   "Manutencao.dc.html": {
@@ -615,7 +615,7 @@
    "y": 13200,
    "w": 1440,
    "h": 900,
-   "title": "Sistema · manutenção",
+   "title": "Sistema · manutenção (503)",
    "is_interactive": true
   },
   "ManutencaoEscuro.dc.html": {
@@ -623,7 +623,23 @@
    "y": 14520,
    "w": 1440,
    "h": 900,
-   "title": "Sistema · manutenção · escuro",
+   "title": "Sistema · manutenção (503) · escuro",
+   "is_interactive": true
+  },
+  "NaoEncontradaBackoffice.dc.html": {
+   "x": 7600,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · a mesma 404 no Backoffice (só o produto muda)",
+   "is_interactive": true
+  },
+  "NaoEncontradaBackofficeEscuro.dc.html": {
+   "x": 7600,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · a mesma 404 no Backoffice (só o produto muda) · escuro",
    "is_interactive": true
   }
  },
@@ -715,16 +731,16 @@
   "sistema": {
    "x": 0,
    "y": 12900,
-   "text": "Páginas de sistema: sem internet, página não encontrada, erro inesperado, sessão expirada e manutenção",
+   "text": "Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform",
    "kind": "title1",
-   "maxW": 7520
+   "maxW": 9040
   },
   "sistemaEscuro": {
    "x": 0,
    "y": 14220,
    "text": "Páginas de sistema no tema escuro",
    "kind": "title1",
-   "maxW": 7520
+   "maxW": 9040
   }
  },
  "order": [
@@ -805,7 +821,9 @@
   "SessaoExpirada.dc.html",
   "SessaoExpiradaEscuro.dc.html",
   "Manutencao.dc.html",
-  "ManutencaoEscuro.dc.html"
+  "ManutencaoEscuro.dc.html",
+  "NaoEncontradaBackoffice.dc.html",
+  "NaoEncontradaBackofficeEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

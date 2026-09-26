@@ -1,61 +1,105 @@
-# ── Páginas de sistema ────────────────────────────────────────────────────
-# Sem internet, página não encontrada (404), erro inesperado (500), sessão expirada e manutenção.
-# Todas no formato do acesso suspenso (o notice-page do DS): fora do rail, pouco conteúdo no
-# centro, um ícone no círculo tingido, o título, uma frase e a saída. Nenhuma culpa a pessoa;
-# toda uma diz o que fazer agora. O erro mostra o código (o requestId da API) para o suporte.
+# ── Páginas de sistema do hub ─────────────────────────────────────────────
+# Sem internet, página não encontrada (404), erro inesperado (500), sessão expirada (401) e
+# manutenção (503) — as mesmas no Code, no Backoffice e no Platform; muda só o nome do produto.
+#
+# A linguagem é a do login: o fundo com a atmosfera da marca (o azul no canto de cima, o amarelo
+# embaixo), o título editorial em duas linhas com a segunda no azul, a legenda mono com o filete.
+# À direita, o palco: o código gigante vazado e o mascote na frente — de olhos abertos quando
+# procura (404, 500), fechados quando dorme (sem internet, manutenção, sessão). Nenhuma culpa a
+# pessoa, e toda tela diz o que fazer agora.
 from base import *  # noqa: F401,F403
 
-
-def _aviso(k, icone, tom, tit, txt, acoes, rodape='', email='rafael@moura.dev'):
-    fundo, cor = {'neutro': (k['sunken'], k['mfg']), 'atencao': (k['tyellow'], k['tyellowfg']),
-                  'erro': (k['tred'], k['tredfg'])}[tom]
-    corpo = (f'<div role="status" style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;">'
-             f'<span style="display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:999px;'
-             f'background:{fundo};color:{cor};">{ic(icone, 28)}</span>'
-             f'<div style="display:flex;flex-direction:column;gap:10px;max-width:460px;">'
-             f'<h1 style="margin:0;font-size:30px;line-height:1.1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};">{T(tit)}</h1>'
-             f'<p style="margin:0;font-size:15px;line-height:23px;color:{k["mfg"]};">{T(txt)}</p></div>'
-             f'<div style="display:flex;flex-direction:column;align-items:stretch;gap:8px;width:320px;">{acoes}</div>'
-             f'{rodape}</div>')
-    return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code", email)}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 80px;">'
-            f'{corpo}</main></div>')
+# qual: (rótulo, linha A, linha B, texto, código do palco, olhos, tom da legenda)
+PAGINAS = {
+    'offline': ('offRot', 'offA', 'offB', 'offTxt', 'OFF', 'fechado'),
+    '404': ('naoRot', 'naoA', 'naoB', 'naoTxt', '404', 'aberto'),
+    '500': ('erroRot', 'erroA', 'erroB', 'erroTxt', '500', 'aberto'),
+    'sessao': ('sessaoRot', 'sessaoA', 'sessaoB', 'sessaoTxt', '401', 'fechado'),
+    'manutencao': ('manRot', 'manA', 'manB', 'manTxt', '503', 'fechado'),
+}
 
 
-def _principal(k, txt, href='#', icone=None):
-    g = ic(icone, 15) if icone else ''
-    return (f'<a href="{href}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:44px;border-radius:11px;'
-            f'background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">{g}{T(txt)}</a>')
+def _fundo(k):
+    return (f'<div aria-hidden="true" style="position:absolute;inset:0;pointer-events:none;'
+            f'background:linear-gradient(to bottom right, color-mix(in oklch, {k["pri"]} 12%, transparent), transparent 45%);"></div>'
+            f'<div aria-hidden="true" style="position:absolute;top:-160px;left:-120px;width:620px;height:620px;border-radius:999px;'
+            f'background:color-mix(in oklch, {k["pri"]} 18%, transparent);filter:blur(170px);pointer-events:none;"></div>'
+            f'<div aria-hidden="true" style="position:absolute;right:-120px;bottom:-180px;width:560px;height:560px;border-radius:999px;'
+            f'background:color-mix(in oklch, {k["accent"]} 26%, transparent);filter:blur(140px);pointer-events:none;"></div>')
 
 
-def _saida(k, txt, href='#', icone=None):
-    g = ic(icone, 15) if icone else ''
-    return (f'<a href="{href}" style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border-radius:10px;'
-            f'color:{k["mfg"]};font-size:14px;font-weight:500;">{g}{T(txt)}</a>')
+def _palco(k, codigo, olhos):
+    mascote = LOGO if olhos == 'aberto' else LOGO_FECHADO
+    return (f'<div aria-hidden="true" style="position:relative;width:620px;height:520px;flex:0 0 auto;display:flex;'
+            f'align-items:center;justify-content:center;">'
+            # o código vazado: filete na cor da marca, sem preenchimento, atrás de tudo
+            f'<span style="position:absolute;top:40px;left:0;right:0;text-align:center;font-family:{FONTE};font-size:300px;line-height:1;'
+            f'font-weight:600;letter-spacing:-0.06em;color:transparent;'
+            f'-webkit-text-stroke:1.5px color-mix(in oklch, {k["pri"]} 45%, transparent);">{codigo}</span>'
+            # a sombra no chão e o mascote na frente, meio de lado
+            f'<span style="position:absolute;bottom:58px;left:50%;width:220px;height:26px;transform:translateX(-50%);border-radius:999px;'
+            f'background:color-mix(in oklch, {k["fgs"]} 14%, transparent);filter:blur(10px);"></span>'
+            f'<span style="position:absolute;bottom:64px;left:50%;width:230px;height:216px;display:flex;'
+            f'transform:translateX(-50%) rotate(-6deg);">{mascote}</span></div>')
 
 
-def _nota(k, html):
-    return f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{html}</p>'
+def _botao(k, txt, href='#'):
+    # o botão do login: o rótulo à esquerda, a seta num círculo à direita
+    return (f'<a href="{href}" style="display:inline-flex;align-items:center;justify-content:space-between;gap:28px;height:48px;'
+            f'padding:0 10px 0 22px;border-radius:12px;background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;'
+            f'letter-spacing:0.02em;">{T(txt)}<span style="display:flex;align-items:center;justify-content:center;width:30px;height:30px;'
+            f'border-radius:999px;background:color-mix(in oklch, {k["prifg"]} 15%, transparent);">{ic("seta", 14)}</span></a>')
 
 
-def tela_sistema(k, qual, sufixo):
+def _secundario(k, txt, href='#'):
+    return (f'<a href="{href}" style="display:inline-flex;align-items:center;height:48px;padding:0 16px;border-radius:12px;'
+            f'color:{k["fgs"]};font-size:15px;font-weight:500;">{T(txt)}</a>')
+
+
+def tela_sistema(k, qual, sufixo, produto='code', idiomas=True, email='rafael@moura.dev'):
+    rot, a, b, txt, codigo, olhos = PAGINAS[qual]
     inicio = f'Inicio{sufixo}.dc.html'
-    if qual == 'offline':
-        return _aviso(k, 'semrede', 'neutro', 'offTit', 'offTxt', _principal(k, 'tentar', icone='recarregar'),
-                      _nota(k, T('offNota')))
-    if qual == '404':
-        return _aviso(k, 'bussola', 'neutro', 'naoTit', 'naoTxt',
-                      _principal(k, 'irInicio', inicio) + _saida(k, 'voltar'),
-                      _nota(k, f'<code style="font-family:{MONO};font-size:12.5px;color:{k["mfg"]};">muriki.dev/code/trilhas/typescrpt</code>'))
-    if qual == '500':
-        return _aviso(k, 'aviso', 'atencao', 'erroTit', 'erroTxt',
-                      _principal(k, 'tentar', icone='recarregar') + _saida(k, 'irInicio', inicio),
-                      _nota(k, f'{T("erroCodigo")}: <b style="font-family:{MONO};font-weight:500;color:{k["fgs"]};">req_7f3a91c2</b> · '
-                               f'<a href="#">{T("suporte")}</a>'))
-    if qual == 'sessao':
-        # a sessão acabou: não há conta no topo, a pessoa não está mais conectada
-        return _aviso(k, 'relogio', 'neutro', 'sessaoTit', 'sessaoTxt', _principal(k, 'entrar', f'Entrar{sufixo}.dc.html'), email='')
-    return _aviso(k, 'engrenagem', 'atencao', 'manTit', 'manTxt', _principal(k, 'tentar', icone='recarregar'))
+    acoes, nota = {
+        'offline': (_botao(k, 'tentar'), f'{ic("relogio", 14)}<span>{T("offNota")}</span>'),
+        '404': (_botao(k, 'irInicio', inicio) + _secundario(k, 'voltar'),
+                f'<code style="font-family:{MONO};font-size:12px;">muriki.dev/{produto}/trilhas/typescrpt</code>'),
+        '500': (_botao(k, 'tentar') + _secundario(k, 'irInicio', inicio),
+                f'<span>{T("erroCodigo")}</span><code style="font-family:{MONO};font-size:12px;color:{k["fgs"]};">req_7f3a91c2</code>'
+                f'<span style="color:{k["input"]};">·</span><a href="#">{T("suporte")}</a>'),
+        'sessao': (_botao(k, 'entrar', f'Entrar{sufixo}.dc.html'), ''),
+        'manutencao': (_botao(k, 'tentar'), f'<a href="#">{T("status")}</a>'),
+    }[qual]
+
+    topo_ = (f'<header style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;height:72px;padding:0 56px;">'
+             f'<span style="display:flex;width:32px;height:32px;">{LOGO}</span>{legenda(f"muriki / {produto}", k)}'
+             f'<span style="margin-left:auto;display:flex;align-items:center;gap:4px;">'
+             + (botao_idioma(k) if idiomas else '') + botao_tema(k)
+             + (f'<span style="width:1px;height:20px;margin:0 10px;background:{k["input"]};"></span>'
+                f'<span style="font-size:13px;color:{k["mfg"]};">{email}</span>' if email else '')
+             + '</span></header>')
+    texto = (f'<div style="display:flex;flex-direction:column;gap:26px;width:560px;flex:0 0 auto;">'
+             f'<div style="display:flex;align-items:center;gap:12px;">{legenda(T(rot), k, "0.3em")}'
+             f'<span style="height:1px;width:64px;background:{k["pri"]};"></span></div>'
+             f'<h1 style="margin:0;font-size:72px;line-height:0.95;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'
+             f'{T(a)}<br><span style="color:{k["pri"]};">{T(b)}</span></h1>'
+             f'<p style="margin:0;max-width:440px;font-size:17px;line-height:1.6;color:{k["mfg"]};">{T(txt)}</p>'
+             f'<div style="display:flex;align-items:center;gap:6px;padding-top:6px;">{acoes}</div>'
+             + (f'<p style="margin:0;display:flex;align-items:center;gap:8px;font-size:13px;color:{k["mfg"]};">{nota}</p>' if nota else '')
+             + '</div>')
+    rodape = (f'<footer style="position:relative;z-index:1;display:flex;align-items:center;height:64px;padding:0 56px;">'
+              f'{legenda(T("direitos"), k)}</footer>')
+    return (f'{raiz(k, "display:flex;flex-direction:column;")}{_fundo(k)}{topo_}'
+            f'<main style="position:relative;z-index:1;flex:1;min-height:0;display:flex;align-items:center;justify-content:space-between;'
+            f'gap:40px;padding:0 56px 0 120px;">{texto}{_palco(k, codigo, olhos)}</main>{rodape}</div>')
 
 
-SISTEMA_TELAS = {'sem_internet': 'offline', 'nao_encontrada': '404', 'erro': '500', 'sessao': 'sessao', 'manutencao': 'manutencao'}
+# id da tela → (página, produto, com seletor de idioma, conta no topo)
+SISTEMA_TELAS = {
+    'sem_internet': ('offline', 'code', True, 'rafael@moura.dev'),
+    'nao_encontrada': ('404', 'code', True, 'rafael@moura.dev'),
+    'erro': ('500', 'code', True, 'rafael@moura.dev'),
+    'sessao': ('sessao', 'code', True, ''),
+    'manutencao': ('manutencao', 'code', True, ''),
+    # a mesma página no Backoffice: só pt-BR e a conta da equipe
+    'nao_encontrada_backoffice': ('404', 'backoffice', False, 'ana.lima@muriki.app'),
+}
