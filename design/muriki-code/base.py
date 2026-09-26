@@ -358,10 +358,17 @@ def rail(k, ativo):
                 f'padding:0 10px;border-radius:9px;font-size:13px;{f}">{b}{ic(icone)}'
                 f'<span style="flex:1;">{T(chave)}</span>{direita}</a>')
 
+    def em_breve(chave, icone):
+        # a tela ainda não existe: esmaecido, com o selo mono, sem navegar (o soon do app-shell)
+        return (f'<span aria-disabled="true" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;'
+                f'border-radius:9px;font-size:13px;color:{k["mfg"]};opacity:0.75;"><span style="display:flex;opacity:0.7;">{ic(icone)}</span>'
+                f'<span style="flex:1;">{T(chave)}</span>'
+                f'<span style="font-family:{MONO};font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;">{T("emBreveRail")}</span></span>')
+
     nav = ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS)
-    ponto = f'<span style="width:7px;height:7px;border-radius:999px;background:{k["ok"]};"></span>'
-    base = (item('peer', 'peer', ativo == 'peer', ponto)
-            + item('plano', 'plano', ativo == 'plano', badge('Pro', k, 'blue')))
+    # o Peer na IDE ainda está em construção; a tela Conectar segue no canvas como desenho do que vem
+    peer = item('peer', 'peer', True) if ativo == 'peer' else em_breve('peer', 'peer')
+    base = peer + item('plano', 'plano', ativo == 'plano', badge('Pro', k, 'blue'))
     return (
         f'<nav aria-label="Muriki Code" style="width:232px;flex:0 0 232px;background:{k["rail"]};display:flex;'
         f'flex-direction:column;box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);">'
