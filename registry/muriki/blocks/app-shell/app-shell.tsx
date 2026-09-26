@@ -35,6 +35,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 export interface AppShellNavItem {
@@ -55,6 +56,13 @@ export interface AppShellNavItem {
    * do texto. Amarelo só no traço sumiria no tema claro. Um item por rail.
    */
   accent?: boolean
+  /**
+   * A tela ainda não existe: o item aparece esmaecido, com o selo mono
+   * "em breve", não navega e é anunciado como desativado. Recolhido, o
+   * selo some e o tooltip diz "Evolução · em breve". O rótulo vem do
+   * i18n (app_shell.soon) ou de `soonLabel` no AppShell.
+   */
+  soon?: boolean
 }
 
 export interface AppShellNavGroup {
@@ -99,6 +107,8 @@ export interface AppShellProps {
   }
   /** Rótulo do botão que abre o menu no celular. */
   menuLabel?: string
+  /** O selo dos itens `soon`. Sem isto, vem do i18n (app_shell.soon). */
+  soonLabel?: string
   defaultOpen?: boolean
   className?: string
   /** O palco: padding do desenho por padrão; aqui entra um max-width, por exemplo. */
@@ -116,7 +126,30 @@ function iconeDoItem(item: AppShellNavItem) {
   return cloneElement(item.icon, { weight: "duotone" })
 }
 
-function Item({ item }: { item: AppShellNavItem }) {
+function Item({ item, soonLabel }: { item: AppShellNavItem; soonLabel: string }) {
+  if (item.soon) {
+    // Sem destino e sem clique, mas ainda com hover: o tooltip do rail
+    // recolhido precisa dele. Por isso não usa o aria-disabled do botão,
+    // que tira os eventos do ponteiro.
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          tooltip={`${item.label} · ${soonLabel}`}
+          aria-disabled="true"
+          data-soon=""
+          onClick={(event) => event.preventDefault()}
+          className="cursor-default text-muted-foreground/70 hover:bg-transparent aria-disabled:pointer-events-auto aria-disabled:opacity-100 [&_svg]:opacity-60"
+        >
+          {iconeDoItem(item)}
+          <span className="flex-1">{item.label}</span>
+          {item.trailing}
+          <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
+            {soonLabel}
+          </span>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -147,11 +180,14 @@ export function AppShell({
   user,
   settings,
   menuLabel = "Menu",
+  soonLabel,
   defaultOpen = true,
   className,
   stageClassName,
   children,
 }: AppShellProps) {
+  const t = useTranslate()
+  const emBreve = soonLabel ?? t("app_shell.soon")
   const marca = (
     <>
       <span className="flex size-[30px] shrink-0 [&>*]:size-full">
@@ -210,7 +246,7 @@ export function AppShell({
               <SidebarGroupContent>
                 <SidebarMenu className="gap-0.5">
                   {group.items.map((item) => (
-                    <Item key={item.key} item={item} />
+                    <Item key={item.key} item={item} soonLabel={emBreve} />
                   ))}
                 </SidebarMenu>
               </SidebarGroupContent>
@@ -222,7 +258,7 @@ export function AppShell({
           {footerItems.length > 0 ? (
             <SidebarMenu className="gap-0.5">
               {footerItems.map((item) => (
-                <Item key={item.key} item={item} />
+                <Item key={item.key} item={item} soonLabel={emBreve} />
               ))}
             </SidebarMenu>
           ) : null}
