@@ -307,7 +307,7 @@
       "is_interactive": true
     },
     "Relatorios.dc.html": {
-      "x": 7600,
+      "x": 9120,
       "y": 5280,
       "w": 1440,
       "h": 900,
@@ -315,7 +315,7 @@
       "is_interactive": true
     },
     "RelatoriosEscuro.dc.html": {
-      "x": 7600,
+      "x": 9120,
       "y": 6600,
       "w": 1440,
       "h": 900,
@@ -323,7 +323,7 @@
       "is_interactive": true
     },
     "RelatorioGerar.dc.html": {
-      "x": 9120,
+      "x": 10640,
       "y": 5280,
       "w": 1440,
       "h": 900,
@@ -331,7 +331,7 @@
       "is_interactive": true
     },
     "RelatorioGerarEscuro.dc.html": {
-      "x": 9120,
+      "x": 10640,
       "y": 6600,
       "w": 1440,
       "h": 900,
@@ -396,6 +396,22 @@
       "w": 1440,
       "h": 900,
       "title": "Clientes · inativar em um produto só, no alert-dialog · escuro",
+      "is_interactive": true
+    },
+    "CupomUsos.dc.html": {
+      "x": 7600,
+      "y": 5280,
+      "w": 1440,
+      "h": 900,
+      "title": "Cupons · os usos de um cupom, cada um leva ao cliente",
+      "is_interactive": true
+    },
+    "CupomUsosEscuro.dc.html": {
+      "x": 7600,
+      "y": 6600,
+      "w": 1440,
+      "h": 900,
+      "title": "Cupons · os usos de um cupom, cada um leva ao cliente · escuro",
       "is_interactive": true
     }
   },
@@ -477,7 +493,8 @@
       "y": 10260,
       "text": "PDFs: o pdf-report e o pdf-recovery-codes do DS, renderizados de verdade pelo takumi",
       "kind": "title1",
-      "maxW": 4480
+      "maxW": 4480,
+      "w": 240
     }
   },
   "order": [
@@ -530,7 +547,9 @@
     "ClienteDetalhe.dc.html",
     "ClienteDetalheEscuro.dc.html",
     "Inativar.dc.html",
-    "InativarEscuro.dc.html"
+    "InativarEscuro.dc.html",
+    "CupomUsos.dc.html",
+    "CupomUsosEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"
