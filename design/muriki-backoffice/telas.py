@@ -841,7 +841,7 @@ CUPONS = [
     # código, desconto, duração, planos, usados, limite, validade, status
     ('BEMVINDO20', '20%', '3 meses', ['Pro'], 212, None, '31 dez 2026', 'Ativo'),
     ('PRO50', 'R$ 50', 'uma vez', ['Pro'], 88, 100, '30 set 2026', 'Ativo'),
-    ('TEAMANUAL', '15%', 'sempre', ['Team'], 12, 50, 'sem validade', 'Ativo'),
+    ('TEAM15', '15%', 'sempre', ['Team'], 12, 50, 'sem validade', 'Ativo'),
     ('UNIVERSIDADE', '50%', 'sempre', ['Pro'], 41, None, 'sem validade', 'Ativo'),
     ('INDICA10', '10%', '12 meses', ['Pro', 'Team'], 64, None, 'sem validade', 'Ativo'),
     ('PARCEIRO25', '25%', '6 meses', ['Pro', 'Team'], 19, 200, '31 mar 2027', 'Pausado'),
@@ -872,7 +872,11 @@ def tela_cupons(k, hover=1, sobre=''):
         else:
             usos = (f'<span style="font-family:{MONO};font-size:12px;color:{k["fgs"]};">{milhar(usados)} '
                     f'<span style="color:{k["mfg"]};">/ sem limite</span></span>')
-        itens = [('lapis', 'Editar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False), ('pontos', 'Mais ações', None, False)]
+        # O Stripe não edita cupom depois de criado: no lugar de Editar, Duplicar abre o novo cupom
+        # preenchido e com o código em branco. Pausar no ativo, Retomar no pausado; esgotado e
+        # expirado são encerrados e não voltam, mas ainda duplicam
+        itens = [('duplicar', 'Duplicar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False)]
+        itens += {'Ativo': [('pausa', 'Pausar', None, False)], 'Pausado': [('retomar', 'Retomar', None, False)]}.get(status, [])
         cel = [
             caixa(k, False, f'Selecionar {cod}'),
             f'<span style="display:flex;align-items:center;gap:8px;">'
@@ -910,18 +914,19 @@ def tela_cupom_novo(k):
         op = 'opacity:0.55;' if desativado else ''
         return (f'<label style="display:flex;align-items:center;gap:10px;{op}">{caixa(k, marcado, nome)}'
                 f'<span style="font-size:13.5px;color:{k["fgs"]};flex:1;">{nome}</span><span style="font-size:12px;color:{k["mfg"]};">{sub}</span></label>')
+    def regra(txt):
+        # o que não é escolha: texto fixo com o ícone, sem controle
+        return (f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:{k["mfg"]};">'
+                f'{ic("check", 14)}<span>{txt}</span></span>')
     onde = secao_sheet(k, 'Onde vale', (
         plano_check('Starter', False, 'grátis, sem cobrança', True) + plano_check('Pro', True, '764 clientes')
         + plano_check('Team', True, '48 clientes') + plano_check('Enterprise', False, 'rascunho', True)
-        + seletor(k, 'Ciclo', 'Mensal e anual')))
+        + regra('Só no plano mensal. O anual já tem o desconto embutido.')))
     limites = secao_sheet(k, 'Limites', (
         f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
         + campo(k, 'Usos no total', '200', dica='Vazio é sem limite.', id_='usos')
         + campo(k, 'Vale até', '31/10/2026', icone='calendario', dica='Até 23:59, horário de Brasília.', id_='validade') + '</div>'
-        + f'<div style="display:flex;align-items:center;gap:12px;"><span style="display:flex;flex-direction:column;flex:1;">'
-          f'<span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">Um por cliente</span>'
-          f'<span style="font-size:12px;color:{k["mfg"]};">Quem já usou não usa de novo, nem em outra conta com o mesmo documento.</span></span>'
-          f'{switch(k, True, "Um por cliente")}</div>'
+        + regra('Todo cupom vale uma vez por conta e uma vez por CPF.')
         + f'<div style="display:flex;align-items:center;gap:12px;"><span style="display:flex;flex-direction:column;flex:1;">'
           f'<span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">Só primeira assinatura</span>'
           f'<span style="font-size:12px;color:{k["mfg"]};">Não vale para quem já pagou algum plano.</span></span>'
