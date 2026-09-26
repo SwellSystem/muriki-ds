@@ -529,6 +529,22 @@
    "h": 900,
    "title": "Conta · acesso ao Code suspenso pela equipe · escuro",
    "is_interactive": true
+  },
+  "Inicio.dc.html": {
+   "x": 7600,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Início · o primeiro dia, antes de qualquer prática",
+   "is_interactive": true
+  },
+  "InicioEscuro.dc.html": {
+   "x": 7600,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Início · o primeiro dia, antes de qualquer prática · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -550,8 +566,8 @@
   },
   "web": {
    "kind": "title1",
-   "maxW": 7520,
-   "text": "Code web: perfil, competência, exercício, avaliação e playground",
+   "maxW": 9040,
+   "text": "Code web: perfil, competência, exercício, avaliação, playground e o início do primeiro dia",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -569,7 +585,7 @@
    "y": 3660,
    "text": "Code web no tema escuro",
    "kind": "title1",
-   "maxW": 7520,
+   "maxW": 9040,
    "w": 240
   },
   "ideEscuro": {
@@ -683,7 +699,9 @@
   "ContaSessoes.dc.html",
   "ContaSessoesEscuro.dc.html",
   "Suspenso.dc.html",
-  "SuspensoEscuro.dc.html"
+  "SuspensoEscuro.dc.html",
+  "Inicio.dc.html",
+  "InicioEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

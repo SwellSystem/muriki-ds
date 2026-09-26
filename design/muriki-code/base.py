@@ -170,6 +170,7 @@ I = dict(
     lua=svg('<path d="M13.3 9.7A5.6 5.6 0 016.3 2.7a5.6 5.6 0 107 7z"/>'),
     sol=svg('<circle cx="8" cy="8" r="2.8"/><path d="M8 1.5v1.6M8 12.9v1.6M1.5 8h1.6M12.9 8h1.6M3.4 3.4l1.1 1.1M11.5 11.5l1.1 1.1M3.4 12.6l1.1-1.1M11.5 4.5l1.1-1.1"/>'),
     envelope=svg('<rect x="1.8" y="3.4" width="12.4" height="9.2" rx="1.6"/><path d="M2.4 4.4L8 8.8l5.6-4.4"/>'),
+    casa=svg('<path d="M2.4 7.2L8 2.6l5.6 4.6"/><path d="M3.8 6.2v7.4h8.4V6.2"/><path d="M6.6 13.6V9.8h2.8v3.8"/>'),
     pessoa=svg('<circle cx="8" cy="5.4" r="2.8"/><path d="M2.8 14c.6-2.8 2.7-4.4 5.2-4.4s4.6 1.6 5.2 4.4"/>'),
     olho_fechado=svg('<path d="M1.6 8s2.4-4.6 6.4-4.6S14.4 8 14.4 8s-2.4 4.6-6.4 4.6S1.6 8 1.6 8z"/><circle cx="8" cy="8" r="1.9"/><path d="M2.6 2.6l10.8 10.8"/>'),
     circulo=svg('<circle cx="8" cy="8" r="4.4"/>'),
@@ -287,6 +288,7 @@ def escala(n, k, larg=20):
 
 
 PRODUTO_ITENS = [
+    ('inicio', 'casa'),
     ('evolucao', 'evolucao'),
     ('trilhas', 'trilhas'),
     ('exercicios', 'exercicios'),
@@ -295,7 +297,7 @@ PRODUTO_ITENS = [
 ]
 
 # para onde cada item do menu leva no Play; __SUF__ vira '' ou 'Escuro' na montagem, e o tema segue junto
-DESTINOS = dict(evolucao='Main', exercicios='Exercicio', avaliacoes='Avaliacao', playground='Playground',
+DESTINOS = dict(inicio='Inicio', evolucao='Main', exercicios='Exercicio', avaliacoes='Avaliacao', playground='Playground',
                 peer='Conectar', plano='Planos')
 
 
