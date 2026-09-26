@@ -23,8 +23,7 @@ INICIO = {
         perfil='Seu perfil de competência',
         perfilTxt='Começa em Pleno em tudo, pela experiência que você escolheu. Cada exercício enviado confirma ou ajusta uma competência.',
         verPerfil='Ver o perfil',
-        planoRot='Plano', planoTxt='Pro em teste grátis até 1º de outubro. Depois, você escolhe entre ficar no Pro ou voltar ao Starter.',
-        diasRestantes='6 dias restantes', verPlanos='Ver planos',
+        pgTit='Playground', pgTxt='Quer só testar uma ideia? Código livre, sem enunciado nem nota, com o Peer do lado e as suas linguagens prontas.', pgAbrir='Abrir o Playground',
     ),
     'en-US': dict(
         titulo='Welcome, Rafael.',
@@ -47,8 +46,7 @@ INICIO = {
         perfil='Your competency profile',
         perfilTxt='It starts at Mid-level in everything, from the experience you chose. Each exercise you submit confirms or adjusts a competency.',
         verPerfil='See the profile',
-        planoRot='Plan', planoTxt='Pro on a free trial until October 1. After that, you choose between staying on Pro or going back to Starter.',
-        diasRestantes='6 days left', verPlanos='See plans',
+        pgTit='Playground', pgTxt='Just want to try an idea? Free code, no brief and no grade, with the Peer beside you and your languages ready.', pgAbrir='Open the Playground',
     ),
     'es-ES': dict(
         titulo='Te damos la bienvenida, Rafael.',
@@ -71,7 +69,6 @@ INICIO = {
         perfil='Tu perfil de competencias',
         perfilTxt='Empieza en Intermedio en todo, por la experiencia que elegiste. Cada ejercicio enviado confirma o ajusta una competencia.',
         verPerfil='Ver el perfil',
-        planoRot='Plan', planoTxt='Pro en prueba gratis hasta el 1 de octubre. Después, eliges entre seguir en Pro o volver a Starter.',
-        diasRestantes='6 días restantes', verPlanos='Ver planes',
+        pgTit='Playground', pgTxt='¿Solo quieres probar una idea? Código libre, sin enunciado ni nota, con el Peer al lado y tus lenguajes listos.', pgAbrir='Abrir el Playground',
     ),
 }

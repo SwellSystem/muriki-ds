@@ -3,7 +3,8 @@
 # mostra o que existe, sem virar vitrine: o próximo passo em destaque (o primeiro exercício), o
 # que ela contou no primeiro acesso com "ajustar" (ou o convite, se pulou: GET
 # /code/learning-profile 404), o mapa do Code com o que ainda vem "em breve", e os dois estados
-# que se enchem com a prática — o perfil de competência e o plano em teste, numa linha só.
+# que se enchem com a prática — o perfil de competência — ao lado da porta do Playground, para
+# quem só quer testar uma ideia. O plano não entra: o selo do menu já diz.
 from base import *  # noqa: F401,F403
 
 h = lambda caminho: '{{' + caminho + '}}'
@@ -77,18 +78,18 @@ def tela_inicio(k, sufixo):
         f'<div style="display:flex;align-items:center;gap:14px;"><span style="display:flex;gap:3px;">{escala_vazia}</span>'
         f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("perfilTxt")}</p></div>',
         k, pad='16px 22px', extra='gap:10px;flex:1.6;min-width:0;')
-    plano = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">{rotulo(T("planoRot"), k["mfg"])}'
-        f'<a href="Planos{sufixo}.dc.html" style="font-size:12.5px;">{T("verPlanos")}</a></div>'
-        f'<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:15px;font-weight:600;color:{k["fgs"]};">Pro</span>'
-        f'{badge(T("diasRestantes"), k, "blue", ponto=True)}</div>'
-        f'<p style="margin:0;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("planoTxt")}</p>',
-        k, pad='16px 22px', extra='gap:8px;flex:1;min-width:0;')
+    playground = cartao(
+        f'<div style="display:flex;align-items:center;gap:8px;color:{k["fgs"]};">{ic("terminal", 16)}'
+        f'<span style="font-size:14px;font-weight:600;">{T("pgTit")}</span>'
+        f'<span style="margin-left:auto;display:flex;gap:6px;">{badge("TypeScript", k, mono=True)}{badge("Python", k, mono=True)}</span></div>'
+        f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("pgTxt")}</p>'
+        f'<div>{botao_link(T("pgAbrir"), f"Playground{sufixo}.dc.html", k, "outline", 36, "seta")}</div>',
+        k, pad='16px 22px', extra='gap:10px;flex:1;min-width:0;')
 
     corpo = (cab
              + f'<div style="display:flex;gap:16px;align-items:stretch;">{proximo}{perfil_card}</div>'
              + mapa
-             + f'<div style="display:flex;gap:16px;align-items:stretch;">{competencia}{plano}</div>')
+             + f'<div style="display:flex;gap:16px;align-items:stretch;">{competencia}{playground}</div>')
     return app(k, 'inicio', corpo, gap=22)
 
 
