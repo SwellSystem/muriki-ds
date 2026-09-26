@@ -329,6 +329,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/app-shell` | `registry:block` | a moldura dos apps do hub sobre o `sidebar`: troca de produto, grupos de navegação, o pé com Peer e Plano, idioma, tema e usuário |
 | `@muriki/plans-page` | `registry:block` | a tela de Planos de dentro do app: plano atual marcado, o estado da assinatura acima dos cards e as regras embaixo |
 | `@muriki/notice-page` | `registry:block` | a tela de aviso fora do shell: ícone, título, frase e ações no centro, a conta embaixo — acesso suspenso, pagamento, confirmação |
+| `@muriki/status-page` | `registry:block` | as páginas de sistema do hub (sem internet, 404, 500, sessão expirada, manutenção): o mascote é o zero do código, com a cara do que houve |
 | `@muriki/account-page` | `registry:block` | a Minha conta: abas por link, dados pessoais, email com troca pendente, excluir conta e o diálogo de confirmar com senha ou código |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/muriki-logo` | `registry:ui` | o macaco da marca em SVG inline, de olhos abertos ou fechados |

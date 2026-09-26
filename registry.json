@@ -1147,6 +1147,33 @@
       "docs": "<NoticePage brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account=\"rafael@moura.dev\" icon={<LockIcon />} tone=\"attention\" title=\"Seu acesso ao Muriki Code está suspenso\" description=\"A sua conta Muriki continua ativa, mas o Code está bloqueado para ela no momento. Fale com o suporte para entender o que aconteceu e como voltar.\" actions={<><Button variant=\"solid\" size=\"touch\" render={<a href={suporte} />}>Falar com o suporte</Button><Button variant=\"ghost\" onClick={sair}><SignOutIcon />Sair da conta</Button></>} footer={<>Você está na conta <b className=\"font-mono font-medium text-foreground-strong\">rafael@moura.dev</b></>} />. Tons: neutral, success (confirmado), attention (suspenso, pendente), danger. O ícone é do app (Phosphor) e ganha 28px."
     },
     {
+      "name": "status-page",
+      "type": "registry:block",
+      "title": "Status Page",
+      "description": "As páginas de sistema do hub — sem internet, página não encontrada (404), erro inesperado (500), sessão expirada (401) e manutenção (503) — na linguagem do login: atmosfera da marca, título editorial em duas linhas e, no palco, o código gigante com o mascote no lugar do zero e a cara do que houve (X, interrogação, espiral, cadeado, alerta). A mesma no Code, no Backoffice e no Platform.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/status-page/status-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/status-page/status-page.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/status-page/status-mascot.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/status-page/status-mascot.tsx"
+        }
+      ],
+      "docs": "<StatusPage kind=\"not-found\" product=\"code\" logo={<MurikiLogo />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account={email} action={{ render: <Link to=\"/\" /> }} secondaryAction={{ onClick: () => history.back() }} note={<code className=\"font-mono text-xs\">{location.pathname}</code>} />. kind: offline | not-found | error | session-expired | maintenance. Textos em status_page.<kind>.* (label, title_a, title_b, description, action, secondary); title, description e label trocam por prop. No erro, passe o requestId na note: <>{t(\"status_page.error.code\")} <code>{requestId}</code> · <a href={suporte}>{t(\"status_page.error.support\")}</a></>. Na sessão expirada, não passe account. O StatusMascot (face: offline | not-found | error | locked | warning) sai à parte, para usar o mascote em outro lugar. Sem internet já traz a nota de que a página volta sozinha."
+    },
+    {
       "name": "account-page",
       "type": "registry:block",
       "title": "Account Page",
