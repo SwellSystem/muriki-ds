@@ -4,7 +4,9 @@
 // selo de teste acima do preço, botão tingido). Aqui a pessoa já tem um
 // plano e está conferindo: nome pequeno com o selo "atual" na mesma
 // linha, preço de 34px, o teste como texto verde na linha de baixo, a
-// lista com filete em cima e o botão no contorno.
+// lista com filete em cima e o botão no contorno. O destaque do card, esse
+// sim, é o mesmo do PlanCard: anel, fio de luz no topo, brilho no canto e
+// a aba, para /plans falar a língua do onboarding.
 //
 // Cabeçalho, faixa de status, cards e regras moram numa coluna só, de até
 // 1200px, que cresce com o palco: o seletor de período termina alinhado
@@ -40,10 +42,13 @@ export interface PlansPagePlan {
   features: string[]
   /** O que ainda não tem número: esmaecido, com o selo tracejado. */
   pendingFeatures?: string[]
-  /** O plano de quem está vendo: anel, selo "atual" e botão desligado. */
+  /** O plano de quem está vendo: botão desligado e, fora do destacado, o selo "atual". */
   current?: boolean
-  /** O botão sai sólido, ex.: o Pro para quem está no Starter. Um por tela. */
+  /** O destaque do onboarding (anel, fio de luz, brilho, leve scale no md), normalmente o Pro.
+   * O botão sai sólido quando o card não é o atual. Um por tela. */
   emphasized?: boolean
+  /** A aba no canto de cima, ex.: "Atual" ou "Recomendado". */
+  tab?: string
   ctaLabel: string
 }
 
@@ -212,20 +217,42 @@ function PlanTile({
     <section
       aria-labelledby={nameId}
       className={cn(
-        "flex min-w-0 flex-col gap-5 rounded-2xl bg-card px-[30px] py-7",
-        plan.current
-          ? "shadow-float ring-[1.5px] ring-primary"
+        "relative flex min-w-0 flex-col gap-5 overflow-hidden rounded-2xl bg-card px-[30px] py-7",
+        plan.emphasized
+          ? "shadow-float ring-[1.5px] ring-primary/60 md:scale-[1.03]"
           : "shadow-sm"
       )}
     >
-      <div className="flex items-center gap-2">
+      {/* O mesmo destaque do PlanCard recomendado. */}
+      {plan.emphasized ? (
+        <>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -top-24 -right-24 size-48 rounded-full bg-primary/[0.08] blur-3xl"
+          />
+        </>
+      ) : null}
+      {plan.tab ? (
+        <div className="absolute top-0 right-0 z-10 rounded-bl-lg bg-primary px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary-foreground">
+          {plan.tab}
+        </div>
+      ) : null}
+
+      <div className="relative flex items-center gap-2">
         <h2 id={nameId} className="text-lg font-semibold text-foreground-strong">
           {plan.name}
         </h2>
-        {plan.current ? <Badge tone="blue">{labels.current}</Badge> : null}
+        {/* No destacado quem diz "atual" é a aba; aqui fica só a marca discreta. */}
+        {plan.current && !plan.emphasized ? (
+          <Badge tone="blue">{labels.current}</Badge>
+        ) : null}
       </div>
 
-      <div className="flex flex-col gap-1">
+      <div className="relative flex flex-col gap-1">
         {!gratis &&
         plan.originalAmountInCents !== undefined &&
         plan.originalAmountInCents > plan.amountInCents ? (
@@ -255,7 +282,7 @@ function PlanTile({
         ) : null}
       </div>
 
-      <ul className="flex flex-1 flex-col gap-3 border-t border-muted pt-[18px]">
+      <ul className="relative flex flex-1 flex-col gap-3 border-t border-muted pt-[18px]">
         {plan.features.map((item) => (
           <li key={item} className="flex items-start gap-2.5 text-sm leading-[22px] text-foreground">
             <CheckIcon aria-hidden size={15} className="mt-[3px] shrink-0 text-success" />
@@ -276,7 +303,7 @@ function PlanTile({
         type="button"
         size="lg"
         variant={plan.emphasized && !plan.current ? "solid" : "outline"}
-        className="h-10 w-full"
+        className="relative h-10 w-full"
         onClick={onSelect}
         disabled={desligado}
         aria-busy={pending}
