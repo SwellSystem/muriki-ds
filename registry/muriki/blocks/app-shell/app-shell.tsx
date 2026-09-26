@@ -337,7 +337,14 @@ function IdiomaDoRail({ language }: { language: ReactElement }) {
   const { state, isMobile } = useSidebar()
   const recolhido = state === "collapsed" && !isMobile
   return (
-    <div className="flex min-w-0 flex-1 group-data-[collapsible=icon]:flex-none [&>*]:w-full group-data-[collapsible=icon]:[&>*]:w-auto">
+    <div
+      className={cn(
+        "flex min-w-0 flex-1 group-data-[collapsible=icon]:flex-none",
+        // aberto, o seletor é a linha inteira com o conteúdo à esquerda (o botao_idioma do desenho);
+        // o alvo é o botão, não os foco-guardas que o menu põe ao lado
+        !recolhido && "[&>button]:w-full [&>button]:justify-start [&>button]:px-2.5"
+      )}
+    >
       {cloneElement(language as ReactElement<{ compact?: boolean }>, { compact: recolhido })}
     </div>
   )
