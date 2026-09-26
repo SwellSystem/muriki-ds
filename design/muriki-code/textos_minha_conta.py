@@ -228,3 +228,22 @@ MINHA_CONTA = {
         soTxt='Safari en iOS y Firefox en Windows salen ahora y tendrán que entrar de nuevo. Esta sesión sigue.', soBotao='Cerrar 2 sesiones',
     ),
 }
+
+# /suspended: o staff inativou a conta no Code (403 PRODUCT_DEACTIVATED); o motivo não vem da API
+SUSPENSO = {
+    'pt-BR': dict(
+        suTit='Seu acesso ao Muriki Code está suspenso',
+        suTxt='A sua conta Muriki continua ativa, mas o Code está bloqueado para ela no momento. Fale com o suporte para entender o que aconteceu e como voltar.',
+        suSuporte='Falar com o suporte', suSair='Sair da conta', suConta='Você está na conta',
+    ),
+    'en-US': dict(
+        suTit='Your access to Muriki Code is suspended',
+        suTxt='Your Muriki account is still active, but Code is blocked for it right now. Contact support to find out what happened and how to get back.',
+        suSuporte='Contact support', suSair='Sign out', suConta='You’re signed in as',
+    ),
+    'es-ES': dict(
+        suTit='Tu acceso a Muriki Code está suspendido',
+        suTxt='Tu cuenta Muriki sigue activa, pero Code está bloqueado para ella por ahora. Habla con soporte para saber qué pasó y cómo volver.',
+        suSuporte='Hablar con soporte', suSair='Cerrar sesión', suConta='Estás en la cuenta',
+    ),
+}

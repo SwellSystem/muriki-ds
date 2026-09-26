@@ -497,3 +497,26 @@ def tela_confirmar_email(k, sufixo):
 ANTES_CONFIRMAR_EMAIL = """const ceE = s.estado || this.props.estado || "confirmado";
 const ce = { ceConfirmando: ceE === "confirmando", ceOk: ceE === "confirmado", ceInvalido: ceE === "invalido", ceTomado: ceE === "emUso" };"""
 PROPS_CONFIRMAR_EMAIL = {'estado': {'editor': 'enum', 'options': ['confirmado', 'confirmando', 'invalido', 'emUso'], 'default': 'confirmado'}}
+
+
+# ── /suspended: o acesso ao Code foi suspenso pela equipe ────────────────
+# As rotas do Code respondem 403 PRODUCT_DEACTIVATED; a pessoa continua conectada, e a conta Muriki
+# segue ativa. Fora do rail (não há produto para navegar), pouco conteúdo no centro, sem culpa e
+# sem motivo (a API não manda). A conta fica visível no topo e no corpo; a saída é sair da conta.
+def tela_suspenso(k, sufixo):
+    corpo = (f'<div role="status" style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center;">'
+             f'<span style="display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:999px;'
+             f'background:{k["tyellow"]};color:{k["tyellowfg"]};">{ic("cadeado", 28)}</span>'
+             f'<div style="display:flex;flex-direction:column;gap:10px;max-width:460px;">'
+             f'<h1 style="margin:0;font-size:30px;line-height:1.1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};">{T("suTit")}</h1>'
+             f'<p style="margin:0;font-size:15px;line-height:23px;color:{k["mfg"]};">{T("suTxt")}</p></div>'
+             f'<div style="display:flex;flex-direction:column;align-items:stretch;gap:8px;width:320px;">'
+             f'<a href="#" style="display:flex;align-items:center;justify-content:center;height:44px;border-radius:11px;'
+             f'background:{k["pri"]};color:{k["prifg"]};font-size:15px;font-weight:500;">{T("suSuporte")}</a>'
+             f'<a href="Entrar{sufixo}.dc.html" style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border-radius:10px;'
+             f'color:{k["mfg"]};font-size:14px;font-weight:500;">{ic("sair", 15)}{T("suSair")}</a></div>'
+             f'<p style="margin:0;font-size:13px;color:{k["mfg"]};">{T("suConta")} '
+             f'<b style="font-family:{MONO};font-weight:500;color:{k["fgs"]};">rafael@moura.dev</b></p></div>')
+    return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px 80px;">'
+            f'{corpo}</main></div>')
