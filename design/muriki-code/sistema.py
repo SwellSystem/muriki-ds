@@ -4,20 +4,20 @@
 #
 # A linguagem é a do login: o fundo com a atmosfera da marca (o azul no canto de cima, o amarelo
 # embaixo), o título editorial em duas linhas com a segunda no azul, a legenda mono com o filete.
-# À direita, o palco: o código gigante vazado e o mascote na frente, com a cara do que houve e a
-# boca triste, e um símbolo no lugar dos olhos: X sem internet, o alerta vermelho no 404, a
-# espiral de tonto no erro, o cadeado na sessão expirada (401) e o alerta de contorno preto e
-# miolo amarelo na manutenção (503). As caras moram em design/logo-*.svg, feitas das camadas do
-# logo. Nenhuma culpa a pessoa, e toda tela diz o que fazer agora.
+# À direita, o palco: o código gigante com o mascote no lugar do zero, com a cara do que houve e
+# a boca triste — X sem internet, a interrogação no 404, a espiral de tonto no erro, o cadeado na
+# sessão expirada (401) e o alerta de pontas arredondadas na manutenção (503). As caras moram em
+# design/logo-*.svg, feitas das camadas do logo. Nenhuma culpa a pessoa, e toda tela diz o que
+# fazer agora.
 from base import *  # noqa: F401,F403
 from base import _logo
 
-CARAS = {nome: _logo(nome) for nome in ('x', 'alerta-vermelho', 'tonto', 'cadeado', 'alerta')}
+CARAS = {nome: _logo(nome) for nome in ('x', 'interrogacao', 'tonto', 'cadeado', 'alerta')}
 
 # qual: (rótulo, linha A, linha B, texto, código do palco, cara do mascote)
 PAGINAS = {
     'offline': ('offRot', 'offA', 'offB', 'offTxt', 'OFF', 'x'),
-    '404': ('naoRot', 'naoA', 'naoB', 'naoTxt', '404', 'alerta-vermelho'),
+    '404': ('naoRot', 'naoA', 'naoB', 'naoTxt', '404', 'interrogacao'),
     '500': ('erroRot', 'erroA', 'erroB', 'erroTxt', '500', 'tonto'),
     'sessao': ('sessaoRot', 'sessaoA', 'sessaoB', 'sessaoTxt', '401', 'cadeado'),
     'manutencao': ('manRot', 'manA', 'manB', 'manTxt', '503', 'alerta'),
@@ -34,18 +34,20 @@ def _fundo(k):
 
 
 def _palco(k, codigo, olhos):
-    mascote = CARAS[olhos]
-    return (f'<div aria-hidden="true" style="position:relative;width:620px;height:520px;flex:0 0 auto;display:flex;'
-            f'align-items:center;justify-content:center;">'
-            # o código vazado: filete na cor da marca, sem preenchimento, atrás de tudo
-            f'<span style="position:absolute;top:40px;left:0;right:0;text-align:center;font-family:{FONTE};font-size:300px;line-height:1;'
-            f'font-weight:600;letter-spacing:-0.06em;color:transparent;'
-            f'-webkit-text-stroke:1.5px color-mix(in oklch, {k["pri"]} 45%, transparent);">{codigo}</span>'
-            # a sombra no chão e o mascote na frente, meio de lado
-            f'<span style="position:absolute;bottom:58px;left:50%;width:220px;height:26px;transform:translateX(-50%);border-radius:999px;'
-            f'background:color-mix(in oklch, {k["fgs"]} 14%, transparent);filter:blur(10px);"></span>'
-            f'<span style="position:absolute;bottom:64px;left:50%;width:230px;height:216px;display:flex;'
-            f'transform:translateX(-50%) rotate(-6deg);">{mascote}</span></div>')
+    # o mascote é o zero: todo código tem um 0 ou um O (4-0-4, 5-0-0, 4-0-1, 5-0-3, O-FF), e ele
+    # entra no lugar desse caractere, na altura dos dígitos e um pouco de lado. Os outros dígitos são
+    # cheios, num tom leve da marca: o número é o elemento forte da tela, não um rascunho.
+    i = codigo.index('0') if '0' in codigo else codigo.index('O')
+    partes = ''
+    for j, c in enumerate(codigo):
+        if j == i:
+            partes += (f'<span style="display:flex;width:222px;height:208px;flex:0 0 auto;margin:0 2px;transform:rotate(-6deg);">'
+                       f'{CARAS[olhos]}</span>')
+        else:
+            partes += (f'<span style="font-family:{FONTE};font-size:260px;line-height:190px;height:190px;font-weight:600;'
+                       f'letter-spacing:-0.04em;color:color-mix(in oklch, {k["pri"]} 18%, transparent);">{c}</span>')
+    return (f'<div aria-hidden="true" style="display:flex;align-items:flex-end;justify-content:center;flex:0 0 auto;">'
+            f'{partes}</div>')
 
 
 def _botao(k, txt, href='#'):
@@ -94,8 +96,10 @@ def tela_sistema(k, qual, sufixo, produto='code', idiomas=True, email='rafael@mo
     rodape = (f'<footer style="position:relative;z-index:1;display:flex;align-items:center;height:64px;padding:0 56px;">'
               f'{legenda(T("direitos"), k)}</footer>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{_fundo(k)}{topo_}'
-            f'<main style="position:relative;z-index:1;flex:1;min-height:0;display:flex;align-items:center;justify-content:space-between;'
-            f'gap:40px;padding:0 56px 0 120px;">{texto}{_palco(k, codigo, olhos)}</main>{rodape}</div>')
+            # duas colunas: o texto à esquerda, o palco centrado na metade da direita, seja qual for a largura do código
+            f'<main style="position:relative;z-index:1;flex:1;min-height:0;display:grid;grid-template-columns:560px minmax(0,1fr);'
+            f'align-items:center;gap:40px;padding:0 64px 0 120px;">{texto}'
+            f'<div style="display:flex;justify-content:center;min-width:0;">{_palco(k, codigo, olhos)}</div></main>{rodape}</div>')
 
 
 # id da tela → (página, produto, com seletor de idioma, conta no topo)
