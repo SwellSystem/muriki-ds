@@ -192,6 +192,9 @@ const STRINGS: Record<string, unknown> = {
       esc_hint: "Esc para fechar · ⌘↵ para criar",
     },
   },
+  app_shell: {
+    soon: "em breve",
+  },
   sidebar: {
     collapse: "Recolher menu",
     expand: "Expandir menu",
