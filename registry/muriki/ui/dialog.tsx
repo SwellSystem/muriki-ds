@@ -185,8 +185,12 @@ function DialogBody({ className, ...props }: React.ComponentProps<"div">) {
       className={cn(
         "muriki-scroll min-h-0 flex-1 overflow-y-auto",
         // no solto o corpo precisa vazar o padding da caixa para a barra de
-        // rolagem encostar na borda; no estruturado a caixa não tem padding
-        framed ? "" : "-mx-5 px-5",
+        // rolagem encostar na borda; no estruturado a caixa não tem padding.
+        // A folga vale também em cima e embaixo: o overflow que faz o miolo
+        // rolar corta o que passa da borda, e o anel de seleção e a sombra de
+        // um card encostado no fim do corpo sumiam (o ChoiceCard no diálogo
+        // de passkey perdia a borda de baixo).
+        framed ? "" : "-mx-5 -my-2 px-5 py-2",
         className
       )}
       {...props}
