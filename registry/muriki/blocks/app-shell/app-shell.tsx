@@ -113,6 +113,12 @@ export interface AppShellProps {
   className?: string
   /** O palco: padding do desenho por padrão; aqui entra um max-width, por exemplo. */
   stageClassName?: string
+  /**
+   * A faixa no topo do palco, em todas as telas: o aviso que pede ação e
+   * não se dispensa, ex.: <SubscriptionStatus tone="overdue" …/> do
+   * plans-page com "Atualizar pagamento". Some quando o app tira.
+   */
+  banner?: ReactNode
   children: ReactNode
 }
 
@@ -184,6 +190,7 @@ export function AppShell({
   defaultOpen = true,
   className,
   stageClassName,
+  banner,
   children,
 }: AppShellProps) {
   const t = useTranslate()
@@ -291,6 +298,7 @@ export function AppShell({
             stageClassName
           )}
         >
+          {banner}
           {children}
         </div>
       </SidebarInset>
