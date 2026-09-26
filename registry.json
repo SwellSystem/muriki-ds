@@ -1150,7 +1150,7 @@
       "name": "status-page",
       "type": "registry:block",
       "title": "Status Page",
-      "description": "As páginas de sistema do hub — sem internet, página não encontrada (404), erro inesperado (500), sessão expirada (401) e manutenção (503) — na linguagem do login: atmosfera da marca, título editorial em duas linhas e, no palco, o código gigante com o mascote no lugar do zero e a cara do que houve (X, interrogação, espiral, cadeado, alerta). A mesma no Code, no Backoffice e no Platform.",
+      "description": "As páginas de sistema do hub — sem internet, página não encontrada (404), erro inesperado (500), sessão expirada (401) e manutenção (503) — na linguagem do login: atmosfera da marca, título editorial em duas linhas e, no palco, o código gigante vazado com o mascote no lugar do 0 (ou do O), com a cara do que houve (X, interrogação, espiral, cadeado, alerta). A mesma no Code, no Backoffice e no Platform.",
       "dependencies": [
         "@phosphor-icons/react"
       ],

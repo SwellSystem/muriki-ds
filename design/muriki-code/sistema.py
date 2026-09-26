@@ -4,11 +4,11 @@
 #
 # A linguagem é a do login: o fundo com a atmosfera da marca (o azul no canto de cima, o amarelo
 # embaixo), o título editorial em duas linhas com a segunda no azul, a legenda mono com o filete.
-# À direita, o palco: o código gigante com o mascote no lugar do zero, com a cara do que houve e
-# a boca triste — X sem internet, a interrogação no 404, a espiral de tonto no erro, o cadeado na
-# sessão expirada (401) e o alerta de pontas arredondadas na manutenção (503). As caras moram em
-# design/logo-*.svg, feitas das camadas do logo. Nenhuma culpa a pessoa, e toda tela diz o que
-# fazer agora.
+# À direita, o palco: o código gigante com o mascote no lugar do 0 (ou do O) e os outros dígitos
+# vazados, só o filete; o mascote tem a cara do que houve e a boca triste — X sem internet, a
+# interrogação no 404, a espiral de tonto no erro, o cadeado na sessão expirada (401) e o alerta de
+# pontas arredondadas na manutenção (503). As caras moram em design/logo-*.svg, feitas das camadas
+# do logo. Nenhuma culpa a pessoa, e toda tela diz o que fazer agora.
 from base import *  # noqa: F401,F403
 from base import _logo
 
@@ -34,9 +34,8 @@ def _fundo(k):
 
 
 def _palco(k, codigo, olhos):
-    # o mascote é o zero: todo código tem um 0 ou um O (4-0-4, 5-0-0, 4-0-1, 5-0-3, O-FF), e ele
-    # entra no lugar desse caractere, na altura dos dígitos e um pouco de lado. Os outros dígitos são
-    # cheios, num tom leve da marca: o número é o elemento forte da tela, não um rascunho.
+    # o mascote é o 0 (ou o O) do código, e os outros dígitos são vazados, só o filete na cor da
+    # marca: 4-0-4, 5-0-0, 4-0-1, 5-0-3, O-FF
     i = codigo.index('0') if '0' in codigo else codigo.index('O')
     partes = ''
     for j, c in enumerate(codigo):
@@ -45,7 +44,8 @@ def _palco(k, codigo, olhos):
                        f'{CARAS[olhos]}</span>')
         else:
             partes += (f'<span style="font-family:{FONTE};font-size:260px;line-height:190px;height:190px;font-weight:600;'
-                       f'letter-spacing:-0.04em;color:color-mix(in oklch, {k["pri"]} 18%, transparent);">{c}</span>')
+                       f'letter-spacing:-0.04em;color:transparent;'
+                       f'-webkit-text-stroke:1.5px color-mix(in oklch, {k["pri"]} 45%, transparent);">{c}</span>')
     return (f'<div aria-hidden="true" style="display:flex;align-items:flex-end;justify-content:center;flex:0 0 auto;">'
             f'{partes}</div>')
 

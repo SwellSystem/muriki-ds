@@ -6,7 +6,7 @@
 //
 // A linguagem é a do login: a atmosfera da marca no fundo, a legenda mono com o filete, o título
 // editorial em duas linhas com a segunda no azul e o botão com a seta no círculo. À direita, o
-// palco: o código gigante com o mascote no lugar do zero (4-0-4, 5-0-0, 4-0-1, 5-0-3, O-FF), com
+// palco: o código gigante com o mascote no lugar do 0 (ou do O) e os outros dígitos vazados, com
 // a cara do que houve. Nenhuma culpa a pessoa, e toda tela diz o que fazer.
 //
 // Sem roteador nem API: as ações chegam por prop, com o elemento que navega em `render` (o
@@ -142,19 +142,20 @@ export function StatusPage({
 }
 
 function Palco({ codigo, cara }: { codigo: string; cara: StatusMascotFace }) {
-  // O mascote entra no lugar do primeiro 0 (ou O). Tudo em em: o tamanho do palco é o
-  // font-size, e dígitos e mascote crescem juntos com a tela.
+  // O mascote entra no lugar do 0 (ou do O) e os outros dígitos são vazados, só o filete na cor
+  // da marca. Tudo em em: o font-size do palco é o tamanho de tudo, e cresce com a tela.
   const i = codigo.includes("0") ? codigo.indexOf("0") : codigo.indexOf("O")
   return (
-    <div
-      aria-hidden
-      className="flex items-end justify-center text-[clamp(120px,17vw,260px)] font-semibold tracking-[-0.04em] text-primary/20"
-    >
+    <div aria-hidden className="flex items-end justify-center text-[clamp(120px,17vw,260px)] font-semibold tracking-[-0.04em]">
       {Array.from(codigo).map((c, j) =>
         j === i ? (
           <StatusMascot key={j} face={cara} className="mx-[0.01em] h-[0.8em] w-[0.855em] -rotate-6" />
         ) : (
-          <span key={j} className="h-[0.73em] leading-[0.73em]">
+          <span
+            key={j}
+            className="h-[0.73em] leading-[0.73em] text-transparent"
+            style={{ WebkitTextStroke: "1.5px color-mix(in oklch, var(--primary) 45%, transparent)" }}
+          >
             {c}
           </span>
         )
