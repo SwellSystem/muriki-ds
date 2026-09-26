@@ -41,6 +41,12 @@ TELAS = [
     ('conta_codigos', 'ContaCodigos', 'Minha conta', 'Minha conta · códigos de backup novos', 7, 8, 9),
     ('conta_passkey_editar', 'ContaPasskeyEditar', 'Minha conta', 'Minha conta · renomear e remover passkey', 8, 8, 9),
     ('conta_sessoes', 'ContaSessoes', 'Minha conta', 'Minha conta · encerrar sessões', 9, 8, 9),
+    ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
+    ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
+    ('erro', 'ErroInesperado', 'Erro inesperado', 'Sistema · erro inesperado (500), com o código para o suporte', 2, 10, 11),
+    ('sessao', 'SessaoExpirada', 'Sessão expirada', 'Sistema · sessão expirada (401)', 3, 10, 11),
+    ('manutencao', 'Manutencao', 'Manutenção', 'Sistema · manutenção (503)', 4, 10, 11),
+    ('nao_encontrada_backoffice', 'NaoEncontradaBackoffice', 'Página não encontrada', 'Sistema · a mesma 404 no Backoffice (só o produto muda)', 5, 10, 11),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -91,6 +97,8 @@ for chave, lin, n, texto in [
     ('contaEscuro', 7, 5, 'Conta no tema escuro'),
     ('minhaConta', 8, 10, 'Minha conta: meus dados, aprendizado, segurança, plano, confirmar o email novo e os fluxos da segurança'),
     ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
+    ('sistema', 10, 6, 'Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform'),
+    ('sistemaEscuro', 11, 6, 'Páginas de sistema no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
 
