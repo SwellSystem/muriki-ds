@@ -6,7 +6,6 @@ import { useId, type ReactNode } from "react"
 import { ArrowRight, SpinnerGap } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { cn } from "@/lib/utils"
 
 export interface PlanCardCta {
@@ -70,28 +69,39 @@ export function PlanCard({
         // chegada, o carregamento pisca.
         "group relative flex h-full flex-col overflow-hidden rounded-lg border bg-card p-4 transition-all duration-200 hover:-translate-y-0.5",
         emphasized
-          ? "border-primary shadow-md hover:shadow-lg md:scale-[1.03]"
-          : "border-border shadow-sm hover:shadow-md",
+          ? "border-primary/60 shadow-md ring-1 ring-primary/15 hover:shadow-lg hover:ring-primary/25 md:scale-[1.03]"
+          : "border-border/70 shadow-sm hover:border-foreground/20 hover:shadow-md",
         selected &&
           "border-primary ring-2 ring-primary/25 hover:ring-primary/35",
         className
       )}
     >
-      {/* O destaque dizia a mesma coisa CINCO vezes: escala, borda, anel,
-          um fio em gradiente no topo e um brilho circular no canto. Os dois
-          últimos são invisíveis no tamanho real e ainda custavam pintura.
-          Ficaram a escala e a borda. */}
+      {/* O destaque do platform, que o Guilherme quer de volta: anel, o fio
+          de luz no topo e o brilho no canto. É o recomendado que tem que
+          parecer o recomendado de longe. */}
+      {emphasized ? (
+        <>
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/70 to-transparent"
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -top-24 -right-24 size-48 rounded-full bg-primary/[0.08] blur-3xl"
+          />
+        </>
+      ) : null}
+
+      {/* O selo é uma aba colada no canto de cima, à direita: azul cheio,
+          letra pequena. Passe só o texto ("Recomendado"); a aba é do card. */}
+      {badgeSlot ? (
+        <div className="absolute top-0 right-0 z-10 rounded-bl-lg bg-primary px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary-foreground">
+          {badgeSlot}
+        </div>
+      ) : null}
 
       <div className="relative flex flex-1 flex-col gap-3">
         <header className="space-y-1.5">
-          {/* O selo abre o cartão, dentro do fluxo. Antes era absoluto no
-              canto superior direito: encostava no nome, e um nome mais longo
-              passava por baixo dele.
-              A linha é RESERVADA mesmo sem selo — 22px, a altura do Badge.
-              Sem isso o cartão com selo empurra o próprio nome para baixo e
-              os títulos da grade deixam de alinhar, que é o preço de tirar o
-              selo da posição absoluta. */}
-          <div className="flex h-[22px] items-center">{badgeSlot}</div>
           <h3
             id={nameId}
             className="text-2xl leading-[1.05] font-semibold tracking-[-0.02em] text-foreground-strong md:text-[28px]"
@@ -105,36 +115,32 @@ export function PlanCard({
           ) : null}
         </header>
 
-        {/* Régua `soft` porque estamos DENTRO de uma peça que já tem
-            contorno. Uma linha inteira aqui desenharia duas caixas dentro
-            do cartão — era o que tinha antes, com border-t de ponta a
-            ponta. Ver a nota no Separator. */}
-        <Separator shape="soft" />
-        <div className="space-y-2">
+        <div className="space-y-2 border-t border-border/60 pt-3">
           {trialBadgeSlot}
           {priceSlot}
         </div>
 
-        <Separator shape="soft" />
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 border-t border-border/60 pt-3">
           {featuresSlot}
           {extraSlots}
         </div>
 
         <div className="space-y-3">
-          {/* O card em destaque é o ÚNICO da grade com botão sólido — é a
-              exceção declarada da regra do botão, gasta uma vez na tela. Os
-              outros ficam em `primary`, que é tingido: continuam sendo a
-              ação principal do próprio card por massa, sem disputar com o
-              recomendado. */}
+          {/* O recomendado é o ÚNICO da grade com botão sólido. Os outros
+              ficam no cinza do secondary e viram azul no hover: continuam
+              sendo a ação do próprio card, sem disputar com o recomendado
+              (o contraste do platform). */}
           <Button
             type="button"
             size="lg"
             onClick={cta.onClick}
             disabled={isDisabled}
             aria-disabled={isDisabled}
-            variant={emphasized ? "solid" : "primary"}
-            className="w-full"
+            variant={emphasized ? "solid" : "secondary"}
+            className={cn(
+              "w-full",
+              !emphasized && "hover:bg-primary hover:text-primary-foreground"
+            )}
           >
             {isLoading ? (
               <SpinnerGap

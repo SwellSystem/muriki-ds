@@ -191,13 +191,8 @@ export function PricingScreen({
                   description={plan.description}
                   emphasized={Boolean(plan.badge)}
                   selected={plan.id === selectedPlanId}
-                  badgeSlot={
-                    plan.badge ? (
-                      <Badge tone="blue" size="sm">
-                        {plan.badge}
-                      </Badge>
-                    ) : undefined
-                  }
+                  // o card desenha a aba; aqui vai só o texto
+                  badgeSlot={plan.badge}
                   trialBadgeSlot={
                     plan.trial ? <PlanTrialBadge label={plan.trial} /> : undefined
                   }
