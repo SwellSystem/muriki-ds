@@ -1655,6 +1655,7 @@
         "utils",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/back-link",
         "SwellSystem/muriki-ds/checkbox",
         "SwellSystem/muriki-ds/input",
         "SwellSystem/muriki-ds/field",
@@ -1689,7 +1690,7 @@
           "target": "components/blocks/login-page/index.ts"
         }
       ],
-      "docs": "O bloco não conhece roteador, i18next nem API: onSubmit e onVerifyCode devolvem um LoginResult. O mascote vem por prop (brand / brandHidden) — o registry não carrega binário."
+      "docs": "O bloco não conhece roteador, i18next nem API: onSubmit e onVerifyCode devolvem um LoginResult. O mascote vem por prop (brand / brandHidden) — o registry não carrega binário. Espera da passkey: o app liga `passkeyPending` no `onProvider(\"passkey\")`, antes de chamar o navigator.credentials.get, e desliga quando o pedido volta (sucesso ou erro). Com ele ligado, a coluna mostra a digital, \"Aguardando a confirmação\", o botão \"Pedir de novo\" (`onRetryPasskey`, refaz o pedido) e \"Usar email e senha\" (`onCancelPasskey`, o app aborta o pedido com AbortController e desliga o estado). Sem o callback, o botão dele some. O email digitado fica guardado. Textos em login.passkey.*."
     },
     {
       "name": "ai-labels",
