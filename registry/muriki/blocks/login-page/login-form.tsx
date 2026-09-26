@@ -11,10 +11,16 @@
  *
  * O erro de credenciais mora embaixo da senha, não num toast — é a mesma
  * regra do FieldError: o erro fica onde a pessoa vai corrigir.
+ *
+ * `passkeyPending` é a espera da passkey: o navegador abriu o pedido e a
+ * tela, que antes ficava parada, mostra que está esperando e dá as duas
+ * saídas (pedir de novo, voltar ao email). O estado é do app, porque é
+ * ele quem conversa com o WebAuthn.
  */
 import { useRef, useState, type FormEvent } from "react"
 import {
   ArrowRight,
+  ArrowsClockwise,
   Buildings,
   Envelope,
   Eye,
@@ -29,6 +35,7 @@ import {
 } from "@phosphor-icons/react"
 
 import { PasswordStrengthBar } from "@/components/blocks/password-strength/password-strength-bar"
+import { BackLink } from "@/components/ui/back-link"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldDescription, FieldError, FieldHeader, FieldLabel } from "@/components/ui/field"
@@ -79,6 +86,9 @@ export function LoginForm({
   allowBackupCode = false,
   showRememberMe = true,
   showTrustDevice = true,
+  passkeyPending = false,
+  onRetryPasskey,
+  onCancelPasskey,
   onPasswordVisibilityChange,
   className,
 }: LoginFormProps) {
@@ -187,7 +197,7 @@ export function LoginForm({
 
   // No passo do código, a credencial já foi aceita: manter e-mail, senha e
   // provedores na tela só empurra o botão para fora da dobra.
-  const credenciais = step === "credentials"
+  const credenciais = step === "credentials" && !passkeyPending
 
   const PasswordIcon = showPassword ? LockOpen : Lock
   const EyeIcon = showPassword ? EyeSlash : Eye
@@ -200,7 +210,7 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-7 md:gap-8 [@media(min-height:781px)_and_(max-height:900px)]:gap-5 [@media(max-height:780px)]:gap-4", className)}>
       {/* rótulo de seção */}
       <div className="flex items-center gap-3">
-        <span className={CAPTION}>{t("login.submit")}</span>
+        <span className={CAPTION}>{t(passkeyPending ? "login.passkey.label" : "login.submit")}</span>
         <span className="h-px w-10 bg-primary" />
         <span className="h-px flex-1 bg-divider" />
       </div>
@@ -208,11 +218,13 @@ export function LoginForm({
       {/* título */}
       <div className="flex flex-col gap-4 [@media(max-height:900px)]:gap-3">
         <h1 className="text-[clamp(2.5rem,9vw,3.75rem)] leading-none font-semibold tracking-[-0.03em] text-foreground-strong md:text-5xl [@media(max-height:900px)]:text-4xl">
-          {t("login.hero_line1")}
+          {t(passkeyPending ? "login.passkey.title" : "login.hero_line1")}
           <br />
-          <span className="text-primary">{t("login.hero_line2")}</span>
+          <span className="text-primary">{t(passkeyPending ? "login.passkey.title_accent" : "login.hero_line2")}</span>
         </h1>
-        {credenciais ? (
+        {passkeyPending ? (
+          <p className="text-sm text-muted-foreground md:text-base">{t("login.passkey.subtitle")}</p>
+        ) : credenciais ? (
         <p className="text-sm text-muted-foreground md:text-base">
           {t("login.subtitle")}{" "}
           <Button
@@ -280,6 +292,9 @@ export function LoginForm({
         </div>
       ) : null}
 
+      {passkeyPending ? (
+        <PasskeyWait onRetry={onRetryPasskey} onCancel={onCancelPasskey} />
+      ) : (
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-6">
         {/* email + senha: só enquanto a credencial é o assunto */}
         {credenciais ? (
@@ -460,6 +475,56 @@ export function LoginForm({
           )}
         </Button>
       </form>
+      )}
+    </div>
+  )
+}
+
+/**
+ * A espera da passkey, no desenho do Code: a digital com os anéis, o
+ * "aguardando" com o ponto âmbar e o "pedir de novo" no cartão; embaixo a
+ * nota do segundo fator e a volta para o email. Os anéis pulsam devagar —
+ * dizem que algo está acontecendo fora da página — e param com
+ * prefers-reduced-motion.
+ */
+function PasskeyWait({ onRetry, onCancel }: { onRetry?: () => void; onCancel?: () => void }) {
+  const t = useTranslate()
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="flex flex-col items-center gap-5 rounded-lg bg-card px-6 pt-8 pb-6 shadow-[inset_0_0_0_1px_var(--border)]">
+        <span aria-hidden className="relative my-[18px] flex size-18 items-center justify-center rounded-full bg-primary-subtle text-primary">
+          <span className="absolute -inset-3.5 rounded-full ring-1 ring-primary/30 motion-safe:animate-pulse" />
+          <span className="absolute -inset-7 rounded-full ring-1 ring-primary/15 motion-safe:animate-pulse motion-safe:[animation-delay:300ms]" />
+          <span className="absolute -inset-[42px] rounded-full ring-1 ring-primary/5 motion-safe:animate-pulse motion-safe:[animation-delay:600ms]" />
+          <Fingerprint size={34} className="size-[34px]" />
+        </span>
+        {/* só o texto é anunciado: o botão ao lado não entra na fala */}
+        <div role="status" aria-live="polite" className="flex flex-col items-center gap-1.5 text-center">
+          <span className="flex items-center gap-2 text-sm font-medium text-foreground-strong">
+            <span aria-hidden className="size-1.75 rounded-full bg-tone-yellow-dot" />
+            {t("login.passkey.waiting")}
+          </span>
+          <span className="max-w-80 text-[13px] leading-[19px] text-muted-foreground">
+            {t("login.passkey.waiting_description")}
+          </span>
+        </div>
+        {onRetry ? (
+          <Button type="button" variant="outline" onClick={onRetry}>
+            <ArrowsClockwise aria-hidden />
+            {t("login.passkey.retry")}
+          </Button>
+        ) : null}
+      </div>
+      <p className="flex items-start gap-2.5 text-[12.5px] leading-[18px] text-muted-foreground">
+        <Lock aria-hidden size={15} className="mt-px size-[15px] shrink-0 text-success" />
+        {t("login.passkey.note")}
+      </p>
+      {onCancel ? (
+        <BackLink render={<button type="button" />} onClick={onCancel} className="cursor-pointer">
+          {t("login.passkey.use_password")}
+        </BackLink>
+      ) : null}
     </div>
   )
 }

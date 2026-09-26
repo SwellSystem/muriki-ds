@@ -244,6 +244,9 @@ const STRINGS: Record<string, unknown> = {
       confirm: "Excluir a conta",
     },
   },
+  app_shell: {
+    soon: "em breve",
+  },
   sidebar: {
     collapse: "Recolher menu",
     expand: "Expandir menu",
@@ -313,6 +316,18 @@ const STRINGS: Record<string, unknown> = {
       backup_description: "Cada código de backup vale uma vez.",
       verify_submit: "Verificar código",
       verifying: "Verificando...",
+    },
+    passkey: {
+      label: "Passkey",
+      title: "Confirme no",
+      title_accent: "seu dispositivo.",
+      subtitle: "O navegador abriu o pedido da sua chave de acesso.",
+      waiting: "Aguardando a confirmação",
+      waiting_description:
+        "Use Touch ID, Windows Hello ou a chave física que você cadastrou. Se a janela do navegador sumiu, peça de novo.",
+      retry: "Pedir de novo",
+      note: "A passkey já é o segundo fator: quem entra por ela não digita código.",
+      use_password: "Usar email e senha",
     },
   },
 }
