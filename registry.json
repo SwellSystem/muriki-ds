@@ -1146,6 +1146,59 @@
       "docs": "<NoticePage brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account=\"rafael@moura.dev\" icon={<LockIcon />} tone=\"attention\" title=\"Seu acesso ao Muriki Code está suspenso\" description=\"A sua conta Muriki continua ativa, mas o Code está bloqueado para ela no momento. Fale com o suporte para entender o que aconteceu e como voltar.\" actions={<><Button variant=\"solid\" size=\"touch\" render={<a href={suporte} />}>Falar com o suporte</Button><Button variant=\"ghost\" onClick={sair}><SignOutIcon />Sair da conta</Button></>} footer={<>Você está na conta <b className=\"font-mono font-medium text-foreground-strong\">rafael@moura.dev</b></>} />. Tons: neutral, success (confirmado), attention (suspenso, pendente), danger. O ícone é do app (Phosphor) e ganha 28px."
     },
     {
+      "name": "account-page",
+      "type": "registry:block",
+      "title": "Account Page",
+      "description": "A Minha conta dentro do app: título e abas por link, e os cartões de cada assunto — dados pessoais (CPF só leitura), email com a troca pendente, excluir conta — e o StepUpDialog (senha ou código do app) das ações sensíveis.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/dialog",
+        "SwellSystem/muriki-ds/field",
+        "SwellSystem/muriki-ds/input",
+        "SwellSystem/muriki-ds/otp-input"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/account-page/account-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-page.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-card.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-profile-form.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-profile-form.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-email-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-email-card.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/step-up-dialog.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/step-up-dialog.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-danger-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-danger-card.tsx"
+        }
+      ],
+      "docs": "<AccountPage title=\"Minha conta\" subtitle=… tabsLabel=\"Seções da conta\" tabs={[{ key: \"dados\", label: \"Meus dados\", active, render: <Link to=\"/account\" /> }, …]}><div className=\"grid gap-4 lg:grid-cols-[1.1fr_1fr] items-start\"><AccountProfileForm values={{ displayName, fullName }} maskedPhone={profile.phone} maskedCpf={profile.cpf} onSubmit={(changes) => patch(changes)} saving errors /><div className=\"flex flex-col gap-4\"><AccountEmailCard email pending={pendingEmailChange && { email, until: formatado }} onRequestChange onCancelPending onResend /><AccountCard title=\"Termos e privacidade\">…</AccountCard><AccountDangerCard onDelete={(cred) => stepUp(cred).then(excluir)} /></div></div></AccountPage>. O StepUpDialog é controlado: abra quando a API responder 403 REAUTHENTICATION_REQUIRED, mande a credencial para POST /auth/step-up e repita a ação. Textos em account.* no i18n (defaults pt-BR); o app traduz no blocks.json."
+    },
+    {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",
