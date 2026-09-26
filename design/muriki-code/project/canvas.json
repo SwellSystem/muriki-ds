@@ -545,6 +545,86 @@
    "h": 900,
    "title": "Início · o primeiro dia, antes de qualquer prática · escuro",
    "is_interactive": true
+  },
+  "SemInternet.dc.html": {
+   "x": 0,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · sem internet",
+   "is_interactive": true
+  },
+  "SemInternetEscuro.dc.html": {
+   "x": 0,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · sem internet · escuro",
+   "is_interactive": true
+  },
+  "NaoEncontrada.dc.html": {
+   "x": 1520,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · página não encontrada (404)",
+   "is_interactive": true
+  },
+  "NaoEncontradaEscuro.dc.html": {
+   "x": 1520,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · página não encontrada (404) · escuro",
+   "is_interactive": true
+  },
+  "ErroInesperado.dc.html": {
+   "x": 3040,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · erro inesperado (500), com o código para o suporte",
+   "is_interactive": true
+  },
+  "ErroInesperadoEscuro.dc.html": {
+   "x": 3040,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · erro inesperado (500), com o código para o suporte · escuro",
+   "is_interactive": true
+  },
+  "SessaoExpirada.dc.html": {
+   "x": 4560,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · sessão expirada",
+   "is_interactive": true
+  },
+  "SessaoExpiradaEscuro.dc.html": {
+   "x": 4560,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · sessão expirada · escuro",
+   "is_interactive": true
+  },
+  "Manutencao.dc.html": {
+   "x": 6080,
+   "y": 13200,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · manutenção",
+   "is_interactive": true
+  },
+  "ManutencaoEscuro.dc.html": {
+   "x": 6080,
+   "y": 14520,
+   "w": 1440,
+   "h": 900,
+   "title": "Sistema · manutenção · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -631,6 +711,20 @@
    "text": "Minha conta no tema escuro",
    "kind": "title1",
    "maxW": 15120
+  },
+  "sistema": {
+   "x": 0,
+   "y": 12900,
+   "text": "Páginas de sistema: sem internet, página não encontrada, erro inesperado, sessão expirada e manutenção",
+   "kind": "title1",
+   "maxW": 7520
+  },
+  "sistemaEscuro": {
+   "x": 0,
+   "y": 14220,
+   "text": "Páginas de sistema no tema escuro",
+   "kind": "title1",
+   "maxW": 7520
   }
  },
  "order": [
@@ -701,7 +795,17 @@
   "Suspenso.dc.html",
   "SuspensoEscuro.dc.html",
   "Inicio.dc.html",
-  "InicioEscuro.dc.html"
+  "InicioEscuro.dc.html",
+  "SemInternet.dc.html",
+  "SemInternetEscuro.dc.html",
+  "NaoEncontrada.dc.html",
+  "NaoEncontradaEscuro.dc.html",
+  "ErroInesperado.dc.html",
+  "ErroInesperadoEscuro.dc.html",
+  "SessaoExpirada.dc.html",
+  "SessaoExpiradaEscuro.dc.html",
+  "Manutencao.dc.html",
+  "ManutencaoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

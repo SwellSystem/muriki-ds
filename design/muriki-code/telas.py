@@ -11,6 +11,8 @@ from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_pre
 from logos import logo_linguagem
 from textos_minha_conta import MINHA_CONTA, SUSPENSO
 from textos_inicio import INICIO
+from textos_sistema import SISTEMA
+from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS
@@ -1592,6 +1594,8 @@ def _montar(tela, tema, sufixo):
         return web(juntar(MINHA_CONTA, PREFERENCIAS), tela_conta_aprendizado(k), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS)
     if tela['id'] == 'conta_seguranca':
         return web(MINHA_CONTA, tela_conta_seguranca(k), ANTES_CONTA_SEGURANCA, VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA)
+    if tela['id'] in SISTEMA_TELAS:
+        return web(SISTEMA, tela_sistema(k, SISTEMA_TELAS[tela['id']], sufixo))
     if tela['id'] == 'inicio':
         return web(INICIO, tela_inicio_primeiro_dia(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)
     if tela['id'] == 'suspenso':
