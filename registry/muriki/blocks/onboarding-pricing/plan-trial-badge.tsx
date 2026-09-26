@@ -19,7 +19,8 @@ export function PlanTrialBadge({ label, className }: PlanTrialBadgeProps) {
       tone="green"
       size="sm"
       className={cn(
-        "font-mono tracking-[0.18em] uppercase",
+        // a pílula do platform: raio cheio
+        "rounded-full px-2.5 font-mono tracking-[0.18em] uppercase",
         className
       )}
     >

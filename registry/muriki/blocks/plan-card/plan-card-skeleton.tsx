@@ -19,22 +19,17 @@ export function PlanCardSkeleton({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        // Veio do platform na letra, e acompanha o card quando ele muda: o
-        // anel do destaque saiu junto com o do card, e a linha do selo virou
-        // altura reservada em vez de peça absoluta no canto.
+        // Veio do platform na letra, e acompanha o card: o anel do
+        // destaque e a aba do selo no canto.
         "relative flex flex-col gap-4 rounded-lg border bg-card p-4 shadow-sm md:p-6",
-        emphasized ? "border-primary" : "border-border",
+        emphasized ? "border-primary/60 ring-1 ring-primary/20" : "border-border/70",
         className
       )}
     >
-      {/* A linha do selo é reservada em TODOS, com ou sem selo — é o que o
-          card faz, e é o que impede o título de pular quando o conteúdo
-          chega. */}
-      <div className="flex h-[22px] items-center">
-        {emphasized ? (
-          <Skeleton className="h-[18px] w-24 rounded-[4px] bg-primary/25" />
-        ) : null}
-      </div>
+      {/* A aba do selo, no canto, como no card. */}
+      {emphasized ? (
+        <Skeleton className="absolute top-0 right-0 h-[18px] w-20 rounded-none rounded-bl-lg bg-primary/25" />
+      ) : null}
 
       <div className="space-y-2">
         <Skeleton className="h-5 w-32 md:w-36" />

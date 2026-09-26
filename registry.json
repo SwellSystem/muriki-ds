@@ -910,8 +910,7 @@
         "utils",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/button",
-        "SwellSystem/muriki-ds/skeleton",
-        "SwellSystem/muriki-ds/separator"
+        "SwellSystem/muriki-ds/skeleton"
       ],
       "files": [
         {
@@ -935,7 +934,7 @@
           "target": "components/blocks/plan-card/index.ts"
         }
       ],
-      "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão."
+      "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão. O recomendado (emphasized) tem o destaque do platform: anel, fio de luz no topo, brilho no canto e o card um pouco maior; o badgeSlot vira a aba azul colada no canto de cima (passe só o texto). Os outros cards têm o botão no cinza que vira azul no hover."
     },
     {
       "name": "onboarding-pricing",
