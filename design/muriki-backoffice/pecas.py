@@ -24,6 +24,8 @@ TOKENS['escuro']['field'] = TOKENS['escuro']['sunken']
 K['field'] = 'var(--field)'
 
 I.update(
+    pausa=svg('<path d="M5.6 3.5v9"/><path d="M10.4 3.5v9"/>'),
+    retomar=svg('<path d="M5 3.2l7.6 4.8L5 12.8z"/>'),
     casa=svg('<path d="M2.4 7.2L8 2.6l5.6 4.6"/><path d="M3.8 6.2v7.4h8.4V6.2"/><path d="M6.6 13.6V9.8h2.8v3.8"/>'),
     pessoas=svg('<circle cx="6" cy="5.6" r="2.4"/><path d="M1.8 13.4c.5-2.4 2.2-3.8 4.2-3.8s3.7 1.4 4.2 3.8"/><path d="M10.4 3.4a2.4 2.4 0 010 4.4"/><path d="M11.8 9.8c1.3.5 2.2 1.7 2.4 3.6"/>'),
     cupom=svg('<path d="M8.6 1.9h5.5v5.5l-6.6 6.6-5.5-5.5z"/><circle cx="11.2" cy="4.8" r="1"/>'),
@@ -379,7 +381,7 @@ def linha_tabela(k, colunas, celulas, hover=False, selecionada=False, altura=52)
 
 def acoes_linha(k, visiveis, itens):
     # o row-actions do DS: só ícone, aparece no hover ou no foco; tooltip e aria-label obrigatórios
-    if not visiveis:
+    if not visiveis or not itens:
         return '<span></span>'
     bs = ''.join(botao_icone(k, i, r, h, destrutivo=d) for i, r, h, d in itens)
     return (f'<span role="toolbar" aria-label="Ações da linha" style="display:flex;justify-content:flex-end;gap:2px;">'
