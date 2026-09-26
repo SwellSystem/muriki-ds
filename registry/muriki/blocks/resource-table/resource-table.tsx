@@ -270,6 +270,11 @@ export function ResourceTable<T>({
                       onClick={
                         onRowClick
                           ? (e) => {
+                              // O menu de overflow e os diálogos das ações são portais: no
+                              // DOM moram no body, mas o clique do React sobe pela árvore de
+                              // componentes até aqui. Clique que não nasceu dentro da linha
+                              // não abre a linha.
+                              if (!e.currentTarget.contains(e.target as Node)) return
                               if ((e.target as HTMLElement).closest(INTERATIVO)) return
                               onRowClick(row)
                             }
