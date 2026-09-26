@@ -16,7 +16,7 @@
 // desktop): as telas não resolvem isso cada uma. `stageClassName` ajusta,
 // ex.: um max-width.
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react"
-import { ArrowsLeftRightIcon, GearSixIcon } from "@phosphor-icons/react"
+import { ArrowsLeftRightIcon, GearSixIcon, SignOutIcon } from "@phosphor-icons/react"
 
 import {
   Sidebar,
@@ -105,6 +105,11 @@ export interface AppShellProps {
     href?: string
     onClick?: () => void
   }
+  /**
+   * Sair da conta: o botão com a porta, ao lado da engrenagem. Recolhido,
+   * vira ícone com tooltip. O rótulo vem do i18n (app_shell.sign_out).
+   */
+  onSignOut?: () => void
   /** Rótulo do botão que abre o menu no celular. */
   menuLabel?: string
   /** O selo dos itens `soon`. Sem isto, vem do i18n (app_shell.soon). */
@@ -185,6 +190,7 @@ export function AppShell({
   utilities,
   user,
   settings,
+  onSignOut,
   menuLabel = "Menu",
   soonLabel,
   defaultOpen = true,
@@ -281,6 +287,16 @@ export function AppShell({
             <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col-reverse">
               <UserLink user={user} />
               {settings ? <Settings settings={settings} /> : null}
+              {onSignOut ? (
+                <SidebarMenuButton
+                  onClick={onSignOut}
+                  aria-label={t("app_shell.sign_out")}
+                  tooltip={t("app_shell.sign_out")}
+                  className="size-8! shrink-0 justify-center px-0! text-muted-foreground"
+                >
+                  <SignOutIcon aria-hidden data-motion="nudge" />
+                </SidebarMenuButton>
+              ) : null}
             </div>
           ) : null}
         </SidebarFooter>

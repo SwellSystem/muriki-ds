@@ -384,6 +384,7 @@ const STRINGS: Record<string, unknown> = {
   },
   app_shell: {
     soon: "em breve",
+    sign_out: "Sair da conta",
   },
   sidebar: {
     collapse: "Recolher menu",
