@@ -62,6 +62,17 @@ export interface LoginFormProps {
   showRememberMe?: boolean
   /** Caixa "Confiar neste dispositivo" no segundo fator. `false` esconde e envia `trustDevice: false`. Padrão: true. */
   showTrustDevice?: boolean
+  /**
+   * O navegador está com o pedido da passkey aberto (WebAuthn). A coluna
+   * troca para a espera: a digital, "aguardando" e as saídas. Controlado
+   * pelo app, que liga no `onProvider("passkey")` e desliga quando o
+   * pedido volta. O que foi digitado no email fica guardado. Padrão: false.
+   */
+  passkeyPending?: boolean
+  /** "Pedir de novo": a janela do navegador sumiu ou a pessoa cancelou. Sem ele, o botão some. */
+  onRetryPasskey?: () => void
+  /** "Usar email e senha": volta ao formulário. Sem ele, o link some. */
+  onCancelPasskey?: () => void
   onPasswordVisibilityChange?: (visible: boolean) => void
   className?: string
 }
