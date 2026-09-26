@@ -4,22 +4,23 @@
 #
 # A linguagem é a do login: o fundo com a atmosfera da marca (o azul no canto de cima, o amarelo
 # embaixo), o título editorial em duas linhas com a segunda no azul, a legenda mono com o filete.
-# À direita, o palco: o código gigante vazado e o mascote na frente, com a cara do que houve —
-# olhos em X sem internet, procurando no 404, triste no erro, dormindo na sessão expirada e na
-# manutenção. As caras moram em design/logo-*.svg, feitas das camadas do logo (pupila, brilho,
-# boca virada). Nenhuma culpa a pessoa, e toda tela diz o que fazer agora.
+# À direita, o palco: o código gigante vazado e o mascote na frente, com a cara do que houve e a
+# boca triste — um X no lugar dos olhos sem internet, procurando no 404, triste no erro, um
+# cadeado na sessão expirada (401) e o alerta na manutenção (503). As caras moram em
+# design/logo-*.svg, feitas das camadas do logo. Nenhuma culpa a pessoa, e toda tela diz o que
+# fazer agora.
 from base import *  # noqa: F401,F403
 from base import _logo
 
-CARAS = {nome: _logo(nome) for nome in ('x', 'procurando', 'triste', 'fechado')}
+CARAS = {nome: _logo(nome) for nome in ('x', 'procurando', 'triste', 'cadeado', 'alerta')}
 
 # qual: (rótulo, linha A, linha B, texto, código do palco, cara do mascote)
 PAGINAS = {
     'offline': ('offRot', 'offA', 'offB', 'offTxt', 'OFF', 'x'),
     '404': ('naoRot', 'naoA', 'naoB', 'naoTxt', '404', 'procurando'),
     '500': ('erroRot', 'erroA', 'erroB', 'erroTxt', '500', 'triste'),
-    'sessao': ('sessaoRot', 'sessaoA', 'sessaoB', 'sessaoTxt', '401', 'fechado'),
-    'manutencao': ('manRot', 'manA', 'manB', 'manTxt', '503', 'fechado'),
+    'sessao': ('sessaoRot', 'sessaoA', 'sessaoB', 'sessaoTxt', '401', 'cadeado'),
+    'manutencao': ('manRot', 'manA', 'manB', 'manTxt', '503', 'alerta'),
 }
 
 
