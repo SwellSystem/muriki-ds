@@ -7,7 +7,7 @@ COMUM = {
         inicio='Início', evolucao='Evolução', trilhas='Trilhas', exercicios='Exercícios', avaliacoes='Avaliações',
         peer='Peer na IDE', plano='Plano', trilhaAria='Trilha', aprender='Aprender',
         contaMuriki='conta Muriki', trocarProduto='Trocar de produto Muriki', config='Configurações',
-        pleno='Pleno', playground='Playground',
+        pleno='Pleno', playground='Playground', emBreveRail='em breve',
     ),
     'en-US': dict(
         lang='en-US', idiomaCurto='EN', idiomaNome='English', idiomaMenu='Language', trocarIdioma='Language: English. Change language',
@@ -15,7 +15,7 @@ COMUM = {
         inicio='Home', evolucao='Progress', trilhas='Tracks', exercicios='Exercises', avaliacoes='Evaluations',
         peer='Peer in your IDE', plano='Plan', trilhaAria='Breadcrumb', aprender='Learn',
         contaMuriki='Muriki account', trocarProduto='Switch Muriki product', config='Settings',
-        pleno='Mid-level', playground='Playground',
+        pleno='Mid-level', playground='Playground', emBreveRail='soon',
     ),
     'es-ES': dict(
         lang='es-ES', idiomaCurto='ES', idiomaNome='Español', idiomaMenu='Idioma', trocarIdioma='Idioma: español. Cambiar idioma',
@@ -23,7 +23,7 @@ COMUM = {
         inicio='Inicio', evolucao='Evolución', trilhas='Rutas', exercicios='Ejercicios', avaliacoes='Evaluaciones',
         peer='Peer en el IDE', plano='Plan', trilhaAria='Ruta de navegación', aprender='Aprender',
         contaMuriki='cuenta Muriki', trocarProduto='Cambiar de producto Muriki', config='Ajustes',
-        pleno='Intermedio', playground='Playground',
+        pleno='Intermedio', playground='Playground', emBreveRail='pronto',
     ),
 }
 

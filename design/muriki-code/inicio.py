@@ -65,16 +65,15 @@ def tela_inicio(k, sufixo):
             + tile('exercicios', 'mExercicios', 'mExerciciosTxt', link('comecar', f'PrimeiroExercicio{sufixo}.dc.html').replace(T('comecar'), T('abrir')))
             + tile('trilhas', 'mTrilhas', 'mTrilhasTxt', _em_breve(k))
             + tile('avaliacoes', 'mAvaliacoes', 'mAvaliacoesTxt', _em_breve(k, 'depoisPrimeiro'))
-            + tile('peer', 'mPeer', 'mPeerTxt', link('conectar', f'Conectar{sufixo}.dc.html'))
-            + tile('terminal', 'mPlayground', 'mPlaygroundTxt', link('abrir', f'Playground{sufixo}.dc.html'))
+            + tile('peer', 'mPeer', 'mPeerTxt', _em_breve(k))
+            + tile('evolucao', 'evolucao', 'mEvolucaoTxt', link('ver', f'PerfilVazio{sufixo}.dc.html'))
             + '</div></section>')
 
     escala_vazia = ''.join(f'<span style="width:18px;height:6px;border-radius:2px;'
                            + (f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};' if i < 2 else f'background:{k["sunken"]};')
                            + '"></span>' for i in range(5))
     competencia = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">{rotulo(T("perfil"), k["mfg"])}'
-        f'<a href="PerfilVazio{sufixo}.dc.html" style="font-size:12.5px;">{T("verPerfil")}</a></div>'
+        f'{rotulo(T("perfil"), k["mfg"])}'
         f'<div style="display:flex;align-items:center;gap:14px;"><span style="display:flex;gap:3px;">{escala_vazia}</span>'
         f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("perfilTxt")}</p></div>',
         k, pad='16px 22px', extra='gap:10px;flex:1.6;min-width:0;')
