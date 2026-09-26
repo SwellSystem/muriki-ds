@@ -26,6 +26,7 @@ K['field'] = 'var(--field)'
 I.update(
     pausa=svg('<path d="M5.6 3.5v9"/><path d="M10.4 3.5v9"/>'),
     retomar=svg('<path d="M5 3.2l7.6 4.8L5 12.8z"/>'),
+    duplicar=svg('<rect x="2" y="5" width="9" height="9" rx="1.6"/><path d="M5 2.2h7.2a1.6 1.6 0 0 1 1.6 1.6V11"/><path d="M6.5 7.2v4.6M4.2 9.5h4.6"/>'),
     casa=svg('<path d="M2.4 7.2L8 2.6l5.6 4.6"/><path d="M3.8 6.2v7.4h8.4V6.2"/><path d="M6.6 13.6V9.8h2.8v3.8"/>'),
     pessoas=svg('<circle cx="6" cy="5.6" r="2.4"/><path d="M1.8 13.4c.5-2.4 2.2-3.8 4.2-3.8s3.7 1.4 4.2 3.8"/><path d="M10.4 3.4a2.4 2.4 0 010 4.4"/><path d="M11.8 9.8c1.3.5 2.2 1.7 2.4 3.6"/>'),
     cupom=svg('<path d="M8.6 1.9h5.5v5.5l-6.6 6.6-5.5-5.5z"/><circle cx="11.2" cy="4.8" r="1"/>'),

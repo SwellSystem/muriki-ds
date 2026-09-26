@@ -872,10 +872,11 @@ def tela_cupons(k, hover=1, sobre=''):
         else:
             usos = (f'<span style="font-family:{MONO};font-size:12px;color:{k["fgs"]};">{milhar(usados)} '
                     f'<span style="color:{k["mfg"]};">/ sem limite</span></span>')
-        # Pausar no ativo, Retomar no pausado; esgotado e expirado são encerrados e não voltam, então não têm ação
-        itens = {'Ativo': [('lapis', 'Editar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False), ('pausa', 'Pausar', None, False)],
-                 'Pausado': [('lapis', 'Editar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False), ('retomar', 'Retomar', None, False)]
-                 }.get(status, [])
+        # O Stripe não edita cupom depois de criado: no lugar de Editar, Duplicar abre o novo cupom
+        # preenchido e com o código em branco. Pausar no ativo, Retomar no pausado; esgotado e
+        # expirado são encerrados e não voltam, mas ainda duplicam
+        itens = [('duplicar', 'Duplicar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False)]
+        itens += {'Ativo': [('pausa', 'Pausar', None, False)], 'Pausado': [('retomar', 'Retomar', None, False)]}.get(status, [])
         cel = [
             caixa(k, False, f'Selecionar {cod}'),
             f'<span style="display:flex;align-items:center;gap:8px;">'
