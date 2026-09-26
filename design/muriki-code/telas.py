@@ -9,10 +9,10 @@ from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_pre
                         ANTES_VERIFICACAO, PROPS_VERIFICACAO, ANTES_PREFERENCIAS, VALORES_PREFERENCIAS,
                         ANTES_PERFIL, PROPS_PERFIL, ANTES_PAGAMENTO, VALORES_PAGAMENTO, PROPS_PAGAMENTO)
 from logos import logo_linguagem
-from textos_minha_conta import MINHA_CONTA
+from textos_minha_conta import MINHA_CONTA, SUSPENSO
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS
-from conta import (tela_conta_dados, tela_conta_aprendizado, tela_conta_seguranca, tela_conta_plano, tela_confirmar_email,
+from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela_conta_seguranca, tela_conta_plano, tela_confirmar_email,
                    ANTES_CONTA_DADOS, VALORES_CONTA_DADOS, PROPS_CONTA_DADOS, ANTES_CONTA_SEGURANCA,
                    VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA, ANTES_CONFIRMAR_EMAIL, PROPS_CONFIRMAR_EMAIL,
                    FLUXOS, antes_fluxo, VALORES_FLUXO, props_fluxo)
@@ -1590,6 +1590,8 @@ def _montar(tela, tema, sufixo):
         return web(juntar(MINHA_CONTA, PREFERENCIAS), tela_conta_aprendizado(k), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS)
     if tela['id'] == 'conta_seguranca':
         return web(MINHA_CONTA, tela_conta_seguranca(k), ANTES_CONTA_SEGURANCA, VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA)
+    if tela['id'] == 'suspenso':
+        return web(SUSPENSO, tela_suspenso(k, sufixo))
     if tela['id'] in FLUXOS:
         fluxo, opcoes, segundo_fator, editar_pk = FLUXOS[tela['id']]
         return web(MINHA_CONTA, tela_conta_seguranca(k, fluxo(k), editar_pk), antes_fluxo(opcoes), VALORES_FLUXO,

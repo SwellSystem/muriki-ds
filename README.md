@@ -328,6 +328,7 @@ toast.error("Sem conexão — nada foi salvo")
 | `@muriki/onboarding-pricing` | `registry:block` | a tela de escolha de plano: trilha de passos, os dois segmentados e a grade com preço que rola os dígitos |
 | `@muriki/app-shell` | `registry:block` | a moldura dos apps do hub sobre o `sidebar`: troca de produto, grupos de navegação, o pé com Peer e Plano, idioma, tema e usuário |
 | `@muriki/plans-page` | `registry:block` | a tela de Planos de dentro do app: plano atual marcado, o estado da assinatura acima dos cards e as regras embaixo |
+| `@muriki/notice-page` | `registry:block` | a tela de aviso fora do shell: ícone, título, frase e ações no centro, a conta embaixo — acesso suspenso, pagamento, confirmação |
 | `@muriki/avatar` | `registry:ui` | retrato ou iniciais em círculo, com fio que não some em nenhum dos dois temas |
 | `@muriki/muriki-logo` | `registry:ui` | o macaco da marca em SVG inline, de olhos abertos ou fechados |
 | `@muriki/qr-code` | `registry:ui` | QR escaneável com cara de marca: pontos, olhos arredondados e logo no meio; placa sempre branca |

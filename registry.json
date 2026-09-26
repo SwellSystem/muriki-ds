@@ -1127,6 +1127,25 @@
       "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O card é próprio, não o PlanCard: aquele tem a hierarquia de quem escolhe o primeiro plano. emphasized deixa o botão sólido (um por tela, ex.: o Pro para quem está no Starter). O trial vira texto verde depois do priceNote."
     },
     {
+      "name": "notice-page",
+      "type": "registry:block",
+      "title": "Notice Page",
+      "description": "A tela de aviso, fora do shell do app: pouco conteúdo no centro — ícone num círculo tingido, título, uma frase, as ações empilhadas e a conta embaixo — e no topo a marca, idioma, tema e o email. Para acesso suspenso, volta do pagamento e confirmação de email.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/notice-page/notice-page.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/notice-page/notice-page.tsx"
+        }
+      ],
+      "docs": "<NoticePage brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account=\"rafael@moura.dev\" icon={<LockIcon />} tone=\"attention\" title=\"Seu acesso ao Muriki Code está suspenso\" description=\"A sua conta Muriki continua ativa, mas o Code está bloqueado para ela no momento. Fale com o suporte para entender o que aconteceu e como voltar.\" actions={<><Button variant=\"solid\" size=\"touch\" render={<a href={suporte} />}>Falar com o suporte</Button><Button variant=\"ghost\" onClick={sair}><SignOutIcon />Sair da conta</Button></>} footer={<>Você está na conta <b className=\"font-mono font-medium text-foreground-strong\">rafael@moura.dev</b></>} />. Tons: neutral, success (confirmado), attention (suspenso, pendente), danger. O ícone é do app (Phosphor) e ganha 28px."
+    },
+    {
       "name": "avatar",
       "type": "registry:ui",
       "title": "Avatar",

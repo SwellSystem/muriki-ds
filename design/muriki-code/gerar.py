@@ -29,6 +29,7 @@ TELAS = [
     ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
     ('criarSenha', 'CriarSenha', 'Criar senha', 'Conta · criar senha (link do email)', 2, 6, 7),
     ('redefinir', 'RedefinirSenha', 'Redefinir senha', 'Conta · redefinir senha (link do email)', 3, 6, 7),
+    ('suspenso', 'Suspenso', 'Acesso suspenso', 'Conta · acesso ao Code suspenso pela equipe', 4, 6, 7),
     ('conta_dados', 'ContaDados', 'Minha conta', 'Minha conta · meus dados, email e excluir conta', 0, 8, 9),
     ('conta_aprendizado', 'ContaAprendizado', 'Minha conta', 'Minha conta · perfil de aprendizado', 1, 8, 9),
     ('conta_seguranca', 'ContaSeguranca', 'Minha conta', 'Minha conta · senha, segundo fator, passkeys e sessões', 2, 8, 9),
@@ -85,8 +86,8 @@ for chave, lin, n, texto in [
     ('webEscuro', 3, 5, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
-    ('conta', 6, 4, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email'),
-    ('contaEscuro', 7, 4, 'Conta no tema escuro'),
+    ('conta', 6, 5, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email, acesso suspenso'),
+    ('contaEscuro', 7, 5, 'Conta no tema escuro'),
     ('minhaConta', 8, 10, 'Minha conta: meus dados, aprendizado, segurança, plano, confirmar o email novo e os fluxos da segurança'),
     ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
 ]:

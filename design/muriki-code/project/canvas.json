@@ -513,6 +513,22 @@
    "h": 900,
    "title": "Minha conta · encerrar sessões · escuro",
    "is_interactive": true
+  },
+  "Suspenso.dc.html": {
+   "x": 6080,
+   "y": 7920,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · acesso ao Code suspenso pela equipe",
+   "is_interactive": true
+  },
+  "SuspensoEscuro.dc.html": {
+   "x": 6080,
+   "y": 9240,
+   "w": 1440,
+   "h": 900,
+   "title": "Conta · acesso ao Code suspenso pela equipe · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -575,16 +591,16 @@
   "conta": {
    "x": 0,
    "y": 7620,
-   "text": "Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email",
+   "text": "Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email, acesso suspenso",
    "kind": "title1",
-   "maxW": 6000
+   "maxW": 7520
   },
   "contaEscuro": {
    "x": 0,
    "y": 8940,
    "text": "Conta no tema escuro",
    "kind": "title1",
-   "maxW": 6000
+   "maxW": 7520
   },
   "minhaConta": {
    "x": 0,
@@ -665,7 +681,9 @@
   "ContaPasskeyEditar.dc.html",
   "ContaPasskeyEditarEscuro.dc.html",
   "ContaSessoes.dc.html",
-  "ContaSessoesEscuro.dc.html"
+  "ContaSessoesEscuro.dc.html",
+  "Suspenso.dc.html",
+  "SuspensoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
