@@ -1150,7 +1150,7 @@
       "name": "account-page",
       "type": "registry:block",
       "title": "Account Page",
-      "description": "A Minha conta dentro do app: título e abas por link, e os cartões de cada assunto — dados pessoais (CPF só leitura), email com a troca pendente, excluir conta — e o StepUpDialog (senha ou código do app) das ações sensíveis.",
+      "description": "A Minha conta dentro do app: título e abas por link, e os cartões de cada assunto — dados pessoais (CPF só leitura), email com a troca pendente, excluir conta — o StepUpDialog (senha ou código do app) das ações sensíveis, e a Segurança: senha, 2FA (ativar em três passos e códigos novos, mostrados uma vez), passkeys (adicionar, renomear, remover) e sessões.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
@@ -1163,7 +1163,12 @@
         "SwellSystem/muriki-ds/dialog",
         "SwellSystem/muriki-ds/field",
         "SwellSystem/muriki-ds/input",
-        "SwellSystem/muriki-ds/otp-input"
+        "SwellSystem/muriki-ds/otp-input",
+        "SwellSystem/muriki-ds/alert-dialog",
+        "SwellSystem/muriki-ds/checkbox",
+        "SwellSystem/muriki-ds/choice-card",
+        "SwellSystem/muriki-ds/qr-code",
+        "SwellSystem/muriki-ds/password-strength"
       ],
       "files": [
         {
@@ -1195,9 +1200,34 @@
           "path": "registry/muriki/blocks/account-page/account-danger-card.tsx",
           "type": "registry:component",
           "target": "components/blocks/account-page/account-danger-card.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-password-form.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-password-form.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/recovery-codes.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/recovery-codes.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-two-factor.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-two-factor.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-passkeys.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-passkeys.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/account-page/account-sessions.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/account-page/account-sessions.tsx"
         }
       ],
-      "docs": "<AccountPage title=\"Minha conta\" subtitle=… tabsLabel=\"Seções da conta\" tabs={[{ key: \"dados\", label: \"Meus dados\", active, render: <Link to=\"/account\" /> }, …]}><div className=\"grid gap-4 lg:grid-cols-[1.1fr_1fr] items-start\"><AccountProfileForm values={{ displayName, fullName }} maskedPhone={profile.phone} maskedCpf={profile.cpf} onSubmit={(changes) => patch(changes)} saving errors /><div className=\"flex flex-col gap-4\"><AccountEmailCard email pending={pendingEmailChange && { email, until: formatado }} onRequestChange onCancelPending onResend /><AccountCard title=\"Termos e privacidade\">…</AccountCard><AccountDangerCard onDelete={(cred) => stepUp(cred).then(excluir)} /></div></div></AccountPage>. O StepUpDialog é controlado: abra quando a API responder 403 REAUTHENTICATION_REQUIRED, mande a credencial para POST /auth/step-up e repita a ação. Textos em account.* no i18n (defaults pt-BR); o app traduz no blocks.json."
+      "docs": "<AccountPage title=\"Minha conta\" subtitle=… tabsLabel=\"Seções da conta\" tabs={[{ key: \"dados\", label: \"Meus dados\", active, render: <Link to=\"/account\" /> }, …]}><div className=\"grid gap-4 lg:grid-cols-[1.1fr_1fr] items-start\"><AccountProfileForm values={{ displayName, fullName }} maskedPhone={profile.phone} maskedCpf={profile.cpf} onSubmit={(changes) => patch(changes)} saving errors /><div className=\"flex flex-col gap-4\"><AccountEmailCard email pending={pendingEmailChange && { email, until: formatado }} onRequestChange onCancelPending onResend /><AccountCard title=\"Termos e privacidade\">…</AccountCard><AccountDangerCard onDelete={(cred) => stepUp(cred).then(excluir)} /></div></div></AccountPage>. O StepUpDialog é controlado: abra quando a API responder 403 REAUTHENTICATION_REQUIRED, mande a credencial para POST /auth/step-up e repita a ação. Textos em account.* no i18n (defaults pt-BR); o app traduz no blocks.json. Segurança: <AccountPasswordForm onSubmit={({ currentPassword, newPassword }) => …} errors={{ current, new }} resetKey />; <AccountTwoFactorCard enabled enabledAt onEnable onDisable onRegenerateCodes /> com <EnableTwoFactorDialog step=\"password\"|\"scan\"|\"codes\" onSubmitPassword otpauthUri secret onVerify codes onDone /> e <RecoveryCodesDialog codes onDownloadPdf />; <AccountPasskeysCard passkeys onAdd onRename onRemove /> com <AddPasskeyDialog state=\"form\"|\"browser\"|\"done\"|\"cancelled\" onCreate onRetry /> (remover: StepUpDialog destructive com account.passkeys.remove_title); <AccountSessionsCard sessions onRevoke onRevokeOthers />. Desligar o 2FA e gerar códigos novos pedem step-up: o app abre o StepUpDialog antes."
     },
     {
       "name": "avatar",
