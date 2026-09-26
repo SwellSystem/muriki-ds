@@ -34,6 +34,7 @@ import {
   SidebarProvider,
   SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -95,7 +96,12 @@ export interface AppShellProps {
   groups: AppShellNavGroup[]
   /** Os itens do pé, acima da régua: Peer, Plano. */
   footerItems?: AppShellNavItem[]
-  /** Idioma e tema, na linha acima do usuário. */
+  /**
+   * O seletor de idioma (o LanguageSwitcher), na linha acima do usuário, com a largura que sobra.
+   * Recolhido, o app-shell liga o `compact` dele sozinho.
+   */
+  language?: ReactElement
+  /** Os outros botões da linha, como o tema. */
   utilities?: ReactNode
   user?: AppShellUser
   /** A engrenagem ao lado do usuário. */
@@ -187,6 +193,7 @@ export function AppShell({
   product,
   groups,
   footerItems = [],
+  language,
   utilities,
   user,
   settings,
@@ -275,11 +282,12 @@ export function AppShell({
               ))}
             </SidebarMenu>
           ) : null}
-          {footerItems.length > 0 && (utilities || user) ? (
+          {footerItems.length > 0 && (language || utilities || user) ? (
             <SidebarSeparator className="mx-1 my-2 bg-muted" />
           ) : null}
-          {utilities ? (
-            <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col [&>*:first-child]:flex-1 group-data-[collapsible=icon]:[&>*:first-child]:flex-none">
+          {language || utilities ? (
+            <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
+              {language ? <IdiomaDoRail language={language} /> : null}
               {utilities}
             </div>
           ) : null}
@@ -319,6 +327,19 @@ export function AppShell({
         </div>
       </SidebarInset>
     </SidebarProvider>
+  )
+}
+
+function IdiomaDoRail({ language }: { language: ReactElement }) {
+  // O invólucro é que tem a largura: o Base UI põe um foco-guarda antes do gatilho quando o menu
+  // abre, e uma regra de :first-child na linha fazia o seletor encolher e andar. Recolhido, o
+  // seletor vira o compacto (globo e sigla).
+  const { state, isMobile } = useSidebar()
+  const recolhido = state === "collapsed" && !isMobile
+  return (
+    <div className="flex min-w-0 flex-1 group-data-[collapsible=icon]:flex-none [&>*]:w-full group-data-[collapsible=icon]:[&>*]:w-auto">
+      {cloneElement(language as ReactElement<{ compact?: boolean }>, { compact: recolhido })}
+    </div>
   )
 }
 
