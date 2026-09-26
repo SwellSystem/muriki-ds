@@ -130,6 +130,11 @@ export interface AppShellProps {
    * plans-page com "Atualizar pagamento". Some quando o app tira.
    */
   banner?: ReactNode
+  /**
+   * O selo do ambiente, à direita do rótulo do primeiro grupo, ex.:
+   * <Badge tone="green" dot>dev</Badge>. Em produção o app não passa.
+   */
+  environment?: ReactNode
   children: ReactNode
 }
 
@@ -204,6 +209,7 @@ export function AppShell({
   className,
   stageClassName,
   banner,
+  environment,
   children,
 }: AppShellProps) {
   const t = useTranslate()
@@ -258,9 +264,10 @@ export function AppShell({
         <SidebarContent>
           {groups.map((group, i) => (
             <SidebarGroup key={group.label ?? i} className="py-1">
-              {group.label ? (
-                <SidebarGroupLabel className="h-[30px] px-2.5 font-mono text-[10px] font-normal tracking-[0.2em] text-muted-foreground">
-                  {group.label}
+              {group.label || (i === 0 && environment) ? (
+                <SidebarGroupLabel className="h-[30px] justify-between gap-2 px-2.5 font-mono text-[10px] font-normal tracking-[0.2em] text-muted-foreground">
+                  <span className="truncate">{group.label}</span>
+                  {i === 0 ? environment : null}
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
