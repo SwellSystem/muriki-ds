@@ -101,7 +101,7 @@ export interface AppShellProps {
    * Recolhido, o app-shell liga o `compact` dele sozinho.
    */
   language?: ReactElement
-  /** Os outros botões da linha, como o tema. */
+  /** Os outros botões da linha, como o tema. Sem `language`, entram na linha do usuário, antes do sair. */
   utilities?: ReactNode
   user?: AppShellUser
   /** A engrenagem ao lado do usuário. */
@@ -214,6 +214,7 @@ export function AppShell({
 }: AppShellProps) {
   const t = useTranslate()
   const emBreve = soonLabel ?? t("app_shell.soon")
+  const utilidadesComUsuario = !language && Boolean(utilities) && Boolean(user)
   const marca = (
     <>
       <span className="flex size-[30px] shrink-0 [&>*]:size-full">
@@ -292,7 +293,9 @@ export function AppShell({
           {footerItems.length > 0 && (language || utilities || user) ? (
             <SidebarSeparator className="mx-1 my-2 bg-muted" />
           ) : null}
-          {language || utilities ? (
+          {/* Sem idioma, a linha de cima teria só o tema, solta: as utilities vão para a linha do
+              usuário, antes da engrenagem e do sair, como no menu antigo do Backoffice. */}
+          {language || (utilities && !utilidadesComUsuario) ? (
             <div className="flex items-center gap-0.5 group-data-[collapsible=icon]:flex-col">
               {language ? <IdiomaDoRail language={language} /> : null}
               {utilities}
@@ -301,6 +304,11 @@ export function AppShell({
           {user ? (
             <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col-reverse">
               <UserLink user={user} />
+              {utilidadesComUsuario ? (
+                <span className="flex shrink-0 items-center gap-1 text-muted-foreground group-data-[collapsible=icon]:flex-col [&_button]:size-8">
+                  {utilities}
+                </span>
+              ) : null}
               {settings ? <Settings settings={settings} /> : null}
               {onSignOut ? (
                 <SidebarMenuButton
