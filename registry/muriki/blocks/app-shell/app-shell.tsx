@@ -81,6 +81,8 @@ export interface AppShellUser {
   /** Onde o nome leva, ex.: <Link to="/account" />. */
   render?: ReactElement
   href?: string
+  /** O nome acessível e o tooltip do link, ex.: "Minha conta". Sem isto, o nome da pessoa. */
+  label?: string
 }
 
 export interface AppShellProps {
@@ -265,6 +267,11 @@ export function AppShell({
         <SidebarContent>
           {groups.map((group, i) => (
             <SidebarGroup key={group.label ?? i} className="py-1">
+              {/* Recolhido, o rótulo some; o traço de 24px separa a marca e os grupos. */}
+              <span
+                aria-hidden
+                className="mx-auto my-1.5 hidden h-px w-6 shrink-0 bg-muted group-data-[collapsible=icon]:block"
+              />
               {group.label || (i === 0 && environment) ? (
                 <SidebarGroupLabel className="h-[30px] justify-between gap-2 px-2.5 font-mono text-[10px] font-normal tracking-[0.2em] text-muted-foreground">
                   <span className="truncate">{group.label}</span>
@@ -302,7 +309,7 @@ export function AppShell({
             </div>
           ) : null}
           {user ? (
-            <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col-reverse">
+            <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col">
               <UserLink user={user} />
               {utilidadesComUsuario ? (
                 <span className="flex shrink-0 items-center gap-1 text-muted-foreground group-data-[collapsible=icon]:flex-col [&_button]:size-8">
@@ -314,7 +321,8 @@ export function AppShell({
                 <SidebarMenuButton
                   onClick={onSignOut}
                   aria-label={t("app_shell.sign_out")}
-                  tooltip={t("app_shell.sign_out")}
+                  // em objeto, o tooltip aparece também com o rail aberto
+                  tooltip={{ children: t("app_shell.sign_out") }}
                   className="size-8! shrink-0 justify-center px-0! text-muted-foreground"
                 >
                   <SignOutIcon aria-hidden data-motion="nudge" />
@@ -384,13 +392,15 @@ function UserLink({ user }: { user: AppShellUser }) {
     </>
   )
   const classe =
-    "flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[8px] px-2 outline-hidden ring-ring focus-visible:ring-2 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-none group-data-[collapsible=icon]:p-1"
+    // recolhido, o avatar desce para o fim da coluna: tema, engrenagem e sair ficam acima dele
+    "flex h-full min-w-0 flex-1 items-center gap-2.5 rounded-[8px] px-2 outline-hidden ring-ring focus-visible:ring-2 group-data-[collapsible=icon]:order-last group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-none group-data-[collapsible=icon]:p-1"
   const alvo = navega(user)
   if (!alvo) return <div className={classe}>{conteudo}</div>
   return (
     <SidebarMenuButton
       render={alvo}
-      tooltip={user.name}
+      aria-label={user.label ?? user.name}
+      tooltip={{ children: user.label ?? user.name }}
       className={cn(classe, "px-2")}
     >
       {conteudo}
