@@ -48,16 +48,10 @@
  * mobile, label que troca por i18n) sem recálculo manual — e continua
  * alinhada dentro de containers com `transform: scale` ou `zoom`.
  */
-import {
-  cloneElement,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import { useCallback, useEffect, useRef, useState, type ReactElement, type ReactNode } from "react"
+import { mergeProps } from "@base-ui/react/merge-props"
+import { useRender } from "@base-ui/react/use-render"
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
@@ -97,15 +91,18 @@ export function ViewToggle<V extends string>({
   iconClassName,
 }: ViewToggleProps<V>) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const buttonRefs = useRef<Map<V, HTMLElement>>(new Map())
   const navega = options.some((o) => o.render)
+  // com "reduzir movimento" no sistema, a pílula pula para o lugar em vez de deslizar
+  const semMovimento = useReducedMotion()
   const [pillStyle, setPillStyle] = useState<{
     left: number
     width: number
   } | null>(null)
 
   const updatePill = useCallback(() => {
-    const btn = buttonRefs.current.get(value)
+    // a opção atual é achada pelo data-state no DOM, sem ref por opção: um ref passado ao link do
+    // app (via render) quebrava a regra react-hooks/refs de quem instala
+    const btn = containerRef.current?.querySelector<HTMLElement>(':scope > [data-state="active"]')
     if (!btn) return
     // offsetLeft/offsetWidth, e não getBoundingClientRect: o rect é medido
     // DEPOIS de qualquer `transform: scale` ou `zoom` de um ancestral, mas o
@@ -113,9 +110,10 @@ export function ViewToggle<V extends string>({
     // cancelam e a pill desalinha. offsetLeft já é relativo ao container
     // posicionado e ignora transform.
     setPillStyle({ left: btn.offsetLeft, width: btn.offsetWidth })
-  }, [value])
+  }, [])
 
-  useEffect(updatePill, [updatePill, options])
+  // mede de novo quando a opção atual ou as opções mudam
+  useEffect(updatePill, [updatePill, value, options])
 
   // Recalcula a pill quando o container redimensiona (ex: fullWidth no mobile)
   useEffect(() => {
@@ -170,7 +168,7 @@ export function ViewToggle<V extends string>({
               left: pillStyle.left,
               width: pillStyle.width,
             }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            transition={semMovimento ? { duration: 0 } : { type: "spring", stiffness: 400, damping: 30 }}
           />
         ) : null}
       </AnimatePresence>
@@ -209,38 +207,49 @@ export function ViewToggle<V extends string>({
             {option.badge}
           </>
         )
-        const guardar = (el: HTMLElement | null) => {
-          if (el) buttonRefs.current.set(option.value, el)
-        }
-        if (option.render) {
-          // o link do app, com a classe, o ref da pílula e o aria-current da rota
-          return cloneElement(option.render as ReactElement<Record<string, unknown>>, {
-            key: option.value,
-            ref: guardar,
-            "aria-current": selected ? "page" : undefined,
-            "aria-label": option.ariaLabel,
-            "data-state": selected ? "active" : "inactive",
-            onClick: () => onChange?.(option.value),
-            className: classe,
-            children: conteudo,
-          })
-        }
         return (
-          <button
+          <Opcao
             key={option.value}
-            ref={guardar}
-            type="button"
-            role="tab"
-            aria-selected={selected}
-            aria-label={option.ariaLabel}
-            data-state={selected ? "active" : "inactive"}
+            render={option.render}
+            selected={selected}
+            ariaLabel={option.ariaLabel}
             onClick={() => onChange?.(option.value)}
             className={classe}
           >
             {conteudo}
-          </button>
+          </Opcao>
         )
       })}
     </div>
   )
+}
+
+function Opcao({
+  render,
+  selected,
+  ariaLabel,
+  onClick,
+  className,
+  children,
+}: {
+  render?: ReactElement
+  selected: boolean
+  ariaLabel?: string
+  onClick: () => void
+  className: string
+  children: ReactNode
+}) {
+  // Com `render` (o <Link> do app), a opção é o link: o useRender junta as props com as dele, e o
+  // onClick de quem passou o link roda junto. Sem ele, é a aba de sempre.
+  const comum = { "aria-label": ariaLabel, "data-state": selected ? "active" : "inactive", onClick, className, children }
+  return useRender({
+    render,
+    defaultTagName: "button",
+    props: mergeProps<"button">(
+      render
+        ? { "aria-current": selected ? "page" : undefined }
+        : { type: "button", role: "tab", "aria-selected": selected },
+      comum
+    ),
+  })
 }
