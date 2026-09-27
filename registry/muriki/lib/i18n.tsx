@@ -382,6 +382,13 @@ const STRINGS: Record<string, unknown> = {
       confirm: "Excluir a conta",
     },
   },
+  bar_chart: {
+    current: "em curso",
+    as_table: "Ver como tabela",
+    as_chart: "Ver como gráfico",
+    empty: "Ainda não há dados neste período.",
+    period: "Período",
+  },
   status_page: {
     offline: {
       label: "Sem conexão",
