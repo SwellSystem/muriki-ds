@@ -138,8 +138,10 @@ def svg(d, extra=''):
 
 I = dict(
     evolucao=svg('<path d="M2 12l4-4 3 3 5-6"/><path d="M10.5 5H14v3.5"/>'),
-    trilhas=svg('<path d="M2.5 3.5h3.8a1.9 1.9 0 011.7 1.9v8.1a1.5 1.5 0 00-1.5-1.5h-4z"/><path d="M13.5 3.5H9.7A1.9 1.9 0 008 5.4v8.1a1.5 1.5 0 011.5-1.5h4z"/>'),
-    exercicios=svg('<path d="M5.5 4.5L2 8l3.5 3.5"/><path d="M10.5 4.5L14 8l-3.5 3.5"/>'),
+    # trilha é o mapa (MapTrifoldIcon no app); exercício é o alvo (TargetIcon), para não somar mais
+    # um ícone de código ao lado do terminal do Playground
+    trilhas=svg('<path d="M2 3.8l3.9-1.3 4.2 1.4 3.9-1.3v9.6l-3.9 1.3-4.2-1.4L2 13.4z"/><path d="M5.9 2.5v9.6"/><path d="M10.1 3.9v9.6"/>'),
+    exercicios=svg('<circle cx="7.6" cy="8.4" r="5.6"/><circle cx="7.6" cy="8.4" r="2.8"/><path d="M7.6 8.4l5.6-5.6"/><path d="M11.1 2.8h2.1v2.1"/>'),
     avaliacoes=svg('<circle cx="8" cy="6.8" r="4.4"/><path d="M6.1 6.8l1.3 1.3 2.5-2.5"/><path d="M5.7 10.6l-.9 3.4L8 12.8l3.2 1.2-.9-3.4"/>'),
     peer=svg('<path d="M2.4 7.6a5.5 5.5 0 119.9 3.3l.9 2.6-2.8-.8A5.5 5.5 0 012.4 7.6z"/>'),
     plano=svg('<rect x="1.8" y="3.5" width="12.4" height="9" rx="1.8"/><path d="M1.8 6.6h12.4"/><path d="M4.4 10h2.6"/>'),
