@@ -76,10 +76,12 @@ function InputGroup({ start, end, size = "default", className, ...props }: Input
 }
 
 function Afixo({ children }: { children: React.ReactNode }) {
+  // o afixo é um passo menor que o texto do campo, em todos os tamanhos: 12.5px e ícone de 15px
+  // (o desenho do Novo cupom), para ler como unidade e não como parte do valor
   return (
     <span
       data-slot="input-group-addon"
-      className="flex shrink-0 items-center text-muted-foreground select-none [&_svg]:size-4"
+      className="flex shrink-0 items-center text-[0.78125rem] text-muted-foreground select-none [&_svg]:size-[15px]"
     >
       {children}
     </span>

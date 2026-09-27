@@ -291,16 +291,17 @@ def radio(k, marcado, rotulo_, sub=''):
 
 
 def segmentado(k, opcoes, ativo, aria):
-    # o view-toggle do DS: pill que corre dentro de um encaixe
+    # o view-toggle do DS no size sm, que é quem vale: trilho redondo afundado, a pílula do card
+    # correndo por cima, a opção atual no azul; todas em peso 500
     bs = ''
     for o in opcoes:
         at = o == ativo
-        est = (f'background:{k["card"]};box-shadow:{k["sombra"]}, inset 0 0 0 1px {k["border"]};color:{k["fgs"]};font-weight:500;'
+        est = (f'background:{k["card"]};box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px {k["input"]};color:{k["pri"]};'
                if at else f'background:transparent;color:{k["mfg"]};')
-        bs += (f'<button type="button" role="tab" aria-selected="{"true" if at else "false"}" style="height:26px;padding:0 12px;border:0;'
-               f'border-radius:6px;{est}font-family:{FONTE};font-size:12.5px;white-space:nowrap;cursor:pointer;">{o}</button>')
-    return (f'<div role="tablist" aria-label="{aria}" style="display:inline-flex;gap:2px;padding:3px;border-radius:9px;'
-            f'background:{k["sunken"]};box-shadow:inset 0 1px 2px rgba(0,0,0,0.06);">{bs}</div>')
+        bs += (f'<button type="button" role="tab" aria-selected="{"true" if at else "false"}" style="height:30px;padding:0 12px;border:0;'
+               f'border-radius:999px;{est}font-family:{FONTE};font-size:12px;font-weight:500;white-space:nowrap;cursor:pointer;">{o}</button>')
+    return (f'<div role="tablist" aria-label="{aria}" style="display:inline-flex;padding:2px;border-radius:999px;'
+            f'background:{k["sunken"]};box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">{bs}</div>')
 
 
 def botao_icone(k, icone, rotulo_, href_=None, tam=28, cor=None, destrutivo=False):
