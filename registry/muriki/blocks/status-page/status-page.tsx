@@ -9,6 +9,10 @@
 // palco: o código gigante com o mascote no lugar do 0 (ou do O) e os outros dígitos vazados, com
 // a cara do que houve. Nenhuma culpa a pessoa, e toda tela diz o que fazer.
 //
+// Duas variantes: `page` (padrão) é a tela inteira, com topo e rodapé; `stage` é a mesma página
+// dentro do palco do app-shell, para o errorComponent das rotas: sem topo nem rodapé, com a altura
+// do conteúdo, a atmosfera contida no cartão e o palco do mascote menor.
+//
 // Sem roteador nem API: as ações chegam por prop, com o elemento que navega em `render` (o
 // <Link> do app) ou um `onClick`. Os textos vêm do i18n (status_page.*), e o app pode trocar
 // qualquer um por prop.
@@ -41,8 +45,10 @@ export interface StatusPageAction {
 
 export interface StatusPageProps {
   kind: StatusPageKind
-  /** O produto na legenda: "code" vira "muriki / code". */
-  product: string
+  /** `page` é a tela inteira; `stage` cabe no palco do app-shell (errorComponent das rotas). */
+  variant?: "page" | "stage"
+  /** O produto na legenda: "code" vira "muriki / code". Só aparece na `page`. */
+  product?: string
   /** O logo do topo, normalmente <MurikiLogo />. */
   logo?: ReactNode
   /** Idioma e tema, à direita no topo. */
@@ -64,6 +70,7 @@ export interface StatusPageProps {
 
 export function StatusPage({
   kind,
+  variant = "page",
   product,
   logo,
   utilities,
@@ -90,13 +97,56 @@ export function StatusPage({
       </>
     ) : null)
 
+  const noPalco = variant === "stage"
+  const texto = (
+    <div className="order-2 flex min-w-0 flex-col gap-6 md:order-1">
+      <div className="flex items-center gap-3">
+        <Legenda largo>{label ?? t(`${k}.label`)}</Legenda>
+        <span aria-hidden className="h-px w-16 bg-primary" />
+      </div>
+      <h1
+        className={cn(
+          "leading-[0.95] font-semibold tracking-[-0.03em] text-foreground-strong",
+          noPalco ? "text-4xl md:text-[56px]" : "text-5xl md:text-[72px]"
+        )}
+      >
+        {linhaA}
+        <br />
+        <span className="text-primary">{linhaB}</span>
+      </h1>
+      <p className="max-w-[440px] text-[17px] leading-[1.6] text-muted-foreground">
+        {description ?? t(`${k}.description`)}
+      </p>
+      <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+        <Acao acao={action} rotulo={t(`${k}.action`)} principal />
+        {secondaryAction ? <Acao acao={secondaryAction} rotulo={t(`${k}.secondary`)} /> : null}
+      </div>
+      {nota ? <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">{nota}</div> : null}
+    </div>
+  )
+
+  if (noPalco) {
+    // Dentro do app: o rail e o topo já dizem onde a pessoa está, então sobram o texto e o palco.
+    return (
+      <div className={cn("relative flex w-full overflow-hidden rounded-2xl", className)}>
+        <Atmosfera contida />
+        <main className="relative z-10 grid w-full grid-cols-1 items-center gap-8 px-6 py-10 md:grid-cols-[minmax(0,480px)_minmax(0,1fr)] md:gap-10 md:px-12 md:py-16">
+          {texto}
+          <div className="order-1 flex min-w-0 justify-center md:order-2">
+            <Palco codigo={pagina.codigo} cara={pagina.cara} tamanho="text-[clamp(96px,12vw,190px)]" />
+          </div>
+        </main>
+      </div>
+    )
+  }
+
   return (
     <div className={cn("relative flex min-h-svh flex-col overflow-hidden bg-background", className)}>
       <Atmosfera />
 
       <header className="relative z-10 flex h-[72px] shrink-0 items-center gap-3 px-6 md:px-14">
         {logo ? <span className="flex size-8 [&>*]:size-full">{logo}</span> : null}
-        <Legenda>{`muriki / ${product}`}</Legenda>
+        {product ? <Legenda>{`muriki / ${product}`}</Legenda> : null}
         <div className="ml-auto flex items-center gap-1">
           {utilities}
           {account ? (
@@ -109,25 +159,7 @@ export function StatusPage({
       </header>
 
       <main className="relative z-10 grid flex-1 grid-cols-1 items-center gap-10 px-6 py-10 md:grid-cols-[minmax(0,560px)_minmax(0,1fr)] md:py-0 md:pr-16 md:pl-[120px]">
-        <div className="order-2 flex min-w-0 flex-col gap-6 md:order-1">
-          <div className="flex items-center gap-3">
-            <Legenda largo>{label ?? t(`${k}.label`)}</Legenda>
-            <span aria-hidden className="h-px w-16 bg-primary" />
-          </div>
-          <h1 className="text-5xl leading-[0.95] font-semibold tracking-[-0.03em] text-foreground-strong md:text-[72px]">
-            {linhaA}
-            <br />
-            <span className="text-primary">{linhaB}</span>
-          </h1>
-          <p className="max-w-[440px] text-[17px] leading-[1.6] text-muted-foreground">
-            {description ?? t(`${k}.description`)}
-          </p>
-          <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
-            <Acao acao={action} rotulo={t(`${k}.action`)} principal />
-            {secondaryAction ? <Acao acao={secondaryAction} rotulo={t(`${k}.secondary`)} /> : null}
-          </div>
-          {nota ? <div className="flex flex-wrap items-center gap-2 text-[13px] text-muted-foreground">{nota}</div> : null}
-        </div>
+        {texto}
 
         <div className="order-1 flex min-w-0 justify-center md:order-2">
           <Palco codigo={pagina.codigo} cara={pagina.cara} />
@@ -141,12 +173,20 @@ export function StatusPage({
   )
 }
 
-function Palco({ codigo, cara }: { codigo: string; cara: StatusMascotFace }) {
+function Palco({
+  codigo,
+  cara,
+  tamanho = "text-[clamp(120px,17vw,260px)]",
+}: {
+  codigo: string
+  cara: StatusMascotFace
+  tamanho?: string
+}) {
   // O mascote entra no lugar do 0 (ou do O) e os outros dígitos são vazados, só o filete na cor
   // da marca. Tudo em em: o font-size do palco é o tamanho de tudo, e cresce com a tela.
   const i = codigo.includes("0") ? codigo.indexOf("0") : codigo.indexOf("O")
   return (
-    <div aria-hidden className="flex items-end justify-center text-[clamp(120px,17vw,260px)] font-semibold tracking-[-0.04em]">
+    <div aria-hidden className={cn("flex items-end justify-center font-semibold tracking-[-0.04em]", tamanho)}>
       {Array.from(codigo).map((c, j) =>
         j === i ? (
           <StatusMascot key={j} face={cara} className="mx-[0.01em] h-[0.8em] w-[0.855em] -rotate-6" />
@@ -198,8 +238,18 @@ function Legenda({ children, largo = false }: { children: ReactNode; largo?: boo
   )
 }
 
-function Atmosfera() {
-  // o degradê do login: o azul no canto de cima, o amarelo embaixo
+function Atmosfera({ contida = false }: { contida?: boolean }) {
+  // o degradê do login: o azul no canto de cima, o amarelo embaixo. Contida (no palco do app),
+  // fica mais fraca e menor: é um cartão na tela, não a tela.
+  if (contida) {
+    return (
+      <>
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent via-45% to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute -top-32 -left-24 size-[420px] rounded-full bg-primary/12 blur-[120px]" />
+        <div aria-hidden className="pointer-events-none absolute -right-24 -bottom-36 size-[380px] rounded-full bg-accent/18 blur-[110px]" />
+      </>
+    )
+  }
   return (
     <>
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/12 via-transparent via-45% to-transparent" />
