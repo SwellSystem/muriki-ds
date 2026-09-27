@@ -306,6 +306,26 @@
       "docs": "Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos."
     },
     {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "O Input com um afixo por dentro: \"R$\" à esquerda, \"%\" ou \"meses\" à direita, ou um ícone. O afixo fica em muted-foreground, dentro do mesmo filete, e clicar nele foca o campo. O foco e o erro do campo acendem o grupo inteiro.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/input-group.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "<InputGroup start=\"R$\" inputMode=\"decimal\" placeholder=\"49,00\" /> · <InputGroup end=\"%\" value={valor} onValueChange={setValor} className=\"w-24\" /> · <InputGroup end=\"meses\" /> · <InputGroup start={<MagnifyingGlassIcon />} placeholder=\"Buscar\" />. className vai para o grupo (largura); o resto, para o <input> (Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos). size: sm, default, lg, touch, as alturas do Input."
+    },
+    {
       "name": "otp-input",
       "type": "registry:ui",
       "title": "OTP Input",
@@ -364,7 +384,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro."
+      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro. Contador: <Textarea maxLength={500} showCount /> põe \"n/500\" logo abaixo do campo, à direita (fora da caixa, para não cobrir o texto); vira aviso nos últimos 10% e vermelho no limite. É só visual (aria-hidden): o limite é o maxLength nativo. Funciona controlado (value) e solto (defaultValue)."
     },
     {
       "name": "radio-group",
@@ -613,7 +633,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio."
+      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio. Como navegação: passe render com o link do app em cada opção, ex.: options={[{ value: \"platform\", label: \"Muriki Platform\", render: <Link to=\".\" search={{ product: \"platform\" }} /> }, …]} e value com a rota atual; o container vira role=\"navigation\", a opção atual ganha aria-current=\"page\" e onChange fica opcional. A pílula desliza igual."
     },
     {
       "name": "sonner",
@@ -705,6 +725,20 @@
           "target": "lib/i18n.tsx"
         }
       ]
+    },
+    {
+      "name": "format",
+      "type": "registry:lib",
+      "title": "Formatos de data",
+      "description": "Os formatos que Code e Backoffice mostram iguais. formatShortDate: a data curta dos desenhos, \"31 dez 2026\" em pt-BR, \"31 dic 2026\" em es e \"Dec 31, 2026\" em en. formatShortDateTime: \"23 set, 09:40\".",
+      "files": [
+        {
+          "path": "registry/muriki/lib/format.ts",
+          "type": "registry:lib",
+          "target": "lib/format.ts"
+        }
+      ],
+      "docs": "import { formatShortDate } from \"@/lib/format\"; formatShortDate(coupon.expiresAt, i18n.language) → \"31 dez 2026\". Aceita Date, string ISO ou timestamp. O locale vem por parâmetro, porque o i18n do DS não guarda o idioma: use o mesmo do i18next. Para fixar o fuso (ex.: validade em horário de Brasília), passe { timeZone: \"America/Sao_Paulo\" }; sem isso, vale o fuso do navegador. formatShortDateTime(uso.redeemedAt, i18n.language) → \"23 set, 09:40\" (en: \"Sep 23, 9:40 AM\"): data sem ano e hora, para o que aconteceu há pouco; aceita o mesmo timeZone."
     },
     {
       "name": "priority-flag",
@@ -1170,7 +1204,7 @@
           "target": "components/blocks/status-page/status-mascot.tsx"
         }
       ],
-      "docs": "<StatusPage kind=\"not-found\" product=\"code\" logo={<MurikiLogo />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account={email} action={{ render: <Link to=\"/\" /> }} secondaryAction={{ onClick: () => history.back() }} note={<code className=\"font-mono text-xs\">{location.pathname}</code>} />. kind: offline | not-found | error | session-expired | maintenance. Textos em status_page.<kind>.* (label, title_a, title_b, description, action, secondary); title, description e label trocam por prop. No erro, passe o requestId na note: <>{t(\"status_page.error.code\")} <code>{requestId}</code> · <a href={suporte}>{t(\"status_page.error.support\")}</a></>. Na sessão expirada, não passe account. O StatusMascot (face: offline | not-found | error | locked | warning) sai à parte, para usar o mascote em outro lugar. Sem internet já traz a nota de que a página volta sozinha."
+      "docs": "<StatusPage kind=\"not-found\" product=\"code\" logo={<MurikiLogo />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account={email} action={{ render: <Link to=\"/\" /> }} secondaryAction={{ onClick: () => history.back() }} note={<code className=\"font-mono text-xs\">{location.pathname}</code>} />. kind: offline | not-found | error | session-expired | maintenance. Textos em status_page.<kind>.* (label, title_a, title_b, description, action, secondary); title, description e label trocam por prop. No erro, passe o requestId na note: <>{t(\"status_page.error.code\")} <code>{requestId}</code> · <a href={suporte}>{t(\"status_page.error.support\")}</a></>. Na sessão expirada, não passe account. O StatusMascot (face: offline | not-found | error | locked | warning) sai à parte, para usar o mascote em outro lugar. Sem internet já traz a nota de que a página volta sozinha. variant=\"stage\": a mesma página dentro do palco do app-shell, para o errorComponent das rotas — sem topo nem rodapé (product, logo, utilities e account são ignorados), com a altura do conteúdo, a atmosfera contida num cartão e o palco menor. Ex.: errorComponent: ({ reset }) => <StatusPage variant=\"stage\" kind=\"error\" action={{ onClick: reset }} secondaryAction={{ render: <Link to=\"/\" /> }} />; sem conexão, kind=\"offline\"."
     },
     {
       "name": "account-page",
@@ -1618,7 +1652,7 @@
           "target": "components/blocks/resource-table/index.ts"
         }
       ],
-      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app. ResourcePageSkeleton é a tela inteira carregando: use como pendingComponent da rota. Filtros: <ResourceToolbar filters={<ResourceFilterChip label=\"Plano\" options={[{ value: \"pro\", label: \"Pro\" }, { value: \"team\", label: \"Team\" }]} value={plano} onValueChange={setPlano} />} />. Vazio, o chip é o rótulo com o funil no contorno tracejado; com valor, \"Plano: Pro\" no contorno cheio, e o menu ganha \"Limpar filtro\" (resource.clear_filter). Opção única por padrão (value: string | null, fecha na escolha); multiple com value: string[] marca várias e mostra \"Pro +1\"."
+      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Passe `pending` durante o envio: o botão gira e Cancelar e Esc ficam travados até a mutation resolver. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app. ResourcePageSkeleton é a tela inteira carregando: use como pendingComponent da rota. Filtros: <ResourceToolbar filters={<ResourceFilterChip label=\"Plano\" options={[{ value: \"pro\", label: \"Pro\" }, { value: \"team\", label: \"Team\" }]} value={plano} onValueChange={setPlano} />} />. Vazio, o chip é o rótulo com o funil no contorno tracejado; com valor, \"Plano: Pro\" no contorno cheio, e o menu ganha \"Limpar filtro\" (resource.clear_filter). Opção única por padrão (value: string | null, fecha na escolha); multiple com value: string[] marca várias e mostra \"Pro +1\"."
     },
     {
       "name": "route-progress",
