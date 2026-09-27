@@ -32,6 +32,7 @@ export const RESOURCE_STRINGS: Record<string, string> = {
   "resource.saving": "Salvando…",
   "resource.confirm": "Confirmar",
   "resource.confirming": "Aguarde…",
+  "resource.clear_filter": "Limpar filtro",
 }
 
 function interpolate(template: string, params?: Record<string, unknown>) {
