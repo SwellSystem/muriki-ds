@@ -1578,7 +1578,8 @@
         "SwellSystem/muriki-ds/skeleton",
         "SwellSystem/muriki-ds/tabs",
         "SwellSystem/muriki-ds/sheet",
-        "SwellSystem/muriki-ds/alert-dialog"
+        "SwellSystem/muriki-ds/alert-dialog",
+        "SwellSystem/muriki-ds/dropdown-menu"
       ],
       "files": [
         {
@@ -1597,6 +1598,11 @@
           "target": "components/blocks/resource-table/resource-form-sheet.tsx"
         },
         {
+          "path": "registry/muriki/blocks/resource-table/resource-filter-chip.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/resource-table/resource-filter-chip.tsx"
+        },
+        {
           "path": "registry/muriki/blocks/resource-table/labels.ts",
           "type": "registry:component",
           "target": "components/blocks/resource-table/labels.ts"
@@ -1612,7 +1618,7 @@
           "target": "components/blocks/resource-table/index.ts"
         }
       ],
-      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app. ResourcePageSkeleton é a tela inteira carregando: use como pendingComponent da rota."
+      "docs": "Tudo é controlado: busca, aba, ordenação, página e seleção são estado do caller (em geral a query da API). Paginação em dois modos: `page` (padrão: total, faixa \"1–50 de N\" e números) e `mode: \"cursor\"` (hasPrevious/hasNext/onPrevious/onNext, sem total — guarde a pilha de cursores para voltar). Marque `sortable` só nas colunas que a API ordena, e volte para a primeira página quando a ordenação mudar. Criar e editar usam o MESMO ResourceFormSheet, vazio ou preenchido. Revogar e apagar passam pelo ResourceConfirmDialog, que só fecha quando você muda `open` — feche no sucesso da mutation. Rótulos em pt-BR por padrão; traduza pelas chaves `resource.*` no i18n do app. ResourcePageSkeleton é a tela inteira carregando: use como pendingComponent da rota. Filtros: <ResourceToolbar filters={<ResourceFilterChip label=\"Plano\" options={[{ value: \"pro\", label: \"Pro\" }, { value: \"team\", label: \"Team\" }]} value={plano} onValueChange={setPlano} />} />. Vazio, o chip é o rótulo com o funil no contorno tracejado; com valor, \"Plano: Pro\" no contorno cheio, e o menu ganha \"Limpar filtro\" (resource.clear_filter). Opção única por padrão (value: string | null, fecha na escolha); multiple com value: string[] marca várias e mostra \"Pro +1\"."
     },
     {
       "name": "route-progress",

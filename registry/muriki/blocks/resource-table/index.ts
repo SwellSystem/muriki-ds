@@ -4,6 +4,8 @@ export { ResourcePageHeader, ResourceToolbar, ResourcePageSkeleton } from "./res
 export type { ResourcePageHeaderProps, ResourceToolbarProps, ResourcePageSkeletonProps } from "./resource-page"
 export { ResourceFormSheet, ResourceFormSection, ResourceConfirmDialog } from "./resource-form-sheet"
 export type { ResourceFormSheetProps, ResourceFormSectionProps, ResourceConfirmDialogProps } from "./resource-form-sheet"
+export { ResourceFilterChip } from "./resource-filter-chip"
+export type { ResourceFilterChipProps, ResourceFilterOption } from "./resource-filter-chip"
 export { useResourceLabel, RESOURCE_STRINGS } from "./labels"
 export type {
   ResourceColumn,
