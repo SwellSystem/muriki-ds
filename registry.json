@@ -306,6 +306,26 @@
       "docs": "Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos."
     },
     {
+      "name": "input-group",
+      "type": "registry:ui",
+      "title": "Input Group",
+      "description": "O Input com um afixo por dentro: \"R$\" à esquerda, \"%\" ou \"meses\" à direita, ou um ícone. O afixo fica em muted-foreground, dentro do mesmo filete, e clicar nele foca o campo. O foco e o erro do campo acendem o grupo inteiro.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/input-group.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "<InputGroup start=\"R$\" inputMode=\"decimal\" placeholder=\"49,00\" /> · <InputGroup end=\"%\" value={valor} onValueChange={setValor} className=\"w-24\" /> · <InputGroup end=\"meses\" /> · <InputGroup start={<MagnifyingGlassIcon />} placeholder=\"Buscar\" />. className vai para o grupo (largura); o resto, para o <input> (Base UI Input: dentro de um <Field> o id, o label e o aria-describedby vêm sozinhos). size: sm, default, lg, touch, as alturas do Input."
+    },
+    {
       "name": "otp-input",
       "type": "registry:ui",
       "title": "OTP Input",
