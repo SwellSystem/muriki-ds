@@ -384,7 +384,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro."
+      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro. Contador: <Textarea maxLength={500} showCount /> põe \"n/500\" logo abaixo do campo, à direita (fora da caixa, para não cobrir o texto); vira aviso nos últimos 10% e vermelho no limite. É só visual (aria-hidden): o limite é o maxLength nativo. Funciona controlado (value) e solto (defaultValue)."
     },
     {
       "name": "radio-group",
