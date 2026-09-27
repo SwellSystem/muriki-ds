@@ -17,7 +17,9 @@
  *
  * Acessibilidade não é opcional aqui: `role="tablist"` no container,
  * `role="tab"` + `aria-selected` em cada opção, e `ariaLabel` obrigatório
- * no tipo. Opção sem `label` visível exige `ariaLabel` próprio — ícone
+ * no tipo. Quando as opções são links (`render` com o <Link> do app), o
+ * controle é navegação: o container vira `role="navigation"` e a opção da
+ * rota atual ganha `aria-current="page"` — link não é aba. Opção sem `label` visível exige `ariaLabel` próprio — ícone
  * sozinho é adivinhação, a mesma regra do RowActions.
  *
  * O relevo é o mesmo nos dois temas; o MEIO de produzi-lo não é.
@@ -46,7 +48,15 @@
  * mobile, label que troca por i18n) sem recálculo manual — e continua
  * alinhada dentro de containers com `transform: scale` ou `zoom`.
  */
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react"
+import {
+  cloneElement,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactElement,
+  type ReactNode,
+} from "react"
 import { AnimatePresence, motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
@@ -57,11 +67,17 @@ export interface ViewToggleOption<V extends string> {
   icon?: ReactNode
   ariaLabel?: string
   badge?: ReactNode
+  /**
+   * O elemento que navega, ex.: <Link to="/customers" search={{ product: "code" }} />.
+   * Com ele a opção é um link, e `value` diz qual é a rota atual.
+   */
+  render?: ReactElement
 }
 
 export interface ViewToggleProps<V extends string> {
   value: V
-  onChange: (next: V) => void
+  /** Dispensável quando as opções são links: a rota é que muda o `value`. */
+  onChange?: (next: V) => void
   options: ViewToggleOption<V>[]
   ariaLabel: string
   size?: "sm" | "md"
@@ -81,7 +97,8 @@ export function ViewToggle<V extends string>({
   iconClassName,
 }: ViewToggleProps<V>) {
   const containerRef = useRef<HTMLDivElement>(null)
-  const buttonRefs = useRef<Map<V, HTMLButtonElement>>(new Map())
+  const buttonRefs = useRef<Map<V, HTMLElement>>(new Map())
+  const navega = options.some((o) => o.render)
   const [pillStyle, setPillStyle] = useState<{
     left: number
     width: number
@@ -112,7 +129,7 @@ export function ViewToggle<V extends string>({
   return (
     <div
       ref={containerRef}
-      role="tablist"
+      role={navega ? "navigation" : "tablist"}
       aria-label={ariaLabel}
       className={cn(
         "relative inline-flex items-center rounded-full p-0.5",
@@ -161,33 +178,22 @@ export function ViewToggle<V extends string>({
       {options.map((option) => {
         const selected = option.value === value
         const iconOnly = option.icon && !option.label
-        return (
-          <button
-            key={option.value}
-            ref={(el) => {
-              if (el) buttonRefs.current.set(option.value, el)
-            }}
-            type="button"
-            role="tab"
-            aria-selected={selected}
-            aria-label={option.ariaLabel}
-            data-state={selected ? "active" : "inactive"}
-            onClick={() => onChange(option.value)}
-            className={cn(
-              "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap transition-colors",
-              "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-0 focus-visible:outline-none",
-              size === "sm"
-                ? iconOnly
-                  ? "size-[30px]"
-                  : "h-[30px] px-3 text-xs"
-                : iconOnly
-                  ? "size-8 md:size-9"
-                  : "h-8 px-3.5 text-[13px] md:h-9 md:px-4",
-              selected
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
+        const classe = cn(
+          "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap transition-colors",
+          "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-0 focus-visible:outline-none",
+          size === "sm"
+            ? iconOnly
+              ? "size-[30px]"
+              : "h-[30px] px-3 text-xs"
+            : iconOnly
+              ? "size-8 md:size-9"
+              : "h-8 px-3.5 text-[13px] md:h-9 md:px-4",
+          selected
+            ? "text-primary"
+            : "text-muted-foreground hover:text-foreground"
+        )
+        const conteudo = (
+          <>
             {option.icon ? (
               <span
                 aria-hidden="true"
@@ -201,6 +207,37 @@ export function ViewToggle<V extends string>({
             ) : null}
             {option.label}
             {option.badge}
+          </>
+        )
+        const guardar = (el: HTMLElement | null) => {
+          if (el) buttonRefs.current.set(option.value, el)
+        }
+        if (option.render) {
+          // o link do app, com a classe, o ref da pílula e o aria-current da rota
+          return cloneElement(option.render as ReactElement<Record<string, unknown>>, {
+            key: option.value,
+            ref: guardar,
+            "aria-current": selected ? "page" : undefined,
+            "aria-label": option.ariaLabel,
+            "data-state": selected ? "active" : "inactive",
+            onClick: () => onChange?.(option.value),
+            className: classe,
+            children: conteudo,
+          })
+        }
+        return (
+          <button
+            key={option.value}
+            ref={guardar}
+            type="button"
+            role="tab"
+            aria-selected={selected}
+            aria-label={option.ariaLabel}
+            data-state={selected ? "active" : "inactive"}
+            onClick={() => onChange?.(option.value)}
+            className={classe}
+          >
+            {conteudo}
           </button>
         )
       })}
