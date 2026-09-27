@@ -785,14 +785,23 @@ def singular(u):
 def tela_features(k):
     cab = cabecalho(k, 'Matriz de features',
                     'Cada linha é uma feature, cada coluna um plano. Mudou aqui, vale para o plano inteiro.',
-                    direita=segmentado(k, ['Ativos', 'Todos'], 'Todos', 'Planos na matriz')
+                    direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto')
+                    + segmentado(k, ['Ativos', 'Todos'], 'Todos', 'Planos na matriz')
                     + link_botao(k, 'Nova feature', '#', 'solid', 36, 'mais'),
                     trilha=[('Planos', 'Planos'), ('Matriz de features', 'Features')])
     cols = 'minmax(0,1.6fr) 110px repeat(4, minmax(0,1fr))'
 
-    def cel_plano(i, conteudo):
+    # Edição em lote: a célula mudada e não salva fica amarela até Salvar; a barra embaixo conta as pendentes
+    alteradas = {('exercicios.mes', 1), ('peer.modelos_avancados', 1)}
+    hover = 'avaliacao.rubrica'
+
+    def cel_plano(i, conteudo, alterada=False):
         destaque = f'background:{k["prisub"]};' if i == 1 else ''
-        return (f'<span style="display:flex;align-items:center;justify-content:center;align-self:stretch;{destaque}">{conteudo}</span>')
+        if alterada:
+            destaque = (f'background:color-mix(in oklch, {k["accent"]} 24%, transparent);'
+                        f'box-shadow:inset 0 0 0 1px color-mix(in oklch, {k["accent"]} 70%, transparent);')
+        return (f'<span style="display:flex;align-items:center;justify-content:center;align-self:stretch;{destaque}"'
+                + (' title="Alterada, ainda não salva"' if alterada else '') + f'>{conteudo}</span>')
 
     def valor(tipo, v, unidade):
         if tipo == 'bool':
@@ -821,19 +830,34 @@ def tela_features(k):
             grupo_atual = grupo
             linhas += (f'<div style="display:flex;align-items:center;height:28px;padding:0 18px;background:{k["rail"]};'
                        f'box-shadow:inset 0 -1px 0 {k["muted"]};">{rotulo(grupo, k["mfg"], 9.5)}</div>')
-        tipo_selo = f'<span style="display:flex;">{badge("liga/desliga" if tipo == "bool" else "limite", k, "gray" if tipo == "bool" else "blue", mono=True)}</span>'
+        # os tipos: liga/desliga e valor no cinza, limite no azul; nada de roxo, que não é cor da casa
+        rot_tipo, tom_tipo = {'bool': ('liga/desliga', 'gray'), 'limite': ('limite', 'blue'), 'valor': ('valor', 'gray')}[tipo]
+        tipo_selo = f'<span style="display:flex;">{badge(rot_tipo, k, tom_tipo, mono=True)}</span>'
+        lapis = (f'<span style="display:flex;margin-left:auto;">{botao_icone(k, "lapis", f"Editar {nome}")}</span>' if chave == hover else '')
+        if chave == 'exercicios.mes':
+            valores = [valores[0], 80] + valores[2:]
+        if chave == 'peer.modelos_avancados':
+            valores = [valores[0], True] + valores[2:]
         linhas += (f'<div role="row" style="display:grid;grid-template-columns:{cols};gap:0 12px;align-items:stretch;min-height:44px;padding:0 18px;'
-                   f'box-shadow:inset 0 -1px 0 {k["muted"]};">'
-                   f'<span style="display:flex;flex-direction:column;justify-content:center;"><span style="font-size:13.5px;color:{k["fgs"]};">{nome}</span>'
-                   f'{mono(chave, k, k["mfg"], 11)}</span><span style="display:flex;align-items:center;">{tipo_selo}</span>'
-                   + ''.join(cel_plano(i, valor(tipo, v, unidade)) for i, v in enumerate(valores)) + '</div>')
+                   f'box-shadow:inset 0 -1px 0 {k["muted"]};'
+                   + (f'background:{k["rail"]};' if chave == hover else '') + '">'
+                   f'<span style="display:flex;align-items:center;gap:8px;"><span style="display:flex;flex-direction:column;justify-content:center;">'
+                   f'<span style="font-size:13.5px;color:{k["fgs"]};">{nome}</span>'
+                   f'{mono(chave, k, k["mfg"], 11)}</span>{lapis}</span><span style="display:flex;align-items:center;">{tipo_selo}</span>'
+                   + ''.join(cel_plano(i, valor(tipo, v, unidade), (chave, i) in alteradas) for i, v in enumerate(valores)) + '</div>')
     rodape = (f'<footer style="display:flex;align-items:center;gap:10px;padding:12px 18px;box-shadow:inset 0 1px 0 {k["muted"]};'
               f'font-size:12.5px;color:{k["mfg"]};">{ic("dica", 14)}'
               f'<span>“—” é feature que depende de outra: Mensagens com o Peer só existe onde Peer na IDE está ligada.</span></footer>')
     matriz = (f'<section role="table" aria-label="Features por plano" style="flex:1;min-height:0;background:{k["card"]};border-radius:12px;'
               f'box-shadow:{k["sombra"]};display:flex;flex-direction:column;overflow:hidden;">{topo}'
               f'<div style="flex:1;min-height:0;overflow:hidden;">{linhas}</div>{rodape}</section>')
-    return app(k, 'planos', cab + matriz, gap=18)
+    # a barra só existe com alteração pendente: flutua sobre a matriz, embaixo, até Salvar ou Descartar
+    barra = (f'<div role="status" style="position:absolute;left:50%;bottom:36px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;'
+             f'padding:8px 8px 8px 16px;border-radius:12px;background:{k["card"]};box-shadow:{k["sombra"]}, 0 8px 24px -8px rgba(0,0,0,0.25), inset 0 0 0 1px {k["border"]};">'
+             f'<span style="width:8px;height:8px;border-radius:999px;background:{k["accent"]};"></span>'
+             f'<span style="font-size:13px;color:{k["fgs"]};white-space:nowrap;"><b style="font-weight:600;">{len(alteradas)} alterações</b> sem salvar</span>'
+             f'{link_botao(k, "Descartar", "#", "ghost", 32)}{link_botao(k, "Salvar", "#", "solid", 32)}</div>')
+    return app(k, 'planos', cab + f'<div style="position:relative;flex:1;min-height:0;display:flex;flex-direction:column;">{matriz}{barra}</div>', gap=18)
 
 
 # ── Cupons ─────────────────────────────────────────────────────────────
@@ -853,8 +877,10 @@ COLS_CUPONS = '16px minmax(0,1.3fr) 150px minmax(0,1fr) 150px 120px 110px 100px'
 
 
 def tela_cupons(k, hover=1, sobre=''):
+    # cupom é por produto: o mesmo seletor de Clientes
     cab = cabecalho(k, 'Cupons', contagem=str(len(CUPONS)),
-                    direita=link_botao(k, 'Novo cupom', href('CupomNovo'), 'solid', 36, 'mais'))
+                    direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto')
+                    + link_botao(k, 'Novo cupom', href('CupomNovo'), 'solid', 36, 'mais'))
     barra = barra_recurso(k, 'Buscar código', [('Todos', '9'), ('Ativos', '5'), ('Pausados', '1'), ('Encerrados', '3')], 'Todos',
                           filtro_chip(k, 'Plano'))
     cab_t = [(caixa(k, False, 'Selecionar todos'), 'esq', False), ('Código', 'esq', True), ('Desconto', 'esq', False),
