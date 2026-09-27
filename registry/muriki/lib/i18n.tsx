@@ -418,6 +418,14 @@ const STRINGS: Record<string, unknown> = {
       action: "Entrar de novo",
       secondary: "Ir para o início",
     },
+    forbidden: {
+      label: "Sem acesso",
+      title_a: "Esta área",
+      title_b: "não é para você.",
+      description: "Sua conta não tem permissão para abrir esta página. Se acha que deveria ter, peça acesso a quem administra a sua equipe.",
+      action: "Ir para o início",
+      secondary: "Voltar",
+    },
     maintenance: {
       label: "Manutenção",
       title_a: "Voltamos",

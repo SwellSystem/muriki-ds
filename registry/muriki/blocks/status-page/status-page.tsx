@@ -24,13 +24,21 @@ import { cn } from "@/lib/utils"
 
 import { StatusMascot, type StatusMascotFace } from "./status-mascot"
 
-export type StatusPageKind = "offline" | "not-found" | "error" | "session-expired" | "maintenance"
+export type StatusPageKind =
+  | "offline"
+  | "not-found"
+  | "error"
+  | "session-expired"
+  | "forbidden"
+  | "maintenance"
 
 const PAGINAS: Record<StatusPageKind, { codigo: string; cara: StatusMascotFace; chave: string }> = {
   offline: { codigo: "OFF", cara: "offline", chave: "offline" },
   "not-found": { codigo: "404", cara: "not-found", chave: "not_found" },
   error: { codigo: "500", cara: "error", chave: "error" },
   "session-expired": { codigo: "401", cara: "locked", chave: "session_expired" },
+  // entrou, mas não tem permissão: o mesmo cadeado do 401; o texto e a ação é que mudam
+  forbidden: { codigo: "403", cara: "locked", chave: "forbidden" },
   maintenance: { codigo: "503", cara: "warning", chave: "maintenance" },
 }
 
