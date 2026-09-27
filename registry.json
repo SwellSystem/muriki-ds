@@ -613,7 +613,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio."
+      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio. Como navegação: passe render com o link do app em cada opção, ex.: options={[{ value: \"platform\", label: \"Muriki Platform\", render: <Link to=\".\" search={{ product: \"platform\" }} /> }, …]} e value com a rota atual; o container vira role=\"navigation\", a opção atual ganha aria-current=\"page\" e onChange fica opcional. A pílula desliza igual."
     },
     {
       "name": "sonner",
