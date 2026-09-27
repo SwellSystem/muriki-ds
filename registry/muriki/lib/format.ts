@@ -16,11 +16,35 @@ export function formatShortDate(
   locale: string,
   options: { timeZone?: string } = {}
 ): string {
+  return dataCurta(date, locale, options.timeZone, true)
+}
+
+/**
+ * Data e hora curtas, sem o ano, para o que aconteceu há pouco: "23 set, 11:20" em pt-BR,
+ * "Sep 23, 11:20 AM" em en, "23 sept, 11:20" em es. A data segue a regra da data curta, a hora é
+ * a do Intl, e as duas se juntam com vírgula no lugar do "às" / "at".
+ */
+export function formatShortDateTime(
+  date: DataDeEntrada,
+  locale: string,
+  options: { timeZone?: string } = {}
+): string {
+  // relógio de 24 horas com dois dígitos ("09:40"); no de 12, sem o zero ("9:40 AM")
+  const ciclo = new Intl.DateTimeFormat(locale, { hour: "numeric" }).resolvedOptions().hourCycle
+  const hora = new Intl.DateTimeFormat(locale, {
+    hour: ciclo === "h11" || ciclo === "h12" ? "numeric" : "2-digit",
+    minute: "2-digit",
+    timeZone: options.timeZone,
+  }).format(new Date(date))
+  return `${dataCurta(date, locale, options.timeZone, false)}, ${hora}`
+}
+
+function dataCurta(date: DataDeEntrada, locale: string, timeZone: string | undefined, comAno: boolean) {
   const partes = new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
-    year: "numeric",
-    timeZone: options.timeZone,
+    year: comAno ? "numeric" : undefined,
+    timeZone,
   }).formatToParts(new Date(date))
 
   const temPalavra = partes.some((p) => p.type === "literal" && /\p{L}/u.test(p.value))
@@ -28,5 +52,6 @@ export function formatShortDate(
 
   const parte = (tipo: Intl.DateTimeFormatPartTypes) =>
     partes.find((p) => p.type === tipo)?.value ?? ""
-  return `${parte("day")} ${parte("month").replace(/\.$/, "")} ${parte("year")}`
+  const dia = `${parte("day")} ${parte("month").replace(/\.$/, "")}`
+  return comAno ? `${dia} ${parte("year")}` : dia
 }

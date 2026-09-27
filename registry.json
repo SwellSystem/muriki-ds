@@ -710,7 +710,7 @@
       "name": "format",
       "type": "registry:lib",
       "title": "Formatos de data",
-      "description": "Os formatos que Code e Backoffice mostram iguais. formatShortDate: a data curta dos desenhos, \"31 dez 2026\" em pt-BR, \"31 dic 2026\" em es e \"Dec 31, 2026\" em en.",
+      "description": "Os formatos que Code e Backoffice mostram iguais. formatShortDate: a data curta dos desenhos, \"31 dez 2026\" em pt-BR, \"31 dic 2026\" em es e \"Dec 31, 2026\" em en. formatShortDateTime: \"23 set, 09:40\".",
       "files": [
         {
           "path": "registry/muriki/lib/format.ts",
@@ -718,7 +718,7 @@
           "target": "lib/format.ts"
         }
       ],
-      "docs": "import { formatShortDate } from \"@/lib/format\"; formatShortDate(coupon.expiresAt, i18n.language) → \"31 dez 2026\". Aceita Date, string ISO ou timestamp. O locale vem por parâmetro, porque o i18n do DS não guarda o idioma: use o mesmo do i18next. Para fixar o fuso (ex.: validade em horário de Brasília), passe { timeZone: \"America/Sao_Paulo\" }; sem isso, vale o fuso do navegador."
+      "docs": "import { formatShortDate } from \"@/lib/format\"; formatShortDate(coupon.expiresAt, i18n.language) → \"31 dez 2026\". Aceita Date, string ISO ou timestamp. O locale vem por parâmetro, porque o i18n do DS não guarda o idioma: use o mesmo do i18next. Para fixar o fuso (ex.: validade em horário de Brasília), passe { timeZone: \"America/Sao_Paulo\" }; sem isso, vale o fuso do navegador. formatShortDateTime(uso.redeemedAt, i18n.language) → \"23 set, 09:40\" (en: \"Sep 23, 9:40 AM\"): data sem ano e hora, para o que aconteceu há pouco; aceita o mesmo timeZone."
     },
     {
       "name": "priority-flag",
