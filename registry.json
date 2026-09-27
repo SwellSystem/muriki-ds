@@ -384,7 +384,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro. Contador: <Textarea maxLength={500} showCount /> põe \"n/500\" logo abaixo do campo, à direita (fora da caixa, para não cobrir o texto); vira aviso nos últimos 10% e vermelho no limite. É só visual (aria-hidden): o limite é o maxLength nativo. Funciona controlado (value) e solto (defaultValue)."
+      "docs": "Compartilha `inputVariants` com o @muriki/input — instalar um traz o outro. Contador: <Textarea maxLength={500} showCount /> põe \"n/500\" logo abaixo do campo, à direita (fora da caixa, para não cobrir o texto); vira aviso nos últimos 10% e vermelho no limite. Conta caracteres de verdade (code points, como a API): um emoji vale 1. Com o contador, o limite é do componente, que apara o excesso antes do onChange, e não o maxLength nativo (que mede em UTF-16); o contador fica ligado ao campo por aria-describedby. Funciona controlado (value) e solto (defaultValue)."
     },
     {
       "name": "radio-group",
@@ -633,7 +633,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio. Como navegação: passe render com o link do app em cada opção, ex.: options={[{ value: \"platform\", label: \"Muriki Platform\", render: <Link to=\".\" search={{ product: \"platform\" }} /> }, …]} e value com a rota atual; o container vira role=\"navigation\", a opção atual ganha aria-current=\"page\" e onChange fica opcional. A pílula desliza igual."
+      "docs": "O pill é uma exceção deliberada à regra do raio: aqui ele é um cursor que desliza, não decoração. Opção sem label visível exige ariaLabel próprio. Como navegação: passe render com o link do app em cada opção, ex.: options={[{ value: \"platform\", label: \"Muriki Platform\", render: <Link to=\".\" search={{ product: \"platform\" }} /> }, …]} e value com a rota atual; o container vira role=\"navigation\", a opção atual ganha aria-current=\"page\" e onChange fica opcional; o onClick do link passado roda junto. A pílula desliza igual, e com \"reduzir movimento\" no sistema ela pula para o lugar."
     },
     {
       "name": "sonner",
@@ -727,18 +727,18 @@
       ]
     },
     {
-      "name": "format",
+      "name": "date-format",
       "type": "registry:lib",
       "title": "Formatos de data",
       "description": "Os formatos que Code e Backoffice mostram iguais. formatShortDate: a data curta dos desenhos, \"31 dez 2026\" em pt-BR, \"31 dic 2026\" em es e \"Dec 31, 2026\" em en. formatShortDateTime: \"23 set, 09:40\".",
       "files": [
         {
-          "path": "registry/muriki/lib/format.ts",
+          "path": "registry/muriki/lib/date-format.ts",
           "type": "registry:lib",
-          "target": "lib/format.ts"
+          "target": "lib/date-format.ts"
         }
       ],
-      "docs": "import { formatShortDate } from \"@/lib/format\"; formatShortDate(coupon.expiresAt, i18n.language) → \"31 dez 2026\". Aceita Date, string ISO ou timestamp. O locale vem por parâmetro, porque o i18n do DS não guarda o idioma: use o mesmo do i18next. Para fixar o fuso (ex.: validade em horário de Brasília), passe { timeZone: \"America/Sao_Paulo\" }; sem isso, vale o fuso do navegador. formatShortDateTime(uso.redeemedAt, i18n.language) → \"23 set, 09:40\" (en: \"Sep 23, 9:40 AM\"): data sem ano e hora, para o que aconteceu há pouco; aceita o mesmo timeZone."
+      "docs": "import { formatShortDate, formatShortDateTime } from \"@/lib/date-format\"; formatShortDate(coupon.expiresAt, i18n.language) → \"31 dez 2026\". Aceita Date, string ISO ou timestamp. O locale vem por parâmetro, porque o i18n do DS não guarda o idioma: use o mesmo do i18next. Para fixar o fuso (ex.: validade em horário de Brasília), passe { timeZone: \"America/Sao_Paulo\" }; sem isso, vale o fuso do navegador. formatShortDateTime(uso.redeemedAt, i18n.language) → \"23 set, 09:40\" (en: \"Sep 23, 9:40 AM\"): data sem ano e hora, para o que aconteceu há pouco; aceita o mesmo timeZone."
     },
     {
       "name": "priority-flag",

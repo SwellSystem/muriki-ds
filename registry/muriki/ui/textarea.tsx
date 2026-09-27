@@ -15,9 +15,13 @@
  * `showCount` com `maxLength` põe o contador "n/max" logo abaixo do campo,
  * à direita — fora da caixa, para nunca cobrir o texto quando ele rola.
  * Ele fica calado até perto do fim: em
- * muted-foreground, vira aviso nos últimos 10% e vermelho no limite. É só
- * visual (aria-hidden); o limite de verdade é o `maxLength` nativo, que o
- * leitor de tela já anuncia.
+ * muted-foreground, vira aviso nos últimos 10% e vermelho no limite.
+ *
+ * Com o contador, a conta é em caracteres de verdade (code points), como a
+ * API conta: um emoji vale 1, e não 2 como no `maxLength` nativo, que mede
+ * em UTF-16 e cortaria a nota antes do limite. Por isso o limite passa a
+ * ser do componente — o texto que passa do máximo é aparado antes do
+ * onChange — e o contador fica ligado ao campo por aria-describedby.
  */
 import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
@@ -44,10 +48,12 @@ function Textarea({
   ...props
 }: TextareaProps) {
   const ref = React.useRef<HTMLTextAreaElement>(null)
+  const contadorId = React.useId()
+  const { maxLength, onChange, ...resto } = props
   // controlado, o tamanho vem do `value`; solto, do que a pessoa digitou
-  const [digitado, setDigitado] = React.useState(() => String(props.defaultValue ?? "").length)
-  const contar = showCount && props.maxLength !== undefined
-  const usados = typeof props.value === "string" ? props.value.length : digitado
+  const [digitado, setDigitado] = React.useState(() => caracteres(String(props.defaultValue ?? "")))
+  const contar = showCount && maxLength !== undefined
+  const usados = typeof props.value === "string" ? caracteres(props.value) : digitado
 
   const ajustar = React.useCallback(() => {
     const el = ref.current
@@ -64,10 +70,21 @@ function Textarea({
       ref={ref}
       data-slot="textarea"
       rows={rows}
-      {...props}
+      {...resto}
+      // sem contador, o limite é o nativo, como sempre; com ele, é o aparo em code points
+      maxLength={contar ? undefined : maxLength}
+      aria-describedby={contar ? [props["aria-describedby"], contadorId].filter(Boolean).join(" ") : props["aria-describedby"]}
+      onChange={(event) => {
+        if (contar) {
+          const pontos = Array.from(event.currentTarget.value)
+          if (pontos.length > maxLength) event.currentTarget.value = pontos.slice(0, maxLength).join("")
+        }
+        onChange?.(event)
+      }}
       onInput={(event) => {
         ajustar()
-        setDigitado(event.currentTarget.value.length)
+        // o aparo pode rodar depois deste evento: o contador nunca passa do máximo
+        setDigitado(Math.min(caracteres(event.currentTarget.value), maxLength ?? Infinity))
         props.onInput?.(event)
       }}
       className={cn(
@@ -81,12 +98,12 @@ function Textarea({
   )
   if (!contar) return campo
 
-  const max = props.maxLength as number
+  const max = maxLength
   return (
     <div data-slot="textarea-count-wrapper" className="flex w-full min-w-0 flex-col gap-1">
       {campo}
       <span
-        aria-hidden
+        id={contadorId}
         data-slot="textarea-count"
         className={cn(
           "self-end font-mono text-[11px] leading-4 tabular-nums text-muted-foreground",
@@ -97,6 +114,11 @@ function Textarea({
       </span>
     </div>
   )
+}
+
+/** Caracteres como a pessoa (e a API) conta: um emoji é um, não dois. */
+function caracteres(texto: string) {
+  return Array.from(texto).length
 }
 
 export { Textarea }
