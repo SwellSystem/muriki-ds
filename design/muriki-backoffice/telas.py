@@ -875,12 +875,13 @@ def tela_cupons(k, hover=1, sobre=''):
         # O Stripe não edita cupom depois de criado: no lugar de Editar, Duplicar abre o novo cupom
         # preenchido e com o código em branco. Pausar no ativo, Retomar no pausado; esgotado e
         # expirado são encerrados e não voltam, mas ainda duplicam
-        itens = [('duplicar', 'Duplicar', href('CupomNovo'), False), ('copiar', 'Copiar código', None, False)]
+        itens = [('olho', 'Ver usos', href('CupomUsos'), False), ('duplicar', 'Duplicar', href('CupomNovo'), False),
+                 ('copiar', 'Copiar código', None, False)]
         itens += {'Ativo': [('pausa', 'Pausar', None, False)], 'Pausado': [('retomar', 'Retomar', None, False)]}.get(status, [])
         cel = [
             caixa(k, False, f'Selecionar {cod}'),
-            f'<span style="display:flex;align-items:center;gap:8px;">'
-            f'{mono(cod, k, k["mfg"] if encerrado else k["fgs"], 13)}</span>',
+            f'<a href="{href("CupomUsos")}" style="display:flex;align-items:center;gap:8px;color:inherit;">'
+            f'{mono(cod, k, k["mfg"] if encerrado else k["fgs"], 13)}</a>',
             f'<span style="display:flex;flex-direction:column;"><span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{desc}</span>'
             f'<span style="font-size:12px;color:{k["mfg"]};">{dur}</span></span>',
             f'<span style="display:flex;gap:4px;flex-wrap:wrap;">{"".join(badge(p, k, "gray") for p in planos)}</span>',
@@ -935,6 +936,76 @@ def tela_cupom_novo(k):
               f'{link_botao(k, "Criar cupom", href("Cupons"), "solid", 36)}')
     s = sheet(k, 'Novo cupom', 'O código passa a valer quando você criar.', codigo + desconto + onde + limites, rodape, largura=540)
     return tela_cupons(k, hover=-1, sobre=s)
+
+
+# ── Usos de um cupom ───────────────────────────────────────────────────
+# Uma página, e não um sheet: os usos são paginados e podem ser mil, como os pagamentos do cliente.
+# Cupom não se edita (o Stripe não deixa), então o topo só mostra os dados e as ações da linha:
+# Duplicar, Copiar e Pausar ou Retomar. Contrato da muriki-api: GET /admin/billing/coupons/{id}
+# (code, desconto, duração, planos, validade, limite, contagem, status, createdBy, createdAt) e
+# GET …/{id}/redemptions por cursor, com cliente (id, nome, e-mail mascarado), plano e redeemedAt.
+USOS = [
+    # iniciais, tom, nome, e-mail mascarado, plano, quando
+    ('SM', 'blue', 'Sofia Martins', 's***@martins.io', 'Pro', 'hoje, 14:12'),
+    ('RB', 'green', 'Rafael Borges', 'r***@gmail.com', 'Pro', 'hoje, 09:40'),
+    ('LA', 'yellow', 'Luana Alves', 'l***@alves.dev', 'Pro', 'ontem, 21:03'),
+    ('TC', 'blue', 'Thiago Cardoso', 't***@outlook.com', 'Pro', 'ontem, 17:55'),
+    ('JP', 'gray', 'Júlia Prado', 'j***@prado.com.br', 'Pro', '23 set, 11:20'),
+    ('MN', 'green', 'Mateus Nogueira', 'm***@gmail.com', 'Pro', '22 set, 19:48'),
+    ('BF', 'yellow', 'Bianca Freitas', 'b***@freitas.me', 'Pro', '22 set, 08:15'),
+    ('GR', 'blue', 'Gabriel Ramos', 'g***@ramos.dev', 'Pro', '21 set, 16:32'),
+]
+COLS_USOS = 'minmax(0,1fr) 140px 160px 48px'
+
+
+def _dado_cupom(k, rot, valor, sub='', extra=''):
+    return (f'<div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;padding:14px 18px;">'
+            f'<span style="font-size:12px;color:{k["mfg"]};">{rot}</span>'
+            f'<span style="font-size:15px;font-weight:600;color:{k["fgs"]};">{valor}</span>{extra}'
+            + (f'<span style="font-size:12px;color:{k["mfg"]};">{sub}</span>' if sub else '') + '</div>')
+
+
+def tela_cupom_usos(k, hover=1):
+    cod, desc, dur, planos, usados, limite, validade, status = CUPONS[1]
+    acoes = (link_botao(k, 'Duplicar', href('CupomNovo'), 'outline', 32, 'duplicar')
+             + link_botao(k, 'Copiar código', '#', 'ghost', 32, 'copiar')
+             + link_botao(k, 'Pausar', '#', 'outline', 32, 'pausa'))
+    titulo = (f'<span style="display:flex;align-items:center;gap:12px;">'
+              f'<span style="font-family:{MONO};letter-spacing:0.02em;">{cod}</span>{selo_status(k, status)}</span>')
+    cab = cabecalho(k, titulo, 'Criado por Ana Lima em 2 de julho de 2026',
+                    trilha=[('Cupons', 'Cupons'), (cod, 'CupomUsos')], direita=acoes)
+    pct = usados / limite
+    barra = (f'<span style="display:block;height:4px;margin-top:2px;border-radius:999px;background:{k["sunken"]};">'
+             f'<span style="display:block;height:4px;width:{pct * 100:.0f}%;border-radius:999px;background:{k["warn"]};"></span></span>')
+    sep = f'<span style="width:1px;align-self:stretch;margin:14px 0;background:{k["muted"]};"></span>'
+    dados = (f'<section aria-label="O cupom" style="display:flex;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};">'
+             + sep.join([
+                 _dado_cupom(k, 'Desconto', desc, f'{dur}, por cobrança'),
+                 _dado_cupom(k, 'Onde vale', ' e '.join(planos), 'só no plano mensal'),
+                 _dado_cupom(k, 'Vale até', validade, 'faltam 4 dias'),
+                 _dado_cupom(k, 'Usos', f'<span style="font-family:{MONO};">{usados} <span style="font-weight:400;color:{k["mfg"]};">/ {limite}</span></span>',
+                             f'restam {limite - usados}', barra),
+             ]) + '</section>')
+    regra = (f'<p style="margin:-4px 0 0;display:flex;align-items:center;gap:8px;font-size:12px;color:{k["mfg"]};">'
+             f'{ic("check", 13)}Vale uma vez por conta e uma vez por CPF.</p>')
+    titulo_usos = (f'<h2 style="margin:8px 0 0;display:flex;align-items:baseline;gap:10px;font-size:16px;font-weight:600;color:{k["fgs"]};">'
+                   f'Usos<span style="font-family:{MONO};font-size:12px;font-weight:400;color:{k["mfg"]};">{usados}</span></h2>')
+    cab_t = [('Cliente', 'esq', False), ('Plano', 'esq', False), ('Quando', 'esq', True), ('', 'dir', False)]
+    linhas = ''
+    for i, (ini, tom, nome, email, plano, quando) in enumerate(USOS):
+        # a linha inteira leva ao cliente; a seta só aparece no hover, como convite
+        seta = (f'<span style="display:flex;justify-content:flex-end;color:{k["mfg"] if i == hover else "transparent"};">{ic("seta", 14)}</span>')
+        linhas += linha_tabela(k, COLS_USOS, [
+            f'<a href="{href("ClienteDetalhe")}" style="display:flex;align-items:center;gap:10px;min-width:0;color:inherit;">'
+            f'{avatar(ini, k, tom)}<span style="display:flex;flex-direction:column;min-width:0;">'
+            f'<span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">{nome}</span>'
+            f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};">{email}</span></span></a>',
+            f'<span style="display:flex;">{badge(plano, k, "gray")}</span>',
+            f'<span style="font-size:13px;color:{k["mfg"]};">{quando}</span>',
+            seta,
+        ], hover=i == hover, altura=52)
+    t = tabela(k, COLS_USOS, cab_t, linhas, paginacao(k, 1))
+    return app(k, 'cupons', cab + dados + regra + titulo_usos + t, gap=16)
 
 
 # ── Auditoria: a linha do tempo da equipe ──────────────────────────────
@@ -1346,4 +1417,6 @@ def _montar(tela, tema):
         return pagina(t, tela_cupons(k), tema)
     if i == 'cupom':
         return pagina(t, tela_cupom_novo(k), tema)
+    if i == 'cupom-usos':
+        return pagina(t, tela_cupom_usos(k), tema)
     raise KeyError(i)
