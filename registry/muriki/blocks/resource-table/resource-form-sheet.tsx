@@ -133,6 +133,7 @@ export interface ResourceConfirmDialogProps {
   onConfirm: () => void | Promise<void>
   /** Vermelho cheio. Desligue para confirmações que não destroem nada. */
   destructive?: boolean
+  /** Enviando: o botão gira, e Cancelar e Esc ficam travados até o caller resolver. */
   pending?: boolean
 }
 
@@ -150,7 +151,15 @@ export function ResourceConfirmDialog({
 }: ResourceConfirmDialogProps) {
   const t = useResourceLabel()
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
+    // Enquanto envia, o diálogo não fecha (Esc, Cancelar): fechar no meio desmontava os campos, e o
+    // erro chegava num toast sem o diálogo para corrigir.
+    <AlertDialog
+      open={open}
+      onOpenChange={(next) => {
+        if (pending && !next) return
+        onOpenChange(next)
+      }}
+    >
       <AlertDialogContent>
         <AlertDialogHeader icon={destructive}>
           <AlertDialogTitle>{title}</AlertDialogTitle>
@@ -158,7 +167,7 @@ export function ResourceConfirmDialog({
         </AlertDialogHeader>
         {children ? <div className="flex flex-col gap-3">{children}</div> : null}
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancelLabel ?? t("resource.cancel")}</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>{cancelLabel ?? t("resource.cancel")}</AlertDialogCancel>
           {/* Botão comum, não o Close: o diálogo só fecha quando o caller mudar `open` — se a ação falhar, ele fica. */}
           <Button
             variant="solid"
