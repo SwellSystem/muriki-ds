@@ -17,6 +17,17 @@ export interface ResourceColumn<T> {
   sortable?: boolean
   /** Some abaixo desse breakpoint. A primeira coluna nunca some. */
   hideBelow?: "sm" | "md" | "lg"
+  /**
+   * O papel da coluna quando a tabela vira cartões (contêiner com menos de
+   * 40rem, o celular). `title` é a linha de cima (avatar, nome, e-mail ou
+   * código); `subtitle` vai logo embaixo, em tom apagado; `meta` entra na
+   * linha de fatos como "Rótulo valor"; `status` fica no pé do cartão (o
+   * selo); `hidden` some. Sem isto, a primeira coluna é `title` e as outras
+   * são `meta`.
+   */
+  mobile?: "title" | "subtitle" | "meta" | "status" | "hidden"
+  /** O rótulo na linha de fatos do cartão. Sem ele, vai o `header`. */
+  mobileLabel?: React.ReactNode
 }
 
 export interface ResourceSort {

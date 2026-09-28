@@ -7,6 +7,10 @@
  * UMA delas sólida, a de criar. Barra: busca, filtros (os chips são do
  * caller), um espaço, o que for secundário (exportar), e embaixo as abas de
  * status com contagem. Aba, não view-toggle: cada aba mostra OUTRAS linhas.
+ *
+ * No celular: a busca ocupa a largura toda, os filtros rolam numa linha
+ * embaixo dela, e as abas que não cabem rolam de lado — com um esmaecido na
+ * borda que ainda tem aba escondida, e a ativa rolando para ficar à vista.
  */
 import * as React from "react"
 import { MagnifyingGlassIcon } from "@phosphor-icons/react"
@@ -85,7 +89,7 @@ export function ResourceToolbar({
   const t = useResourceLabel()
   const ph = searchPlaceholder ?? t("resource.search")
   return (
-    <div data-slot="resource-toolbar" className={cn("flex flex-col gap-3", className)}>
+    <div data-slot="resource-toolbar" className={cn("flex min-w-0 flex-col gap-3", className)}>
       <div className="flex flex-wrap items-center gap-2">
         {onSearchChange ? (
           <label className="relative w-full sm:w-80">
@@ -103,23 +107,86 @@ export function ResourceToolbar({
             />
           </label>
         ) : null}
-        {filters}
+        {filters ? (
+          // no celular os chips rolam numa linha só, abaixo da busca
+          <div className="muriki-scroll-x flex max-w-full items-center gap-2 overflow-x-auto max-sm:w-full [&>*]:shrink-0">
+            {filters}
+          </div>
+        ) : null}
         {trailing ? <div className="ml-auto flex items-center gap-1.5">{trailing}</div> : null}
       </div>
       {tabs && tabs.length > 0 ? (
         <Tabs value={tab ?? tabs[0].value} onValueChange={(v) => onTabChange?.(String(v))}>
-          <TabsList aria-label="Status" className="gap-5">
-            {tabs.map((s) => (
-              <TabsTrigger key={s.value} value={s.value}>
-                {s.label}
-                {s.count != null ? (
-                  <span className="font-mono text-[11px] font-normal text-muted-foreground">{formatCount(s.count)}</span>
-                ) : null}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <AbasRolaveis ativa={tab ?? tabs[0].value}>
+            <TabsList aria-label="Status" className="gap-5">
+              {tabs.map((s) => (
+                <TabsTrigger key={s.value} value={s.value}>
+                  {s.label}
+                  {s.count != null ? (
+                    <span className="font-mono text-[11px] font-normal text-muted-foreground">{formatCount(s.count)}</span>
+                  ) : null}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </AbasRolaveis>
         </Tabs>
       ) : null}
+    </div>
+  )
+}
+
+/**
+ * As abas rolam de lado quando não cabem. O esmaecido aparece só na borda que
+ * ainda esconde aba (máscara, para funcionar sobre qualquer fundo), e a ativa
+ * rola para dentro da vista quando muda.
+ */
+function AbasRolaveis({ ativa, children }: { ativa: string; children: React.ReactNode }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [bordas, setBordas] = React.useState({ esquerda: false, direita: false })
+
+  const medir = React.useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    const esquerda = el.scrollLeft > 1
+    const direita = el.scrollLeft + el.clientWidth < el.scrollWidth - 1
+    setBordas((b) => (b.esquerda === esquerda && b.direita === direita ? b : { esquerda, direita }))
+  }, [])
+
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    medir()
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(medir) : null
+    ro?.observe(el)
+    return () => ro?.disconnect()
+  }, [medir])
+
+  React.useEffect(() => {
+    const el = ref.current
+    const aba = el?.querySelector<HTMLElement>("[data-slot=tabs-trigger][data-active]")
+    if (!el || !aba) return
+    // sem scrollIntoView: ele rolaria a página na vertical junto
+    const inicio = aba.offsetLeft - 24
+    const fim = aba.offsetLeft + aba.offsetWidth + 24 - el.clientWidth
+    if (el.scrollLeft > inicio) el.scrollLeft = Math.max(0, inicio)
+    else if (el.scrollLeft < fim) el.scrollLeft = fim
+    medir()
+  }, [ativa, medir])
+
+  const mascara =
+    bordas.esquerda || bordas.direita
+      ? `linear-gradient(to right, ${bordas.esquerda ? "transparent, black 32px" : "black"}, ${bordas.direita ? "black calc(100% - 32px), transparent" : "black"})`
+      : undefined
+
+  return (
+    <div
+      ref={ref}
+      onScroll={medir}
+      data-slot="resource-tabs-scroll"
+      className="muriki-scroll-x -mb-px max-w-full overflow-x-auto pb-px"
+      style={mascara ? { maskImage: mascara, WebkitMaskImage: mascara } : undefined}
+    >
+      {children}
     </div>
   )
 }
