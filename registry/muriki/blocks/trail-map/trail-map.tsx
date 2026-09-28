@@ -17,7 +17,12 @@
 // Acessibilidade: sem `onStepClick`, o SVG é uma imagem com o `ariaLabel`, e uma lista oculta
 // descreve cada etapa. Com ele, cada estação é um botão (tabindex itinerante, setas andam) com o
 // aria-label "3. Converter duração… — feita, nota C".
-import { useRef, useState, type CSSProperties, type KeyboardEvent } from "react"
+//
+// `size="mini"` é o mesmo mapa em miniatura (aprender.py, _minimapa), para os cartões do topo de
+// Trilhas: sem nomes nem metas, as regiões só como retângulos, estações pequenas, bandeiras menores e
+// um balão só — "você está aqui" na etapa de agora, ou "comece aqui" quando nada foi feito ainda.
+// Com `href` ou `render`, o mini inteiro vira o link para o mapa.
+import { cloneElement, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactElement } from "react"
 
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -48,8 +53,16 @@ export interface TrailMapProps {
   hereLabel?: string
   /** O resumo para o leitor de tela, ex.: "Testes que dão confiança: 3 de 8 etapas feitas". */
   ariaLabel: string
-  /** Com isto, cada estação vira um botão. */
+  /** Com isto, cada estação vira um botão. Só no tamanho padrão. */
   onStepClick?: (index: number) => void
+  /** "mini": o minimapa dos cartões, sem nomes, com um balão só. */
+  size?: "default" | "mini"
+  /** No mini, o balão quando nada foi feito e a de agora é a primeira. Sem isto, trail_map.start. */
+  startLabel?: string
+  /** No mini, o destino do link ("Ver o mapa"): um <a href>. */
+  href?: string
+  /** No mini, o elemento que navega, ex.: <Link to="/trilhas/$id" />. Ganha de `href`. */
+  render?: ReactElement
   className?: string
 }
 
@@ -83,7 +96,11 @@ function cortar(texto: string, largura: number) {
   return texto.length > max ? `${texto.slice(0, max - 1).trimEnd()}…` : texto
 }
 
-export function TrailMap({ steps, regions = [], hereLabel, ariaLabel, onStepClick, className }: TrailMapProps) {
+export function TrailMap(props: TrailMapProps) {
+  return props.size === "mini" ? <TrailMapMini {...props} /> : <TrailMapDefault {...props} />
+}
+
+function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClick, className }: TrailMapProps) {
   const t = useTranslate()
   const aqui = hereLabel ?? t("trail_map.here")
   const n = steps.length
@@ -302,3 +319,124 @@ export function TrailMap({ steps, regions = [], hereLabel, ariaLabel, onStepClic
     </div>
   )
 }
+
+const MW = 420
+const MH = 140
+const M_MARGEM = 22
+const M_ALTO = 60
+const M_BAIXO = 104
+
+function TrailMapMini({ steps, regions = [], hereLabel, startLabel, ariaLabel, href, render, className }: TrailMapProps) {
+  const t = useTranslate()
+  const n = steps.length
+  const passo = n > 1 ? (MW - 2 * M_MARGEM) / (n - 1) : 0
+  const pontos: Ponto[] = steps.map((_, i) => [n > 1 ? M_MARGEM + i * passo : MW / 2, i % 2 === 0 ? M_BAIXO : M_ALTO])
+  const atual = steps.findIndex((s) => s.state === "now")
+  const feitas = steps.filter((s) => s.state === "done").length
+  const ultimaFeita = steps.reduce((acc, s, i) => (s.state === "done" ? i : acc), -1)
+  const fimFeito = atual >= 0 ? atual : ultimaFeita
+  const comeco = feitas === 0 && atual === 0
+  const balao = comeco ? (startLabel ?? t("trail_map.start")) : (hereLabel ?? t("trail_map.here"))
+  const resumo = `${ariaLabel} · ${t("trail_map.summary", { done: feitas, total: n })}`
+
+  // o balão cabe dentro do mapa: encosta na borda em vez de sair
+  const alvo = atual >= 0 ? pontos[atual] : null
+  const larguraBalao = balao.length * 6.2 + 24
+  const xBalao = alvo ? Math.min(Math.max(alvo[0] - larguraBalao / 2, 2), MW - larguraBalao - 2) : 0
+
+  const mapa = (
+    <svg viewBox={`0 0 ${MW} ${MH}`} width="100%" role="img" aria-label={resumo} className="block h-auto">
+      {regions.map((r) => {
+        const a = pontos[Math.max(0, r.from)]
+        const b = pontos[Math.min(n - 1, r.to)]
+        if (!a || !b) return null
+        const meio = passo ? Math.min(passo / 2 - 4, M_MARGEM - 6) : 30
+        const x = Math.max(6, a[0] - meio)
+        const w = Math.min(MW - 6, b[0] + meio) - x
+        return (
+          <rect
+            key={`${r.label}-${r.from}`}
+            x={x}
+            y={22}
+            width={w}
+            height={110}
+            rx={18}
+            fill="color-mix(in oklch, var(--primary) 5%, transparent)"
+            stroke="color-mix(in oklch, var(--primary) 18%, transparent)"
+            strokeDasharray="2 5"
+          />
+        )
+      })}
+      <path d={curva(pontos)} fill="none" stroke="var(--card)" strokeWidth={6} strokeLinecap="round" />
+      <path
+        d={curva(pontos.slice(Math.max(0, fimFeito)))}
+        fill="none"
+        stroke="var(--input)"
+        strokeWidth={2}
+        strokeDasharray="1 5"
+        strokeLinecap="round"
+      />
+      {fimFeito > 0 ? (
+        <path d={curva(pontos.slice(0, fimFeito + 1))} fill="none" stroke="var(--primary)" strokeWidth={2.5} strokeLinecap="round" />
+      ) : null}
+      {steps.map((s, i) => {
+        const [x, y] = pontos[i]
+        return (
+          <g key={i}>
+            {s.state === "done" ? (
+              <>
+                <circle cx={x} cy={y} r={7} fill="var(--primary)" />
+                <path
+                  d={`M${x - 3},${y} l2,2 l4,-4.5`}
+                  fill="none"
+                  stroke="var(--primary-foreground)"
+                  strokeWidth={1.6}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </>
+            ) : s.state === "now" ? (
+              <>
+                <circle cx={x} cy={y} r={16} fill="color-mix(in oklch, var(--primary) 12%, transparent)" />
+                <circle cx={x} cy={y} r={8} fill="var(--card)" stroke="var(--primary)" strokeWidth={2.5} />
+              </>
+            ) : (
+              <circle cx={x} cy={y} r={5} fill="var(--card)" stroke="var(--input)" strokeWidth={1.4} />
+            )}
+            {s.milestone ? (
+              <g transform={`translate(${x + 7},${y + 2})`}>
+                <path d="M0,0 V-15" stroke="var(--foreground-strong)" strokeWidth={1.2} />
+                <path
+                  d="M0,-15 h9 l-2,3.5 l2,3.5 h-9 z"
+                  fill="var(--accent)"
+                  stroke="var(--foreground-strong)"
+                  strokeWidth={1}
+                  strokeLinejoin="round"
+                />
+              </g>
+            ) : null}
+          </g>
+        )
+      })}
+      {alvo ? (
+        <g aria-hidden>
+          <rect x={xBalao} y={alvo[1] - 38} width={larguraBalao} height={20} rx={10} fill="var(--foreground-strong)" />
+          <text x={xBalao + larguraBalao / 2} y={alvo[1] - 24} textAnchor="middle" fill="var(--background)" style={{ fontSize: 10.5, fontWeight: 600 }}>
+            {balao}
+          </text>
+          <path d={`M${alvo[0] - 4},${alvo[1] - 18} l4,5 l4,-5 z`} fill="var(--foreground-strong)" />
+        </g>
+      ) : null}
+    </svg>
+  )
+
+  const classe = cn(
+    "block w-full min-w-0 rounded-[10px] outline-none",
+    (href || render) && "focus-visible:ring-2 focus-visible:ring-ring/50",
+    className
+  )
+  if (render) return cloneElement(render as ReactElement<Record<string, unknown>>, { className: classe, children: mapa })
+  if (href) return <a href={href} className={classe}>{mapa}</a>
+  return <div className={classe}>{mapa}</div>
+}
+
