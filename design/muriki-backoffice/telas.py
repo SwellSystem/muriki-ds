@@ -345,9 +345,37 @@ TESTES_MESES = [  # iniciados, convertidos, encerrados sem pagar
 ATRASO_MESES = [  # entraram em atraso, recuperadas, perdidas
     (14, 9, 3), (17, 12, 4), (15, 10, 4), (21, 15, 5), (19, 14, 4), (24, 17, 6),
     (22, 16, 5), (27, 19, 7), (25, 19, 5), (29, 22, 6), (31, 23, 7), (26, 12, 2)]
-ORIGENS = [  # origem, contas, pagantes
-    ('Google', 412, 198), ('Instagram', 286, 102), ('LinkedIn', 174, 91), ('YouTube', 121, 38),
-    ('Indicação', 84, 52), ('TikTok', 98, 17), ('Evento', 41, 22), ('Outra', 36, 9), ('Não informada', 32, 6)]
+ORIGENS = [  # origem, contas, pagantes, ícone (Phosphor: o logo das redes; genérico nas outras)
+    ('Google', 412, 198, 'google'), ('Instagram', 286, 102, 'instagram'), ('LinkedIn', 174, 91, 'linkedin'),
+    ('YouTube', 121, 38, 'youtube'), ('TikTok', 98, 17, 'tiktok'), ('Indicação', 84, 52, 'indicacao'),
+    ('Evento', 41, 22, 'evento'), ('Outra', 36, 9, 'outra'), ('Não informada', 32, 6, 'nao')]
+# os SVGs do Phosphor (regular, 256 × 256), tirados do @phosphor-icons/react que o DS usa
+ORIGEM_ICONES = {"google": "<path d=\"M224,128a96,96,0,1,1-21.95-61.09,8,8,0,1,1-12.33,10.18A80,80,0,1,0,207.6,136H128a8,8,0,0,1,0-16h88A8,8,0,0,1,224,128Z\"></path>", "instagram": "<path d=\"M128,80a48,48,0,1,0,48,48A48.05,48.05,0,0,0,128,80Zm0,80a32,32,0,1,1,32-32A32,32,0,0,1,128,160ZM176,24H80A56.06,56.06,0,0,0,24,80v96a56.06,56.06,0,0,0,56,56h96a56.06,56.06,0,0,0,56-56V80A56.06,56.06,0,0,0,176,24Zm40,152a40,40,0,0,1-40,40H80a40,40,0,0,1-40-40V80A40,40,0,0,1,80,40h96a40,40,0,0,1,40,40ZM192,76a12,12,0,1,1-12-12A12,12,0,0,1,192,76Z\"></path>", "linkedin": "<path d=\"M216,24H40A16,16,0,0,0,24,40V216a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V40A16,16,0,0,0,216,24Zm0,192H40V40H216V216ZM96,112v64a8,8,0,0,1-16,0V112a8,8,0,0,1,16,0Zm88,28v36a8,8,0,0,1-16,0V140a20,20,0,0,0-40,0v36a8,8,0,0,1-16,0V112a8,8,0,0,1,15.79-1.78A36,36,0,0,1,184,140ZM100,84A12,12,0,1,1,88,72,12,12,0,0,1,100,84Z\"></path>", "youtube": "<path d=\"M164.44,121.34l-48-32A8,8,0,0,0,104,96v64a8,8,0,0,0,12.44,6.66l48-32a8,8,0,0,0,0-13.32ZM120,145.05V111l25.58,17ZM234.33,69.52a24,24,0,0,0-14.49-16.4C185.56,39.88,131,40,128,40s-57.56-.12-91.84,13.12a24,24,0,0,0-14.49,16.4C19.08,79.5,16,97.74,16,128s3.08,48.5,5.67,58.48a24,24,0,0,0,14.49,16.41C69,215.56,120.4,216,127.34,216h1.32c6.94,0,58.37-.44,91.18-13.11a24,24,0,0,0,14.49-16.41c2.59-10,5.67-28.22,5.67-58.48S236.92,79.5,234.33,69.52Zm-15.49,113a8,8,0,0,1-4.77,5.49c-31.65,12.22-85.48,12-86,12H128c-.54,0-54.33.2-86-12a8,8,0,0,1-4.77-5.49C34.8,173.39,32,156.57,32,128s2.8-45.39,5.16-54.47A8,8,0,0,1,41.93,68c30.52-11.79,81.66-12,85.85-12h.27c.54,0,54.38-.18,86,12a8,8,0,0,1,4.77,5.49C221.2,82.61,224,99.43,224,128S221.2,173.39,218.84,182.47Z\"></path>", "tiktok": "<path d=\"M224,72a48.05,48.05,0,0,1-48-48,8,8,0,0,0-8-8H128a8,8,0,0,0-8,8V156a20,20,0,1,1-28.57-18.08A8,8,0,0,0,96,130.69V88a8,8,0,0,0-9.4-7.88C50.91,86.48,24,119.1,24,156a76,76,0,0,0,152,0V116.29A103.25,103.25,0,0,0,224,128a8,8,0,0,0,8-8V80A8,8,0,0,0,224,72Zm-8,39.64a87.19,87.19,0,0,1-43.33-16.15A8,8,0,0,0,160,102v54a60,60,0,0,1-120,0c0-25.9,16.64-49.13,40-57.6v27.67A36,36,0,1,0,136,156V32h24.5A64.14,64.14,0,0,0,216,87.5Z\"></path>", "indicacao": "<path d=\"M244.8,150.4a8,8,0,0,1-11.2-1.6A51.6,51.6,0,0,0,192,128a8,8,0,0,1-7.37-4.89,8,8,0,0,1,0-6.22A8,8,0,0,1,192,112a24,24,0,1,0-23.24-30,8,8,0,1,1-15.5-4A40,40,0,1,1,219,117.51a67.94,67.94,0,0,1,27.43,21.68A8,8,0,0,1,244.8,150.4ZM190.92,212a8,8,0,1,1-13.84,8,57,57,0,0,0-98.16,0,8,8,0,1,1-13.84-8,72.06,72.06,0,0,1,33.74-29.92,48,48,0,1,1,58.36,0A72.06,72.06,0,0,1,190.92,212ZM128,176a32,32,0,1,0-32-32A32,32,0,0,0,128,176ZM72,120a8,8,0,0,0-8-8A24,24,0,1,1,87.24,82a8,8,0,1,0,15.5-4A40,40,0,1,0,37,117.51,67.94,67.94,0,0,0,9.6,139.19a8,8,0,1,0,12.8,9.61A51.6,51.6,0,0,1,64,128,8,8,0,0,0,72,120Z\"></path>", "evento": "<path d=\"M208,32H184V24a8,8,0,0,0-16,0v8H88V24a8,8,0,0,0-16,0v8H48A16,16,0,0,0,32,48V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM72,48v8a8,8,0,0,0,16,0V48h80v8a8,8,0,0,0,16,0V48h24V80H48V48ZM208,208H48V96H208V208Zm-68-76a12,12,0,1,1-12-12A12,12,0,0,1,140,132Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,132ZM96,172a12,12,0,1,1-12-12A12,12,0,0,1,96,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,140,172Zm44,0a12,12,0,1,1-12-12A12,12,0,0,1,184,172Z\"></path>", "outra": "<path d=\"M140,128a12,12,0,1,1-12-12A12,12,0,0,1,140,128Zm56-12a12,12,0,1,0,12,12A12,12,0,0,0,196,116ZM60,116a12,12,0,1,0,12,12A12,12,0,0,0,60,116Z\"></path>", "nao": "<path d=\"M140,180a12,12,0,1,1-12-12A12,12,0,0,1,140,180ZM128,72c-22.06,0-40,16.15-40,36v4a8,8,0,0,0,16,0v-4c0-11,10.77-20,24-20s24,9,24,20-10.77,20-24,20a8,8,0,0,0-8,8v8a8,8,0,0,0,16,0v-.72c18.24-3.35,32-17.9,32-35.28C168,88.15,150.06,72,128,72Zm104,56A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z\"></path>"}
+
+
+def _icone_origem(chave, tam=16):
+    return (f'<svg viewBox="0 0 256 256" width="{tam}" height="{tam}" fill="currentColor" aria-hidden="true" style="display:block;">'
+            f'{ORIGEM_ICONES[chave]}</svg>')
+
+
+def _colunas_origens(k, alto=128, compacto=False):
+    # "De onde vêm as contas" em colunas: o número de contas em cima, a coluna com as contas no tom claro
+    # e quem paga no cheio por baixo, e embaixo o logo da origem, o nome e o % que paga
+    maior = max(o[1] for o in ORIGENS)
+    cols = ''
+    for nome, contas, pagantes, chave in ORIGENS:
+        cols += (f'<div role="listitem" aria-label="{nome}: {contas} contas, {pagantes} pagantes ({pagantes / contas * 100:.0f}%)" '
+                 f'style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;">'
+                 f'<span style="font-family:{MONO};font-size:{11 if compacto else 12}px;color:{k["fgs"]};">{contas}</span>'
+                 f'<span aria-hidden="true" style="position:relative;display:block;width:{16 if compacto else 26}px;height:{alto}px;border-radius:5px;background:{k["sunken"]};">'
+                 f'<span style="position:absolute;left:0;right:0;bottom:0;height:{contas / maior * 100:.1f}%;border-radius:5px;'
+                 f'background:color-mix(in oklch, {k["pri"]} 28%, transparent);"></span>'
+                 f'<span style="position:absolute;left:0;right:0;bottom:0;height:{pagantes / maior * 100:.1f}%;border-radius:5px;background:{k["pri"]};"></span></span>'
+                 f'<span style="display:flex;align-items:center;justify-content:center;width:{24 if compacto else 28}px;height:{24 if compacto else 28}px;border-radius:8px;'
+                 f'background:{k["sunken"]};color:{k["fgs"] if chave != "nao" else k["mfg"]};">{_icone_origem(chave, 13 if compacto else 15)}</span>'
+                 + ('' if compacto else f'<span style="font-size:11.5px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;">{nome}</span>')
+                 + f'<span style="font-family:{MONO};font-size:{10.5 if compacto else 11}px;color:{k["mfg"]};">{pagantes / contas * 100:.0f}%</span></div>')
+    return f'<div role="list" style="display:flex;align-items:flex-end;gap:{4 if compacto else 8}px;">{cols}</div>'
 # as abas de Clientes são o billingState, com /subscriptions/counts.byBillingState
 ESTADOS = [('Todos', 1284), ('Em teste', 58), ('Teste com cartão', 38), ('Pagantes', 771), ('Em atraso', 41),
            ('Grátis', 338), ('Cancelados', 38)]
@@ -547,22 +575,11 @@ def tela_inicio(k):
         + f'<span style="font-size:12px;color:{k["mfg"]};">A taxa conta só os que terminaram: {conv} de {conv + sem}. Os outros {ini - conv - sem} ainda estão no teste.</span>'),
         f'<a href="{href("Metricas")}" style="font-size:12.5px;">Mês a mês</a>')
 
-    maior = max(o[1] for o in ORIGENS)
-    lin = ''
-    for nome, contas, pagantes in ORIGENS:
-        lin += (f'<div style="display:grid;grid-template-columns:110px minmax(0,1fr) 56px 64px;gap:12px;align-items:center;height:20px;">'
-                f'<span style="font-size:13px;color:{k["fg"] if nome != "Não informada" else k["mfg"]};">{nome}</span>'
-                f'<span style="position:relative;display:block;height:10px;border-radius:3px;background:{k["sunken"]};">'
-                f'<span style="position:absolute;left:0;top:0;bottom:0;width:{contas / maior * 100:.1f}%;border-radius:3px;'
-                f'background:color-mix(in oklch, {k["pri"]} 28%, transparent);"></span>'
-                f'<span style="position:absolute;left:0;top:0;bottom:0;width:{pagantes / maior * 100:.1f}%;border-radius:3px;background:{k["pri"]};"></span></span>'
-                f'<span style="font-family:{MONO};font-size:12px;color:{k["fgs"]};text-align:right;">{milhar(contas)}</span>'
-                f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};text-align:right;">{pagantes / contas * 100:.0f}%</span></div>')
-    # contas no tom claro, quem paga no cheio por cima; à direita o número de contas e quanto delas paga
     aquis = _cartao(k, 'De onde vêm as contas',
-                    f'<div style="display:flex;flex-direction:column;gap:4px;margin-top:-4px;">{lin}</div>',
+                    _colunas_origens(k),
                     f'<span style="display:flex;gap:14px;">{_legenda(k, [("contas", "color-mix(in oklch, var(--pri) 28%, transparent)"), ("pagantes", k["pri"])])}</span>'
-                    f'<span style="font-size:12.5px;color:{k["mfg"]};margin-left:8px;">últimos 30 dias</span>', 2, '14px 20px')
+                    f'<span style="font-size:12.5px;color:{k["mfg"]};margin-left:8px;">últimos 30 dias</span>'
+                    f'<a href="#" style="font-size:12.5px;margin-left:8px;">Ver como tabela</a>', 2, '14px 20px')
 
     def atencao(icone, cor, txt, sub, destino, extra=''):
         return (f'<a href="{destino}" style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;box-shadow:inset 0 -1px 0 {k["muted"]};color:inherit;">'
