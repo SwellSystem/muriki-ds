@@ -174,7 +174,8 @@ export function AreaChart({
                   fill={`url(#${idBase}-${s.key})`}
                   fillOpacity={0.4}
                   stroke={`var(--color-${s.key})`}
-                  strokeWidth={2}
+                  // a linha é um fio, como no exemplo do shadcn: grossa, ela pesa contra o degradê
+                  strokeWidth={1}
                   isAnimationActive={false}
                   connectNulls={false}
                 />
@@ -190,8 +191,8 @@ export function AreaChart({
                       fill={`url(#${idBase}-${s.key})`}
                       fillOpacity={0.18}
                       stroke={`var(--color-${s.key})`}
-                      strokeWidth={2}
-                      strokeDasharray="4 4"
+                      strokeWidth={1}
+                      strokeDasharray="3 3"
                       isAnimationActive={false}
                       activeDot={false}
                       // o ponto do mês em curso, vazado
@@ -201,10 +202,10 @@ export function AreaChart({
                             key={`${s.key}-curso`}
                             cx={p.cx}
                             cy={p.cy}
-                            r={3.5}
+                            r={3}
                             fill="var(--card)"
                             stroke={`var(--color-${s.key})`}
-                            strokeWidth={2}
+                            strokeWidth={1.5}
                           />
                         ) : (
                           <g key={`${s.key}-${p.index}`} />
