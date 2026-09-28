@@ -368,37 +368,57 @@ def _delta(k, txt):
 
 
 def _grafico_vendas(k):
-    # uma série só, magnitude no tempo: barras numa cor, sem legenda, rótulo direto só no mês corrente
+    # o "Area Chart - Gradient" do shadcn, que é o area-chart do DS: linha natural, área com degradê
+    # da cor do tema (0.8 em cima, 0.1 embaixo), grade só horizontal, sem linha nem tique no eixo dos
+    # meses. O mês em curso é o último trecho tracejado e o ponto esmaecido: ainda não fechou.
     w, h, esq, base, topo = 700, 230, 44, 204, 12
     teto = 50000
-    passo = (w - esq) / len(VENDAS)
-    larg = passo - 14
+    x = lambda i: esq + 12 + i * (w - esq - 24) / (len(VENDAS) - 1)
     y = lambda v: base - (base - topo) * v / teto
+    pts = [(x(i), y(v)) for i, v in enumerate(VENDAS)]
+
+    def curva(ps):
+        # Catmull-Rom em Bézier: a "natural" do recharts, sem passar do ponto
+        d = f'M{ps[0][0]:.1f},{ps[0][1]:.1f}'
+        for a in range(len(ps) - 1):
+            p0 = ps[a - 1] if a > 0 else ps[a]
+            p1, p2 = ps[a], ps[a + 1]
+            p3 = ps[a + 2] if a + 2 < len(ps) else p2
+            c1 = (p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6)
+            c2 = (p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6)
+            d += f' C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}'
+        return d
+
+    linha = curva(pts)
+    fechados = curva(pts[:-1])
+    em_curso = curva(pts[-2:])
+    area = linha + f' L{pts[-1][0]:.1f},{base} L{pts[0][0]:.1f},{base} Z'
     grade = ''
     for v in (0, 10000, 20000, 30000, 40000, 50000):
         grade += (f'<line x1="{esq}" x2="{w}" y1="{y(v):.1f}" y2="{y(v):.1f}" style="stroke:var(--muted);stroke-width:1;"/>'
                   f'<text x="{esq - 8}" y="{y(v) + 4:.1f}" text-anchor="end" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">'
                   f'{"0" if v == 0 else f"{v // 1000}k"}</text>')
-    barras = ''
-    for i, (m, v) in enumerate(zip(MESES, VENDAS)):
-        x = esq + i * passo + 7
-        yy = y(v)
-        ultimo = i == len(VENDAS) - 1
-        # 4px arredondados só no topo, ancorado na linha de base
-        d = (f'M{x:.1f},{base} V{yy + 4:.1f} Q{x:.1f},{yy:.1f} {x + 4:.1f},{yy:.1f} H{x + larg - 4:.1f} '
-             f'Q{x + larg:.1f},{yy:.1f} {x + larg:.1f},{yy + 4:.1f} V{base} Z')
-        est = ('fill:color-mix(in oklch, var(--pri) 45%, transparent);' if ultimo else 'fill:var(--pri);')
-        barras += (f'<g><title>{m}: {brl(v, False)}{" (mês em curso)" if ultimo else ""}</title>'
-                   f'<rect x="{x - 4:.1f}" y="{topo}" width="{larg + 8:.1f}" height="{base - topo}" style="fill:transparent;"/>'
-                   f'<path d="{d}" style="{est}"/></g>'
-                   f'<text x="{x + larg / 2:.1f}" y="{base + 18}" text-anchor="middle" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{m}</text>')
-    pico = VENDAS.index(max(VENDAS))
-    xp = esq + pico * passo + 7 + larg / 2
-    rotulo_pico = (f'<text x="{xp:.1f}" y="{y(max(VENDAS)) - 8:.1f}" text-anchor="middle" style="fill:var(--fgs);font-family:{FONTE};'
-                   f'font-size:11.5px;font-weight:500;">{brl(max(VENDAS), False)}</text>')
+    meses = ''.join(f'<text x="{px:.1f}" y="{base + 20}" text-anchor="middle" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{m}</text>'
+                    for (px, _), m in zip(pts, MESES))
+    # o ponto de agosto com o tooltip aberto, como no hover do app
+    hx, hy = pts[-2]
+    tip = (f'<line x1="{hx:.1f}" x2="{hx:.1f}" y1="{topo}" y2="{base}" style="stroke:var(--input);stroke-width:1;stroke-dasharray:3 3;"/>'
+           f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="4" style="fill:var(--card);stroke:var(--pri);stroke-width:2;"/>'
+           f'<g transform="translate({hx - 150:.1f},{hy + 14:.1f})"><rect width="138" height="58" rx="8" style="fill:var(--card);stroke:var(--border);"/>'
+           f'<text x="12" y="19" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">ago 2026</text>'
+           f'<rect x="12" y="29" width="8" height="8" rx="2" style="fill:var(--pri);"/>'
+           f'<text x="26" y="37" style="fill:var(--fgs);font-family:{FONTE};font-size:12px;font-weight:600;">{brl(VENDAS[-2], False)}</text>'
+           f'<text x="12" y="51" style="fill:var(--mfg);font-family:{FONTE};font-size:11px;">312 vendas</text></g>')
     return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" '
             f'aria-label="Vendas por mês, de outubro de 2025 a setembro de 2026. Pico em agosto, {brl(max(VENDAS), False)}.">'
-            f'{grade}{barras}{rotulo_pico}</svg>')
+            f'<defs><linearGradient id="vendasArea" x1="0" y1="0" x2="0" y2="1">'
+            f'<stop offset="5%" style="stop-color:var(--pri);stop-opacity:0.8"/><stop offset="95%" style="stop-color:var(--pri);stop-opacity:0.1"/>'
+            f'</linearGradient></defs>{grade}'
+            f'<path d="{area}" style="fill:url(#vendasArea);"/>'
+            f'<path d="{fechados}" style="fill:none;stroke:var(--pri);stroke-width:2;"/>'
+            f'<path d="{em_curso}" style="fill:none;stroke:var(--pri);stroke-width:2;stroke-dasharray:4 4;"/>'
+            f'<circle cx="{pts[-1][0]:.1f}" cy="{pts[-1][1]:.1f}" r="3.5" style="fill:var(--card);stroke:color-mix(in oklch, var(--pri) 45%, transparent);stroke-width:2;"/>'
+            f'{meses}{tip}</svg>')
 
 
 def tela_inicio(k):
