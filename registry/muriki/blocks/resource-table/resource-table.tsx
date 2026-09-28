@@ -39,6 +39,18 @@ const HIDE: Record<NonNullable<ResourceColumn<unknown>["hideBelow"]>, string> = 
   sm: "hidden sm:table-cell",
   md: "hidden md:table-cell",
   lg: "hidden lg:table-cell",
+  xl: "hidden xl:table-cell",
+  "2xl": "hidden 2xl:table-cell",
+}
+
+// O <col> some junto com as células: numa tabela table-fixed, o col escondido ainda guardava a
+// largura dele, e esconder a coluna não devolvia espaço para as outras.
+const HIDE_COL: Record<NonNullable<ResourceColumn<unknown>["hideBelow"]>, string> = {
+  sm: "hidden sm:table-column",
+  md: "hidden md:table-column",
+  lg: "hidden lg:table-column",
+  xl: "hidden xl:table-column",
+  "2xl": "hidden 2xl:table-column",
 }
 
 /** Clique que nasce num controle da linha não abre a linha. */
@@ -207,8 +219,12 @@ export function ResourceTable<T>({
             <caption className="sr-only">{label}</caption>
             <colgroup>
               {selectable ? <col className="w-12" /> : null}
-              {columns.map((c) => (
-                <col key={c.id} style={c.width ? { width: c.width } : undefined} />
+              {columns.map((c, i) => (
+                <col
+                  key={c.id}
+                  className={i > 0 && c.hideBelow ? HIDE_COL[c.hideBelow] : undefined}
+                  style={c.width ? { width: c.width } : undefined}
+                />
               ))}
               {temAcoes ? <col style={{ width: larguraAcoes }} /> : null}
             </colgroup>
