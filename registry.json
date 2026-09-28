@@ -1251,6 +1251,26 @@
       "docs": "Com o GET /overview?product&period (centavos → reais): <MetricGrid><MetricCard label=\"Líquido\" value={brl(o.net / 100)} detail={<span className=\"flex flex-col\"><span>{brl(o.received / 100)} recebido</span><span className=\"text-destructive\">−{brl(o.refunded / 100)} em reembolsos</span></span>} /><MetricCard label=\"MRR\" value={brl(o.mrr / 100)} detail={<>+{brl(o.newMrr / 100)} novo · −{brl(o.lostMrr / 100)} perdido</>} /><MetricCard label=\"Testes com cartão\" value={brl(o.trialPipelineMrr / 100)} detail={`${o.trialsWithCard} testes · viram MRR se pagarem`} live /><MetricCard label=\"Em aberto por atraso\" value={brl(o.overdueOpen / 100)} detail={`${o.overdueCount} clientes`} live render={<Link to=\"/metrics\" />} /></MetricGrid>. live: o número de agora, que ignora o seletor de período (o selo \"agora\" com tooltip; textos em metric_card.*). trend={{ value: \"+6,8%\", direction: \"up\" }} põe a variação; good decide a cor quando subir é ruim (ex.: MRR perdido, good: false). Com href ou render, o cartão vira link (seta no canto) e o selo deixa de ser focável: o aviso fica num texto para o leitor de tela. loading: skeleton com a mesma silhueta. Os nomes dos campos do /overview acima são ilustrativos: use os do contrato da API."
     },
     {
+      "name": "bar-list",
+      "type": "registry:block",
+      "title": "Bar List",
+      "description": "A lista com barra horizontal de \"De onde vêm as contas\": uma linha por item com o rótulo, a barra em duas camadas na mesma escala (value no tom claro, part no cheio por cima), o número e uma coluna à direita. Legenda opcional, item esmaecido, uma frase por linha para o leitor de tela, estado vazio e skeleton. Sem dependência nova.",
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/bar-list/bar-list.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/bar-list/bar-list.tsx"
+        }
+      ],
+      "docs": "Com o GET /customers/acquisition?product&period (as 9 origens fixas, com contas e pagantes): const NOMES = { google: \"Google\", instagram: \"Instagram\", linkedin: \"LinkedIn\", youtube: \"YouTube\", tiktok: \"TikTok\", referral: \"Indicação\", event: \"Evento\", other: \"Outra\", unknown: \"Não informada\" }; <BarList items={origens.map((o) => ({ key: o.source, label: NOMES[o.source], value: o.accounts, part: o.paying, muted: o.source === \"unknown\" }))} legend={{ value: \"contas\", part: \"pagantes\" }} formatSecondary={(i) => (i.value ? `${Math.round(((i.part ?? 0) / i.value) * 100)}%` : \"—\")} loading={isPending} />. Cada linha é lida como \"Google: 412 contas, 198 pagantes (48%)\"; troque a frase com itemLabel. formatValue formata o número à direita (padrão: Intl.NumberFormat). max fixa o topo da escala (padrão: o maior value). Tudo zero ou sem itens: estado vazio (bar_list.empty). loading: BarListSkeleton, que também sai à parte. Os nomes dos campos da API acima são ilustrativos: use os do contrato."
+    },
+    {
       "name": "area-chart",
       "type": "registry:block",
       "title": "Area Chart",

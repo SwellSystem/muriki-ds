@@ -386,6 +386,9 @@ const STRINGS: Record<string, unknown> = {
     live: "agora",
     live_hint: "Retrato de agora: não muda com o período",
   },
+  bar_list: {
+    empty: "Ainda não há dados neste período.",
+  },
   bar_chart: {
     current: "em curso",
     as_table: "Ver como tabela",
