@@ -336,17 +336,33 @@ MESES = ['out', 'nov', 'dez', 'jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', '
 VENDAS = [8240, 11530, 14870, 17810, 21390, 25320, 29610, 33790, 38140, 41720, 44930, 36180]
 VENDIDO = sum(VENDAS)
 
+# Números da muriki-api (c9f6d7c), um produto por vez: /overview, recurring/monthly, trials/monthly,
+# dunning/monthly, /dunning e /customers/acquisition. Em reais; o app recebe centavos.
+MRR_MESES = [18400, 20100, 22300, 24050, 26200, 28700, 31100, 33500, 35800, 38300, 39260, 41920]
+TESTES_MESES = [  # iniciados, convertidos, encerrados sem pagar
+    (96, 28, 51), (104, 31, 55), (88, 27, 49), (131, 38, 70), (142, 44, 72), (156, 49, 80),
+    (149, 52, 74), (171, 58, 86), (188, 63, 94), (176, 66, 88), (214, 71, 97), (122, 34, 41)]
+ATRASO_MESES = [  # entraram em atraso, recuperadas, perdidas
+    (14, 9, 3), (17, 12, 4), (15, 10, 4), (21, 15, 5), (19, 14, 4), (24, 17, 6),
+    (22, 16, 5), (27, 19, 7), (25, 19, 5), (29, 22, 6), (31, 23, 7), (26, 12, 2)]
+ORIGENS = [  # origem, contas, pagantes
+    ('Google', 412, 198), ('Instagram', 286, 102), ('LinkedIn', 174, 91), ('YouTube', 121, 38),
+    ('Indicação', 84, 52), ('TikTok', 98, 17), ('Evento', 41, 22), ('Outra', 36, 9), ('Não informada', 32, 6)]
+# as abas de Clientes são o billingState, com /subscriptions/counts.byBillingState
+ESTADOS = [('Todos', 1284), ('Em teste', 58), ('Teste com cartão', 38), ('Pagantes', 771), ('Em atraso', 41),
+           ('Grátis', 338), ('Cancelados', 38)]
+
 CLIENTES = [
     # iniciais, tom, nome, email, plano, status, último acesso, desde, total pago
-    ('MC', 'blue', 'Marina Costa', 'marina@costa.dev', 'Pro', 'Ativo', 'há 2 h', 'mar 2026', 343),
-    ('RM', 'green', 'Rafael Moura', 'rafael@moura.dev', 'Pro', 'Ativo', 'há 20 min', 'jan 2026', 470),
-    ('BN', 'orange', 'Beatriz Nunes', 'bia@nunes.io', 'Team', 'Inadimplente', 'há 6 dias', 'nov 2025', 1341),
-    ('TA', 'yellow', 'Tiago Albuquerque', 'tiago@albuquerque.com', 'Pro', 'Em teste', 'ontem', 'set 2026', 0),
-    ('LF', 'blue', 'Lucas Ferraz', 'lucas.ferraz@gmail.com', 'Starter', 'Ativo', 'há 3 dias', 'jul 2026', 0),
-    ('CR', 'green', 'Camila Rocha', 'camila@rocha.design', 'Team', 'Ativo', 'há 1 h', 'out 2025', 1788),
-    ('JL', 'gray', 'João Pedro Lima', 'jp@lima.dev', 'Pro', 'Inativo', 'há 2 meses', 'fev 2026', 196),
-    ('HD', 'yellow', 'Helena Duarte', 'helena@duarte.app', 'Pro', 'Ativo', 'agora', 'abr 2026', 470),
-    ('OP', 'orange', 'Otávio Prado', 'otavio.prado@outlook.com', 'Starter', 'Ativo', 'há 5 h', 'ago 2026', 0),
+    ('MC', 'blue', 'Marina Costa', 'marina@costa.dev', 'Pro', 'Pagante', 'há 2 h', 'mar 2026', 343),
+    ('RM', 'green', 'Rafael Moura', 'rafael@moura.dev', 'Pro', 'Pagante', 'há 20 min', 'jan 2026', 470),
+    ('BN', 'orange', 'Beatriz Nunes', 'bia@nunes.io', 'Team', 'Em atraso', 'há 6 dias', 'nov 2025', 1341),
+    ('TA', 'yellow', 'Tiago Albuquerque', 'tiago@albuquerque.com', 'Pro', 'Teste com cartão', 'ontem', 'set 2026', 0),
+    ('LF', 'blue', 'Lucas Ferraz', 'lucas.ferraz@gmail.com', 'Starter', 'Grátis', 'há 3 dias', 'jul 2026', 0),
+    ('CR', 'green', 'Camila Rocha', 'camila@rocha.design', 'Team', 'Pagante', 'há 1 h', 'out 2025', 1788),
+    ('JL', 'gray', 'João Pedro Lima', 'jp@lima.dev', 'Pro', 'Cancelado', 'há 2 meses', 'fev 2026', 196),
+    ('HD', 'yellow', 'Helena Duarte', 'helena@duarte.app', 'Pro', 'Pagante', 'agora', 'abr 2026', 470),
+    ('OP', 'orange', 'Otávio Prado', 'otavio.prado@outlook.com', 'Starter', 'Grátis', 'há 5 h', 'ago 2026', 0),
     ('SM', 'blue', 'Sofia Martins', 'sofia@martins.co', 'Pro', 'Em teste', 'há 12 min', 'set 2026', 0),
 ]
 
@@ -367,18 +383,17 @@ def _delta(k, txt):
             f'{ic("evolucao", 13)}{txt}</span>')
 
 
-def _grafico_vendas(k):
-    # o "Area Chart - Gradient" do shadcn, que é o area-chart do DS: linha natural, área com degradê
-    # da cor do tema (0.8 em cima, 0.1 embaixo), grade só horizontal, sem linha nem tique no eixo dos
-    # meses. O mês em curso é o último trecho tracejado e o ponto esmaecido: ainda não fechou.
-    w, h, esq, base, topo = 700, 230, 44, 204, 12
-    teto = 50000
-    x = lambda i: esq + 12 + i * (w - esq - 24) / (len(VENDAS) - 1)
+def _grafico_area(k, valores, teto, rotulo_tick, tip, gid, aria, h=230):
+    # o area-chart do DS: linha natural de 1px, degradê da cor do tema (0.8 em cima, 0.1 embaixo, com
+    # 0.4 por cima), grade só horizontal, sem linha nem tique nos meses; o último trecho tracejado e o
+    # ponto vazado são o mês em curso. `tip` = (índice, linhas) do tooltip aberto.
+    w, esq, topo = 700, 44, 12
+    base = h - 26
+    x = lambda i: esq + 12 + i * (w - esq - 24) / (len(valores) - 1)
     y = lambda v: base - (base - topo) * v / teto
-    pts = [(x(i), y(v)) for i, v in enumerate(VENDAS)]
+    pts = [(x(i), y(v)) for i, v in enumerate(valores)]
 
     def curva(ps):
-        # Catmull-Rom em Bézier: a "natural" do recharts, sem passar do ponto
         d = f'M{ps[0][0]:.1f},{ps[0][1]:.1f}'
         for a in range(len(ps) - 1):
             p0 = ps[a - 1] if a > 0 else ps[a]
@@ -389,110 +404,213 @@ def _grafico_vendas(k):
             d += f' C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}'
         return d
 
-    linha = curva(pts)
-    fechados = curva(pts[:-1])
-    em_curso = curva(pts[-2:])
-    area = linha + f' L{pts[-1][0]:.1f},{base} L{pts[0][0]:.1f},{base} Z'
+    area = curva(pts) + f' L{pts[-1][0]:.1f},{base} L{pts[0][0]:.1f},{base} Z'
     grade = ''
-    for v in (0, 10000, 20000, 30000, 40000, 50000):
+    for n in range(6):
+        v = teto * n / 5
         grade += (f'<line x1="{esq}" x2="{w}" y1="{y(v):.1f}" y2="{y(v):.1f}" style="stroke:var(--muted);stroke-width:1;"/>'
                   f'<text x="{esq - 8}" y="{y(v) + 4:.1f}" text-anchor="end" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">'
-                  f'{"0" if v == 0 else f"{v // 1000}k"}</text>')
+                  f'{rotulo_tick(v)}</text>')
     meses = ''.join(f'<text x="{px:.1f}" y="{base + 20}" text-anchor="middle" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{m}</text>'
                     for (px, _), m in zip(pts, MESES))
-    # o ponto de agosto com o tooltip aberto, como no hover do app
-    hx, hy = pts[-2]
-    tip = (f'<line x1="{hx:.1f}" x2="{hx:.1f}" y1="{topo}" y2="{base}" style="stroke:var(--input);stroke-width:1;stroke-dasharray:3 3;"/>'
-           f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="3.5" style="fill:var(--pri);"/>'
-           f'<g transform="translate({hx - 150:.1f},{hy + 14:.1f})"><rect width="138" height="58" rx="8" style="fill:var(--card);stroke:var(--border);"/>'
-           f'<text x="12" y="19" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">ago 2026</text>'
-           f'<rect x="12" y="29" width="8" height="8" rx="2" style="fill:var(--pri);"/>'
-           f'<text x="26" y="37" style="fill:var(--fgs);font-family:{FONTE};font-size:12px;font-weight:600;">{brl(VENDAS[-2], False)}</text>'
-           f'<text x="12" y="51" style="fill:var(--mfg);font-family:{FONTE};font-size:11px;">312 vendas</text></g>')
-    return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" '
-            f'aria-label="Vendas por mês, de outubro de 2025 a setembro de 2026. Pico em agosto, {brl(max(VENDAS), False)}.">'
-            f'<defs><linearGradient id="vendasArea" x1="0" y1="0" x2="0" y2="1">'
+    ti, linhas = tip
+    hx, hy = pts[ti]
+    alt = 22 + 15 * len(linhas)
+    caixa_ = (f'<line x1="{hx:.1f}" x2="{hx:.1f}" y1="{topo}" y2="{base}" style="stroke:var(--input);stroke-width:1;stroke-dasharray:3 3;"/>'
+              f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="3.5" style="fill:var(--pri);"/>'
+              f'<g transform="translate({hx - 162:.1f},{hy + 12:.1f})"><rect width="150" height="{alt}" rx="8" style="fill:var(--card);stroke:var(--border);"/>'
+              f'<text x="12" y="18" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{MESES[ti]} 2026</text>'
+              + ''.join(f'<text x="12" y="{36 + 15 * n}" style="fill:{"var(--fgs)" if n == 0 else "var(--mfg)"};font-family:{FONTE};'
+                        f'font-size:{12 if n == 0 else 11}px;font-weight:{600 if n == 0 else 400};">{t}</text>' for n, t in enumerate(linhas))
+              + '</g>')
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{aria}">'
+            f'<defs><linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1">'
             f'<stop offset="5%" style="stop-color:var(--pri);stop-opacity:0.8"/><stop offset="95%" style="stop-color:var(--pri);stop-opacity:0.1"/>'
             f'</linearGradient></defs>{grade}'
-            f'<path d="{area}" style="fill:url(#vendasArea);fill-opacity:0.4;"/>'
-            f'<path d="{fechados}" style="fill:none;stroke:var(--pri);stroke-width:1;"/>'
-            f'<path d="{em_curso}" style="fill:none;stroke:var(--pri);stroke-width:1;stroke-dasharray:3 3;"/>'
+            f'<path d="{area}" style="fill:url(#{gid});fill-opacity:0.4;"/>'
+            f'<path d="{curva(pts[:-1])}" style="fill:none;stroke:var(--pri);stroke-width:1;"/>'
+            f'<path d="{curva(pts[-2:])}" style="fill:none;stroke:var(--pri);stroke-width:1;stroke-dasharray:3 3;"/>'
             f'<circle cx="{pts[-1][0]:.1f}" cy="{pts[-1][1]:.1f}" r="3" style="fill:var(--card);stroke:var(--pri);stroke-width:1.5;"/>'
-            f'{meses}{tip}</svg>')
+            f'{meses}{caixa_}</svg>')
+
+
+def _grafico_vendas(k):
+    return _grafico_area(k, VENDAS, 50000, lambda v: '0' if v == 0 else f'{int(v) // 1000}k',
+                         (10, [brl(VENDAS[10], False), '312 vendas']), 'vendasArea',
+                         f'Vendas por mês, de outubro de 2025 a setembro de 2026. Pico em agosto, {brl(max(VENDAS), False)}.')
+
+
+def _grafico_mrr(k, h=230):
+    return _grafico_area(k, MRR_MESES, 50000, lambda v: '0' if v == 0 else f'{int(v) // 1000}k',
+                         (10, [brl(MRR_MESES[10], False) + ' de MRR', '802 pagantes', '+61 novas · −14 canceladas']), 'mrrArea',
+                         'MRR mês a mês, de outubro de 2025 a setembro de 2026: de R$ 18.400 a R$ 41.920.', h)
+
+
+def _barras_agrupadas(k, dados, cores, nomes, teto, aria, h=200, w=1100):
+    # o bar-chart do DS com três séries da mesma unidade: agrupadas por mês, legenda em cima, o mês em
+    # curso a 45%
+    esq, topo = 34, 8
+    base = h - 24
+    passo = (w - esq) / len(dados)
+    larg = (passo - 16) / len(nomes)
+    y = lambda v: base - (base - topo) * v / teto
+    grade = ''
+    for n in range(5):
+        v = teto * n / 4
+        grade += (f'<line x1="{esq}" x2="{w}" y1="{y(v):.1f}" y2="{y(v):.1f}" style="stroke:var(--muted);stroke-width:1;"/>'
+                  f'<text x="{esq - 8}" y="{y(v) + 4:.1f}" text-anchor="end" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{int(v)}</text>')
+    barras = ''
+    for i, trio in enumerate(dados):
+        ultimo = i == len(dados) - 1
+        for j, v in enumerate(trio):
+            bx = esq + i * passo + 8 + j * larg
+            by = y(v)
+            r = min(3, larg / 2)
+            d = (f'M{bx:.1f},{base} V{by + r:.1f} Q{bx:.1f},{by:.1f} {bx + r:.1f},{by:.1f} H{bx + larg - 1 - r:.1f} '
+                 f'Q{bx + larg - 1:.1f},{by:.1f} {bx + larg - 1:.1f},{by + r:.1f} V{base} Z')
+            cor = cores[j]
+            barras += f'<path d="{d}" style="fill:{f"color-mix(in oklch, {cor} 45%, transparent)" if ultimo else cor};"/>'
+        barras += (f'<text x="{esq + i * passo + passo / 2:.1f}" y="{base + 18}" text-anchor="middle" '
+                   f'style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{MESES[i]}</text>')
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{aria}">{grade}{barras}</svg>')
+
+
+def _legenda(k, itens):
+    return ''.join(f'<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:{k["mfg"]};">'
+                   f'<span style="width:8px;height:8px;border-radius:2px;background:{c};"></span>{n}</span>' for n, c in itens)
+
+
+def _agora(k):
+    # o número é de agora e não segue o seletor de período: o selo diz isso no próprio cartão
+    return (f'<span title="Retrato de agora: não muda com o período" style="display:inline-flex;align-items:center;gap:4px;height:18px;'
+            f'padding:0 6px;border-radius:4px;box-shadow:inset 0 0 0 1px {k["input"]};font-family:{MONO};font-size:10px;'
+            f'letter-spacing:0.06em;text-transform:uppercase;color:{k["mfg"]};">{ic("relogio", 11)}agora</span>')
+
+
+def _cartao(k, titulo, corpo, direita='', flex=1, pad='16px 20px'):
+    return (f'<section aria-label="{titulo}" style="flex:{flex};min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+            f'padding:{pad};display:flex;flex-direction:column;gap:12px;">'
+            f'<div style="display:flex;align-items:center;gap:10px;"><h2 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">{titulo}</h2>'
+            f'<span style="flex:1;"></span>{direita}</div>{corpo}</section>')
+
+
+def _abas_cartao(k, opcoes, ativa):
+    return ('<div role="tablist" style="display:flex;gap:16px;">'
+            + ''.join(f'<span role="tab" aria-selected="{"true" if o == ativa else "false"}" style="height:26px;display:flex;align-items:center;font-size:12.5px;'
+                      + (f'color:{k["fgs"]};font-weight:500;box-shadow:inset 0 -2px 0 {k["pri"]};' if o == ativa else f'color:{k["mfg"]};')
+                      + f'">{o}</span>' for o in opcoes) + '</div>')
 
 
 def tela_inicio(k):
-    cab = cabecalho(k, 'Bom dia, Ana', 'Quarta, 23 de setembro. Quem está com a gente e quanto já entrou.',
-                    direita=segmentado(k, ['30 dias', '12 meses', 'Tudo'], 'Tudo', 'Período'))
-    kpis = (f'<div style="display:flex;gap:16px;">'
-            + _kpi(k, 'Clientes', milhar(TOTAL_CLIENTES), _delta(k, '+46'), 'nos últimos 30 dias', hero=True)
-            + _kpi(k, 'Vendido até agora', brl(VENDIDO), '', 'desde o lançamento, já sem os descontos de cupom', hero=True)
-            + _kpi(k, 'Receita recorrente (MRR)', brl(MRR, False), _delta(k, '+6,8%'), 'sobre agosto')
+    # Um produto por vez. Em cima, o retrato: o que o período fez (líquido e MRR) e o que está valendo
+    # agora (testes com cartão e atraso em aberto, com o selo "agora"). No meio, a curva do MRR (ou das
+    # vendas) e o funil de testes. Embaixo, de onde vêm as contas e o que pede atenção. O mês a mês de
+    # testes e de atraso mora em Métricas, para o Início não pesar.
+    cab = cabecalho(k, 'Bom dia, Ana', 'Quarta, 23 de setembro. Quanto entrou, quanto se repete e o que pede atenção.',
+                    direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto')
+                    + segmentado(k, ['30 dias', '12 meses', 'Tudo'], '30 dias', 'Período'))
+
+    def kpi(rot, valor, linha, selo='', destino=None):
+        link = (f'<a href="{destino}" style="margin-left:auto;display:flex;color:{k["mfg"]};">{ic("direita", 13)}</a>' if destino else '')
+        return (f'<section aria-label="{rot}" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+                f'padding:16px 20px;display:flex;flex-direction:column;gap:6px;">'
+                f'<span style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:{k["mfg"]};">{rot}{selo}{link}</span>'
+                f'<span style="font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{valor}</span>'
+                f'<span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12.5px;color:{k["mfg"]};">{linha}</span></section>')
+    neg = lambda t: f'<span style="color:{k["bad"]};font-weight:500;">{t}</span>'
+    pos = lambda t: f'<span style="color:{k["ok"]};font-weight:500;">{t}</span>'
+    kpis = ('<div style="display:flex;gap:16px;">'
+            + kpi('Líquido', brl(38412, False), f'<span style="display:flex;flex-direction:column;gap:2px;"><span>{brl(40110, False)} recebido</span>'
+                  f'<span>{neg("−" + brl(1698, False))} em reembolsos</span></span>')
+            + kpi('MRR', brl(41920, False), f'{pos("+" + brl(3410, False))} novo · {neg("−" + brl(720, False))} perdido')
+            + kpi('Testes com cartão', brl(4214, False), '86 testes · viram MRR se pagarem', _agora(k))
+            + kpi('Em aberto por atraso', brl(3927, False), '41 clientes · o mais antigo há 18 dias', _agora(k), href('Metricas'))
             + '</div>')
 
-    grafico = (f'<section aria-label="Vendas por mês" style="flex:2;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
-               f'padding:16px 20px 12px;display:flex;flex-direction:column;gap:10px;">'
-               f'<div style="display:flex;align-items:baseline;gap:10px;"><h2 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">Vendas por mês</h2>'
-               f'<span style="font-size:12.5px;color:{k["mfg"]};">últimos 12 meses · setembro em curso</span>'
-               f'<span style="flex:1;"></span><a href="#" style="font-size:12.5px;">Ver como tabela</a></div>{_grafico_vendas(k)}</section>')
+    grafico = _cartao(k, 'Receita', _grafico_mrr(k, 214),
+                      _abas_cartao(k, ['MRR', 'Vendas'], 'MRR') + f'<a href="#" style="font-size:12.5px;margin-left:8px;">Ver como tabela</a>', 2)
 
-    maior = max(p[4] for p in PLANOS)
-    linhas_planos = ''
-    for nome, slug, mensal, anual, n, mrr, teste, status in PLANOS:
-        if status != 'Ativo':
-            continue
-        pct = n / TOTAL_CLIENTES * 100
-        linhas_planos += (
-            f'<a href="{href("Plano") if nome == "Pro" else "#"}" style="display:flex;flex-direction:column;gap:6px;color:inherit;">'
-            f'<span style="display:flex;align-items:baseline;gap:8px;">'
-            f'<span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">{nome}</span>'
-            f'<span style="font-size:12px;color:{k["mfg"]};">{brl(mensal, False) + "/mês" if mensal else "grátis"}</span>'
-            f'<span style="flex:1;"></span><span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};">{milhar(n)}</span>'
-            f'<span style="font-family:{MONO};font-size:11.5px;color:{k["mfg"]};width:40px;text-align:right;">{pct:.0f}%</span></span>'
-            f'<span style="display:block;height:8px;border-radius:3px;background:{k["sunken"]};">'
-            f'<span style="display:block;height:8px;width:{n / maior * 100:.1f}%;border-radius:3px;background:{k["pri"]};"></span></span>'
-            f'<span style="font-size:12px;color:{k["mfg"]};">{brl(mrr, False) + " de MRR" if mrr else "sem receita, porta de entrada"}</span></a>')
-    planos = (f'<section aria-label="Clientes por plano" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
-              f'padding:16px 20px;display:flex;flex-direction:column;gap:16px;">'
-              f'<div style="display:flex;align-items:baseline;"><h2 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">Clientes por plano</h2>'
-              f'<span style="flex:1;"></span><a href="{href("Planos")}" style="font-size:12.5px;">Planos</a></div>{linhas_planos}'
-              f'<span style="margin-top:auto;font-size:12px;color:{k["mfg"]};">Enterprise está em rascunho e não aparece na página de preços.</span></section>')
+    ini, conv, sem = TESTES_MESES[-2]
+    taxa = conv / (conv + sem) * 100
 
-    vendas = [('HD', 'yellow', 'Helena Duarte', 'Pro anual', None, 470, 'agora'),
-              ('SM', 'blue', 'Sofia Martins', 'Pro mensal', 'BEMVINDO20', 39.2, 'há 12 min'),
-              ('CR', 'green', 'Camila Rocha', 'Team mensal', None, 149, 'há 1 h'),
-              ('MC', 'blue', 'Marina Costa', 'Pro mensal', None, 49, 'há 2 h')]
-    lv = ''
-    for ini, tom, nome, plano, cupom, valor, quando in vendas:
-        c = badge(cupom, k, 'yellow', mono=True) if cupom else ''
-        lv += (f'<div style="display:grid;grid-template-columns:minmax(0,1fr) 210px 110px 80px;gap:12px;align-items:center;height:44px;'
-               f'box-shadow:inset 0 -1px 0 {k["muted"]};">'
-               f'<span style="display:flex;align-items:center;gap:10px;min-width:0;">{avatar(ini, k, tom, 26)}'
-               f'<span style="font-size:13.5px;color:{k["fgs"]};">{nome}</span></span>'
-               f'<span style="display:flex;align-items:center;gap:6px;font-size:13px;color:{k["fg"]};white-space:nowrap;">{plano}{c}</span>'
-               f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};text-align:right;">{brl(valor)}</span>'
-               f'<span style="font-size:12px;color:{k["mfg"]};text-align:right;">{quando}</span></div>')
-    recentes = (f'<section aria-label="Vendas recentes" style="flex:2;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
-                f'padding:16px 20px 8px;display:flex;flex-direction:column;">'
-                f'<div style="display:flex;align-items:baseline;padding-bottom:6px;"><h2 style="margin:0;font-size:14px;font-weight:600;color:{k["fgs"]};">Vendas recentes</h2>'
-                f'<span style="flex:1;"></span><a href="{href("Clientes")}" style="font-size:12.5px;">Clientes</a></div>{lv}</section>')
+    def degrau(rot, n, cor, pct):
+        return (f'<div style="display:flex;flex-direction:column;gap:5px;"><span style="display:flex;align-items:baseline;gap:8px;">'
+                f'<span style="font-size:13px;color:{k["fgs"]};">{rot}</span><span style="flex:1;"></span>'
+                f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};">{n}</span></span>'
+                f'<span style="display:block;height:8px;border-radius:3px;background:{k["sunken"]};">'
+                f'<span style="display:block;height:8px;width:{pct:.0f}%;border-radius:3px;background:{cor};"></span></span></div>')
+    funil = _cartao(k, 'Testes em agosto', (
+        f'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:28px;line-height:34px;font-weight:600;color:{k["fgs"]};">{taxa:.0f}%</span>'
+        f'<span style="font-size:12.5px;color:{k["mfg"]};">viraram pagantes</span></div>'
+        + degrau('Iniciados', ini, k['pri'], 100) + degrau('Convertidos', conv, k['ok'], conv / ini * 100)
+        + degrau('Encerrados sem pagar', sem, k['mfg'], sem / ini * 100)
+        + f'<span style="font-size:12px;color:{k["mfg"]};">A taxa conta só os que terminaram: {conv} de {conv + sem}. Os outros {ini - conv - sem} ainda estão no teste.</span>'),
+        f'<a href="{href("Metricas")}" style="font-size:12.5px;">Mês a mês</a>')
 
-    def atencao(icone, cor, txt, sub, destino):
+    maior = max(o[1] for o in ORIGENS)
+    lin = ''
+    for nome, contas, pagantes in ORIGENS:
+        lin += (f'<div style="display:grid;grid-template-columns:110px minmax(0,1fr) 56px 64px;gap:12px;align-items:center;height:20px;">'
+                f'<span style="font-size:13px;color:{k["fg"] if nome != "Não informada" else k["mfg"]};">{nome}</span>'
+                f'<span style="position:relative;display:block;height:10px;border-radius:3px;background:{k["sunken"]};">'
+                f'<span style="position:absolute;left:0;top:0;bottom:0;width:{contas / maior * 100:.1f}%;border-radius:3px;'
+                f'background:color-mix(in oklch, {k["pri"]} 28%, transparent);"></span>'
+                f'<span style="position:absolute;left:0;top:0;bottom:0;width:{pagantes / maior * 100:.1f}%;border-radius:3px;background:{k["pri"]};"></span></span>'
+                f'<span style="font-family:{MONO};font-size:12px;color:{k["fgs"]};text-align:right;">{milhar(contas)}</span>'
+                f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};text-align:right;">{pagantes / contas * 100:.0f}%</span></div>')
+    # contas no tom claro, quem paga no cheio por cima; à direita o número de contas e quanto delas paga
+    aquis = _cartao(k, 'De onde vêm as contas',
+                    f'<div style="display:flex;flex-direction:column;gap:4px;margin-top:-4px;">{lin}</div>',
+                    f'<span style="display:flex;gap:14px;">{_legenda(k, [("contas", "color-mix(in oklch, var(--pri) 28%, transparent)"), ("pagantes", k["pri"])])}</span>'
+                    f'<span style="font-size:12.5px;color:{k["mfg"]};margin-left:8px;">últimos 30 dias</span>', 2, '14px 20px')
+
+    def atencao(icone, cor, txt, sub, destino, extra=''):
         return (f'<a href="{destino}" style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;box-shadow:inset 0 -1px 0 {k["muted"]};color:inherit;">'
                 f'<span style="margin-top:2px;display:flex;color:{cor};">{ic(icone, 15)}</span>'
-                f'<span style="display:flex;flex-direction:column;gap:1px;flex:1;"><span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{txt}</span>'
-                f'<span style="font-size:12px;color:{k["mfg"]};">{sub}</span></span>'
+                f'<span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{txt}</span>'
+                f'<span style="font-size:12px;color:{k["mfg"]};">{sub}</span>{extra}</span>'
                 f'<span style="display:flex;color:{k["mfg"]};margin-top:2px;">{ic("direita", 13)}</span></a>')
-    pendencias = (f'<section aria-label="Pede atenção" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
-                  f'padding:16px 20px 6px;display:flex;flex-direction:column;">'
-                  f'<h2 style="margin:0 0 4px;font-size:14px;font-weight:600;color:{k["fgs"]};">Pede atenção</h2>'
-                  f'{atencao("aviso", k["warn"], "41 clientes inadimplentes", "R$ 3.927 em aberto, o mais antigo há 18 dias", href("Clientes"))}'
-                  f'{atencao("cupom", k["mfg"], "PRO50 perto do fim", "88 de 100 usos, vale até 30 de setembro", href("Cupons"))}'
-                  f'{atencao("relogio", k["mfg"], "96 testes terminam esta semana", "Pro e Team, 14 dias sem cartão", href("Clientes"))}</section>')
+    divisao = (f'<span style="display:flex;gap:6px;margin-top:3px;">{badge("29 past_due", k, "orange", mono=True)}'
+               f'{badge("12 unpaid", k, "red", mono=True)}</span>')
+    pendencias = _cartao(k, 'Pede atenção',
+                         f'<div style="display:flex;flex-direction:column;margin-top:-8px;">'
+                         f'{atencao("aviso", k["warn"], "41 clientes em atraso", "R$ 3.927 em aberto, o mais antigo há 18 dias", href("Clientes"), divisao)}'
+                         f'{atencao("cupom", k["mfg"], "PRO50 perto do fim", "88 de 100 usos, vale até 30 de setembro", href("CupomUsos"))}'
+                         f'{atencao("relogio", k["mfg"], "96 testes terminam esta semana", "38 com cartão, 58 sem", href("Clientes"))}</div>',
+                         _agora(k), 1, '16px 20px 6px')
 
-    corpo = (cab + kpis + f'<div style="display:flex;gap:16px;">{grafico}{planos}</div>'
-             + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{recentes}{pendencias}</div>')
-    return app(k, 'inicio', corpo, gap=18)
+    corpo = (cab + kpis + f'<div style="display:flex;gap:16px;">{grafico}{funil}</div>'
+             + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{aquis}{pendencias}</div>')
+    return app(k, 'inicio', corpo, gap=16)
+
+
+def tela_metricas(k):
+    # o mês a mês que não cabe no Início: testes e atraso, em barras agrupadas (o bar-chart do DS com
+    # três séries da mesma unidade), cada um com o número que resume o mês
+    cab = cabecalho(k, 'Métricas', 'Os últimos 12 meses do Muriki Platform. Setembro ainda está em curso.',
+                    trilha=[('Início', 'Inicio'), ('Métricas', 'Metricas')],
+                    direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto'))
+
+    def resumo(itens):
+        return ('<div style="display:flex;gap:28px;">' + ''.join(
+            f'<div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:{k["mfg"]};">{r}</span>'
+            f'<span style="font-size:20px;font-weight:600;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{v}</span></div>' for r, v in itens) + '</div>')
+
+    cores_t = [k['pri'], k['ok'], 'var(--mfg)']
+    ini, conv, sem = TESTES_MESES[-2]
+    testes = _cartao(k, 'Testes por mês',
+                     resumo([('Taxa em agosto', f'{conv / (conv + sem) * 100:.0f}%'), ('Iniciados', str(ini)), ('Convertidos', str(conv)), ('Sem pagar', str(sem))])
+                     + f'<div style="display:flex;gap:16px;">{_legenda(k, zip(["Iniciados", "Convertidos", "Encerrados sem pagar"], cores_t))}</div>'
+                     + _barras_agrupadas(k, TESTES_MESES, cores_t, ['i', 'c', 's'], 240, 'Testes por mês: iniciados, convertidos e encerrados sem pagar.', 196),
+                     '<a href="#" style="font-size:12.5px;">Ver como tabela</a>')
+    cores_a = [k['warn'], k['ok'], k['bad']]
+    ent, rec, perd = ATRASO_MESES[-2]
+    atraso = _cartao(k, 'Atraso por mês',
+                     resumo([('Em aberto agora', brl(3927, False)), ('Entraram em agosto', str(ent)), ('Recuperadas', str(rec)), ('Perdidas', str(perd))])
+                     + f'<div style="display:flex;gap:16px;">{_legenda(k, zip(["Entraram em atraso", "Recuperadas", "Perdidas"], cores_a))}</div>'
+                     + _barras_agrupadas(k, ATRASO_MESES, cores_a, ['e', 'r', 'p'], 40, 'Atraso por mês: entraram, recuperadas e perdidas.', 196),
+                     '<a href="#" style="font-size:12.5px;">Ver como tabela</a>')
+    return app(k, 'inicio', cab + f'<div style="display:flex;flex-direction:column;gap:16px;flex:1;">{testes}{atraso}</div>', gap=16)
 
 
 # ── Clientes: a tela que vira o molde do CRUD ──────────────────────────
@@ -507,7 +625,7 @@ def tela_clientes(k, hover=2, sobre=''):
     cab = cabecalho(k, 'Clientes', contagem=milhar(TOTAL_CLIENTES),
                     direita=segmentado(k, ['Muriki Platform', 'Muriki Code'], PRODUTO, 'Produto'))
     barra = barra_recurso(k, 'Buscar por nome ou e-mail',
-                          [('Todos', '1.284'), ('Ativos', '1.108'), ('Em teste', '96'), ('Inadimplentes', '41'), ('Inativos', '39')],
+                          [(n, milhar(c)) for n, c in ESTADOS],
                           'Todos', filtro_chip(k, 'Plano') + filtro_chip(k, 'Último acesso'))
     cab_t = [(caixa(k, False, 'Selecionar todos'), 'esq', False), ('Cliente', 'esq', True), ('Plano', 'esq', True),
              ('Status', 'esq', True), ('Último acesso', 'esq', True), ('Desde', 'esq', True), ('Total pago', 'dir', True), ('', 'dir', False)]
@@ -1447,6 +1565,8 @@ def _montar(tela, tema):
         return pagina(t, tela_relatorio_gerar(k), tema)
     if i == 'inicio':
         return pagina(t, tela_inicio(k), tema)
+    if i == 'metricas':
+        return pagina(t, tela_metricas(k), tema)
     if i == 'clientes':
         return pagina(t, tela_clientes(k), tema)
     if i == 'cliente':

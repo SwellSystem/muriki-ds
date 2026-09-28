@@ -181,7 +181,7 @@
     "Inicio.dc.html": {
       "h": 900,
       "is_interactive": true,
-      "title": "Início · clientes, vendido até agora e planos",
+      "title": "Início · líquido, MRR, testes, atraso e de onde vêm as contas",
       "w": 1440,
       "x": 0,
       "y": 2640
@@ -189,7 +189,7 @@
     "InicioEscuro.dc.html": {
       "h": 900,
       "is_interactive": true,
-      "title": "Início · clientes, vendido até agora e planos · escuro",
+      "title": "Início · líquido, MRR, testes, atraso e de onde vêm as contas · escuro",
       "w": 1440,
       "x": 0,
       "y": 3960
@@ -413,6 +413,22 @@
       "h": 900,
       "title": "Cupons · os usos de um cupom, cada um leva ao cliente · escuro",
       "is_interactive": true
+    },
+    "Metricas.dc.html": {
+      "x": 6080,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Início · métricas: testes e atraso mês a mês",
+      "is_interactive": true
+    },
+    "MetricasEscuro.dc.html": {
+      "x": 6080,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Início · métricas: testes e atraso mês a mês · escuro",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -442,15 +458,15 @@
     },
     "clientes": {
       "kind": "title1",
-      "maxW": 6000,
-      "text": "Início e clientes: a lista é de um produto por vez; o detalhe tem um cartão por produto, e inativar é num produto só",
+      "maxW": 7520,
+      "text": "Início, métricas e clientes: a lista é de um produto por vez; o detalhe tem um cartão por produto, e inativar é num produto só",
       "w": 240,
       "x": 0,
       "y": 2340
     },
     "clientesEscuro": {
       "kind": "title1",
-      "maxW": 6000,
+      "maxW": 7520,
       "text": "Início e clientes no tema escuro",
       "w": 240,
       "x": 0,
@@ -549,7 +565,9 @@
     "Inativar.dc.html",
     "InativarEscuro.dc.html",
     "CupomUsos.dc.html",
-    "CupomUsosEscuro.dc.html"
+    "CupomUsosEscuro.dc.html",
+    "Metricas.dc.html",
+    "MetricasEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"
