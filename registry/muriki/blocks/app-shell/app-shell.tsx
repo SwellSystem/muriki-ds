@@ -16,7 +16,7 @@
 // desktop): as telas não resolvem isso cada uma. `stageClassName` ajusta,
 // ex.: um max-width.
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react"
-import { ArrowsLeftRightIcon, GearSixIcon, SignOutIcon } from "@phosphor-icons/react"
+import { ArrowsLeftRightIcon, CaretRightIcon, GearSixIcon, ListIcon, SignOutIcon, XIcon } from "@phosphor-icons/react"
 
 import {
   Sidebar,
@@ -33,9 +33,9 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarSeparator,
-  SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { Button } from "@/components/ui/button"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -118,8 +118,15 @@ export interface AppShellProps {
    * vira ícone com tooltip. O rótulo vem do i18n (app_shell.sign_out).
    */
   onSignOut?: () => void
-  /** Rótulo do botão que abre o menu no celular. */
+  /** Rótulo do botão que abre o menu no celular. Sem isto, vem do i18n (app_shell.open_menu). */
   menuLabel?: string
+  /**
+   * O nome da tela na barra de topo do celular, ao lado do logo (ex.: "Clientes").
+   * Sem isto, vai o nome do produto.
+   */
+  mobileTitle?: ReactNode
+  /** A ponta direita da barra de topo do celular: o avatar da conta, uma ação da tela. */
+  mobileEnd?: ReactNode
   /** O selo dos itens `soon`. Sem isto, vem do i18n (app_shell.soon). */
   soonLabel?: string
   defaultOpen?: boolean
@@ -205,7 +212,9 @@ export function AppShell({
   user,
   settings,
   onSignOut,
-  menuLabel = "Menu",
+  menuLabel,
+  mobileTitle,
+  mobileEnd,
   soonLabel,
   defaultOpen = true,
   className,
@@ -261,6 +270,7 @@ export function AppShell({
               </div>
             )}
             <SidebarControls />
+            <FecharNoCelular />
           </div>
         </SidebarHeader>
 
@@ -309,7 +319,15 @@ export function AppShell({
             </div>
           ) : null}
           {user ? (
-            <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col">
+            <UsuarioNoCelular
+              user={user}
+              utilities={utilidadesComUsuario ? utilities : undefined}
+              settings={settings}
+              onSignOut={onSignOut}
+            />
+          ) : null}
+          {user ? (
+            <div className="flex h-11 items-center gap-1 group-data-[collapsible=icon]:h-auto group-data-[collapsible=icon]:flex-col max-md:hidden">
               <UserLink user={user} />
               {utilidadesComUsuario ? (
                 <span className="flex shrink-0 items-center gap-1 text-muted-foreground group-data-[collapsible=icon]:flex-col [&_button]:size-8">
@@ -334,9 +352,18 @@ export function AppShell({
       </Sidebar>
 
       <SidebarInset>
-        {/* No celular o rail vira gaveta, e alguém precisa abri-la. */}
-        <header className="flex h-12 items-center gap-2 px-4 md:hidden">
-          <SidebarTrigger aria-label={menuLabel} />
+        {/* No celular o rail vira gaveta: a barra de topo tem o botão que a abre, o logo com o
+            nome da tela e, na ponta, a conta. */}
+        <header
+          data-slot="app-shell-mobile-bar"
+          className="sticky top-0 z-20 flex h-14 items-center gap-2 bg-background/85 px-2 shadow-[inset_0_-1px_0_var(--border)] backdrop-blur-md md:hidden"
+        >
+          <AbrirMenu label={menuLabel ?? t("app_shell.open_menu")} />
+          <span className="flex size-7 shrink-0 [&>*]:size-full">{product.logo}</span>
+          <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-foreground-strong">
+            {mobileTitle ?? product.name}
+          </span>
+          {mobileEnd ? <div className="flex shrink-0 items-center gap-1 pr-2">{mobileEnd}</div> : null}
         </header>
         <div
           data-slot="app-shell-stage"
@@ -369,6 +396,100 @@ function IdiomaDoRail({ language }: { language: ReactElement }) {
       )}
     >
       {cloneElement(language as ReactElement<{ compact?: boolean }>, { compact: recolhido })}
+    </div>
+  )
+}
+
+function AbrirMenu({ label }: { label: string }) {
+  const { setOpenMobile } = useSidebar()
+  return (
+    <Button variant="ghost" size="icon" onClick={() => setOpenMobile(true)} aria-label={label} className="size-10 shrink-0">
+      <ListIcon aria-hidden className="size-5" />
+    </Button>
+  )
+}
+
+function FecharNoCelular() {
+  // Na gaveta do celular, o fechar fica no lugar do recolher (que só existe no rail)
+  const { isMobile, setOpenMobile } = useSidebar()
+  const t = useTranslate()
+  if (!isMobile) return null
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setOpenMobile(false)}
+      aria-label={t("app_shell.close_menu")}
+      className="size-10 shrink-0 text-muted-foreground"
+    >
+      <XIcon aria-hidden className="size-[18px]" />
+    </Button>
+  )
+}
+
+function UsuarioNoCelular({
+  user,
+  utilities,
+  settings,
+  onSignOut,
+}: {
+  user: AppShellUser
+  utilities?: ReactNode
+  settings?: AppShellProps["settings"]
+  onSignOut?: () => void
+}) {
+  // O pé da gaveta no celular: a conta numa linha inteira com a seta, e embaixo o tema e o sair
+  // como dois botões de meia largura, com alvo de toque de 40px
+  const { isMobile } = useSidebar()
+  const t = useTranslate()
+  if (!isMobile) return null
+  const alvo = navega(user)
+  const conteudo = (
+    <>
+      <span className="flex size-8 shrink-0 items-center justify-center [&>*]:size-full">{user.avatar}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[14px] font-medium text-foreground-strong">{user.name}</span>
+        {user.detail ? <span className="block truncate text-[12px] text-muted-foreground">{user.detail}</span> : null}
+      </span>
+      {alvo ? <CaretRightIcon aria-hidden className="size-4 shrink-0 text-muted-foreground" /> : null}
+    </>
+  )
+  const linha = "flex h-14 w-full items-center gap-3 rounded-[10px] px-2 outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+  return (
+    <div data-slot="app-shell-mobile-account" className="flex flex-col gap-2 pt-1">
+      {alvo
+        ? cloneElement(alvo as ReactElement<Record<string, unknown>>, {
+            className: cn(linha, "hover:bg-secondary"),
+            "aria-label": user.label ?? user.name,
+            children: conteudo,
+          })
+        : <div className={linha}>{conteudo}</div>}
+      {utilities || settings || onSignOut ? (
+        <div className="grid auto-cols-fr grid-flow-col gap-2">
+          {utilities ? (
+            <div className="flex [&>*]:h-10 [&>*]:w-full [&>*]:rounded-[10px] [&>*]:shadow-[inset_0_0_0_1px_var(--input)]">
+              {utilities}
+            </div>
+          ) : null}
+          {settings ? (
+            <Button
+              variant="outline"
+              render={navega(settings)}
+              onClick={settings.onClick}
+              className="h-10 w-full"
+            >
+              <GearSixIcon aria-hidden />
+              {settings.label}
+            </Button>
+          ) : null}
+          {onSignOut ? (
+            <Button variant="outline" onClick={onSignOut} className="h-10 w-full">
+              <SignOutIcon aria-hidden />
+              {t("app_shell.sign_out_short")}
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   )
 }
