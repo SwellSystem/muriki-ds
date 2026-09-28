@@ -1319,6 +1319,87 @@
       "docs": "<StatusPage kind=\"not-found\" product=\"code\" logo={<MurikiLogo />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account={email} action={{ render: <Link to=\"/\" /> }} secondaryAction={{ onClick: () => history.back() }} note={<code className=\"font-mono text-xs\">{location.pathname}</code>} />. kind: offline | not-found | error | session-expired | forbidden | maintenance (forbidden é o 403: entrou, mas não tem permissão; o mesmo cadeado do 401, com a ação para o início). Textos em status_page.<kind>.* (label, title_a, title_b, description, action, secondary); title, description e label trocam por prop. No erro, passe o requestId na note: <>{t(\"status_page.error.code\")} <code>{requestId}</code> · <a href={suporte}>{t(\"status_page.error.support\")}</a></>. Na sessão expirada, não passe account. O StatusMascot (face: offline | not-found | error | locked | warning) sai à parte, para usar o mascote em outro lugar. Sem internet já traz a nota de que a página volta sozinha. variant=\"stage\": a mesma página dentro do palco do app-shell, para o errorComponent das rotas — sem topo nem rodapé (product, logo, utilities e account são ignorados), com a altura do conteúdo, a atmosfera contida num cartão e o palco menor. Ex.: errorComponent: ({ reset }) => <StatusPage variant=\"stage\" kind=\"error\" action={{ onClick: reset }} secondaryAction={{ render: <Link to=\"/\" /> }} />; sem conexão, kind=\"offline\"."
     },
     {
+      "name": "welcome-dialog",
+      "type": "registry:block",
+      "title": "Welcome Dialog",
+      "description": "As boas-vindas em passos na primeira vez numa área: o véu desfocando a janela inteira (rail junto), o splash com o mascote flutuando e as tecnologias em ladrilhos, o rótulo mono, o stepper, o conteúdo do passo e o rodapé com Pular, Voltar, Continuar e o botão final. Movimento desligado com prefers-reduced-motion.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/muriki-logo",
+        "SwellSystem/muriki-ds/brand-logo"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/welcome-dialog/welcome-dialog.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/welcome-dialog/welcome-dialog.tsx"
+        }
+      ],
+      "docs": "Nas Trilhas, na primeira visita: <WelcomeDialog open={!visto} onOpenChange={…} eyebrow=\"Trilhas · primeira vez\" brands={[\"ts\", \"py\", \"js\", \"go\", \"docker\", \"postgres\", \"rust\", \"ruby\", \"mysql\", \"aws\"]} highlight={profile.languages} steps={[{ label: \"Seu ponto de partida\", content: <PontoDePartida profile={profile} /> }, { label: \"Suas trilhas\", content: <TresTrilhas tracks={recomendadas} /> }, { label: \"Como a trilha anda\", content: <ComoAnda /> }]} labels={{ finish: \"Abrir a trilha\" }} finishRender={<Link to=\"/tracks/$id\" params={{ id: recomendadas[0].id }} />} onSkip={marcarVisto} onFinish={marcarVisto} />. O conteúdo de cada passo é do app (título 24px semibold, texto 14px muted, e o que o passo mostra); o componente cuida do splash, do stepper, do foco (vai para o conteúdo a cada passo) e do rodapé. Passo controlado com step/onStepChange (0 é o primeiro) ou solto com defaultStep. highlight vem maior e mais perto do mascote (as linguagens da pessoa); até 10 tecnologias. splash troca o topo inteiro (null tira). Esc e clique fora chamam onSkip. Rótulos em welcome_dialog.* (Pular, Voltar, Continuar, Começar) ou por labels. As animações moram no css deste item (muriki-welcome-*): véu que aparece, modal que sobe e cresce, mascote que flutua e ladrilhos que entram um a um; com prefers-reduced-motion, tudo parado.",
+      "css": {
+        "@keyframes muriki-welcome-veil": {
+          "from": {
+            "opacity": "0"
+          },
+          "to": {
+            "opacity": "1"
+          }
+        },
+        "@keyframes muriki-welcome-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(14px) scale(0.96)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-welcome-float": {
+          "0%, 100%": {
+            "transform": "translateY(0) rotate(-4deg)"
+          },
+          "50%": {
+            "transform": "translateY(-6px) rotate(-4deg)"
+          }
+        },
+        "@keyframes muriki-welcome-tile": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(8px) rotate(var(--muriki-welcome-turn, 0deg))"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "rotate(var(--muriki-welcome-turn, 0deg))"
+          }
+        },
+        ".muriki-welcome-veil": {
+          "animation": "muriki-welcome-veil 0.35s ease-out both"
+        },
+        ".muriki-welcome-modal": {
+          "animation": "muriki-welcome-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s both"
+        },
+        ".muriki-welcome-mascot": {
+          "animation": "muriki-welcome-float 3.2s ease-in-out 0.6s infinite"
+        },
+        ".muriki-welcome-tile": {
+          "animation": "muriki-welcome-tile 0.45s ease-out both"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-welcome-veil, .muriki-welcome-modal, .muriki-welcome-mascot, .muriki-welcome-tile": {
+            "animation": "none"
+          }
+        }
+      }
+    },
+    {
       "name": "account-page",
       "type": "registry:block",
       "title": "Account Page",
@@ -1449,6 +1530,23 @@
         }
       ],
       "docs": "Tamanho por className (size-8 é o padrão; size-[30px] no rail, size-9 na tela de entrada). eyes=\"closed\" é o de olhos fechados — o login usa quando a senha fica visível. Decorativo por padrão; passe title=\"Muriki\" quando for o único nome do link."
+    },
+    {
+      "name": "brand-logo",
+      "type": "registry:ui",
+      "title": "Brand Logo",
+      "description": "O logo de uma tecnologia em SVG inline, com a cor oficial: TypeScript, JavaScript, Python, Go, Docker, PostgreSQL, MySQL, Rust e Ruby (Simple Icons, CC0) e AWS (devicon, MIT). Com tile, num ladrilho branco que lê igual nos dois temas.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/brand-logo.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "<BrandLogo brand=\"ts\" size={16} /> ao lado do nome (decorativo, aria-hidden). brand: ts | js | py | go | docker | postgres | mysql | rust | ruby | aws; BRANDS lista todos e brandName(brand) dá o nome (\"PostgreSQL\", \"AWS\"). tile: o ladrilho branco com sombra e raio (size é o lado do ladrilho; o logo ocupa ~56%), para o Rust preto e o texto escuro da AWS lerem no tema escuro. Sem o nome ao lado, passe title=\"TypeScript\" e ele vira role=\"img\". Nos chips de linguagem: <span className=\"flex size-[18px] items-center justify-center rounded-full bg-white\"><BrandLogo brand=\"py\" size={12} /></span> Python."
     },
     {
       "name": "qr-code",
