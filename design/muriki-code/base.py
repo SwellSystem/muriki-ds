@@ -36,7 +36,23 @@ def _vars(d):
     return ''.join(f'--{n}:{v};' for n, v in d.items())
 
 
+# o flyout do app-shell recolhido (os dois canvas): o grupo é o gatilho (mouse ou foco), e o cartão do popover
+# (--float, raio de recipiente) abre à direita com o rótulo e os itens clicáveis; o rail não se mexe
+CSS_FLYOUT = (
+    '.mc nav:has(.grupo){position:relative;z-index:20;}'
+    '.mc .grupo{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;}'
+    '.mc .flyout{position:absolute;left:calc(100% + 12px);top:0;z-index:50;width:224px;padding:6px;border-radius:14px;'
+    'background:var(--card);box-shadow:var(--sombraFlut),inset 0 0 0 1px var(--border);display:flex;flex-direction:column;gap:2px;'
+    'opacity:0;visibility:hidden;transform:scale(0.95);transform-origin:left top;'
+    'transition:opacity 100ms ease-out,transform 100ms ease-out,visibility 0s linear 100ms;}'
+    '.mc .flyout::before{content:"";position:absolute;right:100%;top:0;bottom:0;width:14px;}'
+    '.mc .grupo:is(:hover,:focus-within)>.flyout{opacity:1;visibility:visible;transform:none;transition-delay:90ms,90ms,0s;}'
+    '@media (prefers-reduced-motion: reduce){.mc .flyout{transition:none;}}'
+)
+
 def casca(titulo, corpo, logica, props, css=''):
+    if 'class="grupo"' in corpo:
+        css += CSS_FLYOUT
     dados = dict(props)
     dados['$preview'] = dict(width=W, height=H)
     dados = json.dumps(dados, ensure_ascii=False, separators=(',', ':')).replace('&', '&amp;').replace("'", '&#39;')
@@ -354,23 +370,28 @@ def botao_idioma(k, alt=36, extra='', abre='baixo', compacto=False):
     return f'<span style="position:relative;display:flex;{extra}">{botao}{menu}</span>'
 
 
-def rail(k, ativo):
-    def item(chave, icone, at, direita=''):
-        f = (f'background:{k["prisub"]};color:{k["prisubfg"]};font-weight:500;' if at
-             else f'color:{k["mfg"]};')
-        b = (f'<span style="position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:999px;'
-             f'background:{k["pri"]};"></span>') if at else ''
-        cur = ' aria-current="page"' if at else ''
-        return (f'<a href="{destino(chave)}"{cur} style="position:relative;display:flex;align-items:center;gap:10px;height:36px;'
-                f'padding:0 10px;border-radius:9px;font-size:13px;{f}">{b}{ic(icone)}'
-                f'<span style="flex:1;">{T(chave)}</span>{direita}</a>')
+def _item_rail(k, chave, icone, at, direita=''):
+    f = (f'background:{k["prisub"]};color:{k["prisubfg"]};font-weight:500;' if at
+         else f'color:{k["mfg"]};')
+    b = (f'<span style="position:absolute;left:0;top:7px;bottom:7px;width:3px;border-radius:999px;'
+         f'background:{k["pri"]};"></span>') if at else ''
+    cur = ' aria-current="page"' if at else ''
+    return (f'<a href="{destino(chave)}"{cur} style="position:relative;display:flex;align-items:center;gap:10px;height:36px;'
+            f'padding:0 10px;border-radius:9px;font-size:13px;{f}">{b}{ic(icone)}'
+            f'<span style="flex:1;">{T(chave)}</span>{direita}</a>')
 
-    def em_breve(chave, icone):
-        # a tela ainda não existe: esmaecido, com o selo mono, sem navegar (o soon do app-shell)
-        return (f'<span aria-disabled="true" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;'
-                f'border-radius:9px;font-size:13px;color:{k["mfg"]};opacity:0.75;"><span style="display:flex;opacity:0.7;">{ic(icone)}</span>'
-                f'<span style="flex:1;">{T(chave)}</span>'
-                f'<span style="font-family:{MONO};font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;">{T("emBreveRail")}</span></span>')
+
+def _em_breve_rail(k, chave, icone):
+    # a tela ainda não existe: esmaecido, com o selo mono, sem navegar (o soon do app-shell)
+    return (f'<span aria-disabled="true" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 10px;'
+            f'border-radius:9px;font-size:13px;color:{k["mfg"]};opacity:0.75;"><span style="display:flex;opacity:0.7;">{ic(icone)}</span>'
+            f'<span style="flex:1;">{T(chave)}</span>'
+            f'<span style="font-family:{MONO};font-size:9.5px;letter-spacing:0.08em;text-transform:uppercase;">{T("emBreveRail")}</span></span>')
+
+
+def rail(k, ativo):
+    item = lambda chave, icone, at, direita='': _item_rail(k, chave, icone, at, direita)
+    em_breve = lambda chave, icone: _em_breve_rail(k, chave, icone)
 
     nav = ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS)
     # o Peer na IDE ainda está em construção; a tela Conectar segue no canvas como desenho do que vem
@@ -413,13 +434,23 @@ def rail_compacto(k, ativo):
         cur = ' aria-current="page"' if at else ''
         return (f'<a href="{destino(chave)}" aria-label="{T(chave)}"{cur} style="display:flex;align-items:center;justify-content:center;'
                 f'width:40px;height:40px;border-radius:10px;{f}">{ic(icone, 17)}</a>')
-    nav = ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS)
+    def grupo(titulo, quadrados, linhas):
+        # o flyout do app-shell: mouse ou foco no grupo abre o cartão com os itens clicáveis
+        cab = (f'<div style="height:30px;display:flex;align-items:center;padding:0 10px;">{rotulo(titulo, k["mfg"])}</div>'
+               if titulo else '')
+        return f'<div class="grupo">{quadrados}<div class="flyout" aria-hidden="true">{cab}{linhas}</div></div>'
+
+    nav = grupo(T('aprender'), ''.join(item(c, i, c == ativo) for c, i in PRODUTO_ITENS),
+                ''.join(_item_rail(k, c, i, c == ativo) for c, i in PRODUTO_ITENS))
+    peer = _item_rail(k, 'peer', 'peer', True) if ativo == 'peer' else _em_breve_rail(k, 'peer', 'peer')
+    base = grupo('', item('peer', 'peer', False) + item('plano', 'plano', ativo == 'plano'),
+                 peer + _item_rail(k, 'plano', 'plano', ativo == 'plano', badge('Pro', k, 'blue')))
     idioma = botao_idioma(k, extra='margin-top:6px;', abre='lado', compacto=True)
     return (
         f'<nav aria-label="Muriki Code" style="width:64px;flex:0 0 64px;background:{k["rail"]};display:flex;'
         f'flex-direction:column;align-items:center;gap:4px;padding:14px 0 12px;box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);">'
         f'<span style="display:flex;width:30px;height:30px;margin-bottom:14px;">{LOGO}</span>{nav}'
-        f'<div style="flex:1;"></div>{item("peer", "peer", False)}{item("plano", "plano", False)}{idioma}{botao_tema(k, 40)}'
+        f'<div style="flex:1;"></div>{base}{idioma}{botao_tema(k, 40)}'
         f'<span style="margin-top:8px;width:30px;height:30px;border-radius:999px;background:{k["tgreen"]};color:{k["tgreenfg"]};'
         f'display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">RM</span></nav>')
 
