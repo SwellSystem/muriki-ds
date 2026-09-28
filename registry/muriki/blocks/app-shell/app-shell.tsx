@@ -356,7 +356,7 @@ export function AppShell({
             nome da tela e, na ponta, a conta. */}
         <header
           data-slot="app-shell-mobile-bar"
-          className="sticky top-0 z-20 flex h-14 items-center gap-2 bg-background/85 px-2 shadow-[inset_0_-1px_0_var(--border)] backdrop-blur-md md:hidden"
+          className="sticky top-0 z-20 flex h-14 items-center gap-2 bg-rail px-2 shadow-[inset_0_-1px_0_var(--border)] md:hidden"
         >
           <AbrirMenu label={menuLabel ?? t("app_shell.open_menu")} />
           <span className="flex size-7 shrink-0 [&>*]:size-full">{product.logo}</span>
@@ -467,7 +467,7 @@ function UsuarioNoCelular({
       {utilities || settings || onSignOut ? (
         <div className="grid auto-cols-fr grid-flow-col gap-2">
           {utilities ? (
-            <div className="flex [&>*]:h-10 [&>*]:w-full [&>*]:rounded-[10px] [&>*]:shadow-[inset_0_0_0_1px_var(--input)]">
+            <div className="flex [&>*]:h-11 [&>*]:w-full [&>*]:rounded-[10px] [&>*]:shadow-[inset_0_0_0_1px_var(--input)]">
               {utilities}
             </div>
           ) : null}
@@ -476,14 +476,14 @@ function UsuarioNoCelular({
               variant="outline"
               render={navega(settings)}
               onClick={settings.onClick}
-              className="h-10 w-full"
+              className="h-11 w-full"
             >
               <GearSixIcon aria-hidden />
               {settings.label}
             </Button>
           ) : null}
           {onSignOut ? (
-            <Button variant="outline" onClick={onSignOut} className="h-10 w-full">
+            <Button variant="outline" onClick={onSignOut} className="h-11 w-full">
               <SignOutIcon aria-hidden />
               {t("app_shell.sign_out_short")}
             </Button>
