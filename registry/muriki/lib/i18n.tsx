@@ -382,6 +382,10 @@ const STRINGS: Record<string, unknown> = {
       confirm: "Excluir a conta",
     },
   },
+  metric_card: {
+    live: "agora",
+    live_hint: "Retrato de agora: não muda com o período",
+  },
   bar_list: {
     empty: "Ainda não há dados neste período.",
   },

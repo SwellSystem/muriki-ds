@@ -1226,6 +1226,31 @@
       "docs": "Card Vendas por mês, com GET /admin/billing/sales/monthly (12 meses, total em centavos, count): const brl = new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", maximumFractionDigits: 0 }); <BarChart labels={meses.map((m) => formatMonth(m.month))} series={[{ key: \"platform\", label: \"Muriki Platform\", values: meses.map((m) => m.total / 100) }]} formatValue={(v) => brl.format(v)} current={meses.length - 1} extra={(_, i) => `${meses[i].count} vendas`} ariaLabel=\"Vendas por mês, de out de 2025 a set de 2026. Pico em ago, R$ 44.930.\" loading={isPending} />. Os valores vão na unidade do eixo (reais, não centavos). As séries dividem UMA escala: não misture moedas — BRL e USD na mesma escala enganam; cada moeda vai no seu gráfico, ou o card ganha um seletor de produto (view-toggle). Duas séries da mesma moeda saem agrupadas por mês, com legenda; uma série, sem legenda. color é opcional (padrão: --primary, --chart-1, --chart-3). formatTick troca o rótulo compacto do eixo. Negativos (um reembolso no mês) descem da linha do zero. Tudo zero ou sem rótulos: estado vazio (bar_chart.empty). loading: BarChartSkeleton, que também sai à parte. Textos em bar_chart.* (current, as_table, as_chart, empty, period)."
     },
     {
+      "name": "metric-card",
+      "type": "registry:block",
+      "title": "Metric Card",
+      "description": "O cartão de número do Início: rótulo, o valor grande em tabular e a linha de baixo (aceita duas linhas). Variação opcional com seta e cor pelo que é bom (não pelo que sobe), o selo \"agora\" para o número que é retrato do momento e não segue o período, o cartão inteiro como link com a seta no canto, e skeleton com a mesma silhueta. MetricGrid: 1, 2 ou 4 colunas.",
+      "dependencies": [
+        "@phosphor-icons/react",
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/tooltip"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/metric-card/metric-card.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/metric-card/metric-card.tsx"
+        }
+      ],
+      "docs": "Com o GET /overview?product&period (centavos → reais): <MetricGrid><MetricCard label=\"Líquido\" value={brl(o.net / 100)} detail={<span className=\"flex flex-col\"><span>{brl(o.received / 100)} recebido</span><span className=\"text-destructive\">−{brl(o.refunded / 100)} em reembolsos</span></span>} /><MetricCard label=\"MRR\" value={brl(o.mrr / 100)} detail={<>+{brl(o.newMrr / 100)} novo · −{brl(o.lostMrr / 100)} perdido</>} /><MetricCard label=\"Testes com cartão\" value={brl(o.trialPipelineMrr / 100)} detail={`${o.trialsWithCard} testes · viram MRR se pagarem`} live /><MetricCard label=\"Em aberto por atraso\" value={brl(o.overdueOpen / 100)} detail={`${o.overdueCount} clientes`} live render={<Link to=\"/metrics\" />} /></MetricGrid>. live: o número de agora, que ignora o seletor de período (o selo \"agora\" com tooltip; textos em metric_card.*). trend={{ value: \"+6,8%\", direction: \"up\" }} põe a variação; good decide a cor quando subir é ruim (ex.: MRR perdido, good: false). Com href ou render, o cartão vira link (seta no canto) e o selo deixa de ser focável: o aviso fica num texto para o leitor de tela. loading: skeleton com a mesma silhueta. Os nomes dos campos do /overview acima são ilustrativos: use os do contrato da API."
+    },
+    {
       "name": "bar-list",
       "type": "registry:block",
       "title": "Bar List",
