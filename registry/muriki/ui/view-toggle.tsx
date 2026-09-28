@@ -179,13 +179,15 @@ export function ViewToggle<V extends string>({
         const classe = cn(
           "relative z-10 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-full font-medium whitespace-nowrap transition-colors",
           "focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-0 focus-visible:outline-none",
+          // alvo de toque: no celular e com ponteiro grosso o sm vai a 36px (o TrilhaMovel) e o md a
+          // 40px (antes 32, menor que o sm); no desktop, com mouse, tudo como sempre (30 e 36)
           size === "sm"
             ? iconOnly
-              ? "size-[30px]"
-              : "h-[30px] px-3 text-xs"
+              ? "size-[30px] max-md:size-9 pointer-coarse:size-9"
+              : "h-[30px] px-3 text-xs max-md:h-9 max-md:px-3.5 pointer-coarse:h-9"
             : iconOnly
-              ? "size-8 md:size-9"
-              : "h-8 px-3.5 text-[13px] md:h-9 md:px-4",
+              ? "size-10 md:size-9 pointer-coarse:size-10"
+              : "h-10 px-3.5 text-[13px] md:h-9 md:px-4 pointer-coarse:h-10",
           selected
             ? "text-primary"
             : "text-muted-foreground hover:text-foreground"
