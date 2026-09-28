@@ -5,6 +5,7 @@
 # plano. Peer na web: o histórico das conversas da IDE, a conversa aberta com o trecho que o Peer
 # viu e a evidência que ela gerou, e onde o Peer pode olhar (ligado por projeto).
 from base import *  # noqa: F401,F403
+from logos_marcas import logo_marca, nome_marca
 
 I.update(
     busca=svg('<circle cx="7" cy="7" r="4.6"/><path d="M10.4 10.4L14 14"/>'),
@@ -427,11 +428,16 @@ def tela_trilha_boas_vindas(k, sufixo):
     fundo = tela_trilhas(k, sufixo)
     assert fundo.endswith('</div>')
 
-    # o splash: a atmosfera da marca, o mascote flutuando e as competências da largada entrando uma a uma
-    chips = ''.join(f'<span class="splash-chip" style="animation-delay:{0.45 + 0.12 * i:.2f}s;position:absolute;{pos}">{badge(c, k, tom)}</span>'
-                    for i, (c, tom, pos) in enumerate([('Testing', 'blue', 'left:92px;top:58px;'),
-                                                      ('TypeScript', 'gray', 'right:84px;top:44px;'),
-                                                      ('Architecture', 'yellow', 'right:120px;bottom:30px;')]))
+    # o splash: a atmosfera da marca, o mascote flutuando e as tecnologias em volta, entrando uma a uma
+    # em ladrilhos brancos (lê igual nos dois temas); as da pessoa (TypeScript e Python) vêm maiores
+    marcas = [('ts', 170, 44, 40), ('py', 404, 40, 40), ('js', 96, 92, 32), ('go', 470, 104, 32), ('docker', 36, 34, 30),
+              ('postgres', 540, 36, 30), ('rust', 118, 20, 26), ('ruby', 556, 116, 26), ('mysql', 30, 126, 28), ('aws', 330, 128, 32)]
+    chips = ''.join(
+        f'<span class="splash-chip" title="{nome_marca(c)}" style="animation-delay:{0.4 + 0.07 * i:.2f}s;position:absolute;left:{x}px;top:{y}px;'
+        f'width:{t}px;height:{t}px;display:flex;align-items:center;justify-content:center;border-radius:{t * 0.28:.0f}px;background:#fff;'
+        f'box-shadow:0 6px 16px -6px rgba(0,0,0,0.28), 0 0 0 1px rgba(0,0,0,0.06);transform:rotate({[-6, 5, -3, 7, -8, 4, 9, -5, 6, -4][i]}deg);">'
+        f'{logo_marca(c, round(t * 0.56))}</span>'
+        for i, (c, x, y, t) in enumerate(marcas))
     splash = (f'<div style="position:relative;height:176px;overflow:hidden;'
               f'background:linear-gradient(135deg, color-mix(in oklch, {k["pri"]} 16%, {k["card"]}) 0%, {k["card"]} 55%, '
               f'color-mix(in oklch, {k["accent"]} 30%, {k["card"]}) 100%);">'
@@ -449,13 +455,17 @@ def tela_trilha_boas_vindas(k, sufixo):
 
     chip = lambda t: (f'<span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;'
                       f'background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;font-weight:500;">{t}</span>')
+    chip_marca = lambda c: (f'<span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px 0 4px;border-radius:999px;'
+                            f'background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;font-weight:500;">'
+                            f'<span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#fff;">'
+                            f'{logo_marca(c, 12)}</span>{nome_marca(c)}</span>')
     linha = lambda rot, v: (f'<div style="display:flex;align-items:center;gap:12px;"><span style="width:92px;font-size:12.5px;color:{k["mfg"]};">{T(rot)}</span>'
                             f'<span style="display:flex;gap:6px;flex-wrap:wrap;">{v}</span></div>')
     titulo = lambda chave: f'<h2 style="margin:0;font-size:24px;line-height:30px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T(chave)}</h2>'
     texto = lambda chave: f'<p style="margin:0;font-size:14px;color:{k["mfg"]};">{T(chave)}</p>'
     p1 = (titulo('bv1Tit') + texto('bv1Txt')
           + f'<div style="display:flex;flex-direction:column;gap:10px;">'
-          + linha('bvExp', chip(T('pleno'))) + linha('bvLing', chip('TypeScript') + chip('Python'))
+          + linha('bvExp', chip(T('pleno'))) + linha('bvLing', chip_marca('ts') + chip_marca('py'))
           + linha('bvObj', chip(T('bvAprender')) + chip(T('bvRevisar'))) + '</div>'
           f'<div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:{k["sunken"]};">'
           f'<span style="display:flex;margin-top:2px;color:{k["pri"]};">{ic("trilhas", 15)}</span>'
