@@ -80,11 +80,14 @@ def _minimapa(k, sufixo, atual, comeco=False):
     txt = T('miniComece' if comeco else 'miniAqui')
     largura_balao = 92
     bx = min(max(x - largura_balao / 2, 2), w - largura_balao - 2)
-    balao = (f'<g><rect x="{bx}" y="{y - 38}" width="{largura_balao}" height="20" rx="10" style="fill:var(--fgs);"/>'
-             f'<text x="{bx + largura_balao / 2}" y="{y - 24}" text-anchor="middle" style="fill:var(--bg);font-family:{FONTE};font-size:10.5px;font-weight:600;">{txt}</text>'
-             f'<path d="M{x - 4},{y - 18} l4,5 l4,-5 z" style="fill:var(--fgs);"/></g>')
-    svg_ = (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{T("miniTit")}: {atual}/8">'
-            f'{regioes}{caminho}{nos}{balao}</svg>')
+    # o balão é HTML por cima do SVG: o canvas não preenche {{t.…}} dentro de <text>
+    seta = f'<path d="M{x - 4},{y - 18} l4,5 l4,-5 z" style="fill:var(--fgs);"/>'
+    balao = (f'<span style="position:absolute;left:{bx / w * 100:.2f}%;top:{y - 38}px;width:{largura_balao}px;height:20px;border-radius:10px;'
+             f'background:{k["fgs"]};color:{k["bg"]};display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;'
+             f'white-space:nowrap;">{txt}</span>')
+    svg_ = (f'<span style="position:relative;display:block;">'
+            f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{T("miniTit")}: {atual}/8" style="display:block;">'
+            f'{regioes}{caminho}{nos}{seta}</svg>{balao}</span>')
     return (f'<a href="Trilha{sufixo}.dc.html" style="width:440px;flex:0 0 auto;display:flex;flex-direction:column;gap:4px;padding:12px 14px 6px;border-radius:12px;'
             f'background:{k["rail"]};box-shadow:inset 0 0 0 1px {k["border"]};color:inherit;">'
             f'<span style="display:flex;align-items:center;">{rotulo(T("miniTit"), k["mfg"], 9.5)}'
@@ -386,13 +389,22 @@ def _mapa_svg(k):
     w, h = 1100, 360
     fundo = ''.join(f'<path d="M-20,{y} C220,{y - 40} 420,{y + 45} 640,{y - 10} S980,{y - 45} 1120,{y - 15}" '
                     f'style="fill:none;stroke:var(--muted);stroke-width:1;opacity:0.8;"/>' for y in (40, 110, 180, 250, 320))
+    # Os textos (nomes, regiões, você está aqui) são HTML por cima do SVG, posicionados em % do quadro:
+    # o canvas não preenche {{t.…}} dentro de <text>. O SVG fica só com formas e números.
+    textos = []
+
+    def texto(x, y, conteudo, estilo, ancora='middle'):
+        tx = {'middle': '-50%', 'start': '0', 'end': '-100%'}[ancora]
+        textos.append(f'<span style="position:absolute;left:{x / w * 100:.2f}%;top:{y / h * 100:.2f}%;transform:translate({tx},-78%);'
+                      f'white-space:nowrap;{estilo}">{conteudo}</span>')
+    halo = f'text-shadow:0 0 3px {k["card"]}, 0 0 3px {k["card"]}, 0 0 3px {k["card"]};'
     regioes = ''
     for chave, cx, cy, rw, rh in REGIOES:
         # o nome da região fica embaixo, à esquerda, longe dos nomes das estações
         regioes += (f'<rect x="{cx - rw / 2}" y="{cy - rh / 2}" width="{rw}" height="{rh}" rx="40" style="fill:color-mix(in oklch, var(--pri) 5%, transparent);'
-                    f'stroke:color-mix(in oklch, var(--pri) 20%, transparent);stroke-dasharray:2 6;"/>'
-                    f'<text x="{cx - rw / 2 + 24}" y="{cy + rh / 2 - 16}" style="fill:var(--mfg);font-family:{MONO};font-size:10px;'
-                    f'letter-spacing:0.18em;text-transform:uppercase;">{T(chave)}</text>')
+                    f'stroke:color-mix(in oklch, var(--pri) 20%, transparent);stroke-dasharray:2 6;"/>')
+        texto(cx - rw / 2 + 24, cy + rh / 2 - 16, T(chave),
+              f'color:{k["mfg"]};font-family:{MONO};font-size:10px;letter-spacing:0.18em;text-transform:uppercase;', 'start')
     atual = 3
     caminho = (f'<path d="{_curva(ESTACOES)}" style="fill:none;stroke:var(--card);stroke-width:10;stroke-linecap:round;"/>'
                f'<path d="{_curva(ESTACOES[atual:])}" style="fill:none;stroke:var(--input);stroke-width:2.5;stroke-dasharray:1 7;stroke-linecap:round;"/>'
@@ -414,23 +426,24 @@ def _mapa_svg(k):
             # a bandeira do marco de nível, presa na estação
             no += (f'<g transform="translate({x + 14},{y + 6})"><path d="M0,0 V-22" style="stroke:var(--fgs);stroke-width:1.4;"/>'
                    f'<path d="M0,-22 h14 l-3.5,5 l3.5,5 h-14 z" style="fill:var(--accent);stroke:var(--fgs);stroke-width:1.1;stroke-linejoin:round;"/></g>')
-        cor = 'var(--fgs)' if estado != 'depois' else 'var(--mfg)'
+        cor = k['fgs'] if estado != 'depois' else k['mfg']
         sub = f'{T("nota")} {nota}' if nota else f'{mins} {T("min")}'
-        linhas = [(f'{T(tit)}', f'fill:{cor};font-family:{FONTE};font-size:12px;font-weight:{600 if estado == "agora" else 500};'),
-                  (sub, f'fill:var(--mfg);font-family:{MONO};font-size:10.5px;')]
+        linhas = [(f'{T(tit)}', f'color:{cor};font-size:12px;font-weight:{600 if estado == "agora" else 500};'),
+                  (sub, f'color:{k["mfg"]};font-family:{MONO};font-size:10.5px;')]
         if n in MARCOS:
-            linhas.append((T(MARCOS[n]), f'fill:var(--fgs);font-family:{FONTE};font-size:11px;font-weight:600;'))
+            linhas.append((T(MARCOS[n]), f'color:{k["fgs"]};font-size:11px;font-weight:600;'))
         base_y = y - 30 - 15 * (len(linhas) - 1) if cima else y + (46 if estado == 'agora' else 32)
-        # contorno da cor do cartão: o nome continua legível quando o caminho passa por baixo
-        halo = 'paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round;'
-        rot = ''.join(f'<text x="{x}" y="{base_y + 15 * i}" text-anchor="middle" style="{est}{halo}">{t}</text>' for i, (t, est) in enumerate(linhas))
-        nos += f'<g>{no}{rot}</g>'
+        # o halo da cor do cartão: o nome continua legível quando o caminho passa por baixo
+        for i, (t, est) in enumerate(linhas):
+            texto(x, base_y + 15 * i, t, est + halo)
+        nos += f'<g>{no}</g>'
     x, y = ESTACOES[atual]
     aqui = (f'<g transform="translate({x},{y - 44})"><rect x="-58" y="-26" width="116" height="24" rx="12" style="fill:var(--fgs);"/>'
-            f'<text x="0" y="-10" text-anchor="middle" style="fill:var(--bg);font-family:{FONTE};font-size:11.5px;font-weight:600;">{T("vcAqui")}</text>'
             f'<path d="M-6,-2 l6,7 l6,-7 z" style="fill:var(--fgs);"/></g>')
-    return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{T("mapa")}: 3/8">'
-            f'{fundo}{regioes}{caminho}{nos}{aqui}</svg>')
+    texto(x, y - 54, T('vcAqui'), f'color:{k["bg"]};font-size:11.5px;font-weight:600;')
+    return (f'<div style="position:relative;width:100%;aspect-ratio:{w} / {h};">'
+            f'<svg viewBox="0 0 {w} {h}" width="100%" height="100%" role="img" aria-label="{T("mapa")}: 3/8" style="position:absolute;inset:0;">'
+            f'{fundo}{regioes}{caminho}{nos}{aqui}</svg>{"".join(textos)}</div>')
 
 
 def tela_trilha_mapa(k, sufixo):
