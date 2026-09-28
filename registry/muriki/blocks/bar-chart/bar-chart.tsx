@@ -15,6 +15,10 @@
 //
 // Séries dividem UMA escala: não misture moedas. BRL e USD na mesma escala enganam; cada moeda vai
 // num gráfico, ou o card ganha um seletor de produto.
+//
+// Compacto (o celular): abaixo de 480px de largura o gráfico liga sozinho 3 degraus no eixo (0, meio
+// e teto) e os rótulos de baixo de 2 em 2, contados a partir do último, para o período em curso nunca
+// sumir. `yTicks` e `xTickEvery` mandam quando o app passa; `compact` força ou desliga.
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react"
 
 import { Skeleton } from "@/components/ui/skeleton"
@@ -47,6 +51,15 @@ export interface BarChartProps {
   loading?: boolean
   /** Altura do gráfico em px. */
   height?: number
+  /**
+   * Compacto: 3 degraus no eixo e os rótulos de 2 em 2. "auto" (padrão) liga abaixo de 480px de
+   * largura; true força, false desliga.
+   */
+  compact?: boolean | "auto"
+  /** Quantos degraus no eixo Y (0, meio e teto são 3). Ganha do compacto. */
+  yTicks?: number
+  /** Rótulo do eixo X de N em N, contando do último para trás. Ganha do compacto. */
+  xTickEvery?: number
   className?: string
 }
 
@@ -54,6 +67,7 @@ const CORES = ["var(--primary)", "var(--chart-1)", "var(--chart-3)"]
 const ESQ = 44 // espaço dos rótulos do eixo
 const TOPO = 22 // folga do rótulo do pico
 const RODAPE = 26 // os meses
+const LARGURA_COMPACTA = 480
 
 export function BarChart({
   labels,
@@ -65,6 +79,9 @@ export function BarChart({
   ariaLabel,
   loading = false,
   height = 230,
+  compact = "auto",
+  yTicks,
+  xTickEvery,
   className,
 }: BarChartProps) {
   const t = useTranslate()
@@ -112,7 +129,9 @@ export function BarChart({
       {comoTabela ? (
         <Tabela {...{ labels, series, formatValue, current, extra, ariaLabel }} />
       ) : (
-        <Grafico {...{ labels, series, cores, formatValue, formatTick, current, extra, ariaLabel, height }} />
+        <Grafico
+          {...{ labels, series, cores, formatValue, formatTick, current, extra, ariaLabel, height, compact, yTicks, xTickEvery }}
+        />
       )}
     </div>
   )
@@ -128,8 +147,11 @@ function Grafico({
   extra,
   ariaLabel,
   height,
+  compact,
+  yTicks,
+  xTickEvery,
 }: Required<Pick<BarChartProps, "labels" | "series" | "formatValue" | "formatTick" | "ariaLabel" | "height">> &
-  Pick<BarChartProps, "current" | "extra"> & { cores: string[] }) {
+  Pick<BarChartProps, "current" | "extra" | "compact" | "yTicks" | "xTickEvery"> & { cores: string[] }) {
   const t = useTranslate()
   const caixa = useRef<HTMLDivElement>(null)
   const botoes = useRef<(HTMLButtonElement | null)[]>([])
@@ -145,8 +167,14 @@ function Grafico({
     return () => ro.disconnect()
   }, [])
 
+  const compacto_ = compact === true || (compact === "auto" && largura < LARGURA_COMPACTA)
+  const degraus = yTicks ?? (compacto_ ? 3 : undefined)
+  const cada = Math.max(1, xTickEvery ?? (compacto_ ? 2 : 1))
+  // de N em N a partir do último: o período em curso (o mais recente) sempre tem rótulo
+  const rotulado = (i: number) => (labels.length - 1 - i) % cada === 0
+
   const todos = series.flatMap((s) => s.values)
-  const { piso, teto, passoGrade } = escala(Math.min(0, ...todos), Math.max(0, ...todos))
+  const { piso, teto, passoGrade } = escala(Math.min(0, ...todos), Math.max(0, ...todos), degraus)
   const base = height - RODAPE
   const y = (v: number) => TOPO + ((teto - v) / (teto - piso)) * (base - TOPO)
   const n = labels.length
@@ -236,7 +264,7 @@ function Grafico({
               textAnchor="middle"
               className={cn("font-mono text-[10.5px]", ativo === i ? "fill-foreground-strong" : "fill-muted-foreground")}
             >
-              {rotulo}
+              {rotulado(i) || ativo === i ? rotulo : null}
             </text>
           </g>
         ))}
@@ -415,11 +443,26 @@ function caminho(x: number, w: number, zero: number, ponta: number) {
 }
 
 /** Grade "redonda": passos de 1, 2, 2,5 ou 5 vezes uma potência de 10, uns cinco degraus. */
-function escala(min: number, max: number) {
+function escala(min: number, max: number, degraus?: number) {
+  if (degraus && degraus >= 2) return escalaFixa(min, max, degraus)
   const bruto = (max - min) / 5 || 1
   const pot = 10 ** Math.floor(Math.log10(bruto))
   const passoGrade = [1, 2, 2.5, 5, 10].map((m) => m * pot).find((p) => p >= bruto) ?? 10 * pot
   return { piso: Math.floor(min / passoGrade) * passoGrade, teto: Math.ceil(max / passoGrade) * passoGrade, passoGrade }
+}
+
+/** Exatamente N degraus redondos cobrindo [min, max]: o teto arredonda para cima. */
+function escalaFixa(min: number, max: number, degraus: number) {
+  const bruto = (max - min) / (degraus - 1) || 1
+  let pot = 10 ** Math.floor(Math.log10(bruto))
+  for (;;) {
+    for (const m of [1, 2, 2.5, 5]) {
+      const passoGrade = m * pot
+      const piso = Math.floor(min / passoGrade) * passoGrade
+      if (piso + passoGrade * (degraus - 1) >= max) return { piso, teto: piso + passoGrade * (degraus - 1), passoGrade }
+    }
+    pot *= 10
+  }
 }
 
 function compacto(v: number) {
