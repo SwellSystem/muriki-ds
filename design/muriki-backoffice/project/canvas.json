@@ -557,6 +557,38 @@
       "h": 1130,
       "title": "Celular · Planos: um cartão por plano · escuro",
       "is_interactive": true
+    },
+    "ClienteInativo.dc.html": {
+      "x": 7600,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · produto inativo: o motivo, quem e quando, e reativar",
+      "is_interactive": true
+    },
+    "ClienteInativoEscuro.dc.html": {
+      "x": 7600,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · produto inativo: o motivo, quem e quando, e reativar · escuro",
+      "is_interactive": true
+    },
+    "Reativar.dc.html": {
+      "x": 9120,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · reativar no alert-dialog: o que volta e o que não volta",
+      "is_interactive": true
+    },
+    "ReativarEscuro.dc.html": {
+      "x": 9120,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Clientes · reativar no alert-dialog: o que volta e o que não volta · escuro",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -586,7 +618,7 @@
     },
     "clientes": {
       "kind": "title1",
-      "maxW": 7520,
+      "maxW": 8000,
       "text": "Início, métricas e clientes: a lista é de um produto por vez; o detalhe tem um cartão por produto, e inativar é num produto só",
       "w": 240,
       "x": 0,
@@ -594,7 +626,7 @@
     },
     "clientesEscuro": {
       "kind": "title1",
-      "maxW": 7520,
+      "maxW": 8000,
       "text": "Início e clientes no tema escuro",
       "w": 240,
       "x": 0,
@@ -727,7 +759,11 @@
     "CupomMovel.dc.html",
     "CupomMovelEscuro.dc.html",
     "PlanosMovel.dc.html",
-    "PlanosMovelEscuro.dc.html"
+    "PlanosMovelEscuro.dc.html",
+    "ClienteInativo.dc.html",
+    "ClienteInativoEscuro.dc.html",
+    "Reativar.dc.html",
+    "ReativarEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"

@@ -648,7 +648,9 @@ def tela_clientes(k, hover=2, sobre=''):
              ('Status', 'esq', True), ('Último acesso', 'esq', True), ('Desde', 'esq', True), ('Total pago', 'dir', True), ('', 'dir', False)]
     linhas = ''
     for i, (ini, tom, nome, email, plano, status, acesso, desde, pago) in enumerate(CLIENTES):
-        inativo = status == 'Inativo'
+        # inativo no produto é acesso, não cobrança: o selo vermelho vem em cima e o billingState fica
+        # embaixo, em texto; a linha esmaece e o menu troca Inativar por Reativar
+        inativo = ini in INATIVOS_NO_PRODUTO
         cor = k['mfg'] if inativo else k['fgs']
         # os atalhos da linha: ver, pagamentos e, no menu, o que tira acesso (o row-actions manda o destrutivo para o overflow)
         itens = [('olho', 'Ver cliente', href('ClienteDetalhe'), False), ('lista', 'Ver pagamentos', href('ClienteDetalhe'), False)]
@@ -661,7 +663,8 @@ def tela_clientes(k, hover=2, sobre=''):
             f'<span style="font-size:13.5px;font-weight:500;color:{cor};">{nome}</span>'
             f'<span style="font-size:12px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{email}</span></span></a>',
             f'<span style="font-size:13px;color:{k["fg"]};">{plano}</span>',
-            selo_status(k, status),
+            (f'<span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">{selo_status(k, "Inativo")}'
+             f'<span style="font-size:11.5px;color:{k["mfg"]};">{status.lower()}</span></span>' if inativo else selo_status(k, status)),
             f'<span style="font-size:13px;color:{k["mfg"]};">{acesso}</span>',
             f'<span style="font-size:13px;color:{k["mfg"]};">{desde}</span>',
             f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"] if pago else k["mfg"]};text-align:right;">{brl(pago) if pago else "—"}</span>',
@@ -691,6 +694,10 @@ PAGAMENTOS = [
 COLS_PAGAMENTOS = '120px 150px minmax(0,1fr) 110px 120px 90px'
 
 
+# quem está inativo no produto selecionado da lista (o acesso é por produto; a cobrança segue à parte)
+INATIVOS_NO_PRODUTO = {'JL'}
+
+
 def selo_produto(k, nome):
     # identidade, não estado: neutro e em mono, para não disputar com a cor do status
     return badge(nome, k, 'gray', mono=True)
@@ -708,28 +715,73 @@ def _cartao_produto(k, produto, plano, status, linhas, acao):
             f'<div style="display:flex;justify-content:flex-end;">{acao}</div></section>')
 
 
+def _cartao_produto_inativo(k, produto, plano, linhas, motivo, quem, quando, nota):
+    # O produto inativado: o selo vermelho, o corpo esmaecido (o acesso está bloqueado, os fatos seguem
+    # valendo), a faixa com o motivo, quem e quando (e a nota, se houver) e Reativar no lugar de Inativar
+    dl = ''.join(f'<div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;box-shadow:inset 0 -1px 0 {k["muted"]};font-size:13px;">'
+                 f'<span style="color:{k["mfg"]};">{r}</span><span style="color:{k["fgs"]};text-align:right;">{v}</span></div>' for r, v in linhas)
+    curto = produto.replace('Muriki ', '')
+    faixa = (f'<div style="display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:9px;'
+             f'background:color-mix(in oklch, {k["bad"]} 8%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklch, {k["bad"]} 22%, transparent);">'
+             f'<span style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:{k["fgs"]};">'
+             f'<span style="display:flex;color:{k["bad"]};">{ic("bloqueio", 14)}</span>{motivo}</span>'
+             f'<span style="font-size:12.5px;color:{k["mfg"]};">Inativada por {quem} em {quando}. O acesso ao {curto} está bloqueado; '
+             f'a sessão e o outro produto seguem.</span>'
+             + (f'<span style="font-size:12.5px;line-height:18px;color:{k["fg"]};">“{nota}”</span>' if nota else '') + '</div>')
+    acao = (f'<a href="{href("Reativar")}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;'
+            f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["fgs"]};font-size:13px;font-weight:500;">'
+            f'{ic("chave", 14)}Reativar no {curto}</a>')
+    return (f'<section aria-label="{produto}, inativo" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};'
+            f'padding:16px 20px;display:flex;flex-direction:column;gap:12px;">'
+            f'<div style="display:flex;align-items:center;gap:8px;">{selo_produto(k, produto)}<span style="flex:1;"></span>{selo_status(k, "Inativo")}</div>'
+            f'<div style="display:flex;flex-direction:column;gap:12px;opacity:0.55;">'
+            f'<div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:20px;font-weight:600;color:{k["fgs"]};">{plano[0]}</span>'
+            f'<span style="font-size:13px;color:{k["mfg"]};">{plano[1]}</span></div>'
+            f'<div style="display:flex;flex-direction:column;">{dl}</div></div>'
+            f'{faixa}<div style="display:flex;justify-content:flex-end;">{acao}</div></section>')
+
+
 def _inativar_link(k, produto):
     return (f'<a href="{href("Inativar")}" style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:8px;'
             f'box-shadow:inset 0 0 0 1px {k["input"]};background:{k["card"]};color:{k["bad"]};font-size:13px;font-weight:500;">'
             f'{ic("bloqueio", 14)}Inativar no {produto.replace("Muriki ", "")}</a>')
 
 
-def tela_cliente_detalhe(k, sobre=''):
-    cab = cabecalho(k, 'Marina Costa', f'<span style="font-family:{MONO};">m***@costa.dev</span> · cliente desde março de 2026 · último acesso há 2 h',
+HISTORICO_INATIVO = [
+    # quando, evento, detalhe, quem, ícone, cor
+    ('20 set 2026, 14:32', 'Inativada no Muriki Platform', 'Motivo: chargeback · “Contestou a cobrança de agosto no cartão.”', 'Ana Lima · admin', 'bloqueio', 'bad'),
+    ('12 set 2026, 09:10', 'Pagamento aprovado no Muriki Code', 'Pro mensal · R$ 49,00', 'Stripe', 'check', 'ok'),
+    ('4 ago 2026, 08:02', 'Pagamento aprovado no Muriki Platform', 'Pro mensal · R$ 49,00 · 2ª tentativa', 'Stripe', 'check', 'ok'),
+    ('3 ago 2026, 08:00', 'Pagamento falhou no Muriki Platform', 'Cartão recusado; nova tentativa no dia seguinte', 'Stripe', 'aviso', 'warn'),
+    ('12 jul 2026, 18:40', 'Cupom BEMVINDO20 aplicado', 'Muriki Code · 20% por 3 meses', 'Marina Costa', 'cupom', 'mfg'),
+]
+
+
+def tela_cliente_detalhe(k, sobre='', inativo=False):
+    # inativo: o mesmo detalhe com o Platform inativado — o cartão muda, o cabeçalho ganha o selo e a
+    # aba aberta é o Histórico, com a inativação em cima
+    titulo = ('Marina Costa' + (f'<span style="margin-left:12px;align-self:center;display:flex;">{badge("inativa no Platform", k, "red", ponto=True)}</span>'
+                                if inativo else ''))
+    cab = cabecalho(k, titulo, f'<span style="font-family:{MONO};">m***@costa.dev</span> · cliente desde março de 2026 · último acesso há 2 h',
                     trilha=[('Clientes', 'Clientes'), ('Marina Costa', 'ClienteDetalhe')],
                     direita=link_botao(k, 'Copiar ID', '#', 'ghost', 32, 'copiar'))
     code = _cartao_produto(k, 'Muriki Code', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
         ('Próxima cobrança', '12 de outubro'), ('Último pagamento', '12 de setembro · R$ 49,00'),
         ('Desde', 'março de 2026')], _inativar_link(k, 'Muriki Code'))
-    plat = _cartao_produto(k, 'Muriki Platform', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
-        ('Próxima cobrança', '3 de outubro'), ('Último pagamento', '4 de agosto · R$ 49,00 (2ª tentativa)'),
-        ('Desde', 'abril de 2026')], _inativar_link(k, 'Muriki Platform'))
+    if inativo:
+        plat = _cartao_produto_inativo(k, 'Muriki Platform', ('Pro', 'mensal · R$ 49,00'), [
+            ('Assinatura', 'segue; cancelar é à parte'), ('Próxima cobrança', '3 de outubro'), ('Desde', 'abril de 2026')],
+            'Chargeback', 'Ana Lima', '20 de setembro, 14:32', 'Contestou a cobrança de agosto no cartão.')
+    else:
+        plat = _cartao_produto(k, 'Muriki Platform', ('Pro', 'mensal · R$ 49,00'), 'Ativo', [
+            ('Próxima cobrança', '3 de outubro'), ('Último pagamento', '4 de agosto · R$ 49,00 (2ª tentativa)'),
+            ('Desde', 'abril de 2026')], _inativar_link(k, 'Muriki Platform'))
     abas = ''.join(
         f'<button type="button" role="tab" aria-selected="{"true" if at else "false"}" style="display:flex;align-items:center;gap:6px;height:36px;'
         f'padding:0 2px;border:0;background:transparent;font-family:{FONTE};font-size:13px;cursor:pointer;'
         + (f'color:{k["fgs"]};font-weight:500;box-shadow:inset 0 -2px 0 {k["pri"]};' if at else f'color:{k["mfg"]};')
         + f'">{n}<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{c}</span></button>'
-        for n, c, at in [('Pagamentos', '14', True), ('Histórico', '23', False)])
+        for n, c, at in [('Pagamentos', '14', not inativo), ('Histórico', '24' if inativo else '23', inativo)])
     abas = f'<div role="tablist" aria-label="Detalhe do cliente" style="display:flex;gap:20px;box-shadow:inset 0 -1px 0 {k["muted"]};">{abas}</div>'
     cab_t = [('Data', 'esq', True), ('Produto', 'esq', False), ('Descrição', 'esq', False), ('Valor', 'dir', True),
              ('Status', 'esq', False), ('Recibo', 'dir', False)]
@@ -745,6 +797,18 @@ def tela_cliente_detalhe(k, sobre=''):
     t = tabela(k, COLS_PAGAMENTOS, cab_t, linhas, paginacao(k, 1))
     nota = (f'<p style="margin:-6px 0 0;font-size:12px;color:{k["mfg"]};">Os pagamentos aparecem daqui para frente, conforme o Stripe avisa. '
             f'Os anteriores ficam no Stripe.</p>')
+    if inativo:
+        eventos = ''.join(
+            f'<div style="display:grid;grid-template-columns:150px 28px minmax(0,1fr) 160px;gap:12px;align-items:start;padding:12px 18px;'
+            f'box-shadow:inset 0 -1px 0 {k["muted"]};{"background:color-mix(in oklch, " + k["bad"] + " 4%, transparent);" if n == 0 else ""}">'
+            f'<span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};padding-top:2px;">{q}</span>'
+            f'<span style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;background:{k["sunken"]};color:{k[cor]};">{ic(i_, 13)}</span>'
+            f'<span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:13.5px;font-weight:500;color:{k["fgs"]};">{ev}</span>'
+            f'<span style="font-size:12.5px;color:{k["mfg"]};">{det}</span></span>'
+            f'<span style="font-size:12.5px;color:{k["mfg"]};text-align:right;padding-top:2px;">{quem}</span></div>'
+            for n, (q, ev, det, quem, i_, cor) in enumerate(HISTORICO_INATIVO))
+        t = f'<section aria-label="Histórico" style="background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">{eventos}</section>'
+        nota = f'<p style="margin:-6px 0 0;font-size:12px;color:{k["mfg"]};">Inativar e reativar também ficam na auditoria da equipe, com o step-up de quem fez.</p>'
     corpo = (cab + f'<div style="display:flex;gap:16px;">{code}{plat}</div>' + abas + nota + t)
     return app(k, 'clientes', corpo, sobre=sobre, gap=16)
 
@@ -765,6 +829,24 @@ def tela_inativar(k):
                'A partir de agora ela não usa o Platform até alguém reativar. Ela continua conectada, e o Muriki Code '
                'segue normal. A assinatura do Platform continua, a menos que você marque abaixo.', corpo, rodape, icone='bloqueio')
     return tela_cliente_detalhe(k, sobre=a)
+
+
+def tela_reativar(k):
+    # reativar devolve o acesso ao produto e só isso: sem motivo obrigatório (a nota é opcional) e sem
+    # mexer na cobrança — se a assinatura foi cancelada à parte, continua cancelada
+    corpo = (f'<div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:10px;background:{k["sunken"]};font-size:13px;line-height:19px;">'
+             f'<span style="display:flex;gap:8px;color:{k["fg"]};"><span style="display:flex;margin-top:2px;color:{k["ok"]};">{ic("check", 14)}</span>'
+             f'<span><b style="font-weight:600;">Volta:</b> o acesso ao Platform, na hora, com o que ela tinha antes.</span></span>'
+             f'<span style="display:flex;gap:8px;color:{k["fg"]};"><span style="display:flex;margin-top:2px;color:{k["mfg"]};">{ic("x", 14)}</span>'
+             f'<span><b style="font-weight:600;">Não volta:</b> a assinatura, se foi cancelada à parte. Aí ela assina de novo pelo app.</span></span></div>'
+             + campo(k, 'Nota', '', ph='Por que reativou, para quem ler depois', id_='nota',
+                     extra_rotulo=f'<span style="font-size:12px;color:{k["mfg"]};">opcional</span>', dica='Fica no histórico do cliente.'))
+    rodape = (link_botao(k, 'Cancelar', href('ClienteInativo'), 'outline', 36)
+              + link_botao(k, 'Reativar no Platform', href('ClienteDetalhe'), 'solid', 36))
+    a = alerta(k, 'Reativar Marina Costa no Muriki Platform?',
+               'Ela foi inativada em 20 de setembro por chargeback, por Ana Lima. Reativar fica no histórico e na auditoria.',
+               corpo, rodape, icone='chave')
+    return tela_cliente_detalhe(k, sobre=a, inativo=True)
 
 
 # ── Planos e features ──────────────────────────────────────────────────
@@ -1588,6 +1670,10 @@ def _montar(tela, tema):
         return pagina(t, tela_clientes(k), tema)
     if i == 'cliente':
         return pagina(t, tela_cliente_detalhe(k), tema)
+    if i == 'cliente_inativo':
+        return pagina(t, tela_cliente_detalhe(k, inativo=True), tema)
+    if i == 'reativar':
+        return pagina(t, tela_reativar(k), tema)
     if i == 'inativar':
         return pagina(t, tela_inativar(k), tema)
     if i == 'planos':
