@@ -64,7 +64,7 @@ export function ResourceFilterChip(props: ResourceFilterChipProps) {
         data-slot="resource-filter-chip"
         data-active={ativo || undefined}
         className={cn(
-          "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] border border-dashed border-input bg-transparent px-2.5 text-[13px] text-muted-foreground outline-none transition-colors",
+          "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-[8px] border border-dashed max-md:h-10 max-md:rounded-[10px] border-input bg-transparent px-2.5 text-[13px] text-muted-foreground outline-none transition-colors",
           "hover:bg-secondary focus-visible:ring-[3px] focus-visible:ring-ring/40 data-[popup-open]:bg-secondary",
           "data-active:border-solid data-active:bg-field",
           className

@@ -105,9 +105,19 @@ export function BarChart({
   }
 
   const cores = series.map((s, i) => s.color ?? CORES[i % CORES.length])
+  // No compacto (o próprio gráfico com menos de 480px, ou compact) o "Ver como tabela" desce para
+  // baixo, à esquerda, e a legenda fica sozinha na linha de cima. A troca é por container query,
+  // então segue a largura sem esperar a medida do ResizeObserver.
+  const noTopo = compact === true ? "hidden" : compact === false ? undefined : "@max-[479px]/grafico:hidden"
+  const embaixo = compact === true ? undefined : compact === false ? "hidden" : "hidden @max-[479px]/grafico:inline-flex"
+  const alternar = () => setComoTabela((v) => !v)
+  const textoAlternar = comoTabela ? t("bar_chart.as_chart") : t("bar_chart.as_table")
+  const estiloAlternar =
+    "rounded-[6px] px-1.5 text-[12px] font-medium text-primary underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/40"
+
   return (
-    <div className={cn("flex min-w-0 flex-col gap-3", className)}>
-      <div className="flex min-h-6 items-center gap-4">
+    <div className={cn("@container/grafico flex min-w-0 flex-col gap-3", className)}>
+      <div className={cn("flex min-h-6 items-center gap-4", series.length > 1 ? null : noTopo)}>
         {series.length > 1 ? (
           <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-muted-foreground">
             {series.map((s, i) => (
@@ -118,12 +128,8 @@ export function BarChart({
             ))}
           </ul>
         ) : null}
-        <button
-          type="button"
-          onClick={() => setComoTabela((v) => !v)}
-          className="ml-auto rounded-[6px] px-1.5 text-[12px] font-medium text-primary underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/40"
-        >
-          {comoTabela ? t("bar_chart.as_chart") : t("bar_chart.as_table")}
+        <button type="button" onClick={alternar} className={cn(estiloAlternar, "ml-auto", noTopo)}>
+          {textoAlternar}
         </button>
       </div>
       {comoTabela ? (
@@ -133,6 +139,9 @@ export function BarChart({
           {...{ labels, series, cores, formatValue, formatTick, current, extra, ariaLabel, height, compact, yTicks, xTickEvery }}
         />
       )}
+      <button type="button" onClick={alternar} className={cn(estiloAlternar, "-ml-1.5 self-start", embaixo)}>
+        {textoAlternar}
+      </button>
     </div>
   )
 }

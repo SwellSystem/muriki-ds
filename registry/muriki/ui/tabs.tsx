@@ -67,7 +67,7 @@ const tabsListVariants = cva(
          * gatilho, e o pseudo-elemento do pai pintaria por cima dele.
          */
         line: [
-          "relative gap-4",
+          "relative gap-4 max-md:group-data-[orientation=horizontal]/tabs:gap-3.5",
           "before:pointer-events-none before:absolute before:bg-divider",
           "group-data-[orientation=horizontal]/tabs:before:inset-x-0 group-data-[orientation=horizontal]/tabs:before:bottom-0 group-data-[orientation=horizontal]/tabs:before:h-px",
           "group-data-[orientation=horizontal]/tabs:before:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]",
@@ -112,12 +112,16 @@ function TabsTrigger({ className, ...props }: TabsPrimitive.Tab.Props) {
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // line: o filete da ativa cobre a linha do trilho, por cima
         "group-data-[variant=line]/tabs-list:h-9 group-data-[variant=line]/tabs-list:rounded-t-[8px] group-data-[variant=line]/tabs-list:px-0.5",
+        // no celular (tela estreita ou ponteiro grosso) o gatilho sobe para 40px, o alvo de toque
+        "max-md:group-data-[variant=line]/tabs-list:h-10 pointer-coarse:group-data-[variant=line]/tabs-list:h-10",
         "group-data-[variant=line]/tabs-list:after:absolute group-data-[variant=line]/tabs-list:after:bg-primary group-data-[variant=line]/tabs-list:after:opacity-0",
         "group-data-[variant=line]/tabs-list:group-data-[orientation=horizontal]/tabs:after:inset-x-0 group-data-[variant=line]/tabs-list:group-data-[orientation=horizontal]/tabs:after:-bottom-px group-data-[variant=line]/tabs-list:group-data-[orientation=horizontal]/tabs:after:h-0.5",
         "group-data-[variant=line]/tabs-list:group-data-[orientation=vertical]/tabs:after:inset-y-0 group-data-[variant=line]/tabs-list:group-data-[orientation=vertical]/tabs:after:-right-px group-data-[variant=line]/tabs-list:group-data-[orientation=vertical]/tabs:after:w-0.5",
         "group-data-[variant=line]/tabs-list:data-active:after:opacity-100",
         // enclosed: a ativa é a peça elevada dentro do trilho
         "group-data-[variant=enclosed]/tabs-list:h-7 group-data-[variant=enclosed]/tabs-list:rounded-[7px] group-data-[variant=enclosed]/tabs-list:px-3",
+        // no encaixe, 34px dentro do trilho de 3px: 40 no total
+        "max-md:group-data-[variant=enclosed]/tabs-list:h-[34px] pointer-coarse:group-data-[variant=enclosed]/tabs-list:h-[34px]",
         "group-data-[variant=enclosed]/tabs-list:data-active:bg-card",
         "group-data-[variant=enclosed]/tabs-list:data-active:shadow-[0_1px_2px_rgba(0,0,0,0.12),inset_0_0_0_1px_var(--input)]",
         className

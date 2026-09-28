@@ -103,13 +103,15 @@ export function ResourceToolbar({
               value={search ?? ""}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={ph}
-              className="pl-8"
+              // no celular, 40px e texto de 16px: o iOS não dá zoom ao focar
+              className="pl-8 max-md:h-10 max-md:rounded-[10px] max-md:text-base"
             />
           </label>
         ) : null}
         {filters ? (
           // no celular os chips rolam numa linha só, abaixo da busca
-          <div className="muriki-scroll-x flex max-w-full items-center gap-2 overflow-x-auto max-sm:w-full [&>*]:shrink-0">
+          // o p-1 com -m-1 dá lugar ao anel de foco (3px) e à sombra do ViewToggle, que o overflow cortava
+          <div className="muriki-scroll-x -m-1 flex max-w-full items-center gap-2 overflow-x-auto p-1 max-sm:w-full [&>*]:shrink-0">
             {filters}
           </div>
         ) : null}
@@ -183,7 +185,8 @@ function AbasRolaveis({ ativa, children }: { ativa: string; children: React.Reac
       ref={ref}
       onScroll={medir}
       data-slot="resource-tabs-scroll"
-      className="muriki-scroll-x -mb-px max-w-full overflow-x-auto pb-px"
+      // padding com margem negativa igual: o anel de foco da aba (3px) cabe sem mudar o alinhamento
+      className="muriki-scroll-x -mx-1 -mt-1 -mb-1 max-w-full overflow-x-auto px-1 pt-1 pb-1"
       style={mascara ? { maskImage: mascara, WebkitMaskImage: mascara } : undefined}
     >
       {children}

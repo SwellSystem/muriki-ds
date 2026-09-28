@@ -71,9 +71,14 @@ export function MetricCard({
     </>
   ) : (
     <>
-      <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-medium text-muted-foreground max-sm:text-[12.5px]">
-        <span className="truncate">{label}</span>
-        {live ? <SeloAgora interativo={!link} /> : null}
+      {/* o rótulo trunca e o selo e a seta ficam sempre na linha; só o compacto do celular quebra */}
+      <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-muted-foreground max-sm:flex-wrap max-sm:gap-y-1 max-sm:text-[12.5px]">
+        <span className="min-w-0 truncate">{label}</span>
+        {live ? (
+          <span className="flex shrink-0">
+            <SeloAgora interativo={!link} />
+          </span>
+        ) : null}
         {link ? <CaretRightIcon aria-hidden className="ml-auto size-3.5 shrink-0" /> : null}
       </span>
       <span className="text-[28px] leading-[34px] font-semibold tracking-[-0.02em] text-foreground-strong tabular-nums max-sm:text-[22px] max-sm:leading-7">

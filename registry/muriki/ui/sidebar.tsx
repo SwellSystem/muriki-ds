@@ -813,7 +813,7 @@ const sidebarMenuButtonVariants = cva(
       },
       size: {
         /** 36px, raio 9 — o `lg` da casa. Item de nav é alvo frequente. */
-        default: "h-9",
+        default: "h-9 in-data-[mobile=true]:h-11",
         /** 28px, raio 7 — o `sm` da casa. */
         sm: "h-7 rounded-[7px] text-[12.5px]",
         /**
