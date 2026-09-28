@@ -470,6 +470,9 @@ const STRINGS: Record<string, unknown> = {
   app_shell: {
     soon: "em breve",
     sign_out: "Sair da conta",
+    sign_out_short: "Sair",
+    open_menu: "Abrir o menu",
+    close_menu: "Fechar o menu",
   },
   sidebar: {
     collapse: "Recolher menu",

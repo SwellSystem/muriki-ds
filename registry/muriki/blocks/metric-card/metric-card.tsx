@@ -57,6 +57,8 @@ export function MetricCard({
   const link = Boolean(render || href)
   const classe = cn(
     "flex min-w-0 flex-col gap-1.5 rounded-xl bg-card px-5 py-4 shadow-sm",
+    // no celular, dois por linha: o cartão fica compacto
+    "max-sm:gap-1 max-sm:px-3.5 max-sm:py-3",
     link && "outline-none transition-shadow hover:shadow-md focus-visible:ring-[3px] focus-visible:ring-ring/40",
     className
   )
@@ -69,16 +71,16 @@ export function MetricCard({
     </>
   ) : (
     <>
-      <span className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-muted-foreground">
+      <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[13px] font-medium text-muted-foreground max-sm:text-[12.5px]">
         <span className="truncate">{label}</span>
         {live ? <SeloAgora interativo={!link} /> : null}
         {link ? <CaretRightIcon aria-hidden className="ml-auto size-3.5 shrink-0" /> : null}
       </span>
-      <span className="text-[28px] leading-[34px] font-semibold tracking-[-0.02em] text-foreground-strong tabular-nums">
+      <span className="text-[28px] leading-[34px] font-semibold tracking-[-0.02em] text-foreground-strong tabular-nums max-sm:text-[22px] max-sm:leading-7">
         {value}
       </span>
       {trend || detail ? (
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12.5px] text-muted-foreground">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[12.5px] text-muted-foreground max-sm:text-[12px]">
           {trend ? <Variacao trend={trend} /> : null}
           {detail}
         </span>
@@ -126,7 +128,7 @@ function SeloAgora({ interativo }: { interativo: boolean }) {
   )
 }
 
-/** A fileira de cartões: um por linha no celular, dois no tablet, quatro no desktop. */
+/** A fileira de cartões: dois por linha no celular (compactos) e no tablet, quatro no desktop. */
 export function MetricGrid({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("grid gap-4 sm:grid-cols-2 xl:grid-cols-4", className)}>{children}</div>
+  return <div className={cn("grid grid-cols-2 gap-2.5 sm:gap-4 xl:grid-cols-4", className)}>{children}</div>
 }
