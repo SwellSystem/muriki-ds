@@ -125,7 +125,8 @@ def tela_trilha(k, sufixo):
                   + '</div>')
         passos += (f'<div style="display:flex;gap:14px;"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;">{bola}{fio}</div>'
                    f'{corpo_}</div>')
-    caminho = cartao(f'{rotulo(T("mapa"), k["mfg"])}<div style="display:flex;flex-direction:column;">{passos}</div>',
+    caminho = cartao(f'<div style="display:flex;align-items:center;">{rotulo(T("mapa"), k["mfg"])}<span style="margin-left:auto;">{_vista(k, sufixo, "lista")}</span></div>'
+                     f'<div style="display:flex;flex-direction:column;">{passos}</div>',
                      k, pad='20px 24px', extra='flex:1.7;min-width:0;gap:16px;')
 
     linha_nivel = lambda rot, n, extra='': (f'<div style="display:flex;align-items:center;gap:10px;">'
@@ -270,3 +271,232 @@ def tela_peer_web(k, sufixo):
                  f'<a href="Conectar{sufixo}.dc.html" style="font-size:12.5px;">{T("gerenciar")}</a></div>', k, pad='14px 18px')
     lado = f'<div style="width:290px;flex:0 0 290px;display:flex;flex-direction:column;gap:14px;">{onde}{uso}{ide}</div>'
     return app(k, 'peer', cab + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{conversas}{conversa}{lado}</div>', gap=20)
+
+
+def _lado_trilha(k):
+    # o nível na competência e o que a trilha conta: o mesmo lado no mapa e na lista
+    linha_nivel = lambda rot, n, extra='': (f'<div style="display:flex;align-items:center;gap:10px;">'
+                                            f'<span style="width:84px;font-size:12.5px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 18)}'
+                                            f'<span style="font-size:12.5px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
+    nivel = cartao(f'{rotulo(T("seuNivel"), k["mfg"])}'
+                   + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                   + f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("nivelTxt")}</p>',
+                   k, pad='18px 22px', extra='gap:12px;')
+    conta_ = cartao(f'{rotulo(T("conta"), k["mfg"])}'
+                    f'<div style="display:flex;gap:6px;">{badge("Testing", k, "blue")}{badge("Debugging", k)}</div>'
+                    f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("contaTxt")}</p>',
+                    k, pad='18px 22px', extra='gap:12px;')
+    return nivel, conta_
+
+
+def _vista(k, sufixo, atual):
+    # Mapa | Lista: o mapa é a visão principal; a lista é o mesmo caminho em linha
+    op = lambda chave, destino: (f'<a href="{destino}" style="display:inline-flex;align-items:center;height:26px;padding:0 12px;border-radius:999px;'
+                                 f'font-size:12px;font-weight:500;'
+                                 + (f'background:{k["card"]};color:{k["pri"]};box-shadow:0 1px 2px rgba(0,0,0,0.12), inset 0 0 0 1px {k["input"]};'
+                                    if atual == chave else f'color:{k["mfg"]};')
+                                 + f'">{T("vMapa" if chave == "mapa" else "vLista")}</a>')
+    return (f'<span role="navigation" style="display:inline-flex;padding:2px;border-radius:999px;background:{k["sunken"]};'
+            f'box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">'
+            + op('mapa', f'Trilha{sufixo}.dc.html') + op('lista', f'TrilhaLista{sufixo}.dc.html') + '</span>')
+
+
+# as estações do mapa num quadro de 1100 × 360: da esquerda para a direita, subindo e descendo como
+# uma trilha; os nomes se alternam em duas alturas para não se encostarem
+ESTACOES = [(80, 250), (210, 140), (345, 250), (480, 180), (620, 250), (755, 140), (880, 250), (990, 140)]
+ROTULO_EM_CIMA = [False, True, False, False, False, True, False, True]
+REGIOES = [('r1', 210, 205, 400, 280), ('r2', 618, 205, 400, 280), ('r3', 950, 205, 250, 280)]
+MARCOS = {5: 'marcoPleno', 7: 'marcoSenior'}
+
+
+def _curva(ps):
+    d = f'M{ps[0][0]:.1f},{ps[0][1]:.1f}'
+    for a in range(len(ps) - 1):
+        p0 = ps[a - 1] if a > 0 else ps[a]
+        p1, p2 = ps[a], ps[a + 1]
+        p3 = ps[a + 2] if a + 2 < len(ps) else p2
+        c1 = (p1[0] + (p2[0] - p0[0]) / 5, p1[1] + (p2[1] - p0[1]) / 5)
+        c2 = (p2[0] - (p3[0] - p1[0]) / 5, p2[1] - (p3[1] - p1[1]) / 5)
+        d += f' C{c1[0]:.1f},{c1[1]:.1f} {c2[0]:.1f},{c2[1]:.1f} {p2[0]:.1f},{p2[1]:.1f}'
+    return d
+
+
+def _mapa_svg(k):
+    # Um mapa de trilha, parado: três regiões em tom de fundo (os módulos), curvas de nível ao fundo, o
+    # caminho feito cheio e o que falta pontilhado, as estações (feitas com o check, a de agora com o
+    # halo e o "você está aqui", as próximas vazadas) e a bandeira amarela nos marcos de nível.
+    w, h = 1100, 360
+    fundo = ''.join(f'<path d="M-20,{y} C220,{y - 40} 420,{y + 45} 640,{y - 10} S980,{y - 45} 1120,{y - 15}" '
+                    f'style="fill:none;stroke:var(--muted);stroke-width:1;opacity:0.8;"/>' for y in (40, 110, 180, 250, 320))
+    regioes = ''
+    for chave, cx, cy, rw, rh in REGIOES:
+        # o nome da região fica embaixo, à esquerda, longe dos nomes das estações
+        regioes += (f'<rect x="{cx - rw / 2}" y="{cy - rh / 2}" width="{rw}" height="{rh}" rx="40" style="fill:color-mix(in oklch, var(--pri) 5%, transparent);'
+                    f'stroke:color-mix(in oklch, var(--pri) 20%, transparent);stroke-dasharray:2 6;"/>'
+                    f'<text x="{cx - rw / 2 + 24}" y="{cy + rh / 2 - 16}" style="fill:var(--mfg);font-family:{MONO};font-size:10px;'
+                    f'letter-spacing:0.18em;text-transform:uppercase;">{T(chave)}</text>')
+    atual = 3
+    caminho = (f'<path d="{_curva(ESTACOES)}" style="fill:none;stroke:var(--card);stroke-width:10;stroke-linecap:round;"/>'
+               f'<path d="{_curva(ESTACOES[atual:])}" style="fill:none;stroke:var(--input);stroke-width:2.5;stroke-dasharray:1 7;stroke-linecap:round;"/>'
+               f'<path d="{_curva(ESTACOES[:atual + 1])}" style="fill:none;stroke:var(--pri);stroke-width:3;stroke-linecap:round;"/>')
+    nos = ''
+    for n, ((x, y), (tit, tipo, mins, estado, nota), cima) in enumerate(zip(ESTACOES, ETAPAS, ROTULO_EM_CIMA)):
+        if estado == 'feita':
+            no = (f'<circle cx="{x}" cy="{y}" r="13" style="fill:var(--pri);"/>'
+                  f'<path d="M{x - 5},{y} l3.5,3.5 l6.5,-7" style="fill:none;stroke:var(--prifg);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"/>')
+        elif estado == 'agora':
+            no = (f'<circle cx="{x}" cy="{y}" r="30" style="fill:color-mix(in oklch, var(--pri) 9%, transparent);"/>'
+                  f'<circle cx="{x}" cy="{y}" r="21" style="fill:color-mix(in oklch, var(--pri) 15%, transparent);"/>'
+                  f'<circle cx="{x}" cy="{y}" r="14" style="fill:var(--card);stroke:var(--pri);stroke-width:3;"/>'
+                  f'<text x="{x}" y="{y + 4}" text-anchor="middle" style="fill:var(--pri);font-family:{MONO};font-size:11px;font-weight:600;">{n + 1}</text>')
+        else:
+            no = (f'<circle cx="{x}" cy="{y}" r="11" style="fill:var(--card);stroke:var(--input);stroke-width:1.5;"/>'
+                  f'<text x="{x}" y="{y + 4}" text-anchor="middle" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">{n + 1}</text>')
+        if n in MARCOS:
+            # a bandeira do marco de nível, presa na estação
+            no += (f'<g transform="translate({x + 14},{y + 6})"><path d="M0,0 V-22" style="stroke:var(--fgs);stroke-width:1.4;"/>'
+                   f'<path d="M0,-22 h14 l-3.5,5 l3.5,5 h-14 z" style="fill:var(--accent);stroke:var(--fgs);stroke-width:1.1;stroke-linejoin:round;"/></g>')
+        cor = 'var(--fgs)' if estado != 'depois' else 'var(--mfg)'
+        sub = f'{T("nota")} {nota}' if nota else f'{mins} {T("min")}'
+        linhas = [(f'{T(tit)}', f'fill:{cor};font-family:{FONTE};font-size:12px;font-weight:{600 if estado == "agora" else 500};'),
+                  (sub, f'fill:var(--mfg);font-family:{MONO};font-size:10.5px;')]
+        if n in MARCOS:
+            linhas.append((T(MARCOS[n]), f'fill:var(--fgs);font-family:{FONTE};font-size:11px;font-weight:600;'))
+        base_y = y - 30 - 15 * (len(linhas) - 1) if cima else y + (46 if estado == 'agora' else 32)
+        # contorno da cor do cartão: o nome continua legível quando o caminho passa por baixo
+        halo = 'paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round;'
+        rot = ''.join(f'<text x="{x}" y="{base_y + 15 * i}" text-anchor="middle" style="{est}{halo}">{t}</text>' for i, (t, est) in enumerate(linhas))
+        nos += f'<g>{no}{rot}</g>'
+    x, y = ESTACOES[atual]
+    aqui = (f'<g transform="translate({x},{y - 44})"><rect x="-58" y="-26" width="116" height="24" rx="12" style="fill:var(--fgs);"/>'
+            f'<text x="0" y="-10" text-anchor="middle" style="fill:var(--bg);font-family:{FONTE};font-size:11.5px;font-weight:600;">{T("vcAqui")}</text>'
+            f'<path d="M-6,-2 l6,7 l6,-7 z" style="fill:var(--fgs);"/></g>')
+    return (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{T("mapa")}: 3/8">'
+            f'{fundo}{regioes}{caminho}{nos}{aqui}</svg>')
+
+
+def tela_trilha_mapa(k, sufixo):
+    cab = cabecalho(k, [(T('tTitulo'), f'Trilhas{sufixo}.dc.html'), (T('dTitulo'), '')], T('dTitulo'), T('dSub'),
+                    direita=botao(T('sair'), k, 'ghost', 32))
+    mapa = cartao(f'<div style="display:flex;align-items:center;">{rotulo(T("mapa"), k["mfg"])}<span style="margin-left:auto;">{_vista(k, sufixo, "mapa")}</span></div>'
+                  f'<div style="margin:0 -6px;">{_mapa_svg(k)}</div>', k, pad='18px 22px 10px', extra='gap:2px;')
+    agora = cartao(f'<div style="display:flex;align-items:center;gap:10px;">{rotulo(T("agoraTit"), k["mfg"])}'
+                   f'<span style="margin-left:auto;display:flex;align-items:center;gap:6px;font-size:12px;color:{k["prisubfg"]};">{ic("recarregar", 13)}{T("repetiu")}</span></div>'
+                   f'<span style="font-size:17px;font-weight:600;color:{k["fgs"]};">{T("s4")}</span>'
+                   f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">{T("repetiuTxt")}</span>'
+                   f'<div style="margin-top:auto;">{botao_link(T("comecar"), f"Exercicio{sufixo}.dc.html", k, "solid", 38, "seta")}</div>',
+                   k, pad='16px 22px', extra='gap:8px;flex:1.4;min-width:0;')
+    linha_nivel = lambda rot, n, extra='': (f'<div style="display:flex;align-items:center;gap:10px;">'
+                                            f'<span style="width:84px;font-size:12.5px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 18)}'
+                                            f'<span style="font-size:12.5px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
+    nivel = cartao(f'{rotulo(T("seuNivel"), k["mfg"])}'
+                   + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                   + f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("nivelTxt")}</p>'
+                   f'<div style="display:flex;align-items:center;gap:8px;padding-top:10px;box-shadow:inset 0 1px 0 {k["muted"]};">'
+                   f'<span style="font-size:12.5px;color:{k["mfg"]};">{T("conta")}</span><span style="flex:1;"></span>'
+                   f'{badge("Testing", k, "blue")}{badge("Debugging", k)}</div>',
+                   k, pad='16px 22px', extra='gap:10px;flex:1;min-width:0;')
+    embaixo = f'<div style="display:flex;gap:16px;align-items:stretch;">{agora}{nivel}</div>'
+    return app(k, 'trilhas', cab + mapa + embaixo, gap=18)
+
+
+# ── Boas-vindas às trilhas ──
+CSS_SPLASH = (
+    '\n@keyframes mc-splash-in{from{opacity:0;transform:translateY(14px) scale(0.96);}to{opacity:1;transform:none;}}'
+    '\n@keyframes mc-veu-in{from{opacity:0;}to{opacity:1;}}'
+    '\n@keyframes mc-flutua{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-6px) rotate(-4deg);}}'
+    '\n@keyframes mc-chip-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}'
+    '\n.mc .splash-veu{animation:mc-veu-in .35s ease-out both;}'
+    '\n.mc .splash-modal{animation:mc-splash-in .5s cubic-bezier(.2,.8,.2,1) .08s both;}'
+    '\n.mc .splash-mascote{animation:mc-flutua 3.2s ease-in-out .6s infinite;}'
+    '\n.mc .splash-chip{animation:mc-chip-in .45s ease-out both;}'
+    '\n@media (prefers-reduced-motion: reduce){.mc .splash-veu,.mc .splash-modal,.mc .splash-mascote,.mc .splash-chip{animation:none;}}')
+
+ANTES_BOAS_VINDAS = """const bvP = String(s.passo || this.props.passo || "1");
+const bv = { p1: bvP === "1", p2: bvP === "2", p3: bvP === "3", naoP1: bvP !== "1", naoP3: bvP !== "3",
+  s2: bvP === "1" ? "var(--sunken)" : "var(--pri)", s3: bvP === "3" ? "var(--pri)" : "var(--sunken)" };"""
+VALORES_BOAS_VINDAS = ('bv: bv,\nbvProximo: () => this.setState({ passo: String(Math.min(3, Number(bvP) + 1)) }),\n'
+                       'bvVoltar: () => this.setState({ passo: String(Math.max(1, Number(bvP) - 1)) })')
+PROPS_BOAS_VINDAS = {'passo': {'editor': 'enum', 'options': ['1', '2', '3'], 'default': '1'}}
+
+
+def tela_trilha_boas_vindas(k, sufixo):
+    h = lambda caminho: '{{' + caminho + '}}'
+    se = lambda chave, html, padrao=False: (f'<sc-if value="{h("bv." + chave)}" hint-placeholder-val="{{{{ {"true" if padrao else "false"} }}}}">'
+                                            f'{html}</sc-if>')
+    fundo = tela_trilhas(k, sufixo)
+    assert fundo.endswith('</div>')
+
+    # o splash: a atmosfera da marca, o mascote flutuando e as competências da largada entrando uma a uma
+    chips = ''.join(f'<span class="splash-chip" style="animation-delay:{0.45 + 0.12 * i:.2f}s;position:absolute;{pos}">{badge(c, k, tom)}</span>'
+                    for i, (c, tom, pos) in enumerate([('Testing', 'blue', 'left:92px;top:58px;'),
+                                                      ('TypeScript', 'gray', 'right:84px;top:44px;'),
+                                                      ('Architecture', 'yellow', 'right:120px;bottom:30px;')]))
+    splash = (f'<div style="position:relative;height:176px;overflow:hidden;'
+              f'background:linear-gradient(135deg, color-mix(in oklch, {k["pri"]} 16%, {k["card"]}) 0%, {k["card"]} 55%, '
+              f'color-mix(in oklch, {k["accent"]} 30%, {k["card"]}) 100%);">'
+              f'<span aria-hidden="true" style="position:absolute;left:50%;top:50%;width:260px;height:260px;margin:-130px 0 0 -130px;border-radius:999px;'
+              f'background:radial-gradient(circle, color-mix(in oklch, {k["pri"]} 14%, transparent), transparent 70%);"></span>'
+              f'<span class="splash-mascote" style="position:absolute;left:50%;top:50%;width:92px;height:92px;margin:-46px 0 0 -46px;display:flex;">{LOGO}</span>'
+              f'{chips}</div>')
+
+    def passo(n, chave):
+        cor = k['pri'] if n == 1 else h('bv.s' + str(n))
+        return (f'<span style="display:flex;flex-direction:column;gap:6px;flex:1;">'
+                f'<span style="height:4px;border-radius:999px;background:{cor};"></span>'
+                f'<span style="font-size:11.5px;color:{k["mfg"]};">{n}. {T(chave)}</span></span>')
+    stepper = f'<div role="list" style="display:flex;gap:10px;">{passo(1, "bvP1")}{passo(2, "bvP2")}{passo(3, "bvP3")}</div>'
+
+    chip = lambda t: (f'<span style="display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:999px;'
+                      f'background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;font-weight:500;">{t}</span>')
+    linha = lambda rot, v: (f'<div style="display:flex;align-items:center;gap:12px;"><span style="width:92px;font-size:12.5px;color:{k["mfg"]};">{T(rot)}</span>'
+                            f'<span style="display:flex;gap:6px;flex-wrap:wrap;">{v}</span></div>')
+    titulo = lambda chave: f'<h2 style="margin:0;font-size:24px;line-height:30px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T(chave)}</h2>'
+    texto = lambda chave: f'<p style="margin:0;font-size:14px;color:{k["mfg"]};">{T(chave)}</p>'
+    p1 = (titulo('bv1Tit') + texto('bv1Txt')
+          + f'<div style="display:flex;flex-direction:column;gap:10px;">'
+          + linha('bvExp', chip(T('pleno'))) + linha('bvLing', chip('TypeScript') + chip('Python'))
+          + linha('bvObj', chip(T('bvAprender')) + chip(T('bvRevisar'))) + '</div>'
+          f'<div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:{k["sunken"]};">'
+          f'<span style="display:flex;margin-top:2px;color:{k["pri"]};">{ic("trilhas", 15)}</span>'
+          f'<span style="font-size:13.5px;line-height:20px;color:{k["fgs"]};font-weight:500;">{T("bvComeco")}</span></div>')
+
+    def trilha_linha(n, tit, comp, tom, etapas, marca):
+        return (f'<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;'
+                + (f'box-shadow:inset 0 0 0 1.5px {k["pri"]};background:color-mix(in oklch, {k["pri"]} 5%, {k["card"]});' if n == 1
+                   else f'box-shadow:inset 0 0 0 1px {k["border"]};')
+                + f'"><span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};width:14px;">{n}</span>'
+                f'<span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">'
+                f'<span style="font-size:14px;font-weight:600;color:{k["fgs"]};">{T(tit)}</span>'
+                f'<span style="font-size:12px;color:{k["mfg"]};">{T("pleno")} → Senior · {etapas} {T("bvEtapas")}</span></span>'
+                f'{badge(comp, k, tom)}'
+                f'<span style="width:84px;text-align:right;font-size:11.5px;font-weight:{600 if n == 1 else 400};color:{k["pri"] if n == 1 else k["mfg"]};">{T(marca)}</span></div>')
+    p2 = (titulo('bv2Tit') + texto('bv2Txt')
+          + f'<div style="display:flex;flex-direction:column;gap:8px;">'
+          + trilha_linha(1, 't1', 'Testing', 'blue', 8, 'bvComecaAqui') + trilha_linha(2, 't3', 'TypeScript', 'gray', 7, 'bvDepois')
+          + trilha_linha(3, 't5', 'Architecture', 'yellow', 9, 'bvDepois') + '</div>')
+
+    item = lambda icone, tit, txt: (f'<div style="display:flex;gap:12px;align-items:flex-start;">'
+                                     f'<span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;flex:0 0 auto;'
+                                     f'background:{k["prisub"]};color:{k["prisubfg"]};">{ic(icone, 16)}</span>'
+                                     f'<span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:600;color:{k["fgs"]};">{T(tit)}</span>'
+                                     f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">{T(txt)}</span></span></div>')
+    p3 = (titulo('bv3Tit') + texto('bv3Txt')
+          + f'<div style="display:flex;flex-direction:column;gap:14px;">'
+          + item('exercicios', 'bvI1', 'bvI1Txt') + item('recarregar', 'bvI2', 'bvI2Txt') + item('evolucao', 'bvI3', 'bvI3Txt') + '</div>')
+
+    rodape = (f'<div style="display:flex;align-items:center;gap:8px;">'
+              f'<a href="Trilhas{sufixo}.dc.html" style="font-size:13.5px;font-weight:500;color:{k["mfg"]};">{T("bvPular")}</a><span style="flex:1;"></span>'
+              + se('naoP1', botao(T('bvVoltar'), k, 'ghost', 38, acao='bvVoltar'))
+              + se('naoP3', botao(T('bvContinuar'), k, 'solid', 38, 'seta', acao='bvProximo'), True)
+              + se('p3', botao_link(T('bvAbrir'), f'Trilha{sufixo}.dc.html', k, 'solid', 38, 'seta')) + '</div>')
+    corpo = (f'<div style="display:flex;flex-direction:column;gap:18px;padding:22px 28px 24px;">'
+             f'{rotulo(T("bvRotulo"), k["mfg"])}{stepper}'
+             f'<div style="display:flex;flex-direction:column;gap:14px;min-height:268px;">'
+             + se('p1', p1, True) + se('p2', p2) + se('p3', p3) + f'</div>{rodape}</div>')
+    # o véu cobre a tela inteira, o menu junto: desfoca o que está atrás e escurece um pouco
+    veu = (f'<div class="splash-veu" style="position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;'
+           f'background:color-mix(in oklch, {k["bg"]} 45%, transparent);backdrop-filter:blur(14px) saturate(115%);-webkit-backdrop-filter:blur(14px) saturate(115%);">'
+           f'<section role="dialog" aria-modal="true" aria-label="{T("bvRotulo")}" class="splash-modal" style="width:620px;border-radius:18px;background:{k["card"]};'
+           f'box-shadow:0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px {k["border"]};overflow:hidden;">{splash}{corpo}</section></div>')
+    return fundo[:-6] + veu + '</div>'

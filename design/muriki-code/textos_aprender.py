@@ -203,3 +203,74 @@ PEER_WEB = {
         ide='Conectado a VS Code', ideTxt='hace 2 h, en este equipo', gerenciar='Gestionar',
     ),
 }
+
+# O mapa da trilha (a visão principal) e as boas-vindas às trilhas: o modal com o fundo desfocado que
+# monta o começo pelo que a pessoa contou no primeiro acesso (experiência, linguagens, objetivos).
+MAPA = {
+    'pt-BR': dict(
+        vMapa='Mapa', vLista='Lista', vcAqui='você está aqui',
+        r1='Fundamentos', r2='Isolar e confiar', r3='Suíte que se defende',
+        marcoPleno='confirma Pleno', marcoSenior='conta para Senior',
+        agoraTit='Etapa 4 de 8',
+    ),
+    'en-US': dict(
+        vMapa='Map', vLista='List', vcAqui='you are here',
+        r1='Foundations', r2='Isolate and trust', r3='A suite that defends itself',
+        marcoPleno='confirms Mid-level', marcoSenior='counts toward Senior',
+        agoraTit='Step 4 of 8',
+    ),
+    'es-ES': dict(
+        vMapa='Mapa', vLista='Lista', vcAqui='estás aquí',
+        r1='Fundamentos', r2='Aislar y confiar', r3='Una suite que se defiende',
+        marcoPleno='confirma Intermedio', marcoSenior='cuenta para Senior',
+        agoraTit='Paso 4 de 8',
+    ),
+}
+
+BOAS_VINDAS = {
+    'pt-BR': dict(
+        bvRotulo='Trilhas · primeira vez',
+        bvP1='Seu ponto de partida', bvP2='Suas trilhas', bvP3='Como a trilha anda',
+        bv1Tit='Montamos o seu começo, Rafael.', bv1Txt='Pelo que você contou no primeiro acesso:',
+        bvExp='Experiência', bvLing='Linguagens', bvObj='Objetivos', bvAprender='Aprender', bvRevisar='Revisar código',
+        bvComeco='Começamos por Testing em TypeScript, no nível Pleno. Depois, tipos e arquitetura.',
+        bv2Tit='Suas três primeiras trilhas', bv2Txt='Na ordem que faz sentido para você. Ela muda com o que você mostrar.',
+        bvComecaAqui='começa aqui', bvDepois='depois',
+        bv3Tit='Como a trilha anda', bv3Txt='Você não precisa escolher o próximo passo.',
+        bvI1='Cada etapa é um exercício com testes', bvI1Txt='Uns 20 minutos, no navegador ou na IDE.',
+        bvI2='O Code repete ou avança', bvI2Txt='Errou um tema? Ele volta com outro problema antes de seguir.',
+        bvI3='Tudo conta para o seu perfil', bvI3Txt='Duas etapas com nota alta já confirmam o seu nível.',
+        bvPular='Pular', bvVoltar='Voltar', bvContinuar='Continuar', bvAbrir='Abrir a trilha',
+        bvEtapas='etapas',
+    ),
+    'en-US': dict(
+        bvRotulo='Tracks · first time',
+        bvP1='Your starting point', bvP2='Your tracks', bvP3='How a track moves',
+        bv1Tit='We set up your start, Rafael.', bv1Txt='From what you told us on your first access:',
+        bvExp='Experience', bvLing='Languages', bvObj='Goals', bvAprender='Learn', bvRevisar='Review code',
+        bvComeco='We start with Testing in TypeScript, at Mid-level. Then types and architecture.',
+        bv2Tit='Your first three tracks', bv2Txt='In the order that makes sense for you. It changes with what you show.',
+        bvComecaAqui='starts here', bvDepois='next',
+        bv3Tit='How a track moves', bv3Txt='You don’t need to pick the next step.',
+        bvI1='Every step is an exercise with tests', bvI1Txt='About 20 minutes, in the browser or in your IDE.',
+        bvI2='Code repeats or moves on', bvI2Txt='Missed a topic? It comes back with another problem before moving on.',
+        bvI3='Everything counts toward your profile', bvI3Txt='Two steps with a high score already confirm your level.',
+        bvPular='Skip', bvVoltar='Back', bvContinuar='Continue', bvAbrir='Open the track',
+        bvEtapas='steps',
+    ),
+    'es-ES': dict(
+        bvRotulo='Rutas · primera vez',
+        bvP1='Tu punto de partida', bvP2='Tus rutas', bvP3='Cómo avanza la ruta',
+        bv1Tit='Armamos tu comienzo, Rafael.', bv1Txt='Por lo que contaste en tu primer acceso:',
+        bvExp='Experiencia', bvLing='Lenguajes', bvObj='Objetivos', bvAprender='Aprender', bvRevisar='Revisar código',
+        bvComeco='Empezamos por Testing en TypeScript, en nivel Intermedio. Después, tipos y arquitectura.',
+        bv2Tit='Tus tres primeras rutas', bv2Txt='En el orden que tiene sentido para ti. Cambia con lo que demuestres.',
+        bvComecaAqui='empieza aquí', bvDepois='después',
+        bv3Tit='Cómo avanza la ruta', bv3Txt='No necesitas elegir el siguiente paso.',
+        bvI1='Cada paso es un ejercicio con pruebas', bvI1Txt='Unos 20 minutos, en el navegador o en el IDE.',
+        bvI2='Code repite o avanza', bvI2Txt='¿Fallaste un tema? Vuelve con otro problema antes de seguir.',
+        bvI3='Todo cuenta para tu perfil', bvI3Txt='Dos pasos con nota alta ya confirman tu nivel.',
+        bvPular='Saltar', bvVoltar='Volver', bvContinuar='Continuar', bvAbrir='Abrir la ruta',
+        bvEtapas='pasos',
+    ),
+}

@@ -14,8 +14,9 @@ from textos_inicio import INICIO
 from textos_sistema import SISTEMA
 from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
-from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB
-from aprender import tela_trilhas, tela_trilha, tela_catalogo, tela_peer_web
+from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS
+from aprender import (tela_trilhas, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
+                      ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS
 from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela_conta_seguranca, tela_conta_plano, tela_confirmar_email,
@@ -1604,7 +1605,12 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'trilhas':
         return web(TRILHAS, tela_trilhas(k, sufixo))
     if tela['id'] == 'trilha':
-        return web(juntar(TRILHAS, TRILHA), tela_trilha(k, sufixo))
+        return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha_mapa(k, sufixo))
+    if tela['id'] == 'trilha_lista':
+        return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha(k, sufixo))
+    if tela['id'] == 'trilhas_boas_vindas':
+        return web(juntar(TRILHAS, BOAS_VINDAS), tela_trilha_boas_vindas(k, sufixo), ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS,
+                   PROPS_BOAS_VINDAS, CSS_SPLASH)
     if tela['id'] == 'catalogo':
         return web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}), tela_catalogo(k, sufixo))
     if tela['id'] == 'peer_web':

@@ -643,7 +643,7 @@
    "is_interactive": true
   },
   "Trilhas.dc.html": {
-   "x": 0,
+   "x": 1520,
    "y": 15840,
    "w": 1440,
    "h": 900,
@@ -651,7 +651,7 @@
    "is_interactive": true
   },
   "TrilhasEscuro.dc.html": {
-   "x": 0,
+   "x": 1520,
    "y": 17160,
    "w": 1440,
    "h": 900,
@@ -659,23 +659,23 @@
    "is_interactive": true
   },
   "Trilha.dc.html": {
-   "x": 1520,
+   "x": 3040,
    "y": 15840,
    "w": 1440,
    "h": 900,
-   "title": "Trilha · o caminho de etapas e o porquê da etapa de agora",
+   "title": "Trilha · o mapa: regiões, estações, você está aqui e os marcos de nível",
    "is_interactive": true
   },
   "TrilhaEscuro.dc.html": {
-   "x": 1520,
+   "x": 3040,
    "y": 17160,
    "w": 1440,
    "h": 900,
-   "title": "Trilha · o caminho de etapas e o porquê da etapa de agora · escuro",
+   "title": "Trilha · o mapa: regiões, estações, você está aqui e os marcos de nível · escuro",
    "is_interactive": true
   },
   "Exercicios.dc.html": {
-   "x": 3040,
+   "x": 6080,
    "y": 15840,
    "w": 1440,
    "h": 900,
@@ -683,7 +683,7 @@
    "is_interactive": true
   },
   "ExerciciosEscuro.dc.html": {
-   "x": 3040,
+   "x": 6080,
    "y": 17160,
    "w": 1440,
    "h": 900,
@@ -691,7 +691,7 @@
    "is_interactive": true
   },
   "PeerWeb.dc.html": {
-   "x": 4560,
+   "x": 7600,
    "y": 15840,
    "w": 1440,
    "h": 900,
@@ -699,11 +699,43 @@
    "is_interactive": true
   },
   "PeerWebEscuro.dc.html": {
-   "x": 4560,
+   "x": 7600,
    "y": 17160,
    "w": 1440,
    "h": 900,
    "title": "Peer na web · conversas da IDE, o trecho visto e onde ele olha · escuro",
+   "is_interactive": true
+  },
+  "TrilhasBoasVindas.dc.html": {
+   "x": 0,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · boas-vindas: o começo montado pelo primeiro acesso, em três passos",
+   "is_interactive": true
+  },
+  "TrilhasBoasVindasEscuro.dc.html": {
+   "x": 0,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · boas-vindas: o começo montado pelo primeiro acesso, em três passos · escuro",
+   "is_interactive": true
+  },
+  "TrilhaLista.dc.html": {
+   "x": 4560,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha · a lista: o mesmo caminho em linha",
+   "is_interactive": true
+  },
+  "TrilhaListaEscuro.dc.html": {
+   "x": 4560,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha · a lista: o mesmo caminho em linha · escuro",
    "is_interactive": true
   }
  },
@@ -817,7 +849,7 @@
    "y": 15540,
    "text": "Trilhas, catálogo de exercícios e Peer na web: o formato das trilhas é proposta (a visão ainda deixa em aberto)",
    "kind": "title1",
-   "maxW": 6000,
+   "maxW": 8000,
    "w": 240
   },
   "aprenderMaisEscuro": {
@@ -825,7 +857,7 @@
    "y": 16860,
    "text": "Trilhas, exercícios e Peer na web no tema escuro",
    "kind": "title1",
-   "maxW": 6000,
+   "maxW": 8000,
    "w": 240
   }
  },
@@ -917,7 +949,11 @@
   "Exercicios.dc.html",
   "ExerciciosEscuro.dc.html",
   "PeerWeb.dc.html",
-  "PeerWebEscuro.dc.html"
+  "PeerWebEscuro.dc.html",
+  "TrilhasBoasVindas.dc.html",
+  "TrilhasBoasVindasEscuro.dc.html",
+  "TrilhaLista.dc.html",
+  "TrilhaListaEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
