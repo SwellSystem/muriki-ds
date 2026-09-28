@@ -77,7 +77,10 @@
           "scrim": "oklch(0.32 0.02 248.5 / 0.30)",
           "radius-float": "12px",
           "chart-1": "oklch(0.79 0.17 70.25)",
-          "chart-3": "oklch(0.56 0.21 269.11)"
+          "chart-2": "oklch(0.62 0.12 175)",
+          "chart-3": "oklch(0.56 0.21 269.11)",
+          "chart-4": "oklch(0.64 0.17 22)",
+          "chart-5": "oklch(0.6 0.16 305)"
         },
         "dark": {
           "background": "oklch(0.175 0.004 107)",
@@ -144,7 +147,10 @@
           "scrim": "oklch(0.09 0.003 107 / 0.62)",
           "radius-float": "12px",
           "chart-1": "oklch(0.79 0.17 70.25)",
-          "chart-3": "oklch(0.56 0.21 269.11)"
+          "chart-2": "oklch(0.62 0.12 175)",
+          "chart-3": "oklch(0.56 0.21 269.11)",
+          "chart-4": "oklch(0.64 0.17 22)",
+          "chart-5": "oklch(0.6 0.16 305)"
         }
       },
       "css": {
@@ -806,6 +812,26 @@
       }
     },
     {
+      "name": "chart",
+      "type": "registry:ui",
+      "title": "Chart",
+      "description": "A base dos gráficos com recharts: o chart.tsx do shadcn vestido com a casa. ChartContainer publica a cor de cada série como --color-<chave> a partir dos tokens (var(--primary), var(--chart-1)…), repinta eixos, grade e cursor com os tokens, e o tooltip é o dos popovers do DS.",
+      "dependencies": [
+        "recharts"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/chart.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "const config = { vendas: { label: \"Vendas\", color: \"var(--primary)\" } } satisfies ChartConfig; <ChartContainer config={config} className=\"aspect-auto h-[230px] w-full\"><AreaChart data={dados} accessibilityLayer><CartesianGrid vertical={false} /><XAxis dataKey=\"mes\" tickLine={false} axisLine={false} /><ChartTooltip content={<ChartTooltipContent />} /><Area dataKey=\"vendas\" stroke=\"var(--color-vendas)\" fill=\"var(--color-vendas)\" /></AreaChart></ChartContainer>. Cor sempre de token, nunca hex solto; theme: { light, dark } só para cor que muda por tema. ChartTooltipContent aceita indicator (dot | line | dashed), hideLabel, hideIndicator, formatter e labelFormatter. ChartLegend + ChartLegendContent para a legenda. Para o card de vendas, use o bloco area-chart, que já traz tudo pronto."
+    },
+    {
       "name": "spinner",
       "type": "registry:ui",
       "title": "Spinner",
@@ -1198,6 +1224,27 @@
         }
       ],
       "docs": "Card Vendas por mês, com GET /admin/billing/sales/monthly (12 meses, total em centavos, count): const brl = new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", maximumFractionDigits: 0 }); <BarChart labels={meses.map((m) => formatMonth(m.month))} series={[{ key: \"platform\", label: \"Muriki Platform\", values: meses.map((m) => m.total / 100) }]} formatValue={(v) => brl.format(v)} current={meses.length - 1} extra={(_, i) => `${meses[i].count} vendas`} ariaLabel=\"Vendas por mês, de out de 2025 a set de 2026. Pico em ago, R$ 44.930.\" loading={isPending} />. Os valores vão na unidade do eixo (reais, não centavos). As séries dividem UMA escala: não misture moedas — BRL e USD na mesma escala enganam; cada moeda vai no seu gráfico, ou o card ganha um seletor de produto (view-toggle). Duas séries da mesma moeda saem agrupadas por mês, com legenda; uma série, sem legenda. color é opcional (padrão: --primary, --chart-1, --chart-3). formatTick troca o rótulo compacto do eixo. Negativos (um reembolso no mês) descem da linha do zero. Tudo zero ou sem rótulos: estado vazio (bar_chart.empty). loading: BarChartSkeleton, que também sai à parte. Textos em bar_chart.* (current, as_table, as_chart, empty, period)."
+    },
+    {
+      "name": "area-chart",
+      "type": "registry:block",
+      "title": "Area Chart",
+      "description": "Área por período com recharts, o \"Area Chart - Gradient\" do shadcn na linguagem da casa: linha natural, degradê vertical da cor da série (0.8 no topo, 0.1 embaixo), grade só horizontal, eixo de baixo sem linha nem traço. A mesma API do bar-chart: período em curso com o último trecho tracejado e o ponto vazado, negativos até o zero com a linha do zero, tooltip com linha extra, teclado (accessibilityLayer), \"Ver como tabela\", estado vazio e skeleton.",
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/chart"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/area-chart/area-chart.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/area-chart/area-chart.tsx"
+        }
+      ],
+      "docs": "Card Vendas por mês, com GET /admin/billing/sales/monthly (12 meses, total em centavos, count): const brl = new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", maximumFractionDigits: 0 }); <AreaChart labels={meses.map((m) => formatMonth(m.month))} series={[{ key: \"platform\", label: \"Muriki Platform\", values: meses.map((m) => m.total / 100) }]} formatValue={(v) => brl.format(v)} current={meses.length - 1} extra={(_, i) => `${meses[i].count} vendas`} ariaLabel=\"Vendas por mês, de out de 2025 a set de 2026. Pico em ago, R$ 44.930.\" loading={isPending} />. É a mesma API do bar-chart: trocar um pelo outro é trocar o nome do componente. Os valores vão na unidade do eixo (reais, não centavos). Uma moeda por gráfico: BRL e USD na mesma escala enganam; cada moeda vai no seu gráfico, ou o card ganha um seletor de produto (view-toggle). Duas séries da mesma moeda saem sobrepostas, com legenda. color é opcional (padrão: --primary, --chart-1, --chart-3); a key vira --color-<key> dentro do gráfico, então use letras, números e hífen. current: o trecho do período anterior até o em curso sai tracejado, com o preenchimento mais fraco e o ponto vazado; o tooltip e a tabela marcam \"em curso\". Negativos (um reembolso no mês): o eixo inclui o zero e o que está abaixo, a área preenche até o zero e a linha do zero aparece. Tudo zero ou sem rótulos: estado vazio (bar_chart.empty). loading: AreaChartSkeleton, que também sai à parte. Textos reaproveitados de bar_chart.* (current, as_table, as_chart, empty, period). Precisa do recharts (vem pelo item chart)."
     },
     {
       "name": "status-page",
