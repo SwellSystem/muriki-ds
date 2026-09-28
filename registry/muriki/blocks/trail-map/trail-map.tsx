@@ -22,7 +22,22 @@
 // Trilhas: sem nomes nem metas, as regiões só como retângulos, estações pequenas, bandeiras menores e
 // um balão só — "você está aqui" na etapa de agora, ou "comece aqui" quando nada foi feito ainda.
 // Com `href` ou `render`, o mini inteiro vira o link para o mapa.
-import { cloneElement, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactElement } from "react"
+//
+// `orientation="vertical"` é o mapa do celular (design/muriki-code/movel_code.py, _mapa_vertical): o
+// caminho desce em zigue-zague numa faixa estreita à esquerda e os nomes ficam todos numa coluna à
+// direita, na altura de cada estação, para o caminho nunca passar por cima deles; as regiões viram
+// blocos na largura toda, com o rótulo no canto de cima à direita e um respiro entre uma e outra.
+// Os nomes quebram linha (são HTML por cima do SVG). `"auto"` fica vertical quando o contêiner tem
+// menos de 560px. O mini é sempre horizontal.
+import {
+  cloneElement,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactElement,
+} from "react"
 
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -57,6 +72,8 @@ export interface TrailMapProps {
   onStepClick?: (index: number) => void
   /** "mini": o minimapa dos cartões, sem nomes, com um balão só. */
   size?: "default" | "mini"
+  /** "vertical": o mapa do celular. "auto": vertical abaixo de 560px de contêiner. Só no tamanho padrão. */
+  orientation?: "horizontal" | "vertical" | "auto"
   /** No mini, o balão quando nada foi feito e a de agora é a primeira. Sem isto, trail_map.start. */
   startLabel?: string
   /** No mini, o destino do link ("Ver o mapa"): um <a href>. */
@@ -97,7 +114,74 @@ function cortar(texto: string, largura: number) {
 }
 
 export function TrailMap(props: TrailMapProps) {
-  return props.size === "mini" ? <TrailMapMini {...props} /> : <TrailMapDefault {...props} />
+  if (props.size === "mini") return <TrailMapMini {...props} />
+  if (props.orientation === "vertical") return <TrailMapVertical {...props} />
+  if (props.orientation === "auto") return <TrailMapAuto {...props} />
+  return <TrailMapDefault {...props} />
+}
+
+const LIMITE_AUTO = 560
+
+function TrailMapAuto(props: TrailMapProps) {
+  // mede o próprio contêiner: um mapa num painel estreito também vira vertical
+  const ref = useRef<HTMLDivElement>(null)
+  const [estreito, setEstreito] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(([e]) => setEstreito(e.contentRect.width < LIMITE_AUTO))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={cn("w-full min-w-0", props.className)}>
+      {estreito ? <TrailMapVertical {...props} className={undefined} /> : <TrailMapDefault {...props} className={undefined} />}
+    </div>
+  )
+}
+
+/** A descrição de cada estação e o foco itinerante: setas, Home, End e Enter. */
+function useEstacoes(steps: TrailMapStep[], onStepClick?: (index: number) => void) {
+  const t = useTranslate()
+  const n = steps.length
+  const atual = steps.findIndex((s) => s.state === "now")
+  const estado = (s: TrailMapStep) =>
+    s.state === "done" ? t("trail_map.done") : s.state === "now" ? t("trail_map.now") : t("trail_map.later")
+  const descricao = (s: TrailMapStep, i: number) =>
+    `${i + 1}. ${s.title} — ${estado(s)}${s.meta ? `, ${s.meta}` : ""}${s.milestone ? `, ${s.milestone}` : ""}`
+  const [foco, setFoco] = useState(Math.max(0, atual))
+  const refs = useRef<(SVGGElement | null)[]>([])
+  const mover = (e: KeyboardEvent, i: number) => {
+    const alvo = e.key === "ArrowRight" || e.key === "ArrowDown" ? i + 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? n - 1 : null
+    if (alvo === null) {
+      if ((e.key === "Enter" || e.key === " ") && onStepClick) {
+        e.preventDefault()
+        onStepClick(i)
+      }
+      return
+    }
+    e.preventDefault()
+    const j = Math.min(n - 1, Math.max(0, alvo))
+    setFoco(j)
+    refs.current[j]?.focus()
+  }
+  // as props da estação: botão com tabindex itinerante, ou só desenho
+  const estacao = (i: number) =>
+    onStepClick
+      ? {
+          ref: (el: SVGGElement | null) => {
+            refs.current[i] = el
+          },
+          role: "button" as const,
+          tabIndex: i === foco ? 0 : -1,
+          "aria-label": descricao(steps[i], i),
+          onClick: () => onStepClick(i),
+          onKeyDown: (e: KeyboardEvent) => mover(e, i),
+          onFocus: () => setFoco(i),
+          className: "cursor-pointer outline-none [&:focus-visible>.foco]:opacity-100",
+        }
+      : { "aria-hidden": true as const }
+  return { atual, descricao, estacao }
 }
 
 function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClick, className }: TrailMapProps) {
@@ -117,27 +201,7 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   // dois nomes na mesma linha ficam a duas estações de distância
   const larguraNome = n > 2 ? passo * 2 - 16 : W - 2 * MARGEM
 
-  const estado = (s: TrailMapStep) =>
-    s.state === "done" ? t("trail_map.done") : s.state === "now" ? t("trail_map.now") : t("trail_map.later")
-  const descricao = (s: TrailMapStep, i: number) =>
-    `${i + 1}. ${s.title} — ${estado(s)}${s.meta ? `, ${s.meta}` : ""}${s.milestone ? `, ${s.milestone}` : ""}`
-
-  const [foco, setFoco] = useState(Math.max(0, atual))
-  const refs = useRef<(SVGGElement | null)[]>([])
-  const mover = (e: KeyboardEvent, i: number) => {
-    const alvo = e.key === "ArrowRight" || e.key === "ArrowDown" ? i + 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? i - 1 : e.key === "Home" ? 0 : e.key === "End" ? n - 1 : null
-    if (alvo === null) {
-      if ((e.key === "Enter" || e.key === " ") && onStepClick) {
-        e.preventDefault()
-        onStepClick(i)
-      }
-      return
-    }
-    e.preventDefault()
-    const j = Math.min(n - 1, Math.max(0, alvo))
-    setFoco(j)
-    refs.current[j]?.focus()
-  }
+  const { descricao, estacao } = useEstacoes(steps, onStepClick)
 
   const halo = { paintOrder: "stroke", stroke: "var(--card)", strokeWidth: 4, strokeLinejoin: "round" } as const
 
@@ -229,20 +293,7 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
           const base = emCima[i] ? y - 30 - 15 * (linhas.length - 1) : y + (s.state === "now" ? 46 : 32)
           const interativo = Boolean(onStepClick)
           return (
-            <g
-              key={i}
-              ref={(el) => {
-                refs.current[i] = el
-              }}
-              role={interativo ? "button" : undefined}
-              tabIndex={interativo ? (i === foco ? 0 : -1) : undefined}
-              aria-label={interativo ? descricao(s, i) : undefined}
-              aria-hidden={interativo ? undefined : true}
-              onClick={interativo ? () => onStepClick?.(i) : undefined}
-              onKeyDown={interativo ? (e) => mover(e, i) : undefined}
-              onFocus={interativo ? () => setFoco(i) : undefined}
-              className={cn(interativo && "cursor-pointer outline-none [&:focus-visible>.foco]:opacity-100")}
-            >
+            <g key={i} {...estacao(i)}>
               {interativo ? (
                 <circle className="foco" cx={x} cy={y} r={s.state === "now" ? 20 : 18} fill="none" stroke="var(--ring)" strokeWidth={2} opacity={0} />
               ) : null}
@@ -308,6 +359,195 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
           </g>
         ) : null}
       </svg>
+
+      {onStepClick ? null : (
+        <ol className="sr-only">
+          {steps.map((s, i) => (
+            <li key={i}>{descricao(s, i)}</li>
+          ))}
+        </ol>
+      )}
+    </div>
+  )
+}
+
+// o mapa vertical num quadro de 358 de largura: as estações descem num zigue-zague curto na faixa da
+// esquerda (46 ↔ 104) e os nomes começam em 140, na altura de cada estação
+const VW = 358
+const V_X = [46, 104]
+const V_Y0 = 76
+const V_PASSO = 106
+const V_ENTRE = 28 // o respiro a mais entre uma região e a seguinte
+const V_NOMES = 140
+
+function TrailMapVertical({ steps, regions = [], hereLabel, ariaLabel, onStepClick, className }: TrailMapProps) {
+  const t = useTranslate()
+  const aqui = hereLabel ?? t("trail_map.here")
+  const n = steps.length
+  const { atual, descricao, estacao } = useEstacoes(steps, onStepClick)
+  const inicioRegiao = new Set(regions.slice(1).map((r) => r.from))
+  const pontos: Ponto[] = []
+  let y = V_Y0
+  steps.forEach((_, i) => {
+    if (i) y += V_PASSO + (inicioRegiao.has(i) ? V_ENTRE : 0)
+    pontos.push([V_X[i % 2], y])
+  })
+  const VH = (pontos[n - 1]?.[1] ?? V_Y0) + 70
+  const ultimaFeita = steps.reduce((acc, s, i) => (s.state === "done" ? i : acc), -1)
+  const fimFeito = atual >= 0 ? atual : ultimaFeita
+  // posição em % do quadro: o SVG escala com a largura e os textos vão junto
+  const pos = (px: number, py: number): CSSProperties => ({ left: `${(px / VW) * 100}%`, top: `${(py / VH) * 100}%` })
+
+  return (
+    <div className={cn("relative w-full min-w-0", className)} style={{ aspectRatio: `${VW} / ${VH}` }}>
+      <svg
+        viewBox={`0 0 ${VW} ${VH}`}
+        width="100%"
+        height="100%"
+        role={onStepClick ? "group" : "img"}
+        aria-label={ariaLabel}
+        className="absolute inset-0 block overflow-visible"
+      >
+        {/* as regiões: blocos na largura toda, de um pouco acima da primeira etapa a um pouco abaixo da última */}
+        {regions.map((r) => {
+          const a = pontos[Math.max(0, r.from)]
+          const b = pontos[Math.min(n - 1, r.to)]
+          if (!a || !b) return null
+          const y0 = Math.max(4, a[1] - 62)
+          return (
+            <rect
+              key={`${r.label}-${r.from}`}
+              aria-hidden
+              x={4}
+              y={y0}
+              width={VW - 8}
+              height={b[1] + 40 - y0}
+              rx={26}
+              fill="color-mix(in oklch, var(--primary) 5%, transparent)"
+              stroke="color-mix(in oklch, var(--primary) 20%, transparent)"
+              strokeDasharray="2 6"
+            />
+          )
+        })}
+
+        <g aria-hidden>
+          <path d={curva(pontos)} fill="none" stroke="var(--card)" strokeWidth={10} strokeLinecap="round" />
+          <path
+            d={curva(pontos.slice(Math.max(0, fimFeito)))}
+            fill="none"
+            stroke="var(--input)"
+            strokeWidth={2.5}
+            strokeDasharray="1 7"
+            strokeLinecap="round"
+          />
+          {fimFeito > 0 ? (
+            <path d={curva(pontos.slice(0, fimFeito + 1))} fill="none" stroke="var(--primary)" strokeWidth={3} strokeLinecap="round" />
+          ) : null}
+        </g>
+
+        {steps.map((s, i) => {
+          const [x, yy] = pontos[i]
+          return (
+            <g key={i} {...estacao(i)}>
+              {onStepClick ? (
+                <circle className="foco" cx={x} cy={yy} r={s.state === "now" ? 20 : 18} fill="none" stroke="var(--ring)" strokeWidth={2} opacity={0} />
+              ) : null}
+              {s.state === "done" ? (
+                <>
+                  <circle cx={x} cy={yy} r={14} fill="var(--primary)" />
+                  <path
+                    d={`M${x - 5.5},${yy} l3.8,3.8 l7,-7.5`}
+                    fill="none"
+                    stroke="var(--primary-foreground)"
+                    strokeWidth={2.2}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </>
+              ) : s.state === "now" ? (
+                <>
+                  <circle cx={x} cy={yy} r={30} fill="color-mix(in oklch, var(--primary) 9%, transparent)" />
+                  <circle cx={x} cy={yy} r={21} fill="color-mix(in oklch, var(--primary) 15%, transparent)" />
+                  <circle cx={x} cy={yy} r={15} fill="var(--card)" stroke="var(--primary)" strokeWidth={3} />
+                  <text x={x} y={yy + 4} textAnchor="middle" fill="var(--primary)" className="font-mono" style={{ fontSize: 12, fontWeight: 600 }}>
+                    {i + 1}
+                  </text>
+                </>
+              ) : (
+                <>
+                  <circle cx={x} cy={yy} r={12} fill="var(--card)" stroke="var(--input)" strokeWidth={1.5} />
+                  <text x={x} y={yy + 4} textAnchor="middle" fill="var(--muted-foreground)" className="font-mono" style={{ fontSize: 11 }}>
+                    {i + 1}
+                  </text>
+                </>
+              )}
+              {s.milestone ? (
+                <g transform={`translate(${x + 13},${yy + 4})`}>
+                  <path d="M0,0 V-24" stroke="var(--foreground-strong)" strokeWidth={1.4} />
+                  <path
+                    d="M0,-24 h15 l-3.5,5.5 l3.5,5.5 h-15 z"
+                    fill="var(--accent)"
+                    stroke="var(--foreground-strong)"
+                    strokeWidth={1.1}
+                    strokeLinejoin="round"
+                  />
+                </g>
+              ) : null}
+              <title>{descricao(s, i)}</title>
+            </g>
+          )
+        })}
+
+        {atual >= 0 ? (
+          <g aria-hidden>
+            <path d={`M${pontos[atual][0] - 6},${pontos[atual][1] - 42} l6,7 l6,-7 z`} fill="var(--foreground-strong)" />
+          </g>
+        ) : null}
+      </svg>
+
+      {/* os textos em HTML por cima do SVG: quebram linha e não dependem da escala */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        {regions.map((r) => {
+          const a = pontos[Math.max(0, r.from)]
+          if (!a) return null
+          return (
+            <span
+              key={`${r.label}-${r.from}`}
+              className="absolute -translate-x-full -translate-y-1/2 font-mono text-[9.5px] tracking-[0.18em] whitespace-nowrap text-muted-foreground uppercase"
+              style={pos(VW - 20, Math.max(4, a[1] - 62) + 16)}
+            >
+              {r.label}
+            </span>
+          )
+        })}
+        {steps.map((s, i) => (
+          <span
+            key={i}
+            className="absolute -translate-y-1/2 [text-shadow:0_0_3px_var(--card),0_0_3px_var(--card),0_0_3px_var(--card)]"
+            style={{ ...pos(V_NOMES, pontos[i][1]), width: `${((VW - V_NOMES - 14) / VW) * 100}%` }}
+          >
+            <span
+              className={cn(
+                "block text-[13px] leading-[17px]",
+                s.state === "now" ? "font-semibold" : "font-medium",
+                s.state === "later" ? "text-muted-foreground" : "text-foreground-strong"
+              )}
+            >
+              {s.title}
+            </span>
+            {s.meta ? <span className="mt-0.5 block font-mono text-[11px] text-muted-foreground">{s.meta}</span> : null}
+            {s.milestone ? <span className="mt-0.5 block text-[11.5px] font-semibold text-foreground-strong">{s.milestone}</span> : null}
+          </span>
+        ))}
+        {atual >= 0 ? (
+          <span
+            className="absolute flex h-6 -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-foreground-strong px-3.5 text-[11.5px] font-semibold whitespace-nowrap text-background"
+            style={pos(pontos[atual][0], pontos[atual][1] - 54)}
+          >
+            {aqui}
+          </span>
+        ) : null}
+      </div>
 
       {onStepClick ? null : (
         <ol className="sr-only">
