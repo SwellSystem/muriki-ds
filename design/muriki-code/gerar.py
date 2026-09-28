@@ -41,6 +41,10 @@ TELAS = [
     ('conta_codigos', 'ContaCodigos', 'Minha conta', 'Minha conta · códigos de backup novos', 7, 8, 9),
     ('conta_passkey_editar', 'ContaPasskeyEditar', 'Minha conta', 'Minha conta · renomear e remover passkey', 8, 8, 9),
     ('conta_sessoes', 'ContaSessoes', 'Minha conta', 'Minha conta · encerrar sessões', 9, 8, 9),
+    ('trilhas', 'Trilhas', 'Trilhas', 'Trilhas · a lista, com o continue de onde parou', 0, 12, 13),
+    ('trilha', 'Trilha', 'Testes que dão confiança', 'Trilha · o caminho de etapas e o porquê da etapa de agora', 1, 12, 13),
+    ('catalogo', 'Exercicios', 'Exercícios', 'Exercícios · o catálogo, com filtros e o uso do mês', 2, 12, 13),
+    ('peer_web', 'PeerWeb', 'Peer', 'Peer na web · conversas da IDE, o trecho visto e onde ele olha', 3, 12, 13),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
     ('erro', 'ErroInesperado', 'Erro inesperado', 'Sistema · erro inesperado (500), com o código para o suporte', 2, 10, 11),
@@ -84,7 +88,8 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
             order.append(arquivo)
         gerados.append(arquivo)
 
-largura = lambda n: n * W + (n - 1) * 80
+# o canvas limita a nota a 8000 de largura e guarda w: 240; o gerador segue o mesmo para não desfazer
+largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
@@ -99,8 +104,11 @@ for chave, lin, n, texto in [
     ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
     ('sistema', 10, 6, 'Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform'),
     ('sistemaEscuro', 11, 6, 'Páginas de sistema no tema escuro'),
+    ('aprenderMais', 12, 4, 'Trilhas, catálogo de exercícios e Peer na web: o formato das trilhas é proposta (a visão ainda deixa em aberto)'),
+    ('aprenderMaisEscuro', 13, 4, 'Trilhas, exercícios e Peer na web no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
+    notas[chave].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=1)
 print(f'{len(gerados)} quadros em {SAIDA}')

@@ -641,6 +641,70 @@
    "h": 900,
    "title": "Sistema · a mesma 404 no Backoffice (só o produto muda) · escuro",
    "is_interactive": true
+  },
+  "Trilhas.dc.html": {
+   "x": 0,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · a lista, com o continue de onde parou",
+   "is_interactive": true
+  },
+  "TrilhasEscuro.dc.html": {
+   "x": 0,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · a lista, com o continue de onde parou · escuro",
+   "is_interactive": true
+  },
+  "Trilha.dc.html": {
+   "x": 1520,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha · o caminho de etapas e o porquê da etapa de agora",
+   "is_interactive": true
+  },
+  "TrilhaEscuro.dc.html": {
+   "x": 1520,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha · o caminho de etapas e o porquê da etapa de agora · escuro",
+   "is_interactive": true
+  },
+  "Exercicios.dc.html": {
+   "x": 3040,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Exercícios · o catálogo, com filtros e o uso do mês",
+   "is_interactive": true
+  },
+  "ExerciciosEscuro.dc.html": {
+   "x": 3040,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Exercícios · o catálogo, com filtros e o uso do mês · escuro",
+   "is_interactive": true
+  },
+  "PeerWeb.dc.html": {
+   "x": 4560,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer na web · conversas da IDE, o trecho visto e onde ele olha",
+   "is_interactive": true
+  },
+  "PeerWebEscuro.dc.html": {
+   "x": 4560,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer na web · conversas da IDE, o trecho visto e onde ele olha · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -662,7 +726,7 @@
   },
   "web": {
    "kind": "title1",
-   "maxW": 9040,
+   "maxW": 8000,
    "text": "Code web: perfil, competência, exercício, avaliação, playground e o início do primeiro dia",
    "w": 240,
    "x": 0,
@@ -673,7 +737,7 @@
    "y": -300,
    "text": "Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício",
    "kind": "title1",
-   "maxW": 15120,
+   "maxW": 8000,
    "w": 240
   },
   "webEscuro": {
@@ -681,7 +745,7 @@
    "y": 3660,
    "text": "Code web no tema escuro",
    "kind": "title1",
-   "maxW": 9040,
+   "maxW": 8000,
    "w": 240
   },
   "ideEscuro": {
@@ -697,7 +761,7 @@
    "y": 1020,
    "text": "Entrada e primeiro acesso no tema escuro",
    "kind": "title1",
-   "maxW": 15120,
+   "maxW": 8000,
    "w": 240
   },
   "conta": {
@@ -705,42 +769,64 @@
    "y": 7620,
    "text": "Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email, acesso suspenso",
    "kind": "title1",
-   "maxW": 7520
+   "maxW": 7520,
+   "w": 240
   },
   "contaEscuro": {
    "x": 0,
    "y": 8940,
    "text": "Conta no tema escuro",
    "kind": "title1",
-   "maxW": 7520
+   "maxW": 7520,
+   "w": 240
   },
   "minhaConta": {
    "x": 0,
    "y": 10260,
    "text": "Minha conta: meus dados, aprendizado, segurança, plano, confirmar o email novo e os fluxos da segurança",
    "kind": "title1",
-   "maxW": 15120
+   "maxW": 8000,
+   "w": 240
   },
   "minhaContaEscuro": {
    "x": 0,
    "y": 11580,
    "text": "Minha conta no tema escuro",
    "kind": "title1",
-   "maxW": 15120
+   "maxW": 8000,
+   "w": 240
   },
   "sistema": {
    "x": 0,
    "y": 12900,
    "text": "Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform",
    "kind": "title1",
-   "maxW": 9040
+   "maxW": 8000,
+   "w": 240
   },
   "sistemaEscuro": {
    "x": 0,
    "y": 14220,
    "text": "Páginas de sistema no tema escuro",
    "kind": "title1",
-   "maxW": 9040
+   "maxW": 8000,
+   "w": 240
+  },
+  "aprenderMais": {
+   "x": 0,
+   "y": 15540,
+   "text": "Trilhas, catálogo de exercícios e Peer na web: o formato das trilhas é proposta (a visão ainda deixa em aberto)",
+   "kind": "title1",
+   "maxW": 6000,
+   "w": 240
+  },
+  "aprenderMaisEscuro": {
+   "x": 0,
+   "y": 16860,
+   "text": "Trilhas, exercícios e Peer na web no tema escuro",
+   "kind": "title1",
+   "maxW": 6000,
+   "w": 240
   }
  },
  "order": [
@@ -823,7 +909,15 @@
   "Manutencao.dc.html",
   "ManutencaoEscuro.dc.html",
   "NaoEncontradaBackoffice.dc.html",
-  "NaoEncontradaBackofficeEscuro.dc.html"
+  "NaoEncontradaBackofficeEscuro.dc.html",
+  "Trilhas.dc.html",
+  "TrilhasEscuro.dc.html",
+  "Trilha.dc.html",
+  "TrilhaEscuro.dc.html",
+  "Exercicios.dc.html",
+  "ExerciciosEscuro.dc.html",
+  "PeerWeb.dc.html",
+  "PeerWebEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

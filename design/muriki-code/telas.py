@@ -14,6 +14,8 @@ from textos_inicio import INICIO
 from textos_sistema import SISTEMA
 from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
+from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB
+from aprender import tela_trilhas, tela_trilha, tela_catalogo, tela_peer_web
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS
 from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela_conta_seguranca, tela_conta_plano, tela_confirmar_email,
@@ -1599,6 +1601,14 @@ def _montar(tela, tema, sufixo):
         return web(SISTEMA, tela_sistema(k, qual, sufixo, produto, idiomas, email))
     if tela['id'] == 'inicio':
         return web(INICIO, tela_inicio_primeiro_dia(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)
+    if tela['id'] == 'trilhas':
+        return web(TRILHAS, tela_trilhas(k, sufixo))
+    if tela['id'] == 'trilha':
+        return web(juntar(TRILHAS, TRILHA), tela_trilha(k, sufixo))
+    if tela['id'] == 'catalogo':
+        return web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}), tela_catalogo(k, sufixo))
+    if tela['id'] == 'peer_web':
+        return web(PEER_WEB, tela_peer_web(k, sufixo))
     if tela['id'] == 'suspenso':
         return web(SUSPENSO, tela_suspenso(k, sufixo))
     if tela['id'] in FLUXOS:
