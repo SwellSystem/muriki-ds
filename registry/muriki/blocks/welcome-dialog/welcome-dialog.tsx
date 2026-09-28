@@ -15,6 +15,11 @@
  * desligado com prefers-reduced-motion (as animações moram no css do item, em `muriki-welcome-*`).
  *
  * Esc e clique fora são Pular: fechar sem terminar é pular, e o app decide se mostra de novo.
+ *
+ * No celular (abaixo de md), o modal vira folha que sobe de baixo, como o quadro BoasVindasMovel
+ * (design/muriki-code/movel_code.py): largura cheia, cantos de cima arredondados, a alça, até 92dvh
+ * com o conteúdo rolando por dentro, o splash menor e o rodapé com o botão principal em largura
+ * cheia e, embaixo, Pular e Voltar — com o respiro da safe-area. `variant` fixa um dos dois.
  */
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
@@ -54,8 +59,49 @@ export interface WelcomeDialogProps {
   onFinish?: () => void
   /** O botão final como link do app, ex.: <Link to="/tracks/$id" params={…} />. */
   finishRender?: React.ReactElement
+  /** "auto": folha abaixo de md, modal acima. "dialog" e "sheet" fixam um dos dois. */
+  variant?: "auto" | "dialog" | "sheet"
   className?: string
 }
+
+// As classes de cada forma, escritas por inteiro nas três variantes: o Tailwind só gera o que lê.
+const FORMA = {
+  auto: {
+    popup:
+      "muriki-welcome-modal muriki-welcome-auto max-md:inset-x-0 max-md:bottom-0 max-md:max-h-[92dvh] max-md:w-full max-md:rounded-t-[20px] md:top-1/2 md:left-1/2 md:max-h-[calc(100dvh-2rem)] md:w-[min(620px,calc(100vw-2rem))] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[18px]",
+    alca: "md:hidden",
+    corpo: "px-5 pt-[18px] md:px-7 md:pt-[22px]",
+    conteudo: "md:min-h-[268px]",
+    rodape: "grid grid-cols-2 items-center gap-y-1.5 pb-[env(safe-area-inset-bottom)] md:flex md:items-center md:gap-2 md:pb-0",
+    principal: "col-span-2 order-first h-11 w-full md:order-none md:h-9 md:w-auto",
+    pular: "h-11 justify-self-start px-1 md:h-auto md:px-0",
+    voltar: "h-11 justify-self-end md:h-9",
+    espaco: "hidden md:block",
+  },
+  dialog: {
+    popup:
+      "muriki-welcome-modal top-1/2 left-1/2 max-h-[calc(100dvh-2rem)] w-[min(620px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-[18px]",
+    alca: "hidden",
+    corpo: "px-7 pt-[22px]",
+    conteudo: "min-h-[268px]",
+    rodape: "flex items-center gap-2",
+    principal: "",
+    pular: "",
+    voltar: "",
+    espaco: "",
+  },
+  sheet: {
+    popup: "muriki-welcome-sheet inset-x-0 bottom-0 max-h-[92dvh] w-full rounded-t-[20px]",
+    alca: "",
+    corpo: "px-5 pt-[18px]",
+    conteudo: "",
+    rodape: "grid grid-cols-2 items-center gap-y-1.5 pb-[env(safe-area-inset-bottom)]",
+    principal: "col-span-2 order-first h-11 w-full",
+    pular: "h-11 justify-self-start px-1",
+    voltar: "h-11 justify-self-end",
+    espaco: "hidden",
+  },
+} as const
 
 // Os lugares do desenho num splash de 620 × 176: esquerda, topo, lado do ladrilho e giro. Os maiores
 // primeiro, perto do mascote; as tecnologias em destaque ficam com eles.
@@ -64,7 +110,11 @@ const LUGARES: [number, number, number, number][] = [
   [36, 34, 30, -8], [540, 36, 30, 4], [30, 126, 28, 6], [118, 20, 26, 9], [556, 116, 26, -5],
 ]
 
-function Splash({ brands, highlight }: { brands: Brand[]; highlight: Brand[] }) {
+function Splash({ brands, highlight, variant }: { brands: Brand[]; highlight: Brand[]; variant: "auto" | "dialog" | "sheet" }) {
+  // na folha o splash é mais baixo (148px), o mascote menor e só os oito primeiros ladrilhos cabem
+  const alto = { auto: "h-[148px] md:h-44", dialog: "h-44", sheet: "h-[148px]" }[variant]
+  const mascote = { auto: "size-[76px] md:size-[92px]", dialog: "size-[92px]", sheet: "size-[76px]" }[variant]
+  const sobra = { auto: "max-md:hidden", dialog: "", sheet: "hidden" }[variant]
   const ordem = [...brands.filter((b) => highlight.includes(b)), ...brands.filter((b) => !highlight.includes(b))].slice(
     0,
     LUGARES.length
@@ -73,14 +123,14 @@ function Splash({ brands, highlight }: { brands: Brand[]; highlight: Brand[] }) 
     <div
       aria-hidden
       data-slot="welcome-dialog-splash"
-      className="relative h-44 shrink-0 overflow-hidden"
+      className={cn("relative shrink-0 overflow-hidden", alto)}
       style={{
         background:
           "linear-gradient(135deg, color-mix(in oklch, var(--primary) 16%, var(--card)) 0%, var(--card) 55%, color-mix(in oklch, var(--accent) 30%, var(--card)) 100%)",
       }}
     >
       <span className="absolute top-1/2 left-1/2 size-[260px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--primary)_14%,transparent),transparent_70%)]" />
-      <span className="muriki-welcome-mascot absolute top-1/2 left-1/2 -mt-[46px] -ml-[46px] flex size-[92px]">
+      <span className={cn("muriki-welcome-mascot absolute top-1/2 left-1/2 flex -translate-x-1/2 -translate-y-1/2", mascote)}>
         <MurikiLogo className="size-full" />
       </span>
       {ordem.map((brand, i) => {
@@ -88,7 +138,7 @@ function Splash({ brands, highlight }: { brands: Brand[]; highlight: Brand[] }) 
         return (
           <span
             key={brand}
-            className="muriki-welcome-tile absolute"
+            className={cn("muriki-welcome-tile absolute", i >= 8 && sobra)}
             style={
               {
                 left: `${(x / 620) * 100}%`,
@@ -122,8 +172,10 @@ function WelcomeDialog({
   onSkip,
   onFinish,
   finishRender,
+  variant = "auto",
   className,
 }: WelcomeDialogProps) {
+  const f = FORMA[variant]
   const t = useTranslate()
   const [stepInterno, setStepInterno] = React.useState(defaultStep)
   const atual = Math.min(Math.max(stepProp ?? stepInterno, 0), steps.length - 1)
@@ -168,16 +220,19 @@ function WelcomeDialog({
           data-slot="welcome-dialog"
           aria-label={eyebrow}
           initialFocus={conteudoRef}
+          data-variant={variant}
           className={cn(
-            "muriki-welcome-modal fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[min(620px,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden",
-            "rounded-[18px] bg-card text-card-foreground outline-none",
+            "fixed z-50 flex flex-col overflow-hidden bg-card text-card-foreground outline-none",
             "shadow-[0_30px_80px_-20px_rgba(0,0,0,0.45),0_0_0_1px_var(--border)]",
+            f.popup,
             className
           )}
         >
-          {splash === undefined ? <Splash brands={brands} highlight={highlight} /> : splash}
+          {/* a alça da folha; Esc e o véu fecham como Pular */}
+          <span aria-hidden className={cn("absolute top-2 left-1/2 z-10 h-1 w-10 -translate-x-1/2 rounded-full bg-foreground/20", f.alca)} />
+          {splash === undefined ? <Splash brands={brands} highlight={highlight} variant={variant} /> : splash}
 
-          <div className="muriki-scroll flex min-h-0 flex-col gap-[18px] overflow-y-auto px-7 pt-[22px] pb-6">
+          <div className={cn("muriki-scroll flex min-h-0 flex-col gap-[18px] overflow-y-auto pb-6", f.corpo)}>
             <span className="font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">{eyebrow}</span>
 
             <ol className="flex gap-2.5" aria-label={t("welcome_dialog.step", { n: atual + 1, total: steps.length })}>
@@ -200,32 +255,37 @@ function WelcomeDialog({
               ref={conteudoRef}
               tabIndex={-1}
               data-slot="welcome-dialog-content"
-              className="flex min-h-[268px] flex-col gap-3.5 outline-none"
+              className={cn("flex flex-col gap-3.5 outline-none", f.conteudo)}
             >
               {steps[atual]?.content}
             </div>
 
-            <div className="flex items-center gap-2">
+            {/* No modal: Pular à esquerda, Voltar e o principal à direita. Na folha: o principal em
+                largura cheia em cima, e Pular e Voltar na linha de baixo. */}
+            <div className={f.rodape}>
               <button
                 type="button"
                 onClick={pular}
-                className="rounded-[6px] text-[13.5px] font-medium text-muted-foreground outline-none transition-colors hover:text-foreground-strong focus-visible:ring-[3px] focus-visible:ring-ring/35"
+                className={cn(
+                  "rounded-[6px] text-[13.5px] font-medium text-muted-foreground outline-none transition-colors hover:text-foreground-strong focus-visible:ring-[3px] focus-visible:ring-ring/35",
+                  f.pular
+                )}
               >
                 {rotulo("skip")}
               </button>
-              <span className="flex-1" />
+              <span className={cn("flex-1", f.espaco)} />
               {atual > 0 ? (
-                <Button variant="ghost" size="lg" onClick={() => irPara(atual - 1)}>
+                <Button variant="ghost" size="lg" onClick={() => irPara(atual - 1)} className={f.voltar}>
                   {rotulo("back")}
                 </Button>
               ) : null}
               {ultimo ? (
-                <Button variant="solid" size="lg" onClick={onFinish} render={finishRender}>
+                <Button variant="solid" size="lg" onClick={onFinish} render={finishRender} className={f.principal}>
                   {rotulo("finish")}
                   <ArrowRightIcon aria-hidden data-motion="nudge" />
                 </Button>
               ) : (
-                <Button variant="solid" size="lg" onClick={() => irPara(atual + 1)}>
+                <Button variant="solid" size="lg" onClick={() => irPara(atual + 1)} className={f.principal}>
                   {rotulo("next")}
                   <ArrowRightIcon aria-hidden data-motion="nudge" />
                 </Button>

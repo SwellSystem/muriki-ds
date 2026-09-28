@@ -1368,7 +1368,7 @@
           "target": "components/blocks/welcome-dialog/welcome-dialog.tsx"
         }
       ],
-      "docs": "Nas Trilhas, na primeira visita: <WelcomeDialog open={!visto} onOpenChange={…} eyebrow=\"Trilhas · primeira vez\" brands={[\"ts\", \"py\", \"js\", \"go\", \"docker\", \"postgres\", \"rust\", \"ruby\", \"mysql\", \"aws\"]} highlight={profile.languages} steps={[{ label: \"Seu ponto de partida\", content: <PontoDePartida profile={profile} /> }, { label: \"Suas trilhas\", content: <TresTrilhas tracks={recomendadas} /> }, { label: \"Como a trilha anda\", content: <ComoAnda /> }]} labels={{ finish: \"Abrir a trilha\" }} finishRender={<Link to=\"/tracks/$id\" params={{ id: recomendadas[0].id }} />} onSkip={marcarVisto} onFinish={marcarVisto} />. O conteúdo de cada passo é do app (título 24px semibold, texto 14px muted, e o que o passo mostra); o componente cuida do splash, do stepper, do foco (vai para o conteúdo a cada passo) e do rodapé. Passo controlado com step/onStepChange (0 é o primeiro) ou solto com defaultStep. highlight vem maior e mais perto do mascote (as linguagens da pessoa); até 10 tecnologias. splash troca o topo inteiro (null tira). Esc e clique fora chamam onSkip. Rótulos em welcome_dialog.* (Pular, Voltar, Continuar, Começar) ou por labels. As animações moram no css deste item (muriki-welcome-*): véu que aparece, modal que sobe e cresce, mascote que flutua e ladrilhos que entram um a um; com prefers-reduced-motion, tudo parado.",
+      "docs": "Nas Trilhas, na primeira visita: <WelcomeDialog open={!visto} onOpenChange={…} eyebrow=\"Trilhas · primeira vez\" brands={[\"ts\", \"py\", \"js\", \"go\", \"docker\", \"postgres\", \"rust\", \"ruby\", \"mysql\", \"aws\"]} highlight={profile.languages} steps={[{ label: \"Seu ponto de partida\", content: <PontoDePartida profile={profile} /> }, { label: \"Suas trilhas\", content: <TresTrilhas tracks={recomendadas} /> }, { label: \"Como a trilha anda\", content: <ComoAnda /> }]} labels={{ finish: \"Abrir a trilha\" }} finishRender={<Link to=\"/tracks/$id\" params={{ id: recomendadas[0].id }} />} onSkip={marcarVisto} onFinish={marcarVisto} />. O conteúdo de cada passo é do app (título 24px semibold, texto 14px muted, e o que o passo mostra); o componente cuida do splash, do stepper, do foco (vai para o conteúdo a cada passo) e do rodapé. Passo controlado com step/onStepChange (0 é o primeiro) ou solto com defaultStep. highlight vem maior e mais perto do mascote (as linguagens da pessoa); até 10 tecnologias. splash troca o topo inteiro (null tira). Esc e clique fora chamam onSkip. Rótulos em welcome_dialog.* (Pular, Voltar, Continuar, Começar) ou por labels. As animações moram no css deste item (muriki-welcome-*): véu que aparece, modal que sobe e cresce, mascote que flutua e ladrilhos que entram um a um; com prefers-reduced-motion, tudo parado. No celular (abaixo de md), com variant=\"auto\" (padrão), o modal vira folha que sobe de baixo: largura cheia, cantos de cima arredondados, a alça, até 92dvh com o conteúdo rolando, o splash de 148px (mascote de 76px, só os oito primeiros ladrilhos), o botão principal em largura cheia em cima e Pular e Voltar embaixo, com o respiro da safe-area. variant=\"dialog\" ou \"sheet\" fixa uma das formas.",
       "css": {
         "@keyframes muriki-welcome-veil": {
           "from": {
@@ -1418,8 +1418,24 @@
         ".muriki-welcome-tile": {
           "animation": "muriki-welcome-tile 0.45s ease-out both"
         },
+        "@keyframes muriki-welcome-up": {
+          "from": {
+            "transform": "translateY(100%)"
+          },
+          "to": {
+            "transform": "none"
+          }
+        },
+        ".muriki-welcome-sheet": {
+          "animation": "muriki-welcome-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+        },
+        "@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference)": {
+          ".muriki-welcome-modal.muriki-welcome-auto": {
+            "animation": "muriki-welcome-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+          }
+        },
         "@media (prefers-reduced-motion: reduce)": {
-          ".muriki-welcome-veil, .muriki-welcome-modal, .muriki-welcome-mascot, .muriki-welcome-tile": {
+          ".muriki-welcome-veil, .muriki-welcome-modal, .muriki-welcome-sheet, .muriki-welcome-mascot, .muriki-welcome-tile": {
             "animation": "none"
           }
         }
