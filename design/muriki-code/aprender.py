@@ -535,7 +535,7 @@ def tela_trilha_boas_vindas(k, sufixo):
     texto = lambda chave: f'<p style="margin:0;font-size:14px;color:{k["mfg"]};">{T(chave)}</p>'
     p1 = (titulo('bv1Tit') + texto('bv1Txt')
           + f'<div style="display:flex;flex-direction:column;gap:10px;">'
-          + linha('bvExp', chip(T('pleno'))) + linha('bvLing', chip_marca('ts') + chip_marca('py'))
+          + linha('bvExp', chip(T('expContou'))) + linha('bvLing', chip_marca('ts') + chip_marca('py'))
           + linha('bvObj', chip(T('bvAprender')) + chip(T('bvRevisar'))) + '</div>'
           f'<div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:10px;background:{k["sunken"]};">'
           f'<span style="display:flex;margin-top:2px;color:{k["pri"]};">{ic("trilhas", 15)}</span>'

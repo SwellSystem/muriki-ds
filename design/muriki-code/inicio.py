@@ -39,7 +39,7 @@ def tela_inicio(k, sufixo):
 
     linha = lambda rot, valor: (f'<div style="display:flex;flex-direction:column;gap:6px;">{rotulo(rot, k["mfg"], 9.5)}'
                                 f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{valor}</div></div>')
-    contou = (linha(T('nivel'), _chip(k, T('pleno')))
+    contou = (linha(T('nivel'), _chip(k, T('expContou')))
               + linha(T('linguas'), _chip(k, 'TypeScript') + _chip(k, 'Python'))
               + linha(T('objetivos'), _chip(k, T('oAprender')) + _chip(k, T('oEntregar'))))
     pulou = (f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("pulouTxt")}</p>'

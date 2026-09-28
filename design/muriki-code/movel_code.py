@@ -198,7 +198,7 @@ def tela_inicio_movel(k, sufixo, altura_fixa=None):
 
     linha = lambda rot, valor: (f'<div style="display:flex;flex-direction:column;gap:6px;">{rotulo(rot, k["mfg"], 9.5)}'
                                 f'<div style="display:flex;flex-wrap:wrap;gap:6px;">{valor}</div></div>')
-    contou = (linha(T('nivel'), _chip(k, T('pleno')))
+    contou = (linha(T('nivel'), _chip(k, T('expContou')))
               + linha(T('linguas'), _chip(k, 'TypeScript') + _chip(k, 'Python'))
               + linha(T('objetivos'), _chip(k, T('oAprender')) + _chip(k, T('oEntregar'))))
     pulou = (f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("pulouTxt")}</p>'
@@ -557,7 +557,7 @@ def tela_boas_vindas_movel(k, sufixo):
     texto = lambda chave: f'<p style="margin:0;font-size:14px;line-height:20px;color:{k["mfg"]};">{T(chave)}</p>'
     p1 = (titulo('bv1Tit') + texto('bv1Txt')
           + f'<div style="display:flex;flex-direction:column;gap:10px;">'
-          + linha('bvExp', chip_(T('pleno'))) + linha('bvLing', chip_marca('ts') + chip_marca('py'))
+          + linha('bvExp', chip_(T('expContou'))) + linha('bvLing', chip_marca('ts') + chip_marca('py'))
           + linha('bvObj', chip_(T('bvAprender')) + chip_(T('bvRevisar'))) + '</div>'
           f'<div style="display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:10px;background:{k["sunken"]};">'
           f'<span style="display:flex;margin-top:2px;color:{k["pri"]};">{ic("trilhas", 15)}</span>'
