@@ -279,12 +279,13 @@ def filete(k):
     return f'<div style="height:1px;background:{k["muted"]};"></div>'
 
 
-NIVEIS = ['Junior', 'Pleno', 'Senior', 'Tech Lead', 'Architect']
+# a escala da muriki-api (GET /code/competencies): fundamentos, junior, pleno, senior
+NIVEIS = [T('fundamentos'), T('junior'), T('pleno'), T('senior')]
 
 
 def escala(n, k, larg=20):
     segs = ''
-    for i in range(5):
+    for i in range(len(NIVEIS)):
         if i < n:
             s = f'background:{k["pri"]};'
         else:

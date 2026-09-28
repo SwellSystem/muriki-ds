@@ -97,13 +97,13 @@ def _minimapa(k, sufixo, atual, comeco=False):
 
 # ── Trilhas ──
 TRILHAS_DADOS = [
-    # título, texto, competência, nível de/até (1-5), etapas, feitas, horas, pro, para você
-    ('t1', 't1Txt', 'Testing', (2, 3), 8, 3, 3, False, True),
-    ('t2', 't2Txt', 'Debugging', (2, 3), 6, 1, 2, False, True),
+    # título, texto, competência, nível de/até (1 Fundamentos, 2 Junior, 3 Pleno, 4 Senior), etapas, feitas, horas, pro, para você
+    ('t1', 't1Txt', 'Testing', (3, 4), 8, 3, 3, False, True),
+    ('t2', 't2Txt', 'Debugging', (3, 4), 6, 1, 2, False, True),
     ('t3', 't3Txt', 'TypeScript', (3, 4), 7, 0, 3, False, False),
-    ('t4', 't4Txt', 'APIs', (2, 3), 6, 0, 2, False, False),
-    ('t5', 't5Txt', 'Architecture', (1, 2), 9, 0, 4, True, False),
-    ('t6', 't6Txt', 'Security', (2, 3), 5, 0, 2, True, False),
+    ('t4', 't4Txt', 'APIs', (3, 4), 6, 0, 2, False, False),
+    ('t5', 't5Txt', 'Architecture', (2, 3), 9, 0, 4, True, False),
+    ('t6', 't6Txt', 'Security', (3, 4), 5, 0, 2, True, False),
 ]
 
 
@@ -194,7 +194,7 @@ def tela_trilha(k, sufixo):
                                             f'<span style="width:84px;font-size:12.5px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 18)}'
                                             f'<span style="font-size:12.5px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
     nivel = cartao(f'{rotulo(T("seuNivel"), k["mfg"])}'
-                   + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                   + linha_nivel(T('declarado'), 3) + linha_nivel(T('observado'), 3, badge(T('aConfirmar'), k, 'yellow'))
                    + f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("nivelTxt")}</p>',
                    k, pad='18px 22px', extra='gap:12px;')
     conta_ = cartao(f'{rotulo(T("conta"), k["mfg"])}'
@@ -340,7 +340,7 @@ def _lado_trilha(k):
                                             f'<span style="width:84px;font-size:12.5px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 18)}'
                                             f'<span style="font-size:12.5px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
     nivel = cartao(f'{rotulo(T("seuNivel"), k["mfg"])}'
-                   + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                   + linha_nivel(T('declarado'), 3) + linha_nivel(T('observado'), 3, badge(T('aConfirmar'), k, 'yellow'))
                    + f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("nivelTxt")}</p>',
                    k, pad='18px 22px', extra='gap:12px;')
     conta_ = cartao(f'{rotulo(T("conta"), k["mfg"])}'
@@ -461,7 +461,7 @@ def tela_trilha_mapa(k, sufixo):
                                             f'<span style="width:84px;font-size:12.5px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 18)}'
                                             f'<span style="font-size:12.5px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
     nivel = cartao(f'{rotulo(T("seuNivel"), k["mfg"])}'
-                   + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                   + linha_nivel(T('declarado'), 3) + linha_nivel(T('observado'), 3, badge(T('aConfirmar'), k, 'yellow'))
                    + f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("nivelTxt")}</p>'
                    f'<div style="display:flex;align-items:center;gap:8px;padding-top:10px;box-shadow:inset 0 1px 0 {k["muted"]};">'
                    f'<span style="font-size:12.5px;color:{k["mfg"]};">{T("conta")}</span><span style="flex:1;"></span>'
@@ -542,13 +542,14 @@ def tela_trilha_boas_vindas(k, sufixo):
           f'<span style="font-size:13.5px;line-height:20px;color:{k["fgs"]};font-weight:500;">{T("bvComeco")}</span></div>')
 
     def trilha_linha(n, tit, comp, tom, etapas, marca):
+        de, ate = next(t[3] for t in TRILHAS_DADOS if t[0] == tit)
         return (f'<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;'
                 + (f'box-shadow:inset 0 0 0 1.5px {k["pri"]};background:color-mix(in oklch, {k["pri"]} 5%, {k["card"]});' if n == 1
                    else f'box-shadow:inset 0 0 0 1px {k["border"]};')
                 + f'"><span style="font-family:{MONO};font-size:12px;color:{k["mfg"]};width:14px;">{n}</span>'
                 f'<span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">'
                 f'<span style="font-size:14px;font-weight:600;color:{k["fgs"]};">{T(tit)}</span>'
-                f'<span style="font-size:12px;color:{k["mfg"]};">{T("pleno")} → Senior · {etapas} {T("bvEtapas")}</span></span>'
+                f'<span style="font-size:12px;color:{k["mfg"]};">{NIVEIS[de - 1]} → {NIVEIS[ate - 1]} · {etapas} {T("bvEtapas")}</span></span>'
                 f'{badge(comp, k, tom)}'
                 f'<span style="width:84px;text-align:right;font-size:11.5px;font-weight:{600 if n == 1 else 400};color:{k["pri"] if n == 1 else k["mfg"]};">{T(marca)}</span></div>')
     p2 = (titulo('bv2Tit') + texto('bv2Txt')
@@ -595,7 +596,7 @@ def tela_trilhas_vazia(k, sufixo):
         f'<span style="font-size:13px;color:{k["mfg"]};">{T("vzPorque")}</span>'
         f'<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T("t1")}</h2>'
         f'<p style="margin:0;font-size:13.5px;color:{k["mfg"]};">{T("t1Txt")}</p>'
-        f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:{k["mfg"]};">{escala(3, k, 14)}Pleno → Senior · {T("vzMeta")}</span>'
+        f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:{k["mfg"]};">{escala(4, k, 14)}{NIVEIS[2]} → {NIVEIS[3]} · {T("vzMeta")}</span>'
         f'<div style="display:flex;align-items:center;gap:16px;margin-top:10px;">'
         f'{botao_link(T("vzComecar"), f"Trilha{sufixo}.dc.html", k, "solid", 40, "seta")}'
         f'<a href="TrilhasBoasVindas{sufixo}.dc.html" style="font-size:13px;font-weight:500;">{T("vzRever")}</a></div></div>'

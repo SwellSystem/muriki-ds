@@ -25,7 +25,7 @@ MINHA_CONTA = {
         confirmeSenha='Para confirmar, digite a sua senha', usarCodigo='Usar o código do app', excluirDefinitivo='Excluir a conta',
         # aprendizado
         aprTit='Perfil de aprendizado', aprSub='Ajuda o Code a escolher trilhas e o Peer a falar no seu nível. Nada aqui é obrigatório.',
-        declaradoNota='O declarado da Evolução vem da experiência: mudar aqui muda o declarado de todas as competências. O observado continua vindo das suas evidências.',
+        declaradoNota='O declarado da Evolução vem daqui: a experiência vale para todas as competências, e o que você diz de JavaScript/TypeScript vale para as da família e ganha da experiência. O observado continua vindo das suas evidências e não muda com o perfil.',
         # segurança
         senhaTit='Senha', senhaSub='Trocar a senha encerra as suas outras sessões.', senhaAtual='Senha atual', senhaNova='Senha nova',
         senhaNovaPh='Pelo menos 12 caracteres', senhaReq='De 12 a 128 caracteres, fora de vazamentos conhecidos.', trocarSenha='Trocar senha',
@@ -102,7 +102,7 @@ MINHA_CONTA = {
         excluirTxt='This deletes your profile, learning profile, password, passkeys and second factor, in Code and in Platform, and signs out every session. Pro is canceled now, with no refund for the period. This can’t be undone.',
         confirmeSenha='To confirm, type your password', usarCodigo='Use the app code', excluirDefinitivo='Delete account',
         aprTit='Learning profile', aprSub='It helps Code pick tracks and the Peer talk at your level. Nothing here is required.',
-        declaradoNota='The declared level in Progress comes from your experience: changing it here changes the declared level of every competency. The observed level still comes from your evidence.',
+        declaradoNota='The declared level in Progress comes from here: your experience applies to every competency, and what you say about JavaScript/TypeScript applies to that family and wins over experience. The observed level still comes from your evidence and doesn’t change with your profile.',
         senhaTit='Password', senhaSub='Changing your password signs out your other sessions.', senhaAtual='Current password', senhaNova='New password',
         senhaNovaPh='At least 12 characters', senhaReq='12 to 128 characters, not in known breaches.', trocarSenha='Change password',
         doisTit='Two-step verification', doisSub='When you sign in, a code from your authenticator app on top of your password.',
@@ -175,7 +175,7 @@ MINHA_CONTA = {
         excluirTxt='Elimina tu perfil, el perfil de aprendizaje, la contraseña, las passkeys y el segundo factor, en Code y en Platform, y cierra todas las sesiones. Pro se cancela ahora, sin reembolso del periodo. No se puede deshacer.',
         confirmeSenha='Para confirmar, escribe tu contraseña', usarCodigo='Usar el código de la app', excluirDefinitivo='Eliminar la cuenta',
         aprTit='Perfil de aprendizaje', aprSub='Ayuda a Code a elegir rutas y al Peer a hablar a tu nivel. Nada aquí es obligatorio.',
-        declaradoNota='El nivel declarado de Evolución viene de la experiencia: cambiarla aquí cambia el declarado de todas las competencias. El observado sigue viniendo de tus evidencias.',
+        declaradoNota='El nivel declarado de Evolución viene de aquí: la experiencia vale para todas las competencias, y lo que dices de JavaScript/TypeScript vale para esa familia y gana a la experiencia. El observado sigue viniendo de tus evidencias y no cambia con el perfil.',
         senhaTit='Contraseña', senhaSub='Cambiar la contraseña cierra tus otras sesiones.', senhaAtual='Contraseña actual', senhaNova='Contraseña nueva',
         senhaNovaPh='Al menos 12 caracteres', senhaReq='De 12 a 128 caracteres, fuera de filtraciones conocidas.', trocarSenha='Cambiar contraseña',
         doisTit='Verificación en dos pasos', doisSub='Al entrar, además de la contraseña, un código de la app de autenticación.',

@@ -70,8 +70,8 @@ def tela_inicio(k, sufixo):
             + '</div></section>')
 
     escala_vazia = ''.join(f'<span style="width:18px;height:6px;border-radius:2px;'
-                           + (f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};' if i < 2 else f'background:{k["sunken"]};')
-                           + '"></span>' for i in range(5))
+                           + (f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};' if i < 3 else f'background:{k["sunken"]};')
+                           + '"></span>' for i in range(len(NIVEIS)))
     competencia = cartao(
         f'{rotulo(T("perfil"), k["mfg"])}'
         f'<div style="display:flex;align-items:center;gap:14px;"><span style="display:flex;gap:3px;">{escala_vazia}</span>'

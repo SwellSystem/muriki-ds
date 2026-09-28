@@ -29,7 +29,7 @@ from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela
 
 
 def nivel_nome(n):
-    return T('pleno') if n == 2 else NIVEIS[n - 1]
+    return NIVEIS[n - 1]
 
 
 # ── 1 · Evolução: declarado e observado convivem, por competência ──────
@@ -40,27 +40,32 @@ ENGENHARIA = ['Testing', 'Debugging', 'Architecture', 'APIs', 'Databases', 'Secu
               'Design Patterns', 'System Design', 'DDD', 'Observability']
 
 # nome: (declarado, observado, evidências, estado, alvo)  — declarado None = não uso; observado 0 = sem confirmação
-# O declarado nasce da experiência do perfil de aprendizado e vale para todas as competências: a API
-# guarda um nível só (experience: junior, mid, senior, tech_lead, architect), não um por competência;
-# "ainda não sei" (unknown) ou pular deixa o declarado vazio. O Rafael escolheu Pleno, então tudo
-# começa em Pleno, e o que passa disso vem das evidências.
+# Níveis na escala da muriki-api: 1 Fundamentos, 2 Junior, 3 Pleno, 4 Senior. O declarado vem do perfil
+# de aprendizado (source declared_from_experience): nunca, aprendendo e "ainda não sei" → fundamentos,
+# menos de 2 anos → junior, de 2 a 5 → pleno, mais de 5 → senior. A familiaridade com uma família de
+# linguagem (source declared: nunca usei → fundamentos, o básico → junior, uso todo dia → pleno,
+# domino → senior) vale para as competências da família e ganha da experiência. O observado (assessed)
+# nunca muda com o perfil. O Rafael marcou "De 2 a 5 anos" e, em JavaScript/TypeScript, "Uso todo dia":
+# tudo começa em Pleno, TypeScript pela familiaridade, e o que passa disso vem das evidências.
 PERFIL = {
-    'TypeScript': (2, 3, 64, 'confirmado', None),
-    'Python': (2, 0, 3, 'declarado', None),
+    'TypeScript': (3, 3, 64, 'confirmado', None),
+    'Python': (3, 0, 3, 'declarado', None),
     'Go': (None, 0, 0, 'naoUso', None),
-    'Testing': (2, 2, 41, 'progresso', 3),
-    'Debugging': (2, 2, 37, 'progresso', 3),
-    'Architecture': (2, 1, 9, 'aConfirmar', 2),
-    'APIs': (2, 2, 28, 'confirmado', None),
-    'Databases': (2, 2, 15, 'confirmado', None),
-    'Security': (2, 0, 6, 'declarado', None),
-    'Design Patterns': (2, 2, 12, 'confirmado', None),
-    'System Design': (2, 0, 4, 'declarado', None),
-    'DDD': (2, 0, 0, 'declarado', None),
-    'Observability': (2, 0, 3, 'declarado', None),
+    'Testing': (3, 3, 41, 'progresso', 4),
+    'Debugging': (3, 3, 37, 'progresso', 4),
+    'Architecture': (3, 2, 9, 'aConfirmar', 3),
+    'APIs': (3, 3, 28, 'confirmado', None),
+    'Databases': (3, 3, 15, 'confirmado', None),
+    'Security': (3, 0, 6, 'declarado', None),
+    'Design Patterns': (3, 3, 12, 'confirmado', None),
+    'System Design': (3, 0, 4, 'declarado', None),
+    'DDD': (3, 0, 0, 'declarado', None),
+    'Observability': (3, 0, 3, 'declarado', None),
 }
+# competências da família js: o declarado delas vem da familiaridade, não da experiência
+FAMILIA_JS = {'TypeScript'}
 # o dia do primeiro acesso: só o declarado, Pleno em tudo (Intermediário), e Go fora das linguagens marcadas
-PERFIL_INICIAL = {nome: (2, 0, 0, 'declarado', None) for nome in LINGUAGENS + ENGENHARIA}
+PERFIL_INICIAL = {nome: (3, 0, 0, 'declarado', None) for nome in LINGUAGENS + ENGENHARIA}
 PERFIL_INICIAL.update(Go=(None, 0, 0, 'naoUso', None))
 
 COLUNAS_PERFIL = '160px 112px 92px 116px minmax(0,1fr)'
@@ -69,7 +74,7 @@ COLUNAS_PERFIL = '160px 112px 92px 116px minmax(0,1fr)'
 def escala_perfil(decl, obs, progresso, k, larg=20):
     # preenchido = observado; contorno = declarado acima do observado; meio-tom = próximo nível em progresso
     segs = ''
-    for i in range(5):
+    for i in range(len(NIVEIS)):
         if i < obs:
             s = f'background:{k["pri"]};'
         elif progresso and i == obs:
@@ -94,7 +99,7 @@ def tabela_perfil(k, perfil, dica=None):
             selo = badge(T('estConfirmado'), k, 'green')
         elif estado == 'aConfirmar':
             selo = badge(f'{nivel_nome(alvo)} {T("aConfirmar")}', k, 'yellow', ponto=True)
-            chave = 'confirmam3' if alvo == 3 else 'confirmam2'
+            chave = 'confirmam3' if alvo == 4 else 'confirmam2'
             segunda = (f'<a href="{link_nome}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;">'
                        f'{T(chave)}{ic("direita", 12)}</a>')
         elif estado == 'progresso':
@@ -111,7 +116,11 @@ def tabela_perfil(k, perfil, dica=None):
             selo = badge(T('estDeclarado'), k, tracejado=True)
         if nome in dica:
             segunda = f'<span style="font-size:12px;color:{k["pri"]};">{T(dica[nome])}</span>'
-        declarado = (f'<span style="font-size:13px;color:{k["fg"]};">{nivel_nome(decl)}</span>' if decl
+        # o declarado vem da experiência (dito no subtítulo); na família js, marca que veio do que a pessoa disse de JS/TS
+        fonte = (f'<span style="font-size:11px;line-height:14px;color:{k["mfg"]};">{T("fonteFam")}</span>'
+                 if nome in FAMILIA_JS else '')
+        declarado = (f'<span style="display:flex;flex-direction:column;gap:1px;">'
+                     f'<span style="font-size:13px;color:{k["fg"]};">{nivel_nome(decl)}</span>{fonte}</span>' if decl
                      else f'<span style="color:{k["mfg"]};">—</span>')
         observado = (f'<span style="display:flex;align-items:baseline;gap:8px;">'
                      + (f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{nivel_nome(obs)}</span>' if obs
@@ -140,7 +149,7 @@ def tabela_perfil(k, perfil, dica=None):
                 f'{item(amostra("box-shadow:inset 0 0 0 1px " + k["pri"] + ";"), T("legDecl"))}'
                 f'{item(amostra("background:color-mix(in oklch, " + k["pri"] + " 35%, transparent);"), T("legProg"))}'
                 f'<span style="margin-left:auto;font-family:{MONO};font-size:11px;color:{k["mfg"]};">'
-                f'Junior · {T("pleno")} · Senior · Tech Lead · Architect</span></div>')
+                f'{" · ".join(NIVEIS)}</span></div>')
     return (f'<section aria-label="{T("competencias")}" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;'
             f'box-shadow:{k["sombra"]};padding:4px 0 12px;display:flex;flex-direction:column;overflow:hidden;">'
             f'{cab_tab}{grupo(T("grupoLing"), LINGUAGENS)}{grupo(T("grupoEng"), ENGENHARIA)}{legenda_}</section>')
