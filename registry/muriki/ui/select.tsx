@@ -99,7 +99,8 @@ function SelectContent({
         <SelectPrimitive.Popup
           data-slot="select-content"
           className={cn(
-            "max-h-(--available-height) min-w-(--anchor-width) origin-(--transform-origin) overflow-y-auto muriki-scroll",
+            // no máximo o espaço que sobra ao lado do gatilho: com nomes longos no celular, o popup passava da tela
+            "max-h-(--available-height) max-w-(--available-width) min-w-(--anchor-width) origin-(--transform-origin) overflow-y-auto muriki-scroll",
             "rounded-[var(--radius-float)] bg-popover p-1 text-popover-foreground shadow-[var(--float)] outline-none",
             "transition-[opacity,transform] duration-100 ease-out",
             "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
@@ -129,7 +130,7 @@ function SelectItem({ className, children, ...props }: SelectPrimitive.Item.Prop
       )}
       {...props}
     >
-      <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText className="min-w-0 truncate">{children}</SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
         render={
           <span className="pointer-events-none absolute right-2 flex items-center justify-center">
