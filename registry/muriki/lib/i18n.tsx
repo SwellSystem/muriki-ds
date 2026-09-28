@@ -382,6 +382,9 @@ const STRINGS: Record<string, unknown> = {
       confirm: "Excluir a conta",
     },
   },
+  bar_list: {
+    empty: "Ainda não há dados neste período.",
+  },
   bar_chart: {
     current: "em curso",
     as_table: "Ver como tabela",

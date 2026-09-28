@@ -1226,6 +1226,26 @@
       "docs": "Card Vendas por mês, com GET /admin/billing/sales/monthly (12 meses, total em centavos, count): const brl = new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", maximumFractionDigits: 0 }); <BarChart labels={meses.map((m) => formatMonth(m.month))} series={[{ key: \"platform\", label: \"Muriki Platform\", values: meses.map((m) => m.total / 100) }]} formatValue={(v) => brl.format(v)} current={meses.length - 1} extra={(_, i) => `${meses[i].count} vendas`} ariaLabel=\"Vendas por mês, de out de 2025 a set de 2026. Pico em ago, R$ 44.930.\" loading={isPending} />. Os valores vão na unidade do eixo (reais, não centavos). As séries dividem UMA escala: não misture moedas — BRL e USD na mesma escala enganam; cada moeda vai no seu gráfico, ou o card ganha um seletor de produto (view-toggle). Duas séries da mesma moeda saem agrupadas por mês, com legenda; uma série, sem legenda. color é opcional (padrão: --primary, --chart-1, --chart-3). formatTick troca o rótulo compacto do eixo. Negativos (um reembolso no mês) descem da linha do zero. Tudo zero ou sem rótulos: estado vazio (bar_chart.empty). loading: BarChartSkeleton, que também sai à parte. Textos em bar_chart.* (current, as_table, as_chart, empty, period)."
     },
     {
+      "name": "bar-list",
+      "type": "registry:block",
+      "title": "Bar List",
+      "description": "A lista com barra horizontal de \"De onde vêm as contas\": uma linha por item com o rótulo, a barra em duas camadas na mesma escala (value no tom claro, part no cheio por cima), o número e uma coluna à direita. Legenda opcional, item esmaecido, uma frase por linha para o leitor de tela, estado vazio e skeleton. Sem dependência nova.",
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/bar-list/bar-list.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/bar-list/bar-list.tsx"
+        }
+      ],
+      "docs": "Com o GET /customers/acquisition?product&period (as 9 origens fixas, com contas e pagantes): const NOMES = { google: \"Google\", instagram: \"Instagram\", linkedin: \"LinkedIn\", youtube: \"YouTube\", tiktok: \"TikTok\", referral: \"Indicação\", event: \"Evento\", other: \"Outra\", unknown: \"Não informada\" }; <BarList items={origens.map((o) => ({ key: o.source, label: NOMES[o.source], value: o.accounts, part: o.paying, muted: o.source === \"unknown\" }))} legend={{ value: \"contas\", part: \"pagantes\" }} formatSecondary={(i) => (i.value ? `${Math.round(((i.part ?? 0) / i.value) * 100)}%` : \"—\")} loading={isPending} />. Cada linha é lida como \"Google: 412 contas, 198 pagantes (48%)\"; troque a frase com itemLabel. formatValue formata o número à direita (padrão: Intl.NumberFormat). max fixa o topo da escala (padrão: o maior value). Tudo zero ou sem itens: estado vazio (bar_list.empty). loading: BarListSkeleton, que também sai à parte. Os nomes dos campos da API acima são ilustrativos: use os do contrato."
+    },
+    {
       "name": "area-chart",
       "type": "registry:block",
       "title": "Area Chart",
