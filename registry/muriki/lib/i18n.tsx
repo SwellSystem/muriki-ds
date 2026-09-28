@@ -389,6 +389,12 @@ const STRINGS: Record<string, unknown> = {
   bar_list: {
     empty: "Ainda não há dados neste período.",
   },
+  trail_map: {
+    here: "você está aqui",
+    done: "feita",
+    now: "agora",
+    later: "a seguir",
+  },
   bar_chart: {
     current: "em curso",
     as_table: "Ver como tabela",
