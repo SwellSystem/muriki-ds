@@ -16,7 +16,11 @@
 //
 // Séries dividem UMA escala: não misture moedas. Cada moeda vai no seu gráfico, ou o card ganha um
 // seletor de produto.
-import { useId, useState, type ReactNode } from "react"
+//
+// Compacto (o celular): abaixo de 480px de largura o gráfico liga sozinho 3 degraus no eixo (0, meio
+// e teto) e os meses de 2 em 2, contados a partir do último, para o período em curso nunca sumir.
+// `yTicks` e `xTickEvery` mandam quando o app passa; `compact` força ou desliga.
+import { useEffect, useId, useRef, useState, type ReactNode } from "react"
 import { Area, AreaChart as RechartsAreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts"
 
 import { ChartContainer, ChartTooltip, type ChartConfig } from "@/components/ui/chart"
@@ -50,11 +54,21 @@ export interface AreaChartProps {
   loading?: boolean
   /** Altura do gráfico em px. */
   height?: number
+  /**
+   * Compacto: 3 degraus no eixo e os meses de 2 em 2. "auto" (padrão) liga abaixo de 480px de
+   * largura; true força, false desliga.
+   */
+  compact?: boolean | "auto"
+  /** Quantos degraus no eixo Y (0, meio e teto são 3). Ganha do compacto. */
+  yTicks?: number
+  /** Rótulo do eixo X de N em N, contando do último para trás. Ganha do compacto. */
+  xTickEvery?: number
   className?: string
 }
 
 const CORES = ["var(--primary)", "var(--chart-1)", "var(--chart-3)"]
 const EM_CURSO = "__em_curso"
+const LARGURA_COMPACTA = 480
 
 export function AreaChart({
   labels,
@@ -66,11 +80,24 @@ export function AreaChart({
   ariaLabel,
   loading = false,
   height = 230,
+  compact = "auto",
+  yTicks,
+  xTickEvery,
   className,
 }: AreaChartProps) {
   const t = useTranslate()
   const [comoTabela, setComoTabela] = useState(false)
   const idBase = useId().replace(/:/g, "")
+  // a largura do próprio gráfico decide o compacto (e não a tela): um card estreito no desktop também
+  const caixa = useRef<HTMLDivElement>(null)
+  const [largura, setLargura] = useState<number | null>(null)
+  useEffect(() => {
+    const el = caixa.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(([e]) => setLargura(Math.round(e.contentRect.width)))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [loading])
 
   if (loading) return <AreaChartSkeleton height={height} className={className} />
 
@@ -109,8 +136,15 @@ export function AreaChart({
   const minimo = Math.min(0, ...todos)
   const temNegativo = minimo < 0
 
+  const compacto_ = compact === true || (compact === "auto" && largura !== null && largura < LARGURA_COMPACTA)
+  const degraus = yTicks ?? (compacto_ ? 3 : undefined)
+  const cada = Math.max(1, xTickEvery ?? (compacto_ ? 2 : 1))
+  // de N em N a partir do último: o período em curso (o mais recente) sempre tem rótulo
+  const rotulado = (i: number) => (labels.length - 1 - i) % cada === 0
+  const eixo = degraus && degraus >= 2 ? escalaFixa(minimo, Math.max(0, ...todos), degraus) : null
+
   return (
-    <div className={cn("flex min-w-0 flex-col gap-3", className)}>
+    <div ref={caixa} className={cn("flex min-w-0 flex-col gap-3", className)}>
       <div className="flex min-h-6 items-center gap-4">
         {series.length > 1 ? (
           <ul className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[12px] text-muted-foreground">
@@ -145,14 +179,23 @@ export function AreaChart({
                 ))}
               </defs>
               <CartesianGrid vertical={false} />
-              <XAxis dataKey="rotulo" tickLine={false} axisLine={false} tickMargin={8} fontSize={10.5} />
+              <XAxis
+                dataKey="rotulo"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                fontSize={10.5}
+                interval={0}
+                tickFormatter={(v: string, i: number) => (rotulado(i) ? v : "")}
+              />
               <YAxis
                 width={44}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={4}
                 fontSize={10.5}
-                domain={[minimo, "auto"]}
+                domain={eixo ? [eixo.piso, eixo.teto] : [minimo, "auto"]}
+                ticks={eixo?.ticks}
                 tickFormatter={(v: number) => formatTick(v)}
               />
               {temNegativo ? <ReferenceLine y={0} stroke="var(--input)" /> : null}
@@ -338,6 +381,23 @@ export function AreaChartSkeleton({ height = 230, className }: { height?: number
       <div className="h-px bg-muted" style={{ marginTop: -12, marginLeft: 44 }} />
     </div>
   )
+}
+
+/** Exatamente N degraus redondos cobrindo [min, max]: o teto arredonda para cima. */
+function escalaFixa(min: number, max: number, degraus: number) {
+  const bruto = (max - min) / (degraus - 1) || 1
+  let pot = 10 ** Math.floor(Math.log10(bruto))
+  for (;;) {
+    for (const m of [1, 2, 2.5, 5]) {
+      const passo = m * pot
+      const piso = Math.floor(min / passo) * passo
+      if (piso + passo * (degraus - 1) >= max) {
+        const ticks = Array.from({ length: degraus }, (_, i) => Math.round((piso + passo * i) * 1e6) / 1e6)
+        return { piso, teto: ticks[degraus - 1], ticks }
+      }
+    }
+    pot *= 10
+  }
 }
 
 function compacto(v: number) {
