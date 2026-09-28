@@ -528,7 +528,7 @@ def tela_planos_movel(k):
                 f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{txt}</span></span></li>')
     regras = (f'<ul style="margin:4px 0 0;padding:16px 0 0;list-style:none;display:flex;flex-direction:column;gap:14px;box-shadow:inset 0 1px 0 {k["muted"]};">'
               + regra('raio', 'Feature nasce uma vez', 'Chave e tipo são do produto. O plano só escolhe o valor: ligada, desligada ou um limite.')
-              + regra('relogio', 'Preço novo vale para quem chega', 'Quem já assina mantém o preço até você migrar a base, com aviso de 30 dias.')
+              + regra('relogio', 'Preço novo vale para quem chega', 'Quem já assina mantém o preço que tinha.')
               + regra('bloqueio', 'Plano com cliente não se apaga', 'Arquive: ele sai da página de preços e quem está nele continua.')
               + '</ul>')
     corpo = (titulo_movel(k, 'Planos', contagem=str(len(PLANOS)), direita=_toque(k, 'grade', 'Matriz de features', k['fgs'], href('Features')))
