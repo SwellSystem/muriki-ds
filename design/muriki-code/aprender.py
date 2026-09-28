@@ -37,6 +37,61 @@ def _busca(k, ph, largura='300px'):
             f'{ic("busca", 14)}{T(ph)}</span>')
 
 
+# ── O minimapa da trilha ──
+# O mapa grande em miniatura, para os cartões do topo de Trilhas: as mesmas regiões, o caminho (feito
+# cheio, o que falta pontilhado), as estações e as bandeiras; a etapa de agora com o halo e o balão.
+# Antes de começar, tudo vazado e "comece aqui" na primeira.
+MINI = [(22, 104), (74, 58), (128, 104), (182, 70), (238, 106), (292, 56), (346, 100), (398, 50)]
+
+
+def _minimapa(k, sufixo, atual, comeco=False):
+    w, h = 420, 140
+    regioes = ''
+    for x0, x1, rot in ((6, 150, 'r1'), (158, 312, 'r2'), (320, 414, 'r3')):
+        regioes += (f'<rect x="{x0}" y="22" width="{x1 - x0}" height="110" rx="18" style="fill:color-mix(in oklch, var(--pri) 5%, transparent);'
+                    f'stroke:color-mix(in oklch, var(--pri) 18%, transparent);stroke-dasharray:2 5;"/>')
+
+    def curva(ps):
+        d = f'M{ps[0][0]},{ps[0][1]}'
+        for a in range(len(ps) - 1):
+            p0 = ps[a - 1] if a > 0 else ps[a]
+            p1, p2 = ps[a], ps[a + 1]
+            p3 = ps[a + 2] if a + 2 < len(ps) else p2
+            d += (f' C{p1[0] + (p2[0] - p0[0]) / 5:.1f},{p1[1] + (p2[1] - p0[1]) / 5:.1f} '
+                  f'{p2[0] - (p3[0] - p1[0]) / 5:.1f},{p2[1] - (p3[1] - p1[1]) / 5:.1f} {p2[0]},{p2[1]}')
+        return d
+    caminho = (f'<path d="{curva(MINI)}" style="fill:none;stroke:var(--card);stroke-width:6;stroke-linecap:round;"/>'
+               f'<path d="{curva(MINI[atual:])}" style="fill:none;stroke:var(--input);stroke-width:2;stroke-dasharray:1 5;stroke-linecap:round;"/>'
+               + (f'<path d="{curva(MINI[:atual + 1])}" style="fill:none;stroke:var(--pri);stroke-width:2.5;stroke-linecap:round;"/>' if atual else ''))
+    nos = ''
+    for n, (x, y) in enumerate(MINI):
+        if n < atual:
+            nos += (f'<circle cx="{x}" cy="{y}" r="7" style="fill:var(--pri);"/>'
+                    f'<path d="M{x - 3},{y} l2,2 l4,-4.5" style="fill:none;stroke:var(--prifg);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;"/>')
+        elif n == atual:
+            nos += (f'<circle cx="{x}" cy="{y}" r="16" style="fill:color-mix(in oklch, var(--pri) 12%, transparent);"/>'
+                    f'<circle cx="{x}" cy="{y}" r="8" style="fill:var(--card);stroke:var(--pri);stroke-width:2.5;"/>')
+        else:
+            nos += f'<circle cx="{x}" cy="{y}" r="5" style="fill:var(--card);stroke:var(--input);stroke-width:1.4;"/>'
+        if n in (5, 7):
+            nos += (f'<g transform="translate({x + 7},{y + 2})"><path d="M0,0 V-15" style="stroke:var(--fgs);stroke-width:1.2;"/>'
+                    f'<path d="M0,-15 h9 l-2,3.5 l2,3.5 h-9 z" style="fill:var(--accent);stroke:var(--fgs);stroke-width:1;stroke-linejoin:round;"/></g>')
+    x, y = MINI[atual]
+    txt = T('miniComece' if comeco else 'miniAqui')
+    largura_balao = 92
+    bx = min(max(x - largura_balao / 2, 2), w - largura_balao - 2)
+    balao = (f'<g><rect x="{bx}" y="{y - 38}" width="{largura_balao}" height="20" rx="10" style="fill:var(--fgs);"/>'
+             f'<text x="{bx + largura_balao / 2}" y="{y - 24}" text-anchor="middle" style="fill:var(--bg);font-family:{FONTE};font-size:10.5px;font-weight:600;">{txt}</text>'
+             f'<path d="M{x - 4},{y - 18} l4,5 l4,-5 z" style="fill:var(--fgs);"/></g>')
+    svg_ = (f'<svg viewBox="0 0 {w} {h}" width="100%" height="{h}" role="img" aria-label="{T("miniTit")}: {atual}/8">'
+            f'{regioes}{caminho}{nos}{balao}</svg>')
+    return (f'<a href="Trilha{sufixo}.dc.html" style="width:440px;flex:0 0 auto;display:flex;flex-direction:column;gap:4px;padding:12px 14px 6px;border-radius:12px;'
+            f'background:{k["rail"]};box-shadow:inset 0 0 0 1px {k["border"]};color:inherit;">'
+            f'<span style="display:flex;align-items:center;">{rotulo(T("miniTit"), k["mfg"], 9.5)}'
+            f'<span style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:500;color:{k["pri"]};">{T("miniVer")}{ic("seta", 12)}</span></span>'
+            f'{svg_}</a>')
+
+
 # ── Trilhas ──
 TRILHAS_DADOS = [
     # título, texto, competência, nível de/até (1-5), etapas, feitas, horas, pro, para você
@@ -54,13 +109,15 @@ def tela_trilhas(k, sufixo):
     destaque = cartao(
         f'<div style="display:flex;align-items:center;gap:10px;">{rotulo(T("continuar"), k["mfg"])}'
         f'<span style="margin-left:auto;">{badge("Testing", k, "blue")}</span></div>'
-        f'<div style="display:flex;align-items:flex-end;gap:24px;">'
+        f'<div style="display:flex;align-items:stretch;gap:28px;">'
         f'<div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">'
         f'<span style="font-size:13px;color:{k["mfg"]};">{T("t1")} · {T("proxEtapa")}</span>'
         f'<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T("e1")}</h2>'
-        f'<p style="margin:0;font-size:13.5px;color:{k["mfg"]};">{T("e1Txt")}</p></div>'
-        f'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;width:260px;">{_progresso(k, 3, 8)}'
-        f'{botao_link(T("continuarBtn"), f"Trilha{sufixo}.dc.html", k, "solid", 40, "seta")}</div></div>',
+        f'<p style="margin:0;font-size:13.5px;color:{k["mfg"]};">{T("e1Txt")}</p>'
+        f'<div style="margin-top:auto;padding-top:12px;display:flex;align-items:center;gap:20px;">'
+        f'{botao_link(T("continuarBtn"), f"Trilha{sufixo}.dc.html", k, "solid", 40, "seta")}'
+        f'<span style="width:200px;">{_progresso(k, 3, 8)}</span></div></div>'
+        f'{_minimapa(k, sufixo, 3)}</div>',
         k, pad='20px 24px', extra='gap:12px;')
     filtros = ('<div style="display:flex;gap:8px;">' + _chip_filtro(k, T('filtroTodas'), True) + _chip_filtro(k, T('filtroAndamento'))
                + _chip_filtro(k, T('filtroRecomendadas')) + _chip_filtro(k, T('filtroFeitas')) + '</div>')
@@ -514,18 +571,9 @@ def tela_trilha_boas_vindas(k, sufixo):
 
 def tela_trilhas_vazia(k, sufixo):
     # Nada em andamento ainda: o topo não tem de onde continuar, então vira "por onde começar" — a
-    # primeira trilha que as boas-vindas escolheram, com as três primeiras etapas à vista — e as
+    # primeira trilha que as boas-vindas escolheram, com o minimapa do que espera a pessoa — e as
     # recomendadas vêm primeiro, numeradas na ordem, sem barra de progresso
     cab = cabecalho(k, None, T('tTitulo'), T('tSub'))
-    etapas = ''
-    for n, (tit, tipo, mins, _, _) in enumerate(ETAPAS[:3]):
-        etapas += (f'<div style="display:flex;align-items:center;gap:10px;">'
-                   f'<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;flex:0 0 auto;'
-                   + (f'background:{k["card"]};box-shadow:0 0 0 2px {k["pri"]};color:{k["pri"]};font-weight:600;' if n == 0 else
-                      f'background:{k["sunken"]};color:{k["mfg"]};')
-                   + f'font-family:{MONO};font-size:10.5px;">{n + 1}</span>'
-                   f'<span style="flex:1;font-size:13px;color:{k["fgs"] if n == 0 else k["mfg"]};font-weight:{500 if n == 0 else 400};">{T(tit)}</span>'
-                   f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{mins} {T("min")}</span></div>')
     destaque = cartao(
         f'<div style="display:flex;align-items:center;gap:10px;">{rotulo(T("vzRotulo"), k["mfg"])}'
         f'<span style="margin-left:auto;display:flex;gap:6px;">{badge("Testing", k, "blue")}{badge(T("recomendada"), k, "green", ponto=True)}</span></div>'
@@ -538,8 +586,7 @@ def tela_trilhas_vazia(k, sufixo):
         f'<div style="display:flex;align-items:center;gap:16px;margin-top:10px;">'
         f'{botao_link(T("vzComecar"), f"Trilha{sufixo}.dc.html", k, "solid", 40, "seta")}'
         f'<a href="TrilhasBoasVindas{sufixo}.dc.html" style="font-size:13px;font-weight:500;">{T("vzRever")}</a></div></div>'
-        f'<div style="width:320px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:10px;background:{k["rail"]};'
-        f'box-shadow:inset 0 0 0 1px {k["border"]};">{rotulo(T("vzPrimeiras"), k["mfg"], 9.5)}{etapas}</div></div>',
+        f'{_minimapa(k, sufixo, 0, comeco=True)}</div>',
         k, pad='20px 24px', extra='gap:14px;')
 
     def chip(txt, ativo=False, apagado=False, n=None):
