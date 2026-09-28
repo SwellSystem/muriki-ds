@@ -96,7 +96,10 @@
 
   /* série de dados — avatares tintados e a cor de epic dos blocos */
   --chart-1: oklch(0.79 0.17 70.25);
+  --chart-2: oklch(0.62 0.12 175);
   --chart-3: oklch(0.56 0.21 269.11);
+  --chart-4: oklch(0.64 0.17 22);
+  --chart-5: oklch(0.6 0.16 305);
   /* O filete recua. Ele era 0.94, um traço presente em toda separação do
      sistema, e é daí que vinha a cara de grade. Com a rampa clara aberta —
      página 0.968, cartão 0.993 — quem separa passa a ser a superfície; o
@@ -182,7 +185,10 @@
   --scrim: oklch(0.09 0.003 107 / 0.62);
 
   --chart-1: oklch(0.79 0.17 70.25);
+  --chart-2: oklch(0.62 0.12 175);
   --chart-3: oklch(0.56 0.21 269.11);
+  --chart-4: oklch(0.64 0.17 22);
+  --chart-5: oklch(0.6 0.16 305);
   /* Espelho da nota no claro: o filete recua e a superfície separa. */
   --border: oklch(0.215 0.004 107);
   --divider: oklch(0.925 0.004 100 / 0.055);
@@ -235,7 +241,10 @@
   --shadow-float: var(--float);
   --shadow-float-strong: var(--float-strong);
   --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
   --color-border: var(--border);
   --color-divider: var(--divider);
   --color-input: var(--input);
