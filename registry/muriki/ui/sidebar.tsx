@@ -357,6 +357,18 @@ function SidebarProvider({
   )
 }
 
+// Foco de teclado dentro, ou um menu aberto a partir do rail (o idioma, a
+// conta): o painel fica mesmo com o mouse fora.
+function seguraEspiada(el: HTMLElement) {
+  const ativo = document.activeElement
+  return (
+    Boolean(el.querySelector("[data-popup-open]")) ||
+    (ativo instanceof HTMLElement &&
+      el.contains(ativo) &&
+      ativo.matches(":focus-visible"))
+  )
+}
+
 function Sidebar({
   side = "left",
   variant = "sidebar",
@@ -405,37 +417,29 @@ function Sidebar({
   // Quem tinha o foco antes de o teclado entrar no rail: o Esc devolve para ele.
   const focoAntes = React.useRef<HTMLElement | null>(null)
   const fechando = React.useRef(false)
-  const agendarEspiada = (abrir: boolean, espera: number) => {
-    window.clearTimeout(peekTimer.current)
-    fechando.current = !abrir
-    peekTimer.current = window.setTimeout(() => {
-      fechando.current = false
-      setPeeking(abrir)
-    }, espera)
-  }
-  const cancelarEspiada = () => {
+  const agendarEspiada = React.useCallback(
+    (abrir: boolean, espera: number) => {
+      window.clearTimeout(peekTimer.current)
+      fechando.current = !abrir
+      peekTimer.current = window.setTimeout(() => {
+        fechando.current = false
+        setPeeking(abrir)
+      }, espera)
+    },
+    [setPeeking]
+  )
+  const cancelarEspiada = React.useCallback(() => {
     window.clearTimeout(peekTimer.current)
     fechando.current = false
-  }
+  }, [])
   const temMouse = () =>
     window.matchMedia("(hover: hover) and (pointer: fine)").matches
-  // Foco de teclado dentro, ou um menu aberto a partir do rail (o idioma, a
-  // conta): o painel fica mesmo com o mouse fora.
-  const seguraEspiada = (el: HTMLElement) => {
-    const ativo = document.activeElement
-    return (
-      Boolean(el.querySelector("[data-popup-open]")) ||
-      (ativo instanceof HTMLElement &&
-        el.contains(ativo) &&
-        ativo.matches(":focus-visible"))
-    )
-  }
 
   React.useEffect(() => {
     if (canPeek) return
     cancelarEspiada()
     setPeeking(false)
-  }, [canPeek, setPeeking])
+  }, [canPeek, cancelarEspiada, setPeeking])
   React.useEffect(() => () => window.clearTimeout(peekTimer.current), [])
   // Fechado o menu que segurava o painel, o mouse já pode estar no conteúdo:
   // o primeiro movimento fora fecha.
@@ -451,7 +455,7 @@ function Sidebar({
     }
     document.addEventListener("pointerover", aoPassar)
     return () => document.removeEventListener("pointerover", aoPassar)
-  }, [peeking, setPeeking])
+  }, [peeking, agendarEspiada])
 
   // Re-avalia o hide do overlay desafixado: se o mouse não voltou para a
   // sidebar, esconde.
