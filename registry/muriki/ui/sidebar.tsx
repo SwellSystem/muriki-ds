@@ -179,6 +179,9 @@ type SidebarContextProps = {
   enablePinning: boolean
   floating: boolean
   setFloating: (floating: boolean) => void
+  /** Recolhido, o rail aberto por cima do conteúdo enquanto o mouse (ou o foco) está nele. */
+  peeking: boolean
+  setPeeking: (peeking: boolean) => void
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -271,6 +274,11 @@ function SidebarProvider({
     })
   }, [enablePinning])
 
+  // A espiada do rail recolhido. Mora aqui pros tooltips e pro app-shell saberem
+  // que o rail está aberto por cima, mesmo com o state "collapsed".
+  const [_peeking, setPeeking] = React.useState(false)
+  const peeking = _peeking && !open && !isMobile
+
   // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -306,6 +314,8 @@ function SidebarProvider({
       enablePinning,
       floating,
       setFloating,
+      peeking,
+      setPeeking,
     }),
     [
       state,
@@ -320,6 +330,7 @@ function SidebarProvider({
       togglePin,
       enablePinning,
       floating,
+      peeking,
     ]
   )
 
@@ -350,6 +361,7 @@ function Sidebar({
   side = "left",
   variant = "sidebar",
   collapsible = "offcanvas",
+  peekOnHover = true,
   className,
   children,
   dir,
@@ -359,6 +371,12 @@ function Sidebar({
   side?: "left" | "right"
   variant?: "sidebar" | "floating"
   collapsible?: "offcanvas" | "icon" | "none"
+  /**
+   * Recolhido em ícones, passar o mouse (ou tabular para dentro) abre o rail
+   * inteiro por cima do conteúdo, sem empurrar a página; sair fecha. Só no
+   * desktop com mouse. `false` desliga.
+   */
+  peekOnHover?: boolean
 }) {
   const {
     isMobile,
@@ -368,9 +386,72 @@ function Sidebar({
     pinned,
     floating,
     setFloating,
+    peeking,
+    setPeeking,
   } = useSidebar()
   const t = useTranslate()
   const containerRef = React.useRef<HTMLDivElement>(null)
+
+  // A espiada: recolhido em ícones e fixado (desafixado, quem abre é o overlay
+  // flutuante). O painel cresce até a largura do rail aberto por cima do
+  // conteúdo; o gap continua com a largura dos ícones, então a página não anda.
+  const canPeek =
+    peekOnHover &&
+    collapsible === "icon" &&
+    state === "collapsed" &&
+    pinned &&
+    !isMobile
+  const peekTimer = React.useRef<number | undefined>(undefined)
+  // Quem tinha o foco antes de o teclado entrar no rail: o Esc devolve para ele.
+  const focoAntes = React.useRef<HTMLElement | null>(null)
+  const fechando = React.useRef(false)
+  const agendarEspiada = (abrir: boolean, espera: number) => {
+    window.clearTimeout(peekTimer.current)
+    fechando.current = !abrir
+    peekTimer.current = window.setTimeout(() => {
+      fechando.current = false
+      setPeeking(abrir)
+    }, espera)
+  }
+  const cancelarEspiada = () => {
+    window.clearTimeout(peekTimer.current)
+    fechando.current = false
+  }
+  const temMouse = () =>
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  // Foco de teclado dentro, ou um menu aberto a partir do rail (o idioma, a
+  // conta): o painel fica mesmo com o mouse fora.
+  const seguraEspiada = (el: HTMLElement) => {
+    const ativo = document.activeElement
+    return (
+      Boolean(el.querySelector("[data-popup-open]")) ||
+      (ativo instanceof HTMLElement &&
+        el.contains(ativo) &&
+        ativo.matches(":focus-visible"))
+    )
+  }
+
+  React.useEffect(() => {
+    if (canPeek) return
+    cancelarEspiada()
+    setPeeking(false)
+  }, [canPeek, setPeeking])
+  React.useEffect(() => () => window.clearTimeout(peekTimer.current), [])
+  // Fechado o menu que segurava o painel, o mouse já pode estar no conteúdo:
+  // o primeiro movimento fora fecha.
+  React.useEffect(() => {
+    if (!peeking) return
+    const aoPassar = (event: PointerEvent) => {
+      const el = containerRef.current
+      if (!el || el.contains(event.target as Node) || seguraEspiada(el)) return
+      if (event.pointerType !== "mouse") return
+      // um fechar já agendado não recomeça a cada elemento que o mouse cruza
+      if (fechando.current) return
+      agendarEspiada(false, 250)
+    }
+    document.addEventListener("pointerover", aoPassar)
+    return () => document.removeEventListener("pointerover", aoPassar)
+  }, [peeking, setPeeking])
 
   // Re-avalia o hide do overlay desafixado: se o mouse não voltou para a
   // sidebar, esconde.
@@ -447,7 +528,9 @@ function Sidebar({
     <div
       className="group peer hidden text-foreground md:block"
       data-state={state}
-      data-collapsible={state === "collapsed" ? collapsible : ""}
+      // Espiando, o rail se veste de aberto: nomes, grupos e selos voltam.
+      data-collapsible={state === "collapsed" && !peeking ? collapsible : ""}
+      data-peek={peeking ? "true" : undefined}
       data-variant={variant}
       data-side={side}
       data-pinned={pinned ? "true" : "false"}
@@ -473,14 +556,29 @@ function Sidebar({
           "group-data-[side=right]:rotate-180",
           variant === "floating"
             ? "group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
-            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)"
+            : "group-data-[collapsible=icon]:w-(--sidebar-width-icon)",
+          // o painel da espiada fica por cima: o gap segura a largura dos ícones
+          peeking &&
+            (variant === "floating"
+              ? "w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]"
+              : "w-(--sidebar-width-icon)")
         )}
       />
       <div
         data-slot="sidebar-container"
         data-side={side}
         ref={containerRef}
+        onMouseEnter={() => {
+          if (canPeek && temMouse()) agendarEspiada(true, 150)
+        }}
         onMouseLeave={(event) => {
+          if (canPeek) {
+            if (seguraEspiada(event.currentTarget)) {
+              cancelarEspiada()
+            } else {
+              agendarEspiada(false, 250)
+            }
+          }
           // portalizado, então mover o mouse pra ele dispara este leave.
           // Esconder ao sair com o mouse — exceto quando há foco POR TECLADO
           // (focus-visible) dentro. Foco vindo de clique (ex.: clicar num item
@@ -499,21 +597,47 @@ function Sidebar({
           }
           if (!keyboardFocusInside) setFloating(false)
         }}
-        onFocusCapture={() => {
+        onFocusCapture={(event) => {
           // Teclado: tabular pra dentro revela o overlay (senão o foco entraria
           // num cartão invisível/fora de tela).
           if (!pinned) setFloating(true)
+          // Recolhido, o foco de teclado abre a espiada na hora. O de clique
+          // não: quem abre é o mouse.
+          if (canPeek && event.target.matches(":focus-visible")) {
+            const antes = event.relatedTarget
+            if (
+              !peeking &&
+              antes instanceof HTMLElement &&
+              !event.currentTarget.contains(antes)
+            ) {
+              focoAntes.current = antes
+            }
+            cancelarEspiada()
+            setPeeking(true)
+          }
         }}
         onBlurCapture={(event) => {
           if (
             !event.currentTarget.contains(event.relatedTarget as Node | null)
           ) {
             setFloating(false)
+            if (peeking && !event.currentTarget.matches(":hover")) {
+              cancelarEspiada()
+              setPeeking(false)
+            }
           }
+        }}
+        onKeyDownCapture={(event) => {
+          if (event.key !== "Escape" || !peeking) return
+          cancelarEspiada()
+          setPeeking(false)
+          const antes = focoAntes.current
+          focoAntes.current = null
+          if (antes?.isConnected) antes.focus()
         }}
         style={floatStyle ? { ...floatStyle, ...style } : style}
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
+          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear motion-reduce:transition-none group-data-[peek=true]:z-40 group-data-[peek=true]:duration-150 group-data-[peek=true]:ease-out data-[side=left]:left-0 data-[side=left]:group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)] data-[side=right]:right-0 data-[side=right]:group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)] md:flex",
           // Adjust the padding for floating and inset variants.
           variant === "floating"
             ? "p-2 group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4))+2px)]"
@@ -844,7 +968,7 @@ function SidebarMenuButton({
     isActive?: boolean
     tooltip?: string | React.ComponentProps<typeof TooltipContent>
   } & VariantProps<typeof sidebarMenuButtonVariants>) {
-  const { isMobile, state } = useSidebar()
+  const { isMobile, state, peeking } = useSidebar()
   const noTooltip = !tooltip
   const comp = useRender({
     defaultTagName: "button",
@@ -889,7 +1013,10 @@ function SidebarMenuButton({
           side="right"
           align="center"
           sideOffset={8}
-          hidden={isMobile || (!tooltipIsRich && state !== "collapsed")}
+          // espiando, o nome já está no painel
+          hidden={
+            isMobile || peeking || (!tooltipIsRich && state !== "collapsed")
+          }
           {...tooltip}
         />
       </Tooltip>
