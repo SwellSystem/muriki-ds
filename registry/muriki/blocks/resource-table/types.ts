@@ -16,7 +16,7 @@ export interface ResourceColumn<T> {
   /** Mostra o controle de ordenar no cabeçalho. Quem ordena é o caller. */
   sortable?: boolean
   /** Some abaixo desse breakpoint. A primeira coluna nunca some. */
-  hideBelow?: "sm" | "md" | "lg"
+  hideBelow?: "sm" | "md" | "lg" | "xl" | "2xl"
   /**
    * O papel da coluna quando a tabela vira cartões (tela abaixo de md, ou
    * contêiner com menos de 28rem). `title` é a linha de cima (avatar, nome, e-mail ou
