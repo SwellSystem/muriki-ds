@@ -12,11 +12,13 @@
  * É uma <table> de verdade. Leitor de tela anda por linha e coluna, e o
  * `group/row` no <tr> é o que o RowActions usa para aparecer.
  *
- * NO CELULAR VIRA CARTÕES. Quando o contêiner fica com menos de 40rem (é
- * container query, não a largura da tela: vale também num painel estreito),
- * a tabela some e cada linha vira um cartão — o título em cima (a primeira
- * coluna, ou a marcada `mobile: "title"`), os fatos numa linha como
- * "Rótulo valor", o selo no pé e as ações num "…" no canto. Clique no cartão
+ * NO CELULAR VIRA CARTÕES. Com a tela abaixo de md (768px), ou com o contêiner
+ * muito estreito (menos de 28rem: um painel, um sheet), a tabela some e cada
+ * linha vira um cartão; entre 768 e uns 940px, com o rail aberto, continua
+ * tabela, que ainda cabe. No cartão: o título em cima (a primeira
+ * coluna, ou a marcada `mobile: "title"`) com o selo (`status`) na mesma
+ * linha, à direita, os fatos numa linha como "Rótulo valor", o `footer` no
+ * pé e as ações num "…" no canto. Clique no cartão
  * é clique na linha; a seleção em massa não existe nesse tamanho. Quem quer
  * outro desenho passa `renderCard`.
  */
@@ -60,6 +62,11 @@ export interface ResourceTableProps<T> {
   rowActions?: (row: T) => RowAction[]
   /** Quantas ações ficam como ícone antes do menu. */
   inlineActions?: number
+  /**
+   * A largura da coluna de ações. Sem ela, sai do que as linhas mostram: os
+   * ícones inline e, se sobrar ação, o filete e o "…".
+   */
+  actionsWidth?: number
   onRowClick?: (row: T) => void
   /** Linha apagada (ex.: acesso revogado): continua na lista, mas recua. */
   isRowMuted?: (row: T) => boolean
@@ -93,6 +100,7 @@ export function ResourceTable<T>({
   bulkActions,
   rowActions,
   inlineActions = 3,
+  actionsWidth,
   onRowClick,
   isRowMuted,
   sort,
@@ -111,6 +119,13 @@ export function ResourceTable<T>({
   const todos = pageIds.length > 0 && marcados === pageIds.length
   const alguns = marcados > 0 && !todos
   const temAcoes = !!rowActions
+  // A coluna de ações do tamanho do que ela mostra: com 4 ícones (Cupons) os 104px de antes não
+  // cabiam. Mede a linha mais larga da página; carregando, conta o máximo possível.
+  const larguraAcoes =
+    actionsWidth ??
+    (rows.length > 0 && rowActions
+      ? Math.max(...rows.map((r) => larguraDasAcoes(rowActions(r), inlineActions)))
+      : larguraDasAcoes(null, inlineActions))
   const totalColunas = columns.length + (selectable ? 1 : 0) + (temAcoes ? 1 : 0)
 
   function alternarTodos(marcar: boolean) {
@@ -156,13 +171,13 @@ export function ResourceTable<T>({
           "flex min-h-0 flex-1 flex-col overflow-hidden rounded-[12px] bg-card shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
           "dark:shadow-[inset_0_0_0_1px_var(--border)]",
           // em cartões, cada linha é o seu cartão: a moldura da tabela sai
-          "@max-[40rem]/rt:overflow-visible @max-[40rem]/rt:rounded-none @max-[40rem]/rt:bg-transparent @max-[40rem]/rt:shadow-none"
+          "max-md:overflow-visible @max-[28rem]/rt:overflow-visible max-md:rounded-none @max-[28rem]/rt:rounded-none max-md:bg-transparent @max-[28rem]/rt:bg-transparent max-md:shadow-none @max-[28rem]/rt:shadow-none"
         )}
       >
         {bulkActions && selecao.length > 0 ? (
           <div
             data-slot="resource-table-bulk"
-            className="flex h-11 shrink-0 items-center gap-2 bg-primary-subtle px-4 text-[13px] text-primary-subtle-foreground shadow-[inset_0_-1px_0_var(--border)] @max-[40rem]/rt:hidden"
+            className="flex h-11 shrink-0 items-center gap-2 bg-primary-subtle px-4 text-[13px] text-primary-subtle-foreground shadow-[inset_0_-1px_0_var(--border)] max-md:hidden @max-[28rem]/rt:hidden"
           >
             <span className="font-medium">{t("resource.selected", { count: selecao.length })}</span>
             <span aria-hidden className="mx-1 h-4 w-px bg-primary-subtle-border" />
@@ -187,7 +202,7 @@ export function ResourceTable<T>({
           cliqueNaLinha={cliqueNaLinha}
         />
 
-        <div className="muriki-scroll min-h-0 flex-1 overflow-auto @max-[40rem]/rt:hidden">
+        <div className="muriki-scroll min-h-0 flex-1 overflow-auto max-md:hidden @max-[28rem]/rt:hidden">
           <table className="w-full table-fixed border-collapse text-[13px]">
             <caption className="sr-only">{label}</caption>
             <colgroup>
@@ -195,7 +210,7 @@ export function ResourceTable<T>({
               {columns.map((c) => (
                 <col key={c.id} style={c.width ? { width: c.width } : undefined} />
               ))}
-              {temAcoes ? <col className="w-[104px]" /> : null}
+              {temAcoes ? <col style={{ width: larguraAcoes }} /> : null}
             </colgroup>
             <thead className="sticky top-0 z-[1] bg-rail">
               <tr className="h-[38px] shadow-[inset_0_-1px_0_var(--border)]">
@@ -365,13 +380,24 @@ export function ResourceTable<T>({
   )
 }
 
+// O RowActions desenha ícones de 28px com 1px entre eles; o que não cabe vai para o "…" (28px),
+// depois de um filete com 4px de cada lado. Mais o respiro da célula (12px à direita, 8 à esquerda).
+function larguraDasAcoes(acoes: RowAction[] | null, inline: number) {
+  const visiveis = acoes ? Math.min(acoes.filter((a) => !a.destructive).length, inline) : inline
+  const sobra = acoes ? acoes.length > visiveis : true
+  const icones = visiveis * 28 + Math.max(visiveis - 1, 0)
+  const menu = sobra ? (visiveis > 0 ? 1 + 9 : 0) + 28 : 0
+  return icones + menu + 20
+}
+
 function papel<T>(c: ResourceColumn<T>, i: number) {
   return c.mobile ?? (i === 0 ? "title" : "meta")
 }
 
 /**
  * A mesma lista em cartões, para o contêiner estreito. Fica escondida acima
- * de 40rem e a tabela abaixo: as duas estão no DOM, a container query escolhe.
+ * de md (e de 28rem de contêiner) e a tabela abaixo: as duas estão no DOM, a media e a container query
+ * escolhem.
  */
 function ResourceCards<T>({
   columns,
@@ -399,7 +425,7 @@ function ResourceCards<T>({
   const com = (p: string) => columns.filter((c, i) => papel(c, i) === p)
 
   return (
-    <div data-slot="resource-cards" className="hidden flex-col gap-2.5 @max-[40rem]/rt:flex">
+    <div data-slot="resource-cards" className="hidden flex-col gap-2.5 max-md:flex @max-[28rem]/rt:flex">
       {loading
         ? Array.from({ length: Math.min(skeletonRows, 6) }, (_, i) => (
             <div key={`sk-${i}`} aria-hidden className={cn(cartao, "flex flex-col gap-3")}>
@@ -436,6 +462,7 @@ function ResourceCards<T>({
             const acoes = rowActions?.(row)
             const metas = com("meta")
             const status = com("status")
+            const pe = com("footer")
             return (
               <li
                 key={id}
@@ -454,11 +481,23 @@ function ResourceCards<T>({
                       renderCard(row)
                     ) : (
                       <>
-                        {com("title").map((c) => (
-                          <div key={c.id} className="min-w-0 text-foreground">
-                            {c.cell(row)}
+                        {/* o título e, na mesma linha, à direita, o selo */}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                            {com("title").map((c) => (
+                              <div key={c.id} className="min-w-0 text-foreground">
+                                {c.cell(row)}
+                              </div>
+                            ))}
                           </div>
-                        ))}
+                          {status.length > 0 ? (
+                            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                              {status.map((c) => (
+                                <React.Fragment key={c.id}>{c.cell(row)}</React.Fragment>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
                         {com("subtitle").map((c) => (
                           <div key={c.id} className="min-w-0 text-[12.5px] text-muted-foreground">
                             {c.cell(row)}
@@ -490,9 +529,9 @@ function ResourceCards<T>({
                     ))}
                   </dl>
                 ) : null}
-                {!renderCard && status.length > 0 ? (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    {status.map((c) => (
+                {!renderCard && pe.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {pe.map((c) => (
                       <React.Fragment key={c.id}>{c.cell(row)}</React.Fragment>
                     ))}
                   </div>
@@ -547,11 +586,11 @@ export function ResourcePaginationBar(props: ResourcePagination) {
   const barra = cn(
     "flex h-12 shrink-0 items-center gap-3 px-4 text-[12.5px] text-muted-foreground shadow-[inset_0_1px_0_var(--border)]",
     // em cartões: sem filete, os dois botões nas pontas e a página no meio
-    "@max-[40rem]/rt:mt-1 @max-[40rem]/rt:px-0 @max-[40rem]/rt:shadow-none"
+    "max-md:mt-1 @max-[28rem]/rt:mt-1 max-md:px-0 @max-[28rem]/rt:px-0 max-md:shadow-none @max-[28rem]/rt:shadow-none"
   )
   // o celular: Anterior e Próxima com contorno nas pontas, alvo de toque de 40px
   const estreito = (anterior: boolean, proxima: boolean, onAnterior: () => void, onProxima: () => void, pagina?: number) => (
-    <div className="hidden w-full items-center justify-between gap-2 @max-[40rem]/rt:flex">
+    <div className="hidden w-full items-center justify-between gap-2 max-md:flex @max-[28rem]/rt:flex">
       <Button variant="outline" className="h-10" disabled={!anterior} onClick={onAnterior} aria-label={t("resource.previous_page")}>
         <CaretLeftIcon />
         {t("resource.previous")}
@@ -563,7 +602,7 @@ export function ResourcePaginationBar(props: ResourcePagination) {
       </Button>
     </div>
   )
-  const largo = "flex flex-1 items-center gap-3 @max-[40rem]/rt:hidden"
+  const largo = "flex flex-1 items-center gap-3 max-md:hidden @max-[28rem]/rt:hidden"
 
   if (props.mode === "cursor") {
     // Sem total: nada de faixa "de N" nem números. Anterior e próxima, com texto — sozinhas, setas mudas não dizem o bastante.

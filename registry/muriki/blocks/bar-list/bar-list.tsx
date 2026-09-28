@@ -125,19 +125,35 @@ export function BarList({
     </span>
   ) : null
 
+  // No compacto (`compact`, ou o contêiner com menos de 520px) o "Ver como tabela" desce para baixo,
+  // à esquerda, e a legenda fica sozinha em cima, também à esquerda. Por container query.
+  const noTopo = compact ? "hidden" : "@max-[519px]:hidden"
+  const embaixo = compact ? undefined : "hidden @max-[519px]:inline-flex"
+  const alternar = (onde: string | undefined, extra?: string) =>
+    tableToggle ? (
+      <button
+        type="button"
+        onClick={() => setComoTabela((v) => !v)}
+        className={cn(
+          "rounded-[6px] px-1.5 text-[12px] font-medium text-primary underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/40",
+          extra,
+          onde
+        )}
+      >
+        {comoTabela ? t("bar_list.as_list") : t("bar_list.as_table")}
+      </button>
+    ) : null
   const topoDaLista =
     legend || tableToggle ? (
-      <div className="flex items-center justify-end gap-3">
+      <div
+        className={cn(
+          "flex items-center gap-3",
+          compact ? "justify-start" : "justify-end @max-[519px]:justify-start",
+          !legend || comoTabela ? noTopo : undefined
+        )}
+      >
         {comoTabela ? null : legenda}
-        {tableToggle ? (
-          <button
-            type="button"
-            onClick={() => setComoTabela((v) => !v)}
-            className="rounded-[6px] px-1.5 text-[12px] font-medium text-primary underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring/40"
-          >
-            {comoTabela ? t("bar_list.as_list") : t("bar_list.as_table")}
-          </button>
-        ) : null}
+        {alternar(noTopo)}
       </div>
     ) : null
 
@@ -231,6 +247,7 @@ export function BarList({
     <div className={cn("@container flex min-w-0 flex-col gap-2", className)}>
       {topoDaLista}
       {corpo}
+      {alternar(embaixo, "-ml-1.5 self-start")}
     </div>
   )
 }
