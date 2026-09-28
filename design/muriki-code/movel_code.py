@@ -228,8 +228,8 @@ def tela_inicio_movel(k, sufixo, altura_fixa=None):
             + tile('evolucao', 'evolucao', 'mEvolucaoTxt', link('ver', f'PerfilVazio{sufixo}.dc.html'), largo=True)
             + '</div></section>')
     escala_vazia = ''.join(f'<span style="width:18px;height:6px;border-radius:2px;'
-                           + (f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};' if i < 2 else f'background:{k["sunken"]};')
-                           + '"></span>' for i in range(5))
+                           + (f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};' if i < 3 else f'background:{k["sunken"]};')
+                           + '"></span>' for i in range(len(NIVEIS)))
     competencia = card(k, f'{rotulo(T("perfil"), k["mfg"])}<span style="display:flex;gap:3px;">{escala_vazia}</span>'
                           f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("perfilTxt")}</p>', gap=10)
     playground = card(k,
@@ -435,7 +435,7 @@ def tela_trilha_movel(k, sufixo):
                                             f'<span style="width:82px;font-size:13px;color:{k["mfg"]};">{rot}</span>{escala(n, k, 16)}'
                                             f'<span style="font-size:13px;color:{k["fgs"]};">{NIVEIS[n - 1]}</span>{extra}</div>')
     nivel = card(k, f'{rotulo(T("seuNivel"), k["mfg"])}'
-                    + linha_nivel(T('declarado'), 2) + linha_nivel(T('observado'), 2, badge(T('aConfirmar'), k, 'yellow'))
+                    + linha_nivel(T('declarado'), 3) + linha_nivel(T('observado'), 3, badge(T('aConfirmar'), k, 'yellow'))
                     + f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("nivelTxt")}</p>'
                     f'<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;box-shadow:inset 0 1px 0 {k["muted"]};">'
                     f'<span style="font-size:13px;color:{k["mfg"]};flex:1;min-width:140px;">{T("conta")}</span>'

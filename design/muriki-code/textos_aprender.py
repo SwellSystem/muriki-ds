@@ -237,7 +237,7 @@ BOAS_VINDAS = {
         bvP1='Seu ponto de partida', bvP2='Suas trilhas', bvP3='Como a trilha anda',
         bv1Tit='Montamos o seu começo, Rafael.', bv1Txt='Pelo que você contou no primeiro acesso:',
         bvExp='Experiência', bvLing='Linguagens', bvObj='Objetivos', bvAprender='Aprender', bvRevisar='Revisar código',
-        bvComeco='Começamos por Testing em TypeScript, no nível Pleno. Depois, tipos e arquitetura.',
+        bvComeco='Começamos por Testing em TypeScript, de Pleno para Senior. Depois, tipos e arquitetura.',
         bv2Tit='Suas três primeiras trilhas', bv2Txt='Na ordem que faz sentido para você. Ela muda com o que você mostrar.',
         bvComecaAqui='começa aqui', bvDepois='depois',
         bv3Tit='Como a trilha anda', bv3Txt='Você não precisa escolher o próximo passo.',
@@ -253,7 +253,7 @@ BOAS_VINDAS = {
         bvP1='Your starting point', bvP2='Your tracks', bvP3='How a track moves',
         bv1Tit='We set up your start, Rafael.', bv1Txt='From what you told us on your first access:',
         bvExp='Experience', bvLing='Languages', bvObj='Goals', bvAprender='Learn', bvRevisar='Review code',
-        bvComeco='We start with Testing in TypeScript, at Mid-level. Then types and architecture.',
+        bvComeco='We start with Testing in TypeScript, from Mid-level to Senior. Then types and architecture.',
         bv2Tit='Your first three tracks', bv2Txt='In the order that makes sense for you. It changes with what you show.',
         bvComecaAqui='starts here', bvDepois='next',
         bv3Tit='How a track moves', bv3Txt='You don’t need to pick the next step.',
@@ -269,7 +269,7 @@ BOAS_VINDAS = {
         bvP1='Tu punto de partida', bvP2='Tus rutas', bvP3='Cómo avanza la ruta',
         bv1Tit='Armamos tu comienzo, Rafael.', bv1Txt='Por lo que contaste en tu primer acceso:',
         bvExp='Experiencia', bvLing='Lenguajes', bvObj='Objetivos', bvAprender='Aprender', bvRevisar='Revisar código',
-        bvComeco='Empezamos por Testing en TypeScript, en nivel Intermedio. Después, tipos y arquitectura.',
+        bvComeco='Empezamos por Testing en TypeScript, de Intermedio a Senior. Después, tipos y arquitectura.',
         bv2Tit='Tus tres primeras rutas', bv2Txt='En el orden que tiene sentido para ti. Cambia con lo que demuestres.',
         bvComecaAqui='empieza aquí', bvDepois='después',
         bv3Tit='Cómo avanza la ruta', bv3Txt='No necesitas elegir el siguiente paso.',
@@ -285,17 +285,17 @@ BOAS_VINDAS = {
 # primeiro acesso, e as recomendadas vêm primeiro, na ordem.
 TRILHAS_VAZIA = {
     'pt-BR': dict(
-        vzRotulo='Por onde começar', vzPorque='Pelo seu primeiro acesso: programa de 2 a 5 anos, TypeScript e Python.',
+        vzRotulo='Por onde começar', vzPorque='Pelo seu perfil: Pleno por programar de 2 a 5 anos e por usar JS/TS todo dia; TypeScript e Python.',
         vzMeta='8 etapas · uns 3 h · a primeira leva 8 min', vzComecar='Começar a trilha', vzRever='Ver as boas-vindas de novo',
         vz1='1ª para você', vz2='2ª para você', vz3='3ª para você',
     ),
     'en-US': dict(
-        vzRotulo='Where to start', vzPorque='From your first access: coding for 2 to 5 years, TypeScript and Python.',
+        vzRotulo='Where to start', vzPorque='From your profile: Mid-level from coding for 2 to 5 years and using JS/TS daily; TypeScript and Python.',
         vzMeta='8 steps · about 3 h · the first takes 8 min', vzComecar='Start the track', vzRever='See the welcome again',
         vz1='1st for you', vz2='2nd for you', vz3='3rd for you',
     ),
     'es-ES': dict(
-        vzRotulo='Por dónde empezar', vzPorque='Por tu primer acceso: programas de 2 a 5 años, TypeScript y Python.',
+        vzRotulo='Por dónde empezar', vzPorque='Por tu perfil: Intermedio por programar de 2 a 5 años y usar JS/TS a diario; TypeScript y Python.',
         vzMeta='8 pasos · unas 3 h · el primero lleva 8 min', vzComecar='Empezar la ruta', vzRever='Ver la bienvenida de nuevo',
         vz1='1.ª para ti', vz2='2.ª para ti', vz3='3.ª para ti',
     ),

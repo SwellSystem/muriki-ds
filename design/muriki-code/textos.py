@@ -7,7 +7,7 @@ COMUM = {
         inicio='Início', evolucao='Evolução', trilhas='Trilhas', exercicios='Exercícios', avaliacoes='Avaliações',
         peer='Peer na IDE', plano='Plano', trilhaAria='Trilha', aprender='Aprender',
         contaMuriki='conta Muriki', trocarProduto='Trocar de produto Muriki', config='Configurações',
-        pleno='Pleno', playground='Playground', emBreveRail='em breve',
+        fundamentos='Fundamentos', junior='Junior', pleno='Pleno', senior='Senior', playground='Playground', emBreveRail='em breve',
     ),
     'en-US': dict(
         lang='en-US', idiomaCurto='EN', idiomaNome='English', idiomaMenu='Language', trocarIdioma='Language: English. Change language',
@@ -15,7 +15,7 @@ COMUM = {
         inicio='Home', evolucao='Progress', trilhas='Tracks', exercicios='Exercises', avaliacoes='Evaluations',
         peer='Peer in your IDE', plano='Plan', trilhaAria='Breadcrumb', aprender='Learn',
         contaMuriki='Muriki account', trocarProduto='Switch Muriki product', config='Settings',
-        pleno='Mid-level', playground='Playground', emBreveRail='soon',
+        fundamentos='Foundations', junior='Junior', pleno='Mid-level', senior='Senior', playground='Playground', emBreveRail='soon',
     ),
     'es-ES': dict(
         lang='es-ES', idiomaCurto='ES', idiomaNome='Español', idiomaMenu='Idioma', trocarIdioma='Idioma: español. Cambiar idioma',
@@ -23,21 +23,23 @@ COMUM = {
         inicio='Inicio', evolucao='Evolución', trilhas='Rutas', exercicios='Ejercicios', avaliacoes='Evaluaciones',
         peer='Peer en el IDE', plano='Plan', trilhaAria='Ruta de navegación', aprender='Aprender',
         contaMuriki='cuenta Muriki', trocarProduto='Cambiar de producto Muriki', config='Ajustes',
-        pleno='Intermedio', playground='Playground', emBreveRail='pronto',
+        fundamentos='Fundamentos', junior='Junior', pleno='Intermedio', senior='Senior', playground='Playground', emBreveRail='pronto',
     ),
 }
 
 EVOLUCAO = {
     'pt-BR': dict(
         titulo='Seu perfil de competência',
-        sub='Calculado a partir de 219 evidências. O declarado vem da experiência que você escolheu (Pleno, '
-            'em todas as competências); o observado só muda com evidência forte, e nunca por um exercício ruim.',
+        sub='219 evidências. O declarado vem da experiência (De 2 a 5 anos) e, em TypeScript, do que você disse de '
+            'JavaScript/TypeScript (Uso todo dia), que ganha da experiência. O observado só muda com evidência forte, '
+            'nunca por um exercício ruim nem pelo perfil.',
         trajetoria='Trajetória', comoMedido='Como o nível é medido', competencias='Competências',
         colComp='Competência', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Linguagens', grupoEng='Engenharia',
         estConfirmado='confirmado', estDeclarado='declarado', estNaoUso='não uso', aConfirmar='a confirmar', emProgresso='em progresso',
         confirmam3='3 exercícios confirmam', confirmam2='2 exercícios confirmam', doisDeTres='2 de 3 exercícios', adicionar='Adicionar',
         legObs='observado', legDecl='declarado', legProg='em progresso',
+        fonteFam='pelo JS/TS',
         proximoPasso='Próximo passo', confirma='confirma', proxTitulo='Slots com relógio injetado',
         proxTxt='O primeiro dos 3 exercícios de Senior que confirmam Testing. Cobre o que ficou de fora em agenda-slots: '
                 'o tempo como parâmetro e a virada do dia em UTC-3.',
@@ -53,14 +55,16 @@ EVOLUCAO = {
     ),
     'en-US': dict(
         titulo='Your competency profile',
-        sub='Calculated from 219 pieces of evidence. Declared comes from the experience you chose (Mid-level, '
-            'in every competency); observed only changes with strong evidence, never from one bad exercise.',
+        sub='219 pieces of evidence. Declared comes from your experience (2 to 5 years) and, in TypeScript, from what you said '
+            'about JavaScript/TypeScript (I use it daily), which wins over experience. Observed only changes with strong evidence, '
+            'never from one bad exercise or your profile.',
         trajetoria='Trajectory', comoMedido='How the level is measured', competencias='Competencies',
         colComp='Competency', colEscala='Scale', colDecl='Declared', colObs='Observed', colEstado='Status',
         grupoLing='Languages', grupoEng='Engineering',
         estConfirmado='confirmed', estDeclarado='declared', estNaoUso='don’t use', aConfirmar='to confirm', emProgresso='in progress',
         confirmam3='3 exercises would confirm', confirmam2='2 exercises would confirm', doisDeTres='2 of 3 exercises', adicionar='Add',
         legObs='observed', legDecl='declared', legProg='in progress',
+        fonteFam='from JS/TS',
         proximoPasso='Next step', confirma='confirms', proxTitulo='Slots with an injected clock',
         proxTxt='The first of 3 Senior exercises that confirm Testing. It covers what agenda-slots left out: '
                 'time as a parameter and the day rolling over in UTC-3.',
@@ -76,14 +80,16 @@ EVOLUCAO = {
     ),
     'es-ES': dict(
         titulo='Tu perfil de competencias',
-        sub='Calculado a partir de 219 evidencias. El declarado viene de la experiencia que elegiste (Intermedio, '
-            'en todas las competencias); el observado solo cambia con evidencia fuerte, nunca por un mal ejercicio.',
+        sub='219 evidencias. El declarado viene de la experiencia (De 2 a 5 años) y, en TypeScript, de lo que dijiste de '
+            'JavaScript/TypeScript (Lo uso a diario), que gana a la experiencia. El observado solo cambia con evidencia fuerte, '
+            'nunca por un mal ejercicio ni por el perfil.',
         trajetoria='Trayectoria', comoMedido='Cómo se mide el nivel', competencias='Competencias',
         colComp='Competencia', colEscala='Escala', colDecl='Declarado', colObs='Observado', colEstado='Estado',
         grupoLing='Lenguajes', grupoEng='Ingeniería',
         estConfirmado='confirmado', estDeclarado='declarado', estNaoUso='no lo uso', aConfirmar='por confirmar', emProgresso='en progreso',
         confirmam3='3 ejercicios lo confirman', confirmam2='2 ejercicios lo confirman', doisDeTres='2 de 3 ejercicios', adicionar='Añadir',
         legObs='observado', legDecl='declarado', legProg='en progreso',
+        fonteFam='por JS/TS',
         proximoPasso='Siguiente paso', confirma='confirma', proxTitulo='Slots con reloj inyectado',
         proxTxt='El primero de los 3 ejercicios de Senior que confirman Testing. Cubre lo que agenda-slots dejó fuera: '
                 'el tiempo como parámetro y el cambio de día en UTC-3.',
@@ -373,8 +379,9 @@ PRIMEIRO = {
 
 PERFIL_VAZIO = {
     'pt-BR': dict(
-        subVazio='Ainda sem evidência. O ponto de partida vem da experiência que você escolheu (Pleno, '
-                 'em todas as competências), e cada exercício enviado confirma ou ajusta uma competência.',
+        subVazio='Ainda sem evidência. O ponto de partida vem do seu perfil: Pleno pela experiência (De 2 a 5 anos) e, '
+                 'em TypeScript, Pleno pelo que você disse de JavaScript/TypeScript (Uso todo dia). Cada exercício enviado '
+                 'confirma ou ajusta uma competência.',
         trocarJornada='Mudar preferências', entraPrimeiro='entra no 1º exercício',
         primeiroTitulo='Converter duração em texto para minutos',
         primeiroTxt='Seu primeiro exercício: tem testes, dicas sob pedido e uma pergunta para você explicar a solução.',
@@ -382,8 +389,9 @@ PERFIL_VAZIO = {
         trajVazio='A trajetória compara você com você mesmo: a primeira solução enviada vira o ponto de comparação das próximas.',
     ),
     'en-US': dict(
-        subVazio='No evidence yet. The starting point comes from the experience you chose (Mid-level, '
-                 'in every competency), and each exercise you submit confirms or adjusts a competency.',
+        subVazio='No evidence yet. The starting point comes from your profile: Mid-level from your experience (2 to 5 years) and, '
+                 'in TypeScript, Mid-level from what you said about JavaScript/TypeScript (I use it daily). Each exercise you submit '
+                 'confirms or adjusts a competency.',
         trocarJornada='Change preferences', entraPrimeiro='in your first exercise',
         primeiroTitulo='Convert a text duration into minutes',
         primeiroTxt='Your first exercise: it has tests, hints on request and a question for you to explain your solution.',
@@ -391,8 +399,9 @@ PERFIL_VAZIO = {
         trajVazio='The trajectory compares you with yourself: your first submitted solution becomes the baseline for the next ones.',
     ),
     'es-ES': dict(
-        subVazio='Aún sin evidencias. El punto de partida viene de la experiencia que elegiste (Intermedio, '
-                 'en todas las competencias), y cada ejercicio enviado confirma o ajusta una competencia.',
+        subVazio='Aún sin evidencias. El punto de partida viene de tu perfil: Intermedio por la experiencia (De 2 a 5 años) y, '
+                 'en TypeScript, Intermedio por lo que dijiste de JavaScript/TypeScript (Lo uso a diario). Cada ejercicio enviado '
+                 'confirma o ajusta una competencia.',
         trocarJornada='Cambiar preferencias', entraPrimeiro='entra en el 1.er ejercicio',
         primeiroTitulo='Convertir una duración en texto a minutos',
         primeiroTxt='Tu primer ejercicio: tiene pruebas, pistas a demanda y una pregunta para que expliques tu solución.',
@@ -414,7 +423,7 @@ COMPETENCIA = {
         historicoTit='Histórico do nível',
         d1='12 set', h1d='O próximo nível abriu: três exercícios de Senior com rubrica alta confirmam.',
         d3='5 set', h3d='3 submissões de nível Pleno com rubrica alta:',
-        d4='20 ago', h4d='No primeiro acesso, pela experiência: Pleno.',
+        d4='20 ago', h4d='No primeiro acesso, pela experiência (De 2 a 5 anos): Pleno. Mudar o perfil muda só o declarado; o confirmado fica.',
         fontesTit='Evidências por fonte', fonteExercicio='Exercício', fonteExplicacao='Explicação',
         fontePeer='Peer na IDE', fontePlayground='Playground', pesoForte='forte', pesoLeve='leve', total='Total',
         fontesNota='Evidência leve ajusta a confiança e orienta o Peer. Sozinha, não muda o nível.',
@@ -433,7 +442,7 @@ COMPETENCIA = {
         historicoTit='Level history',
         d1='Sep 12', h1d='The next level opened: three Senior exercises with a high rubric confirm it.',
         d3='Sep 5', h3d='3 Mid-level submissions with a high rubric score:',
-        d4='Aug 20', h4d='At first access, from your experience: Mid-level.',
+        d4='Aug 20', h4d='At first access, from your experience (2 to 5 years): Mid-level. Changing your profile only changes what’s declared; what’s confirmed stays.',
         fontesTit='Evidence by source', fonteExercicio='Exercise', fonteExplicacao='Explanation',
         fontePeer='Peer in your IDE', fontePlayground='Playground', pesoForte='strong', pesoLeve='light', total='Total',
         fontesNota='Light evidence adjusts confidence and guides the Peer. On its own, it never changes a level.',
@@ -452,7 +461,7 @@ COMPETENCIA = {
         historicoTit='Historial del nivel',
         d1='12 sept', h1d='Se abrió el siguiente nivel: tres ejercicios de Senior con rúbrica alta lo confirman.',
         d3='5 sept', h3d='3 envíos de nivel Intermedio con una rúbrica alta:',
-        d4='20 ago', h4d='En el primer acceso, por la experiencia: Intermedio.',
+        d4='20 ago', h4d='En el primer acceso, por la experiencia (De 2 a 5 años): Intermedio. Cambiar el perfil solo cambia lo declarado; lo confirmado se queda.',
         fontesTit='Evidencias por fuente', fonteExercicio='Ejercicio', fonteExplicacao='Explicación',
         fontePeer='Peer en el IDE', fontePlayground='Playground', pesoForte='fuerte', pesoLeve='ligera', total='Total',
         fontesNota='La evidencia ligera ajusta la confianza y orienta al Peer. Por sí sola, no cambia el nivel.',
