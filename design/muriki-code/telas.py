@@ -14,8 +14,8 @@ from textos_inicio import INICIO
 from textos_sistema import SISTEMA
 from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
-from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS
-from aprender import (tela_trilhas, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
+from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS, TRILHAS_VAZIA
+from aprender import (tela_trilhas, tela_trilhas_vazia, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
                       ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS
@@ -1604,6 +1604,8 @@ def _montar(tela, tema, sufixo):
         return web(INICIO, tela_inicio_primeiro_dia(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)
     if tela['id'] == 'trilhas':
         return web(TRILHAS, tela_trilhas(k, sufixo))
+    if tela['id'] == 'trilhas_vazia':
+        return web(juntar(TRILHAS, TRILHA, TRILHAS_VAZIA), tela_trilhas_vazia(k, sufixo))
     if tela['id'] == 'trilha':
         return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha_mapa(k, sufixo))
     if tela['id'] == 'trilha_lista':

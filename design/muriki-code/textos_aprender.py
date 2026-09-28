@@ -19,6 +19,7 @@ TRILHAS = {
         t6='O básico que evita incidente', t6Txt='Entrada que não se confia, segredo fora do código e o mínimo de permissão.',
         e1='Testar com relógio falso', e1Txt='A etapa de agora: o seu último envio errou os casos com fuso horário.',
         so_pro='no Pro',
+        miniTit='O caminho', miniAqui='você está aqui', miniComece='comece aqui', miniVer='Ver o mapa',
     ),
     'en-US': dict(
         tTitulo='Tracks',
@@ -35,6 +36,7 @@ TRILHAS = {
         t6='The basics that prevent incidents', t6Txt='Untrusted input, secrets out of the code and least privilege.',
         e1='Testing with a fake clock', e1Txt='The step for now: your last submission missed the time zone cases.',
         so_pro='on Pro',
+        miniTit='The path', miniAqui='you are here', miniComece='start here', miniVer='See the map',
     ),
     'es-ES': dict(
         tTitulo='Rutas',
@@ -51,6 +53,7 @@ TRILHAS = {
         t6='Lo básico que evita incidentes', t6Txt='Entrada que no se confía, secretos fuera del código y el mínimo de permisos.',
         e1='Probar con reloj falso', e1Txt='El paso de ahora: tu último envío falló los casos con zona horaria.',
         so_pro='en Pro',
+        miniTit='El camino', miniAqui='estás aquí', miniComece='empieza aquí', miniVer='Ver el mapa',
     ),
 }
 
@@ -272,5 +275,25 @@ BOAS_VINDAS = {
         bvI3='Todo cuenta para tu perfil', bvI3Txt='Dos pasos con nota alta ya confirman tu nivel.',
         bvPular='Saltar', bvVoltar='Volver', bvContinuar='Continuar', bvAbrir='Abrir la ruta',
         bvEtapas='pasos',
+    ),
+}
+
+# Trilhas antes da primeira etapa: nada em andamento. O topo vira "por onde começar", montado pelo
+# primeiro acesso, e as recomendadas vêm primeiro, na ordem.
+TRILHAS_VAZIA = {
+    'pt-BR': dict(
+        vzRotulo='Por onde começar', vzPorque='Pelo seu primeiro acesso: Pleno, TypeScript e Python.',
+        vzMeta='8 etapas · uns 3 h · a primeira leva 8 min', vzComecar='Começar a trilha', vzRever='Ver as boas-vindas de novo',
+        vz1='1ª para você', vz2='2ª para você', vz3='3ª para você',
+    ),
+    'en-US': dict(
+        vzRotulo='Where to start', vzPorque='From your first access: Mid-level, TypeScript and Python.',
+        vzMeta='8 steps · about 3 h · the first takes 8 min', vzComecar='Start the track', vzRever='See the welcome again',
+        vz1='1st for you', vz2='2nd for you', vz3='3rd for you',
+    ),
+    'es-ES': dict(
+        vzRotulo='Por dónde empezar', vzPorque='Por tu primer acceso: Intermedio, TypeScript y Python.',
+        vzMeta='8 pasos · unas 3 h · el primero lleva 8 min', vzComecar='Empezar la ruta', vzRever='Ver la bienvenida de nuevo',
+        vz1='1.ª para ti', vz2='2.ª para ti', vz3='3.ª para ti',
     ),
 }
