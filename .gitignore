@@ -22,3 +22,6 @@ design/home-focus/home-do-focus.html
 # lixo de sistema e do python dos geradores do design/
 .DS_Store
 __pycache__/
+
+# pastas de trabalho dos agentes do Claude Code: um git add -A as levava como repositório embutido (#99)
+.claude/worktrees/
