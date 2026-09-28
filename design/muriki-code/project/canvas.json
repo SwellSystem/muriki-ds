@@ -753,6 +753,118 @@
    "h": 900,
    "title": "Trilhas · antes da primeira etapa: por onde começar · escuro",
    "is_interactive": true
+  },
+  "MenuMovel.dc.html": {
+   "x": 0,
+   "y": 18480,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · a barra de topo e a gaveta do menu",
+   "is_interactive": true
+  },
+  "MenuMovelEscuro.dc.html": {
+   "x": 0,
+   "y": 20800,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · a barra de topo e a gaveta do menu · escuro",
+   "is_interactive": true
+  },
+  "InicioMovel.dc.html": {
+   "x": 470,
+   "y": 18480,
+   "w": 390,
+   "h": 1600,
+   "title": "Celular · o Início do primeiro dia",
+   "is_interactive": true
+  },
+  "InicioMovelEscuro.dc.html": {
+   "x": 470,
+   "y": 20800,
+   "w": 390,
+   "h": 1600,
+   "title": "Celular · o Início do primeiro dia · escuro",
+   "is_interactive": true
+  },
+  "TrilhasMovel.dc.html": {
+   "x": 940,
+   "y": 18480,
+   "w": 390,
+   "h": 1900,
+   "title": "Celular · Trilhas com o minimapa",
+   "is_interactive": true
+  },
+  "TrilhasMovelEscuro.dc.html": {
+   "x": 940,
+   "y": 20800,
+   "w": 390,
+   "h": 1900,
+   "title": "Celular · Trilhas com o minimapa · escuro",
+   "is_interactive": true
+  },
+  "TrilhaMovel.dc.html": {
+   "x": 1410,
+   "y": 18480,
+   "w": 390,
+   "h": 1710,
+   "title": "Celular · a trilha em mapa vertical",
+   "is_interactive": true
+  },
+  "TrilhaMovelEscuro.dc.html": {
+   "x": 1410,
+   "y": 20800,
+   "w": 390,
+   "h": 1710,
+   "title": "Celular · a trilha em mapa vertical · escuro",
+   "is_interactive": true
+  },
+  "ExerciciosMovel.dc.html": {
+   "x": 1880,
+   "y": 18480,
+   "w": 390,
+   "h": 1850,
+   "title": "Celular · o catálogo em cartões",
+   "is_interactive": true
+  },
+  "ExerciciosMovelEscuro.dc.html": {
+   "x": 1880,
+   "y": 20800,
+   "w": 390,
+   "h": 1850,
+   "title": "Celular · o catálogo em cartões · escuro",
+   "is_interactive": true
+  },
+  "ContaMovel.dc.html": {
+   "x": 2350,
+   "y": 18480,
+   "w": 390,
+   "h": 1420,
+   "title": "Celular · Minha conta, meus dados",
+   "is_interactive": true
+  },
+  "ContaMovelEscuro.dc.html": {
+   "x": 2350,
+   "y": 20800,
+   "w": 390,
+   "h": 1420,
+   "title": "Celular · Minha conta, meus dados · escuro",
+   "is_interactive": true
+  },
+  "BoasVindasMovel.dc.html": {
+   "x": 2820,
+   "y": 18480,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · as boas-vindas às trilhas numa folha que sobe de baixo",
+   "is_interactive": true
+  },
+  "BoasVindasMovelEscuro.dc.html": {
+   "x": 2820,
+   "y": 20800,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · as boas-vindas às trilhas numa folha que sobe de baixo · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -875,6 +987,22 @@
    "kind": "title1",
    "maxW": 8000,
    "w": 240
+  },
+  "celular": {
+   "x": 0,
+   "y": 18180,
+   "text": "Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical e as boas-vindas numa folha",
+   "kind": "title1",
+   "maxW": 3290,
+   "w": 240
+  },
+  "celularEscuro": {
+   "x": 0,
+   "y": 20500,
+   "text": "Code no celular no tema escuro",
+   "kind": "title1",
+   "maxW": 3290,
+   "w": 240
   }
  },
  "order": [
@@ -971,7 +1099,21 @@
   "TrilhaLista.dc.html",
   "TrilhaListaEscuro.dc.html",
   "TrilhasVazia.dc.html",
-  "TrilhasVaziaEscuro.dc.html"
+  "TrilhasVaziaEscuro.dc.html",
+  "MenuMovel.dc.html",
+  "MenuMovelEscuro.dc.html",
+  "InicioMovel.dc.html",
+  "InicioMovelEscuro.dc.html",
+  "TrilhasMovel.dc.html",
+  "TrilhasMovelEscuro.dc.html",
+  "TrilhaMovel.dc.html",
+  "TrilhaMovelEscuro.dc.html",
+  "ExerciciosMovel.dc.html",
+  "ExerciciosMovelEscuro.dc.html",
+  "ContaMovel.dc.html",
+  "ContaMovelEscuro.dc.html",
+  "BoasVindasMovel.dc.html",
+  "BoasVindasMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

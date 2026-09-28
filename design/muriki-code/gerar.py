@@ -1,6 +1,8 @@
 import json, os
 from datetime import datetime, timezone
 from telas import *
+from movel import WM, ALTURAS as ALTURAS_MOVEL
+ALTURA_MOVEL_MAX = max(ALTURAS_MOVEL.values())
 
 SAIDA = os.path.join(AQUI, 'project')
 os.makedirs(SAIDA, exist_ok=True)
@@ -48,6 +50,14 @@ TELAS = [
     ('trilha_lista', 'TrilhaLista', 'Testes que dão confiança', 'Trilha · a lista: o mesmo caminho em linha', 3, 12, 13),
     ('catalogo', 'Exercicios', 'Exercícios', 'Exercícios · o catálogo, com filtros e o uso do mês', 4, 12, 13),
     ('peer_web', 'PeerWeb', 'Peer', 'Peer na web · conversas da IDE, o trecho visto e onde ele olha', 5, 12, 13),
+    # o Code no celular (390), na fileira 14 (claro) e 15 (escuro); o tamanho vem de movel.ALTURAS
+    ('menu_movel', 'MenuMovel', 'Menu', 'Celular · a barra de topo e a gaveta do menu', 0, 14, 15),
+    ('inicio_movel', 'InicioMovel', 'Início', 'Celular · o Início do primeiro dia', 1, 14, 15),
+    ('trilhas_movel', 'TrilhasMovel', 'Trilhas', 'Celular · Trilhas com o minimapa', 2, 14, 15),
+    ('trilha_movel', 'TrilhaMovel', 'Testes que dão confiança', 'Celular · a trilha em mapa vertical', 3, 14, 15),
+    ('exercicios_movel', 'ExerciciosMovel', 'Exercícios', 'Celular · o catálogo em cartões', 4, 14, 15),
+    ('conta_movel', 'ContaMovel', 'Minha conta', 'Celular · Minha conta, meus dados', 5, 14, 15),
+    ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
     ('erro', 'ErroInesperado', 'Erro inesperado', 'Sistema · erro inesperado (500), com o código para o suporte', 2, 10, 11),
@@ -85,8 +95,15 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         open(os.path.join(SAIDA, arquivo), 'w').write(montar(tela, tema))
         x = col * PASSO_X
         y = (lin_claro if tema == 'claro' else lin_escuro) * LINHA_Y
+        w, h = W, H
+        if id_.endswith('_movel'):
+            # o celular: 390 de largura, a altura da página, e as colunas mais juntas
+            chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha',
+                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas'}[id_]
+            x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
+            y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)
         b = boards.setdefault(arquivo, {})
-        b.update(x=x, y=y, w=W, h=H, title=quadro if tema == 'claro' else f'{quadro} · escuro', is_interactive=True)
+        b.update(x=x, y=y, w=w, h=h, title=quadro if tema == 'claro' else f'{quadro} · escuro', is_interactive=True)
         if arquivo not in order:
             order.append(arquivo)
         gerados.append(arquivo)
@@ -111,6 +128,13 @@ for chave, lin, n, texto in [
     ('aprenderMaisEscuro', 13, 7, 'Trilhas, exercícios e Peer na web no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
+    notas[chave].setdefault('w', 240)
+# as notas do celular: a fileira escura começa depois do quadro mais alto do claro
+for chave, y, texto in [
+    ('celular', 14 * LINHA_Y - 300, 'Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical e as boas-vindas numa folha'),
+    ('celularEscuro', 14 * LINHA_Y + ALTURA_MOVEL_MAX + 120, 'Code no celular no tema escuro'),
+]:
+    notas.setdefault(chave, {}).update(x=0, y=y, text=texto, kind='title1', maxW=min(7 * (WM + 80), 8000))
     notas[chave].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=1)

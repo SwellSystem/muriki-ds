@@ -15,6 +15,9 @@ from textos_sistema import SISTEMA
 from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
 from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS, TRILHAS_VAZIA
+from textos_movel import MOVEL
+from movel import (ALTURAS as ALTURAS_MOVEL, casca_movel, tela_menu_movel, tela_inicio_movel, tela_trilhas_movel, tela_trilha_movel,
+                   tela_exercicios_movel, tela_conta_movel, tela_boas_vindas_movel)
 from aprender import (tela_trilhas, tela_trilhas_vazia, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
                       ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)
 from textos_onboarding import PREFERENCIAS
@@ -1617,6 +1620,21 @@ def _montar(tela, tema, sufixo):
         return web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}), tela_catalogo(k, sufixo))
     if tela['id'] == 'peer_web':
         return web(PEER_WEB, tela_peer_web(k, sufixo))
+    # o Code no celular (390): o casca fixa o $preview em W × H, e casca_movel troca pela altura da página
+    moveis = {
+        'menu_movel': ('menu', lambda: web(juntar(INICIO, MOVEL), tela_menu_movel(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)),
+        'inicio_movel': ('inicio', lambda: web(juntar(INICIO, MOVEL), tela_inicio_movel(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)),
+        'trilhas_movel': ('trilhas', lambda: web(juntar(TRILHAS, MOVEL), tela_trilhas_movel(k, sufixo))),
+        'trilha_movel': ('trilha', lambda: web(juntar(TRILHAS, TRILHA, MAPA, MOVEL), tela_trilha_movel(k, sufixo))),
+        'exercicios_movel': ('exercicios', lambda: web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}, MOVEL),
+                                                       tela_exercicios_movel(k, sufixo))),
+        'conta_movel': ('conta', lambda: web(juntar(MINHA_CONTA, MOVEL), tela_conta_movel(k, sufixo))),
+        'boas_vindas_movel': ('boas_vindas', lambda: web(juntar(TRILHAS, BOAS_VINDAS, MOVEL), tela_boas_vindas_movel(k, sufixo),
+                                                         ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)),
+    }
+    if tela['id'] in moveis:
+        chave, fazer = moveis[tela['id']]
+        return casca_movel(fazer(), ALTURAS_MOVEL[chave])
     if tela['id'] == 'suspenso':
         return web(SUSPENSO, tela_suspenso(k, sufixo))
     if tela['id'] in FLUXOS:
