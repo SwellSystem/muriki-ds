@@ -406,6 +406,8 @@ const STRINGS: Record<string, unknown> = {
     done: "feita",
     now: "agora",
     later: "a seguir",
+    start: "comece aqui",
+    summary: "{{done}} de {{total}} etapas feitas",
   },
   bar_chart: {
     current: "em curso",
