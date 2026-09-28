@@ -111,6 +111,34 @@ renderVals() {{ return {{}}; }}
         order.append(arquivo)
     gerados.append(arquivo)
 
+# ── Celular: 390 de largura, a altura da página rolada inteira; claro na fileira 10, o escuro logo
+# abaixo do quadro mais alto do claro (os quadros do celular são mais altos que a fileira)
+from movel import montar_movel, ALTURAS as ALTURAS_MOVEL, MOVEIS as TELAS_MOVEIS, WM  # noqa: E402
+MOVEIS = [
+    ('inicio_movel', 'InicioMovel', 'Início', 'Celular · Início: seletores em largura cheia, cartões 2 × 2 e as origens em colunas'),
+    ('menu_movel', 'MenuMovel', 'Menu', 'Celular · o menu: o rail vira um sheet sobre o véu'),
+    ('clientes_movel', 'ClientesMovel', 'Clientes', 'Celular · Clientes: abas que rolam e a linha vira cartão'),
+    ('cliente_movel', 'ClienteMovel', 'Marina Costa', 'Celular · detalhe do cliente: produtos empilhados e pagamentos em cartões'),
+    ('metricas_movel', 'MetricasMovel', 'Métricas', 'Celular · Métricas: resumo 2 × 2 e as barras com os meses de dois em dois'),
+    ('cupons_movel', 'CuponsMovel', 'Cupons', 'Celular · Cupons: cartões com os usos na barra'),
+    ('cupom_movel', 'CupomMovel', 'PRO50', 'Celular · um cupom: dados 2 × 2, Duplicar em largura cheia e os usos em cartões'),
+    ('planos_movel', 'PlanosMovel', 'Planos', 'Celular · Planos: um cartão por plano'),
+]
+LINHA_MOVEL = 10
+Y_MOVEL_CLARO = LINHA_MOVEL * LINHA_Y
+Y_MOVEL_ESCURO = Y_MOVEL_CLARO + max(ALTURAS_MOVEL.values()) + 420
+for col, (id_, base_nome, titulo, quadro) in enumerate(MOVEIS):
+    altura = ALTURAS_MOVEL[TELAS_MOVEIS[id_][1]]
+    for tema in ('claro', 'escuro'):
+        arquivo = f'{base_nome}{"" if tema == "claro" else "Escuro"}.dc.html'
+        open(os.path.join(SAIDA, arquivo), 'w').write(montar_movel(dict(id=id_, titulo=titulo), tema))
+        b = boards.setdefault(arquivo, {})
+        b.update(x=col * (WM + 80), y=Y_MOVEL_CLARO if tema == 'claro' else Y_MOVEL_ESCURO, w=WM, h=altura,
+                 title=quadro if tema == 'claro' else f'{quadro} · escuro', is_interactive=True)
+        if arquivo not in order:
+            order.append(arquivo)
+        gerados.append(arquivo)
+
 largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
@@ -125,6 +153,12 @@ for chave, lin, n, texto in [
     ('equipeEscuro', 7, 5, 'Equipe no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
+    notas[chave].setdefault('w', 240)
+largura_movel = len(MOVEIS) * WM + (len(MOVEIS) - 1) * 80
+notas.setdefault('celular', {}).update(x=0, y=Y_MOVEL_CLARO - 300, kind='title1', maxW=largura_movel, w=240,
+                                       text='Celular (390): a barra de topo com o menu em sheet, seletores em largura cheia, abas que rolam e a tabela em cartões')
+notas.setdefault('celularEscuro', {}).update(x=0, y=Y_MOVEL_ESCURO - 300, kind='title1', maxW=largura_movel, w=240,
+                                             text='Celular no tema escuro')
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=2)
 print(f'{len(gerados)} quadros em {SAIDA}')

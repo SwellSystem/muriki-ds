@@ -429,6 +429,134 @@
       "h": 900,
       "title": "Início · métricas: testes e atraso mês a mês · escuro",
       "is_interactive": true
+    },
+    "InicioMovel.dc.html": {
+      "x": 0,
+      "y": 13200,
+      "w": 390,
+      "h": 1810,
+      "title": "Celular · Início: seletores em largura cheia, cartões 2 × 2 e as origens em colunas",
+      "is_interactive": true
+    },
+    "InicioMovelEscuro.dc.html": {
+      "x": 0,
+      "y": 15430,
+      "w": 390,
+      "h": 1810,
+      "title": "Celular · Início: seletores em largura cheia, cartões 2 × 2 e as origens em colunas · escuro",
+      "is_interactive": true
+    },
+    "MenuMovel.dc.html": {
+      "x": 470,
+      "y": 13200,
+      "w": 390,
+      "h": 844,
+      "title": "Celular · o menu: o rail vira um sheet sobre o véu",
+      "is_interactive": true
+    },
+    "MenuMovelEscuro.dc.html": {
+      "x": 470,
+      "y": 15430,
+      "w": 390,
+      "h": 844,
+      "title": "Celular · o menu: o rail vira um sheet sobre o véu · escuro",
+      "is_interactive": true
+    },
+    "ClientesMovel.dc.html": {
+      "x": 940,
+      "y": 13200,
+      "w": 390,
+      "h": 1360,
+      "title": "Celular · Clientes: abas que rolam e a linha vira cartão",
+      "is_interactive": true
+    },
+    "ClientesMovelEscuro.dc.html": {
+      "x": 940,
+      "y": 15430,
+      "w": 390,
+      "h": 1360,
+      "title": "Celular · Clientes: abas que rolam e a linha vira cartão · escuro",
+      "is_interactive": true
+    },
+    "ClienteMovel.dc.html": {
+      "x": 1410,
+      "y": 13200,
+      "w": 390,
+      "h": 1560,
+      "title": "Celular · detalhe do cliente: produtos empilhados e pagamentos em cartões",
+      "is_interactive": true
+    },
+    "ClienteMovelEscuro.dc.html": {
+      "x": 1410,
+      "y": 15430,
+      "w": 390,
+      "h": 1560,
+      "title": "Celular · detalhe do cliente: produtos empilhados e pagamentos em cartões · escuro",
+      "is_interactive": true
+    },
+    "MetricasMovel.dc.html": {
+      "x": 1880,
+      "y": 13200,
+      "w": 390,
+      "h": 1120,
+      "title": "Celular · Métricas: resumo 2 × 2 e as barras com os meses de dois em dois",
+      "is_interactive": true
+    },
+    "MetricasMovelEscuro.dc.html": {
+      "x": 1880,
+      "y": 15430,
+      "w": 390,
+      "h": 1120,
+      "title": "Celular · Métricas: resumo 2 × 2 e as barras com os meses de dois em dois · escuro",
+      "is_interactive": true
+    },
+    "CuponsMovel.dc.html": {
+      "x": 2350,
+      "y": 13200,
+      "w": 390,
+      "h": 1450,
+      "title": "Celular · Cupons: cartões com os usos na barra",
+      "is_interactive": true
+    },
+    "CuponsMovelEscuro.dc.html": {
+      "x": 2350,
+      "y": 15430,
+      "w": 390,
+      "h": 1450,
+      "title": "Celular · Cupons: cartões com os usos na barra · escuro",
+      "is_interactive": true
+    },
+    "CupomMovel.dc.html": {
+      "x": 2820,
+      "y": 13200,
+      "w": 390,
+      "h": 1190,
+      "title": "Celular · um cupom: dados 2 × 2, Duplicar em largura cheia e os usos em cartões",
+      "is_interactive": true
+    },
+    "CupomMovelEscuro.dc.html": {
+      "x": 2820,
+      "y": 15430,
+      "w": 390,
+      "h": 1190,
+      "title": "Celular · um cupom: dados 2 × 2, Duplicar em largura cheia e os usos em cartões · escuro",
+      "is_interactive": true
+    },
+    "PlanosMovel.dc.html": {
+      "x": 3290,
+      "y": 13200,
+      "w": 390,
+      "h": 1130,
+      "title": "Celular · Planos: um cartão por plano",
+      "is_interactive": true
+    },
+    "PlanosMovelEscuro.dc.html": {
+      "x": 3290,
+      "y": 15430,
+      "w": 390,
+      "h": 1130,
+      "title": "Celular · Planos: um cartão por plano · escuro",
+      "is_interactive": true
     }
   },
   "createdOnFiles": {
@@ -511,6 +639,22 @@
       "kind": "title1",
       "maxW": 4480,
       "w": 240
+    },
+    "celular": {
+      "x": 0,
+      "y": 12900,
+      "kind": "title1",
+      "maxW": 3680,
+      "w": 240,
+      "text": "Celular (390): a barra de topo com o menu em sheet, seletores em largura cheia, abas que rolam e a tabela em cartões"
+    },
+    "celularEscuro": {
+      "x": 0,
+      "y": 15130,
+      "kind": "title1",
+      "maxW": 3680,
+      "w": 240,
+      "text": "Celular no tema escuro"
     }
   },
   "order": [
@@ -567,7 +711,23 @@
     "CupomUsos.dc.html",
     "CupomUsosEscuro.dc.html",
     "Metricas.dc.html",
-    "MetricasEscuro.dc.html"
+    "MetricasEscuro.dc.html",
+    "InicioMovel.dc.html",
+    "InicioMovelEscuro.dc.html",
+    "MenuMovel.dc.html",
+    "MenuMovelEscuro.dc.html",
+    "ClientesMovel.dc.html",
+    "ClientesMovelEscuro.dc.html",
+    "ClienteMovel.dc.html",
+    "ClienteMovelEscuro.dc.html",
+    "MetricasMovel.dc.html",
+    "MetricasMovelEscuro.dc.html",
+    "CuponsMovel.dc.html",
+    "CuponsMovelEscuro.dc.html",
+    "CupomMovel.dc.html",
+    "CupomMovelEscuro.dc.html",
+    "PlanosMovel.dc.html",
+    "PlanosMovelEscuro.dc.html"
   ],
   "pages": [],
   "title": "Muriki Backoffice"
