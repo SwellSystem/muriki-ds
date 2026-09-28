@@ -93,12 +93,26 @@ def logica(tema, antes='', valores=''):
             '};\n}')
 
 
+# o flyout do app-shell recolhido: o grupo é o gatilho (mouse ou foco), e o cartão do popover
+# (--float, raio de recipiente) abre à direita com o rótulo e os itens clicáveis; o rail não se mexe
+CSS_FLYOUT = (
+    '.mc nav:has(.grupo){position:relative;z-index:20;}'
+    '.mc .grupo{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;}'
+    '.mc .flyout{position:absolute;left:calc(100% + 12px);top:0;z-index:50;width:224px;padding:6px;border-radius:14px;'
+    'background:var(--card);box-shadow:var(--sombraFlut),inset 0 0 0 1px var(--border);display:flex;flex-direction:column;gap:2px;'
+    'opacity:0;visibility:hidden;transform:scale(0.95);transform-origin:left top;'
+    'transition:opacity 100ms ease-out,transform 100ms ease-out,visibility 0s linear 100ms;}'
+    '.mc .flyout::before{content:"";position:absolute;right:100%;top:0;bottom:0;width:14px;}'
+    '.mc .grupo:is(:hover,:focus-within)>.flyout{opacity:1;visibility:visible;transform:none;transition-delay:90ms,90ms,0s;}'
+    '@media (prefers-reduced-motion: reduce){.mc .flyout{transition:none;}}'
+)
 PROPS_RAIL = {'sidebar': {'editor': 'enum', 'options': ['expandido', 'recolhido'], 'default': 'expandido'}}
 
 
 def pagina(titulo, corpo, tema, antes='', valores='', props=None):
     extra = PROPS_RAIL if 'railA' in corpo else {}
-    return casca(titulo, corpo, logica(tema, antes, valores), {**props_tema(tema), **extra, **(props or {})})
+    return casca(titulo, corpo, logica(tema, antes, valores), {**props_tema(tema), **extra, **(props or {})},
+                 CSS_FLYOUT if 'railA' in corpo else '')
 
 
 # ── Rail ────────────────────────────────────────────────────────────────
@@ -138,8 +152,14 @@ def rail(k, ativo):
         f = f'background:{k["prisub"]};color:{k["prisubfg"]};' if at else f'color:{k["mfg"]};'
         cur = ' aria-current="page"' if at else ''
         alvo = href(destino) if destino else '#'
-        return (f'<a href="{alvo}" aria-label="{nome}" title="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
+        return (f'<a href="{alvo}" aria-label="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
                 f'width:40px;height:40px;border-radius:10px;{f}">{ic(icone, 17)}</a>')
+
+    def grupo(titulo, itens, extra):
+        cartao_ = (f'<div class="flyout" aria-hidden="true">'
+                   f'<div style="height:30px;display:flex;align-items:center;padding:0 10px;">{rotulo(titulo, k["mfg"])}</div>'
+                   + ''.join(item(c, n, i, d, extra(c)) for c, n, i, d in itens) + '</div>')
+        return '<div class="grupo">' + ''.join(item_icone(c, n, i, d) for c, n, i, d in itens) + cartao_ + '</div>'
 
     conta = lambda n: f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{n}</span>'
     nav = ''.join(item(c, n, i, d, conta('1.284') if c == 'clientes' else '') for c, n, i, d in MENU)
@@ -172,9 +192,9 @@ def rail(k, ativo):
         f'align-items:center;gap:4px;padding:18px 0 12px;{sombra}">'
         f'<span style="display:flex;width:30px;height:30px;margin-bottom:6px;">{LOGO}</span>{_botao_rail(k, 36)}'
         f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
-        + ''.join(item_icone(c, n, i, d) for c, n, i, d in MENU)
+        + grupo('Operação', MENU, lambda c: conta('1.284') if c == 'clientes' else '')
         + f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
-        + ''.join(item_icone(c, n, i, d) for c, n, i, d in EQUIPE)
+        + grupo('Equipe', EQUIPE, lambda c: '')
         + f'<div style="flex:1;"></div>{botao_tema(k, 36)}{sair}'
         f'<span title="Ana Lima · Administradora" style="margin-top:6px;display:flex;">{avatar("AL", k, "yellow")}</span></nav>')
     return aberto + fechado
