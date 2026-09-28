@@ -845,7 +845,7 @@ def tela_reativar(k):
               + link_botao(k, 'Reativar no Platform', href('ClienteDetalhe'), 'solid', 36))
     a = alerta(k, 'Reativar Marina Costa no Muriki Platform?',
                'Ela foi inativada em 20 de setembro por chargeback, por Ana Lima. Reativar fica no histórico e na auditoria.',
-               corpo, rodape, icone='chave')
+               corpo, rodape, icone='chave', tom='blue')
     return tela_cliente_detalhe(k, sobre=a, inativo=True)
 
 
