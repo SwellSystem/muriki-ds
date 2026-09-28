@@ -406,7 +406,9 @@ def paginacao(k, pagina_=1, tem_proxima=True):
 
 
 def selo_status(k, status):
-    tom = {'Ativo': 'green', 'Em teste': 'blue', 'Inadimplente': 'orange', 'Inativo': 'red', 'Pago': 'green', 'Falhou': 'red',
+    # os de cliente são o billingState da API: trial, trial_with_card, paying, overdue, free, canceled
+    tom = {'Ativo': 'green', 'Em teste': 'blue', 'Inadimplente': 'orange', 'Inativo': 'red',
+           'Teste com cartão': 'blue', 'Pagante': 'green', 'Em atraso': 'orange', 'Grátis': 'gray', 'Cancelado': 'gray', 'Pago': 'green', 'Falhou': 'red',
            'Rascunho': 'gray', 'Arquivado': 'gray', 'Pausado': 'yellow', 'Expirado': 'gray', 'Esgotado': 'gray'}[status]
     return f'<span style="display:flex;">{badge(status, k, tom, ponto=True)}</span>'
 
