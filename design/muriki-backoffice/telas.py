@@ -403,7 +403,7 @@ def _grafico_vendas(k):
     # o ponto de agosto com o tooltip aberto, como no hover do app
     hx, hy = pts[-2]
     tip = (f'<line x1="{hx:.1f}" x2="{hx:.1f}" y1="{topo}" y2="{base}" style="stroke:var(--input);stroke-width:1;stroke-dasharray:3 3;"/>'
-           f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="4" style="fill:var(--card);stroke:var(--pri);stroke-width:2;"/>'
+           f'<circle cx="{hx:.1f}" cy="{hy:.1f}" r="3.5" style="fill:var(--pri);"/>'
            f'<g transform="translate({hx - 150:.1f},{hy + 14:.1f})"><rect width="138" height="58" rx="8" style="fill:var(--card);stroke:var(--border);"/>'
            f'<text x="12" y="19" style="fill:var(--mfg);font-family:{MONO};font-size:10.5px;">ago 2026</text>'
            f'<rect x="12" y="29" width="8" height="8" rx="2" style="fill:var(--pri);"/>'
@@ -414,10 +414,10 @@ def _grafico_vendas(k):
             f'<defs><linearGradient id="vendasArea" x1="0" y1="0" x2="0" y2="1">'
             f'<stop offset="5%" style="stop-color:var(--pri);stop-opacity:0.8"/><stop offset="95%" style="stop-color:var(--pri);stop-opacity:0.1"/>'
             f'</linearGradient></defs>{grade}'
-            f'<path d="{area}" style="fill:url(#vendasArea);"/>'
-            f'<path d="{fechados}" style="fill:none;stroke:var(--pri);stroke-width:2;"/>'
-            f'<path d="{em_curso}" style="fill:none;stroke:var(--pri);stroke-width:2;stroke-dasharray:4 4;"/>'
-            f'<circle cx="{pts[-1][0]:.1f}" cy="{pts[-1][1]:.1f}" r="3.5" style="fill:var(--card);stroke:color-mix(in oklch, var(--pri) 45%, transparent);stroke-width:2;"/>'
+            f'<path d="{area}" style="fill:url(#vendasArea);fill-opacity:0.4;"/>'
+            f'<path d="{fechados}" style="fill:none;stroke:var(--pri);stroke-width:1;"/>'
+            f'<path d="{em_curso}" style="fill:none;stroke:var(--pri);stroke-width:1;stroke-dasharray:3 3;"/>'
+            f'<circle cx="{pts[-1][0]:.1f}" cy="{pts[-1][1]:.1f}" r="3" style="fill:var(--card);stroke:var(--pri);stroke-width:1.5;"/>'
             f'{meses}{tip}</svg>')
 
 
