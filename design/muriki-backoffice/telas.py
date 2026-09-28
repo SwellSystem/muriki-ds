@@ -691,7 +691,9 @@ PAGAMENTOS = [
     ('4 ago 2026', 'Muriki Platform', 'Pro · mensal · nova tentativa', 49.0, 'Pago'),
     ('12 jul 2026', 'Muriki Code', 'Pro · mensal · cupom BEMVINDO20', 39.2, 'Pago'),
 ]
-COLS_PAGAMENTOS = '120px 150px minmax(0,1fr) 110px 120px 90px'
+# sem o recibo: a fatura do Stripe mostra nome, e-mail e endereço sem a máscara do admin, e qualquer
+# membro leria (decisão da muriki-api); se voltar, é só para owner/admin com step-up
+COLS_PAGAMENTOS = '120px 150px minmax(0,1fr) 110px 120px'
 
 
 # quem está inativo no produto selecionado da lista (o acesso é por produto; a cobrança segue à parte)
@@ -784,15 +786,13 @@ def tela_cliente_detalhe(k, sobre='', inativo=False):
         for n, c, at in [('Pagamentos', '14', not inativo), ('Histórico', '24' if inativo else '23', inativo)])
     abas = f'<div role="tablist" aria-label="Detalhe do cliente" style="display:flex;gap:20px;box-shadow:inset 0 -1px 0 {k["muted"]};">{abas}</div>'
     cab_t = [('Data', 'esq', True), ('Produto', 'esq', False), ('Descrição', 'esq', False), ('Valor', 'dir', True),
-             ('Status', 'esq', False), ('Recibo', 'dir', False)]
+             ('Status', 'esq', False)]
     linhas = ''.join(linha_tabela(k, COLS_PAGAMENTOS, [
         f'<span style="font-size:13px;color:{k["fg"]};">{d}</span>',
         f'<span style="display:flex;">{selo_produto(k, p)}</span>',
         f'<span style="font-size:13px;color:{k["mfg"]};">{desc}</span>',
         f'<span style="font-family:{MONO};font-size:12.5px;color:{k["fgs"]};text-align:right;">{brl(v)}</span>',
         selo_status(k, st),
-        (f'<span style="display:flex;justify-content:flex-end;"><a href="#" style="display:inline-flex;align-items:center;gap:4px;font-size:12.5px;">'
-         f'Abrir{ic("seta", 12)}</a></span>' if st == 'Pago' else f'<span style="text-align:right;color:{k["mfg"]};">—</span>'),
     ], altura=44) for d, p, desc, v, st in PAGAMENTOS)
     t = tabela(k, COLS_PAGAMENTOS, cab_t, linhas, paginacao(k, 1))
     nota = (f'<p style="margin:-6px 0 0;font-size:12px;color:{k["mfg"]};">Os pagamentos aparecem daqui para frente, conforme o Stripe avisa. '
