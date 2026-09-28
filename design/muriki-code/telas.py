@@ -16,12 +16,12 @@ from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
 from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS, TRILHAS_VAZIA
 from textos_movel import MOVEL
-from movel import (ALTURAS as ALTURAS_MOVEL, casca_movel, tela_menu_movel, tela_inicio_movel, tela_trilhas_movel, tela_trilha_movel,
+from movel_code import (ALTURAS as ALTURAS_MOVEL, casca_movel, tela_menu_movel, tela_inicio_movel, tela_trilhas_movel, tela_trilha_movel,
                    tela_exercicios_movel, tela_conta_movel, tela_boas_vindas_movel)
 from aprender import (tela_trilhas, tela_trilhas_vazia, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
                       ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)
 from textos_onboarding import PREFERENCIAS
-from onboarding import VALORES_PREFERENCIAS
+from onboarding import VALORES_PREFERENCIAS, PROPS_PREFERENCIAS
 from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela_conta_seguranca, tela_conta_plano, tela_confirmar_email,
                    ANTES_CONTA_DADOS, VALORES_CONTA_DADOS, PROPS_CONTA_DADOS, ANTES_CONTA_SEGURANCA,
                    VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA, ANTES_CONFIRMAR_EMAIL, PROPS_CONFIRMAR_EMAIL,
@@ -1554,7 +1554,7 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'perfil':
         return web(onb(PERFIL_ONB), tela_perfil(k, sufixo), ANTES_PERFIL, 'pf: pf', PROPS_PERFIL, CSS_DIVIDER_SKELETON)
     if tela['id'] == 'preferencias':
-        return web(onb(PREFERENCIAS), tela_preferencias(k, sufixo), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS,
+        return web(onb(PREFERENCIAS), tela_preferencias(k, sufixo), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS, PROPS_PREFERENCIAS,
                    css=CSS_DIVIDER_SKELETON)
     if tela['id'] == 'pagamento':
         return web(onb(PAGAMENTO), tela_pagamento(k, sufixo), ANTES_PAGAMENTO, VALORES_PAGAMENTO, PROPS_PAGAMENTO)
@@ -1597,7 +1597,7 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'conta_dados':
         return web(MINHA_CONTA, tela_conta_dados(k), ANTES_CONTA_DADOS, VALORES_CONTA_DADOS, PROPS_CONTA_DADOS)
     if tela['id'] == 'conta_aprendizado':
-        return web(juntar(MINHA_CONTA, PREFERENCIAS), tela_conta_aprendizado(k), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS)
+        return web(juntar(MINHA_CONTA, PREFERENCIAS), tela_conta_aprendizado(k), ANTES_PREFERENCIAS, VALORES_PREFERENCIAS, PROPS_PREFERENCIAS)
     if tela['id'] == 'conta_seguranca':
         return web(MINHA_CONTA, tela_conta_seguranca(k), ANTES_CONTA_SEGURANCA, VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA)
     if tela['id'] in SISTEMA_TELAS:

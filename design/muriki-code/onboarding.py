@@ -24,10 +24,10 @@ def cabecalho_passo(k, n, titulo, sub, tamanho=52, centro=False):
             f'<p style="margin:0;max-width:65ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{sub}</p></div></header>')
 
 
-def pagina_passo(k, corpo, largura=1024):
+def pagina_passo(k, corpo, largura=1024, gap=36, pad='32px 24px 40px'):
     # a largura vale para o cabeçalho e o conteúdo juntos: barra de passos e campos terminam no mesmo lugar
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:{largura}px;align-self:center;padding:32px 24px 40px;">'
+            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:{gap}px;width:{largura}px;align-self:center;padding:{pad};">'
             f'{corpo}</main></div>')
 
 
@@ -177,10 +177,15 @@ PROPS_PERFIL = {'estado': {'editor': 'enum', 'options': ['novo', 'confirmar'], '
 
 
 # ── Primeiro acesso: o perfil de aprendizado (fora do onboarding, sem contador) ──
-# Tudo opcional: experience (junior, mid, senior, tech_lead, architect ou unknown = "ainda não
-# sei"), languages (0 a 30, de GET /code/languages; supported=false aparece "em breve") e goals
-# (0 a 3). "Pular por agora" não grava nada; o declarado do perfil vem da experience.
-EXPERIENCIAS = ['junior', 'mid', 'senior', 'tech_lead', 'architect', 'unknown']
+# Tudo opcional (muriki-api cac876c): experience é "quanto você programa" — never, learning,
+# under_2_years, from_2_to_5_years, over_5_years ou unknown ("prefiro não dizer"); os valores antigos
+# (junior…architect) dão 422. languages (0 a 30, de GET /code/languages; supported=false aparece
+# "em breve"), familiarity por família de linguagem (hoje só js, que cobre JavaScript e TypeScript;
+# never_used, basics, daily ou expert; a pergunta só aparece com uma linguagem da família marcada)
+# e goals (0 a 3). "Pular por agora" não grava nada.
+EXPERIENCIAS = ['never', 'learning', 'under_2_years', 'from_2_to_5_years', 'over_5_years', 'unknown']
+FAMILIARIDADES = ['never_used', 'basics', 'daily', 'expert']
+FAMILIA_JS = ['JavaScript', 'TypeScript']
 OBJETIVOS = ['learn', 'ship_faster', 'review_code']
 # exemplo do que GET /onboarding/code/languages devolve: (nome, categoria, supported)
 LINGUAGENS_API = [
@@ -193,17 +198,18 @@ LINGUAGENS_API = [
 
 
 def campos_preferencias(k):
-    # experiência, linguagens e objetivos: os mesmos no primeiro acesso e na aba Aprendizado de Minha conta
+    # experiência, linguagens, familiaridade e objetivos: os mesmos no primeiro acesso e na aba
+    # Aprendizado de Minha conta
     exp = (f'<div role="radiogroup" aria-label="{T("experiencia")}" style="display:grid;grid-template-columns:repeat(6, minmax(0, 1fr));gap:10px;">'
            f'<sc-for list="{h("exps")}" as="e" hint-placeholder-count="6">'
            f'<button type="button" role="radio" aria-checked="{h("e.marcado")}" onClick="{h("e.escolher")}" '
-           f'style="display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:0;border-radius:12px;background:{k["card"]};'
+           f'style="display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:0;border-radius:12px;background:{k["card"]};'
            f'box-shadow:{h("e.borda")};text-align:left;font-family:{FONTE};cursor:pointer;">'
            f'<span style="display:flex;align-items:center;gap:8px;">'
            f'<span style="width:14px;height:14px;border-radius:999px;box-shadow:{h("e.radio")};"></span>'
            f'<span style="font-size:14.5px;font-weight:600;color:{k["fgs"]};">{h("e.nome")}</span></span>'
            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{h("e.desc")}</span></button></sc-for></div>')
-    ling = (f'<div style="display:flex;flex-direction:column;gap:10px;">'
+    ling = (f'<div style="display:flex;flex-direction:column;gap:6px;">'
             f'<sc-for list="{h("grupos")}" as="g" hint-placeholder-count="4">'
             f'<div style="display:flex;align-items:center;gap:14px;">'
             f'<span style="width:84px;flex:0 0 auto;font-size:12px;color:{k["mfg"]};">{h("g.nome")}</span>'
@@ -227,11 +233,25 @@ def campos_preferencias(k):
            f'<span style="display:flex;flex-direction:column;gap:3px;">'
            f'<span style="font-size:14.5px;font-weight:600;color:{k["fgs"]};">{h("o.nome")}</span>'
            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{h("o.desc")}</span></span></button></sc-for></div>')
-    return exp, ling, obj
+    # a familiaridade com a família js: escolha única, só com JavaScript ou TypeScript marcado
+    fam = (f'<sc-if value="{h("temJs")}" hint-placeholder-val="{{{{ true }}}}">'
+           f'<div style="display:flex;align-items:center;gap:16px;padding:10px 12px 10px 16px;border-radius:12px;background:{k["rail"]};'
+           f'box-shadow:inset 0 0 0 1px {k["border"]};">'
+           f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">'
+           f'<span style="font-size:14px;font-weight:600;color:{k["fgs"]};">{T("famTitulo")}</span>'
+           f'<span style="font-size:12px;line-height:16px;color:{k["mfg"]};">{T("famSub")}</span></div>'
+           f'<div role="radiogroup" aria-label="{T("famTitulo")}" style="display:flex;gap:6px;flex-shrink:0;">'
+           f'<sc-for list="{h("fams")}" as="f" hint-placeholder-count="4">'
+           f'<button type="button" role="radio" aria-checked="{h("f.marcado")}" onClick="{h("f.escolher")}" '
+           f'style="display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border:0;border-radius:999px;background:{k["card"]};'
+           f'box-shadow:{h("f.borda")};font-family:{FONTE};font-size:13px;font-weight:500;color:{k["fgs"]};cursor:pointer;white-space:nowrap;">'
+           f'<span style="width:12px;height:12px;border-radius:999px;box-shadow:{h("f.radio")};"></span>{h("f.nome")}</button>'
+           f'</sc-for></div></div></sc-if>')
+    return exp, ling, fam, obj
 
 
 def tela_preferencias(k, sufixo):
-    exp, ling, obj = campos_preferencias(k)
+    exp, ling, fam, obj = campos_preferencias(k)
     rodape = (f'<div style="display:flex;align-items:center;gap:8px;">'
               f'{botao_touch(k, T("comecar"), f"PrimeiroExercicio{sufixo}.dc.html")}'
               f'{botao_ir(k, T("pular"), f"PrimeiroExercicio{sufixo}.dc.html", False)}'
@@ -243,24 +263,34 @@ def tela_preferencias(k, sufixo):
               f'<p style="margin:0;max-width:70ch;font-size:16px;line-height:24px;color:{k["mfg"]};">{T("sub")}</p></header>')
     corpo = (cabeca
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("experiencia"))}{exp}</div>'
-             + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("linguagens"))}{ling}</div>'
+             + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("linguagens"))}{ling}{fam}</div>'
              + f'<div style="display:flex;flex-direction:column;gap:14px;">{secao(k, T("objetivos"), contador)}{obj}</div>'
              + rodape)
-    return pagina_passo(k, corpo)
+    return pagina_passo(k, corpo, gap=24, pad='24px 24px 28px')
 
 
 ANTES_PREFERENCIAS = """const EXP = __EXP__;
+const FAM = __FAM__;
+const FAMJS = __FAMJS__;
 const OBJ = __OBJ__;
 const LING = __LING__;
 const CATS = ["mainstream", "web", "mobile", "systems"];
-const exp = s.exp || "mid";
-const langs = s.langs || ["TypeScript", "Python"];
+const exp = s.exp || "from_2_to_5_years";
+const langs = s.langs || (this.props.linguagens === "sem JS/TS" ? ["Python", "Go"] : ["TypeScript", "Python"]);
+const fam = s.fam || "daily";
+const temJs = langs.some((l) => FAMJS.indexOf(l) >= 0);
 const objs = s.objs || ["learn", "ship_faster"];
 const exps = EXP.map((id) => ({
-nome: t[id], desc: t[id + "Desc"], marcado: id === exp,
+nome: t["exp_" + id], desc: t["exp_" + id + "Desc"], marcado: id === exp,
 borda: id === exp ? "0 0 0 1.5px var(--pri), var(--sombra)" : "inset 0 0 0 1px var(--border), var(--sombra)",
 radio: id === exp ? "inset 0 0 0 4px var(--pri)" : "inset 0 0 0 1.5px var(--input)",
 escolher: () => this.setState({ exp: id })
+}));
+const fams = FAM.map((id) => ({
+nome: t["fam_" + id], marcado: id === fam,
+borda: id === fam ? "0 0 0 1.5px var(--pri)" : "inset 0 0 0 1px var(--border)",
+radio: id === fam ? "inset 0 0 0 3.5px var(--pri)" : "inset 0 0 0 1.5px var(--input)",
+escolher: () => this.setState({ fam: id })
 }));
 const grupos = CATS.map((c) => ({
 nome: t[c],
@@ -288,8 +318,10 @@ this.setState({ objs: on ? objs.filter((x) => x !== id) : objs.concat([id]) });
 };
 });
 """.replace('__EXP__', json.dumps(EXPERIENCIAS)).replace('__OBJ__', json.dumps(OBJETIVOS)).replace(
-    '__LING__', json.dumps(LINGUAGENS_API))
-VALORES_PREFERENCIAS = 'exps: exps,\ngrupos: grupos,\nobjs: objsV'
+    '__LING__', json.dumps(LINGUAGENS_API)).replace('__FAM__', json.dumps(FAMILIARIDADES)).replace('__FAMJS__', json.dumps(FAMILIA_JS))
+VALORES_PREFERENCIAS = 'exps: exps,\ngrupos: grupos,\ntemJs: temJs,\nfams: fams,\nobjs: objsV'
+# o quadro mostra os dois casos: com uma linguagem da família js (a pergunta aparece) e sem
+PROPS_PREFERENCIAS = {'linguagens': {'editor': 'enum', 'options': ['com JS/TS', 'sem JS/TS'], 'default': 'com JS/TS'}}
 
 
 # ── Volta do Stripe ────────────────────────────────────────────────────

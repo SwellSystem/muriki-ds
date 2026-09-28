@@ -3,6 +3,7 @@
 
 INICIO = {
     'pt-BR': dict(
+        expContou='De 2 a 5 anos',
         titulo='Boas-vindas, Rafael.',
         sub='O seu Code está pronto. Comece pelo primeiro exercício: ele já conta para o seu perfil.',
         proximo='Próximo passo', entra='entra em Testing e Debugging',
@@ -25,6 +26,7 @@ INICIO = {
         mEvolucaoTxt='Onde você está em cada competência: o que declarou e o que a prática já confirmou.', ver='Ver',
     ),
     'en-US': dict(
+        expContou='2 to 5 years',
         titulo='Welcome, Rafael.',
         sub='Your Code is ready. Start with the first exercise: it already counts toward your profile.',
         proximo='Next step', entra='counts toward Testing and Debugging',
@@ -47,6 +49,7 @@ INICIO = {
         mEvolucaoTxt='Where you stand in each competency: what you declared and what practice has confirmed.', ver='See',
     ),
     'es-ES': dict(
+        expContou='De 2 a 5 años',
         titulo='Te damos la bienvenida, Rafael.',
         sub='Tu Code está listo. Empieza por el primer ejercicio: ya cuenta para tu perfil.',
         proximo='Siguiente paso', entra='cuenta para Testing y Debugging',

@@ -1,7 +1,7 @@
 import json, os
 from datetime import datetime, timezone
 from telas import *
-from movel import WM, ALTURAS as ALTURAS_MOVEL
+from movel_code import WM, ALTURAS as ALTURAS_MOVEL
 ALTURA_MOVEL_MAX = max(ALTURAS_MOVEL.values())
 
 SAIDA = os.path.join(AQUI, 'project')

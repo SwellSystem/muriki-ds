@@ -163,17 +163,17 @@ PROPS_CONTA_DADOS = {'email': {'editor': 'enum', 'options': ['atual', 'trocando'
 
 # ── Aprendizado ──────────────────────────────────────────────────────────
 def tela_conta_aprendizado(k):
-    exp, ling, obj = campos_preferencias(k)
+    exp, ling, fam, obj = campos_preferencias(k)
     bloco = lambda titulo, html, extra='': (f'<div style="display:flex;flex-direction:column;gap:12px;">'
                                             f'<div style="display:flex;align-items:center;">{rotulo(titulo, k["mfg"])}{extra}</div>{html}</div>')
     contador = f'<span style="margin-left:auto;font-size:12px;color:{k["mfg"]};">{T("umATres")}</span>'
     nota = (f'<p style="margin:0;display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
             f'<span style="display:flex;margin-top:1px;">{ic("evolucao", 14)}</span><span>{T("declaradoNota")}</span></p>')
     corpo = _cartao(k, T('aprTit'), T('aprSub'), (
-        bloco(T('experiencia'), exp) + nota + filete(k) + bloco(T('linguagens'), ling) + filete(k)
+        bloco(T('experiencia'), exp) + nota + filete(k) + bloco(T('linguagens'), ling + fam) + filete(k)
         + bloco(T('objetivos'), obj, contador)
         + f'<div style="display:flex;justify-content:flex-end;gap:8px;">{botao(T("descartar"), k, "ghost")}{botao(T("salvar"), k, "primary")}</div>'),
-        extra='gap:18px;')
+        extra='gap:14px;')
     return _pagina(k, 'aprendizado', corpo)
 
 
