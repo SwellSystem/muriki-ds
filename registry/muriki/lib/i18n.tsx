@@ -382,6 +382,13 @@ const STRINGS: Record<string, unknown> = {
       confirm: "Excluir a conta",
     },
   },
+  welcome_dialog: {
+    skip: "Pular",
+    back: "Voltar",
+    next: "Continuar",
+    finish: "Começar",
+    step: "Passo {{n}} de {{total}}",
+  },
   metric_card: {
     live: "agora",
     live_hint: "Retrato de agora: não muda com o período",
