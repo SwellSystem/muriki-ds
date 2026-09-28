@@ -274,3 +274,23 @@ BOAS_VINDAS = {
         bvEtapas='pasos',
     ),
 }
+
+# Trilhas antes da primeira etapa: nada em andamento. O topo vira "por onde começar", montado pelo
+# primeiro acesso, e as recomendadas vêm primeiro, na ordem.
+TRILHAS_VAZIA = {
+    'pt-BR': dict(
+        vzRotulo='Por onde começar', vzPorque='Pelo seu primeiro acesso: Pleno, TypeScript e Python.',
+        vzMeta='8 etapas · uns 3 h · a primeira leva 8 min', vzComecar='Começar a trilha', vzRever='Ver as boas-vindas de novo',
+        vzPrimeiras='As primeiras etapas', vz1='1ª para você', vz2='2ª para você', vz3='3ª para você',
+    ),
+    'en-US': dict(
+        vzRotulo='Where to start', vzPorque='From your first access: Mid-level, TypeScript and Python.',
+        vzMeta='8 steps · about 3 h · the first takes 8 min', vzComecar='Start the track', vzRever='See the welcome again',
+        vzPrimeiras='The first steps', vz1='1st for you', vz2='2nd for you', vz3='3rd for you',
+    ),
+    'es-ES': dict(
+        vzRotulo='Por dónde empezar', vzPorque='Por tu primer acceso: Intermedio, TypeScript y Python.',
+        vzMeta='8 pasos · unas 3 h · el primero lleva 8 min', vzComecar='Empezar la ruta', vzRever='Ver la bienvenida de nuevo',
+        vzPrimeiras='Los primeros pasos', vz1='1.ª para ti', vz2='2.ª para ti', vz3='3.ª para ti',
+    ),
+}

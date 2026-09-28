@@ -510,3 +510,68 @@ def tela_trilha_boas_vindas(k, sufixo):
            f'<section role="dialog" aria-modal="true" aria-label="{T("bvRotulo")}" class="splash-modal" style="width:620px;border-radius:18px;background:{k["card"]};'
            f'box-shadow:0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px {k["border"]};overflow:hidden;">{splash}{corpo}</section></div>')
     return fundo[:-6] + veu + '</div>'
+
+
+def tela_trilhas_vazia(k, sufixo):
+    # Nada em andamento ainda: o topo não tem de onde continuar, então vira "por onde começar" — a
+    # primeira trilha que as boas-vindas escolheram, com as três primeiras etapas à vista — e as
+    # recomendadas vêm primeiro, numeradas na ordem, sem barra de progresso
+    cab = cabecalho(k, None, T('tTitulo'), T('tSub'))
+    etapas = ''
+    for n, (tit, tipo, mins, _, _) in enumerate(ETAPAS[:3]):
+        etapas += (f'<div style="display:flex;align-items:center;gap:10px;">'
+                   f'<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;flex:0 0 auto;'
+                   + (f'background:{k["card"]};box-shadow:0 0 0 2px {k["pri"]};color:{k["pri"]};font-weight:600;' if n == 0 else
+                      f'background:{k["sunken"]};color:{k["mfg"]};')
+                   + f'font-family:{MONO};font-size:10.5px;">{n + 1}</span>'
+                   f'<span style="flex:1;font-size:13px;color:{k["fgs"] if n == 0 else k["mfg"]};font-weight:{500 if n == 0 else 400};">{T(tit)}</span>'
+                   f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{mins} {T("min")}</span></div>')
+    destaque = cartao(
+        f'<div style="display:flex;align-items:center;gap:10px;">{rotulo(T("vzRotulo"), k["mfg"])}'
+        f'<span style="margin-left:auto;display:flex;gap:6px;">{badge("Testing", k, "blue")}{badge(T("recomendada"), k, "green", ponto=True)}</span></div>'
+        f'<div style="display:flex;gap:32px;align-items:stretch;">'
+        f'<div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">'
+        f'<span style="font-size:13px;color:{k["mfg"]};">{T("vzPorque")}</span>'
+        f'<h2 style="margin:0;font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T("t1")}</h2>'
+        f'<p style="margin:0;font-size:13.5px;color:{k["mfg"]};">{T("t1Txt")}</p>'
+        f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:{k["mfg"]};">{escala(3, k, 14)}Pleno → Senior · {T("vzMeta")}</span>'
+        f'<div style="display:flex;align-items:center;gap:16px;margin-top:10px;">'
+        f'{botao_link(T("vzComecar"), f"Trilha{sufixo}.dc.html", k, "solid", 40, "seta")}'
+        f'<a href="TrilhasBoasVindas{sufixo}.dc.html" style="font-size:13px;font-weight:500;">{T("vzRever")}</a></div></div>'
+        f'<div style="width:320px;flex:0 0 auto;display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:10px;background:{k["rail"]};'
+        f'box-shadow:inset 0 0 0 1px {k["border"]};">{rotulo(T("vzPrimeiras"), k["mfg"], 9.5)}{etapas}</div></div>',
+        k, pad='20px 24px', extra='gap:14px;')
+
+    def chip(txt, ativo=False, apagado=False, n=None):
+        conta = f'<span style="font-family:{MONO};font-size:11px;margin-left:6px;">{n}</span>' if n is not None else ''
+        est = (f'background:{k["prisub"]};color:{k["prisubfg"]};font-weight:500;' if ativo
+               else f'background:transparent;color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["input"]};' + ('opacity:0.55;' if apagado else ''))
+        return f'<span style="display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:999px;font-size:13px;{est}">{txt}{conta}</span>'
+    filtros = ('<div style="display:flex;gap:8px;">' + chip(T('filtroTodas'), True) + chip(T('filtroAndamento'), apagado=True, n=0)
+               + chip(T('filtroRecomendadas'), n=3) + chip(T('filtroFeitas'), apagado=True, n=0) + '</div>')
+
+    ordem = {'t1': 1, 't3': 2, 't5': 3}
+    dados = sorted(TRILHAS_DADOS, key=lambda d: ordem.get(d[0], 9))
+
+    def card(tit, txt, comp, niveis, etapas_, feitas, horas, pro, pra_voce):
+        de, ate = niveis
+        n = ordem.get(tit)
+        topo_ = (f'<div style="display:flex;align-items:center;gap:8px;">{badge(comp, k, "blue")}'
+                 + (badge(T(f'vz{n}'), k, 'green', ponto=True) if n else '')
+                 + (f'<span style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:{k["mfg"]};">{ic("cadeado", 12)}{T("so_pro")}</span>' if pro and not n else '')
+                 + '</div>')
+        niv = (f'<span style="display:flex;align-items:center;gap:8px;font-size:12px;color:{k["mfg"]};">{escala(ate, k, 14)}'
+               f'{NIVEIS[de - 1]} → {NIVEIS[ate - 1]}</span>')
+        pe = (f'<span style="display:flex;align-items:center;justify-content:space-between;width:100%;font-size:12.5px;color:{k["mfg"]};">'
+              f'<span>{etapas_} {T("etapas")} · {horas} {T("horas")}</span>'
+              f'<span style="font-weight:500;color:{k["pri"] if (n or not pro) else k["mfg"]};">{T("comecar")}</span></span>')
+        destaque_ = f'box-shadow:{k["sombra"]}, inset 0 0 0 1.5px {k["pri"]};' if n == 1 else f'box-shadow:{k["sombra"]};'
+        return (f'<a href="{f"Trilha{sufixo}.dc.html" if n == 1 else "#"}" style="display:flex;flex-direction:column;gap:10px;padding:18px 20px;border-radius:12px;'
+                f'background:{k["card"]};{destaque_}color:inherit;min-width:0;{"opacity:0.85;" if pro and not n else ""}">{topo_}'
+                f'<div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:16px;font-weight:600;color:{k["fgs"]};">{T(tit)}</span>'
+                f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">{T(txt)}</span></div>'
+                f'{niv}<div style="margin-top:auto;padding-top:4px;">{pe}</div></a>')
+    grade = ('<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">'
+             + ''.join(card(*d) for d in dados) + '</div>')
+    return app(k, 'trilhas', cab + destaque + filtros + grade, gap=20)
+

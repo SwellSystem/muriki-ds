@@ -737,6 +737,22 @@
    "h": 900,
    "title": "Trilha · a lista: o mesmo caminho em linha · escuro",
    "is_interactive": true
+  },
+  "TrilhasVazia.dc.html": {
+   "x": 9120,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · antes da primeira etapa: por onde começar",
+   "is_interactive": true
+  },
+  "TrilhasVaziaEscuro.dc.html": {
+   "x": 9120,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · antes da primeira etapa: por onde começar · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -953,7 +969,9 @@
   "TrilhasBoasVindas.dc.html",
   "TrilhasBoasVindasEscuro.dc.html",
   "TrilhaLista.dc.html",
-  "TrilhaListaEscuro.dc.html"
+  "TrilhaListaEscuro.dc.html",
+  "TrilhasVazia.dc.html",
+  "TrilhasVaziaEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
