@@ -130,6 +130,11 @@ export interface AppShellProps {
   /** O selo dos itens `soon`. Sem isto, vem do i18n (app_shell.soon). */
   soonLabel?: string
   defaultOpen?: boolean
+  /**
+   * Recolhido, passar o mouse abre o rail por cima do conteúdo, com nomes e
+   * grupos, e sair fecha. Padrão `true`; `false` deixa só os tooltips.
+   */
+  peekOnHover?: boolean
   className?: string
   /** O palco: padding do desenho por padrão; aqui entra um max-width, por exemplo. */
   stageClassName?: string
@@ -217,6 +222,7 @@ export function AppShell({
   mobileEnd,
   soonLabel,
   defaultOpen = true,
+  peekOnHover = true,
   className,
   stageClassName,
   banner,
@@ -246,7 +252,7 @@ export function AppShell({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen} className={className}>
-      <Sidebar collapsible="icon">
+      <Sidebar collapsible="icon" peekOnHover={peekOnHover}>
         <SidebarHeader className="px-2.5 pt-3 pb-1.5">
           {/* Marca e recolher na mesma linha; recolhido, empilham. */}
           <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
@@ -384,8 +390,8 @@ function IdiomaDoRail({ language }: { language: ReactElement }) {
   // O invólucro é que tem a largura: o Base UI põe um foco-guarda antes do gatilho quando o menu
   // abre, e uma regra de :first-child na linha fazia o seletor encolher e andar. Recolhido, o
   // seletor vira o compacto (globo e sigla).
-  const { state, isMobile } = useSidebar()
-  const recolhido = state === "collapsed" && !isMobile
+  const { state, isMobile, peeking } = useSidebar()
+  const recolhido = state === "collapsed" && !isMobile && !peeking
   return (
     <div
       className={cn(
