@@ -439,13 +439,14 @@ def secao_sheet(k, titulo, corpo, sub=''):
             f'<div style="display:flex;flex-direction:column;gap:2px;">{rotulo(titulo, k["mfg"], 10)}{s}</div>{corpo}</section>')
 
 
-def alerta(k, titulo, texto, corpo, rodape, icone='aviso'):
+def alerta(k, titulo, texto, corpo, rodape, icone='aviso', tom='red'):
+    # o ícone é vermelho no que destrói ou tira acesso; reativar e outras confirmações brandas usam o azul
     return (f'{veu(k)}<div role="alertdialog" aria-modal="true" aria-label="{titulo}" style="position:absolute;left:50%;top:50%;'
             f'transform:translate(-50%,-50%);width:460px;background:{k["card"]};border-radius:12px;'
             f'box-shadow:{k["sombraFlut"]}, inset 0 0 0 1px {k["border"]};padding:22px 22px 18px;display:flex;flex-direction:column;gap:16px;">'
             f'<div style="display:flex;gap:14px;align-items:flex-start;">'
             f'<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;flex:0 0 auto;border-radius:10px;'
-            f'background:{k["tred"]};color:{k["tredfg"]};">{ic(icone, 18)}</span>'
+            f'background:{k["t" + tom]};color:{k["t" + tom + "fg"]};">{ic(icone, 18)}</span>'
             f'<div style="display:flex;flex-direction:column;gap:6px;">'
             f'<h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:{k["fgs"]};">{titulo}</h2>'
             f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{texto}</p></div></div>'

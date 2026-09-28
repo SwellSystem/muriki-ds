@@ -391,9 +391,8 @@ def tela_cliente_movel(k):
                  f'<span style="display:flex;align-items:center;gap:8px;"><span style="font-family:{MONO};font-size:14px;font-weight:500;color:{k["fgs"]};">{brl(v)}</span>'
                  f'<span style="flex:1;"></span>{selo_status(k, st)}</span>'
                  f'<span style="font-size:12.5px;color:{k["mfg"]};">{d} · {desc}</span></span>')
-        pe = (selo_produto(k, p) + '<span style="flex:1;"></span>'
-              + (f'<a href="#" style="display:inline-flex;align-items:center;gap:4px;min-height:40px;font-size:13px;font-weight:500;">Recibo{ic("seta", 12)}</a>'
-                 if st == 'Pago' else ''))
+        # sem o recibo, como no desktop (a fatura do Stripe não tem a máscara do admin)
+        pe = selo_produto(k, p) + '<span style="flex:1;"></span>'
         pags += cartao_movel(k, topo_, '', pe)
     corpo = (titulo_movel(k, 'Marina Costa', voltar_para=('Clientes', 'ClientesMovel'), direita=_toque(k, 'copiar', 'Copiar ID')) + ids
              + code + plat
