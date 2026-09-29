@@ -1275,11 +1275,12 @@
       "name": "trail-map",
       "type": "registry:block",
       "title": "Trail Map",
-      "description": "O mapa da trilha do Code em SVG próprio, parado: curvas de nível ao fundo, as regiões (módulos) tracejadas no tom da marca, o caminho feito cheio até a etapa de agora e o que falta pontilhado, as estações (feita com check, agora com halo e o balão \"você está aqui\", próximas vazadas) e a bandeira amarela nos marcos de nível. Posiciona as estações sozinho para qualquer quantidade, alternando alto e baixo para os nomes não se encostarem.",
+      "description": "O mapa da trilha do Code como um lugar: cada região (tier) é um terreno no seu tom, com a placa na entrada, a estrada serpenteando com o feito em azul até a etapa de agora, o Muriki com o balão \"você está aqui\" e a chegada com a bandeira no fim. O nome inteiro de cada etapa; caminho longo abre centrado em você e anda pelas setas. Vertical para o celular e mini para os cartões (o trecho em volta de agora). Com movimento, desligado com prefers-reduced-motion.",
       "registryDependencies": [
         "utils",
         "SwellSystem/muriki-ds/theme",
-        "SwellSystem/muriki-ds/i18n"
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/muriki-logo"
       ],
       "files": [
         {
@@ -1288,7 +1289,108 @@
           "target": "components/blocks/trail-map/trail-map.tsx"
         }
       ],
-      "docs": "<TrailMap ariaLabel=\"Testes que dão confiança: 3 de 8 etapas feitas\" steps={[{ title: \"Casos de borda primeiro\", meta: \"8 min\", state: \"done\" }, { title: \"Nomear o que o teste prova\", meta: \"nota B+\", state: \"done\" }, { title: \"Converter duração em texto para minutos\", meta: \"nota C\", state: \"done\" }, { title: \"Testar com relógio falso\", meta: \"25 min\", state: \"now\" }, { title: \"Isolar sem mockar tudo\", meta: \"30 min\", state: \"later\" }, { title: \"Teste que falha pelo motivo certo\", meta: \"20 min\", state: \"later\", milestone: \"confirma Pleno\" }, { title: \"Propriedades em vez de exemplos\", meta: \"10 min\", state: \"later\" }, { title: \"Revisar a suíte de outra pessoa\", meta: \"35 min\", state: \"later\", milestone: \"conta para Senior\" }]} regions={[{ label: \"Fundamentos\", from: 0, to: 2 }, { label: \"Isolar e confiar\", from: 3, to: 5 }, { label: \"Suíte que se defende\", from: 6, to: 7 }]} />. meta vem já formatado (nota ou duração). Uma etapa \"now\" por mapa: fica na altura do meio, com o balão (hereLabel, ou trail_map.here). milestone põe a bandeira e uma 3ª linha no nome. regions usa índices inclusivos. Nome longo é cortado com reticências pela distância até a próxima estação da mesma linha; o nome inteiro vai no aria-label e na lista oculta. onStepClick transforma cada estação em botão (setas, Home e End andam; Enter abre). Largura: 100% do container, com viewBox 1100 × 360; dê ao cartão uns 900px ou mais para os nomes lerem inteiros com 8 etapas. Textos em trail_map.* (here, done, now, later, start, summary). size=\"mini\": o minimapa dos cartões do topo de Trilhas, 100% × ~140 de alto num viewBox 420 × 140 — sem nomes nem metas, regiões só como retângulos, estações pequenas, bandeiras menores e um balão só na etapa de agora (\"você está aqui\", ou \"comece aqui\" quando nada foi feito e a de agora é a primeira; troque com hereLabel e startLabel). O aria-label soma ao ariaLabel o resumo \"3 de 8 etapas feitas\". Com href ou render (ex.: render={<Link to=\"/trilhas/$id\" />}), o mini inteiro vira o link para o mapa. Ex.: <TrailMap size=\"mini\" ariaLabel=\"Testes que dão confiança\" steps={steps} regions={regions} render={<Link to=\"/trilhas/testing\" />} />. onStepClick vale só no tamanho padrão. orientation=\"vertical\": o mapa do celular — o caminho desce em zigue-zague numa faixa à esquerda e os nomes (title, meta, milestone) ficam numa coluna à direita, na altura de cada estação, quebrando linha; as regiões viram blocos na largura toda com o rótulo no canto de cima à direita; a altura cresce com as etapas (~106px cada). orientation=\"auto\": vertical quando o contêiner tem menos de 560px. onStepClick e teclado valem nos dois (setas ↑ ↓ ← →, Home, End, Enter). O mini é sempre horizontal. Ex.: <TrailMap orientation=\"auto\" ariaLabel=… steps={steps} regions={regions} onStepClick={abrir} />."
+      "docs": "<TrailMap ariaLabel=\"Testes que dão confiança: 3 de 8 etapas feitas\" steps={[{ title: \"Casos de borda primeiro\", meta: \"8 min\", state: \"done\" }, { title: \"Nomear o que o teste prova\", meta: \"nota B+\", state: \"done\" }, { title: \"Converter duração em texto para minutos\", meta: \"nota C\", state: \"done\" }, { title: \"Testar com relógio falso\", meta: \"25 min\", state: \"now\" }, { title: \"Isolar sem mockar tudo\", meta: \"30 min\", state: \"later\" }, { title: \"Teste que falha pelo motivo certo\", meta: \"20 min\", state: \"later\", milestone: \"confirma Pleno\" }, { title: \"Propriedades em vez de exemplos\", meta: \"10 min\", state: \"later\" }, { title: \"Revisar a suíte de outra pessoa\", meta: \"35 min\", state: \"later\", milestone: \"conta para Senior\" }]} regions={[{ label: \"Fundamentos\", from: 0, to: 2 }, { label: \"Isolar e confiar\", from: 3, to: 5 }, { label: \"Suíte que se defende\", from: 6, to: 7 }]} />. meta vem já formatado (nota ou duração). Uma etapa \"now\" por mapa: fica na altura do meio, com o balão (hereLabel, ou trail_map.here). milestone põe a bandeira e uma 3ª linha no nome. regions usa índices inclusivos. Nome longo é cortado com reticências pela distância até a próxima estação da mesma linha; o nome inteiro vai no aria-label e na lista oculta. onStepClick transforma cada estação em botão (setas, Home e End andam; Enter abre). Largura: 100% do container, com viewBox 1100 × 360; dê ao cartão uns 900px ou mais para os nomes lerem inteiros com 8 etapas. Textos em trail_map.* (here, done, now, later, start, summary). size=\"mini\": o minimapa dos cartões do topo de Trilhas, 100% × ~140 de alto num viewBox 420 × 140 — sem nomes nem metas, regiões só como retângulos, estações pequenas, bandeiras menores e um balão só na etapa de agora (\"você está aqui\", ou \"comece aqui\" quando nada foi feito e a de agora é a primeira; troque com hereLabel e startLabel). O aria-label soma ao ariaLabel o resumo \"3 de 8 etapas feitas\". Com href ou render (ex.: render={<Link to=\"/trilhas/$id\" />}), o mini inteiro vira o link para o mapa. Ex.: <TrailMap size=\"mini\" ariaLabel=\"Testes que dão confiança\" steps={steps} regions={regions} render={<Link to=\"/trilhas/testing\" />} />. onStepClick vale só no tamanho padrão. orientation=\"vertical\": o mapa do celular — o caminho desce em zigue-zague numa faixa à esquerda e os nomes (title, meta, milestone) ficam numa coluna à direita, na altura de cada estação, quebrando linha; as regiões viram blocos na largura toda com o rótulo no canto de cima à direita; a altura cresce com as etapas (~106px cada). orientation=\"auto\": vertical quando o contêiner tem menos de 560px. onStepClick e teclado valem nos dois (setas ↑ ↓ ← →, Home, End, Enter). O mini é sempre horizontal. Ex.: <TrailMap orientation=\"auto\" ariaLabel=… steps={steps} regions={regions} onStepClick={abrir} />. Caminho longo (ex.: 41 etapas): o vão entre as estações fica fixo e o mapa abre centrado na etapa de agora; a pessoa anda pelas setas ‹ › (trail_map.scroll_prev/next), sem rolagem na mão. No fim do caminho, a chegada (trail_map.finish); com tudo feito, \"você chegou\" (trail_map.arrived) e o Muriki vai para a bandeira. O mini mostra no máximo 9 estações em volta da etapa de agora. O movimento mora no css do item (muriki-trail-*).",
+      "css": {
+        "@keyframes muriki-trail-draw": {
+          "to": {
+            "stroke-dashoffset": "0"
+          }
+        },
+        "@keyframes muriki-trail-pulse": {
+          "0%": {
+            "transform": "scale(0.75)",
+            "opacity": "0.35"
+          },
+          "70%, 100%": {
+            "transform": "scale(1.55)",
+            "opacity": "0"
+          }
+        },
+        "@keyframes muriki-trail-bob": {
+          "0%, 100%": {
+            "transform": "translateY(0) rotate(-4deg)"
+          },
+          "50%": {
+            "transform": "translateY(-5px) rotate(4deg)"
+          }
+        },
+        "@keyframes muriki-trail-enter": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(10px) scale(0.9)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-trail-cloud": {
+          "from": {
+            "transform": "translateX(0)"
+          },
+          "to": {
+            "transform": "translateX(70px)"
+          }
+        },
+        "@keyframes muriki-trail-wave": {
+          "0%, 100%": {
+            "transform": "skewY(0deg) scaleX(1)"
+          },
+          "50%": {
+            "transform": "skewY(-7deg) scaleX(0.9)"
+          }
+        },
+        "@keyframes muriki-trail-pop": {
+          "from": {
+            "opacity": "0",
+            "transform": "scale(0.5)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        ".muriki-trail-draw": {
+          "stroke-dasharray": "1",
+          "stroke-dashoffset": "1",
+          "animation": "muriki-trail-draw 1.6s cubic-bezier(0.45, 0, 0.2, 1) 0.25s forwards"
+        },
+        ".muriki-trail-pulse": {
+          "transform-box": "fill-box",
+          "transform-origin": "center",
+          "animation": "muriki-trail-pulse 2.4s ease-out 1.6s infinite"
+        },
+        ".muriki-trail-bob": {
+          "animation": "muriki-trail-bob 2.8s ease-in-out 2s infinite"
+        },
+        ".muriki-trail-enter": {
+          "animation": "muriki-trail-enter 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 1.5s both"
+        },
+        ".muriki-trail-cloud": {
+          "animation": "muriki-trail-cloud 24s ease-in-out infinite alternate"
+        },
+        ".muriki-trail-wave": {
+          "transform-box": "fill-box",
+          "transform-origin": "left center",
+          "animation": "muriki-trail-wave 1.8s ease-in-out infinite"
+        },
+        ".muriki-trail-station": {
+          "transform-box": "fill-box",
+          "transform-origin": "center",
+          "animation": "muriki-trail-pop 0.4s cubic-bezier(0.2, 0.8, 0.2, 1.3) both"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-trail-draw, .muriki-trail-pulse, .muriki-trail-bob, .muriki-trail-enter, .muriki-trail-cloud, .muriki-trail-wave, .muriki-trail-station": {
+            "animation": "none"
+          },
+          ".muriki-trail-draw": {
+            "stroke-dashoffset": "0"
+          },
+          ".muriki-trail-pulse": {
+            "opacity": "0.18"
+          }
+        }
+      }
     },
     {
       "name": "metric-card",
