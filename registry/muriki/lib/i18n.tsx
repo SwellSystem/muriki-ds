@@ -488,6 +488,10 @@ const STRINGS: Record<string, unknown> = {
     later: "a seguir",
     start: "comece aqui",
     summary: "{{done}} de {{total}} etapas feitas",
+    finish: "chegada",
+    arrived: "você chegou",
+    scroll_prev: "Ver as etapas anteriores",
+    scroll_next: "Ver as próximas etapas",
   },
   bar_chart: {
     current: "em curso",
