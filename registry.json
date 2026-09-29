@@ -1237,7 +1237,7 @@
       "name": "exercise-workspace",
       "type": "registry:block",
       "title": "Exercise Workspace",
-      "description": "A tela de exercício do Code: cabeçalho com a trilha, chips e as ações; a coluna com o enunciado, a explicação e as dicas; e a moldura do editor com a árvore de arquivos (criar, renomear e excluir na própria linha), o painel de testes (esperado e recebido, e a falha de execução), as abas, Rodar testes com ⌘ ↵, a barra de status e o slot do editor. O guia do primeiro exercício cobre a tela com o véu e sobe o editor, os testes e a explicação, um por passo. Só apresentação, sem API. Abaixo de lg, empilha.",
+      "description": "A tela de exercício do Code: cabeçalho com a trilha, chips e as ações; a coluna com o enunciado, a explicação e as dicas; e a moldura do editor com a árvore de arquivos (criar, renomear e excluir na própria linha), o painel de testes (esperado e recebido, e a falha de execução), as abas, Rodar testes com ⌘ ↵, a barra de status e o slot do editor. O guia do primeiro exercício cobre a tela com o véu e sobe o editor, os testes e a explicação, um por passo. O resultado do Enviar solução (ExerciseSubmission): enviando em dois passos, passou ou não, os testes ocultos só com o nome, o retorno, a nota da explicação e a mudança de nível com a escala se enchendo; e o 429 com a contagem. Só apresentação, sem API. Abaixo de lg, empilha.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"
@@ -1250,7 +1250,9 @@
         "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/back-link",
         "SwellSystem/muriki-ds/breadcrumb",
-        "SwellSystem/muriki-ds/textarea"
+        "SwellSystem/muriki-ds/textarea",
+        "SwellSystem/muriki-ds/modal",
+        "SwellSystem/muriki-ds/spinner"
       ],
       "files": [
         {
@@ -1264,12 +1266,52 @@
           "target": "components/blocks/exercise-workspace/exercise-file-tree.tsx"
         },
         {
+          "path": "registry/muriki/blocks/exercise-workspace/exercise-submission.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/exercise-workspace/exercise-submission.tsx"
+        },
+        {
           "path": "registry/muriki/blocks/exercise-workspace/index.ts",
           "type": "registry:component",
           "target": "components/blocks/exercise-workspace/index.ts"
         }
       ],
-      "docs": "<ExerciseWorkspace guide={primeiro ? { step, onStepChange: setStep, onSkip, onFinish } : undefined} header={<ExerciseHeader breadcrumb={[{ label: \"Exercícios\", render: <Link to=\"/exercises\" /> }, { label: \"Testing\", render: <Link …/> }, { label: \"parse-duration\" }]} title={exercise.title} chips={<><Badge tone=\"blue\">Testing</Badge><Badge tone=\"gray\">nível Pleno</Badge><Badge tone=\"yellow\" dot>em andamento</Badge></>} savedLabel=\"salvo há 5 s\" continueInIdeSoon submitSoon />} side={<><ExerciseStatement><Readme markdown={exercise.readme} /></ExerciseStatement><ExerciseExplanation question={…} value={texto} onChange={setTexto} /><ExerciseHints total={exercise.hintCount} used={hints.length} onRequest={pedir} onView={abrirPainel} loading={pedindo} /></>} editor={<ExerciseEditor tabs={[{ path: \"src/solution.js\" }, { path: \"test/visible.test.js\", readOnly: true }]} activeTab={aberto} onTabChange={setAberto} onRun={rodar} running={rodando} runDisabledReason={jsOnly ? undefined : \"em breve\"} status=\"src/solution.js · 11:18\" sidebar={<><ExerciseFileTree rootLabel={slug} files={files} selected={aberto} onSelect={abrir} onCreate={criar} onRename={renomear} onDelete={excluir} /><ExerciseTests summary={report ? { passing, total } : null} items={itens} error={erro} ranAt=\"rodou há 40 s\" onOpenTest={abrirTeste} /></>}><CodeEditor …/></ExerciseEditor>} />. Dê altura à tela no desktop (o palco do AppShell com h-dvh, por exemplo): a moldura estica e o editor ocupa o resto. ExerciseFileTree monta as pastas pelos caminhos; readOnly leva o cadeado, createdByUser o ponto verde, e só estes renomeiam e excluem. onCreate(path) e onRename(from, to) podem devolver uma mensagem de erro (string): o input fica aberto e mostra a mensagem; a validação do nome é do app. ExerciseTests: summary null é \"não rodou\" (os itens com o círculo vazio); items[].status pass ou fail, com expected e received na falha; error { kind: timeout | build | runtime | unavailable, message } mostra a falha de execução. ExerciseEditor: ⌘ ↵ (Ctrl ↵) em qualquer lugar da moldura chama onRun; as abas andam com as setas. shortcutLabel e statusEnd têm o texto-padrão; null tira. ExerciseHints não mostra as dicas: onView abre o painel do app. O guia: step 1, 2 ou 3 mostra o passo (0 esconde); Esc e Pular chamam onSkip, Começar chama onFinish. Textos em exercise_workspace.* no i18n (os da tela, como título e pergunta, vêm do app)."
+      "docs": "<ExerciseWorkspace guide={primeiro ? { step, onStepChange: setStep, onSkip, onFinish } : undefined} header={<ExerciseHeader breadcrumb={[{ label: \"Exercícios\", render: <Link to=\"/exercises\" /> }, { label: \"Testing\", render: <Link …/> }, { label: \"parse-duration\" }]} title={exercise.title} chips={<><Badge tone=\"blue\">Testing</Badge><Badge tone=\"gray\">nível Pleno</Badge><Badge tone=\"yellow\" dot>em andamento</Badge></>} savedLabel=\"salvo há 5 s\" continueInIdeSoon submitSoon />} side={<><ExerciseStatement><Readme markdown={exercise.readme} /></ExerciseStatement><ExerciseExplanation question={…} value={texto} onChange={setTexto} /><ExerciseHints total={exercise.hintCount} used={hints.length} onRequest={pedir} onView={abrirPainel} loading={pedindo} /></>} editor={<ExerciseEditor tabs={[{ path: \"src/solution.js\" }, { path: \"test/visible.test.js\", readOnly: true }]} activeTab={aberto} onTabChange={setAberto} onRun={rodar} running={rodando} runDisabledReason={jsOnly ? undefined : \"em breve\"} status=\"src/solution.js · 11:18\" sidebar={<><ExerciseFileTree rootLabel={slug} files={files} selected={aberto} onSelect={abrir} onCreate={criar} onRename={renomear} onDelete={excluir} /><ExerciseTests summary={report ? { passing, total } : null} items={itens} error={erro} ranAt=\"rodou há 40 s\" onOpenTest={abrirTeste} /></>}><CodeEditor …/></ExerciseEditor>} />. Dê altura à tela no desktop (o palco do AppShell com h-dvh, por exemplo): a moldura estica e o editor ocupa o resto. ExerciseFileTree monta as pastas pelos caminhos; readOnly leva o cadeado, createdByUser o ponto verde, e só estes renomeiam e excluem. onCreate(path) e onRename(from, to) podem devolver uma mensagem de erro (string): o input fica aberto e mostra a mensagem; a validação do nome é do app. ExerciseTests: summary null é \"não rodou\" (os itens com o círculo vazio); items[].status pass ou fail, com expected e received na falha; error { kind: timeout | build | runtime | unavailable, message } mostra a falha de execução. ExerciseEditor: ⌘ ↵ (Ctrl ↵) em qualquer lugar da moldura chama onRun; as abas andam com as setas. shortcutLabel e statusEnd têm o texto-padrão; null tira. ExerciseHints não mostra as dicas: onView abre o painel do app. O guia: step 1, 2 ou 3 mostra o passo (0 esconde); Esc e Pular chamam onSkip, Começar chama onFinish. Textos em exercise_workspace.* no i18n (os da tela, como título e pergunta, vêm do app). ExerciseSubmission: <ExerciseSubmission open={aberto} onOpenChange={setAberto} state={fase} result={submission && { passed, tests, items: ocultos, understanding, feedback, skill: skillNome, skillDemonstrated, levelChanges: levelChanges.map((l) => ({ competency: nomeDa(l.competencyId), from: l.from, to: l.to })) }} error={erro} onRetry={enviar} onNext={irParaProxima} />. state: running (os ocultos no navegador) → sending → result, ou error { kind: rate_limit (429, retryIn em segundos: o Enviar de novo espera a contagem) | runner | network, message? }. Enviando, não fecha. Os ocultos passam só { name, status }. understanding 0–2 aparece como \"a explicação mostra o porquê\"; null diz que ela conta quando vai junto. Níveis: fundamentos | junior | pleno | senior; a escala se enche do from ao to (muriki-level-fill, no css do item).",
+      "css": {
+        "@keyframes muriki-submit-pop": {
+          "from": {
+            "opacity": "0",
+            "transform": "scale(0.4)"
+          },
+          "70%": {
+            "transform": "scale(1.12)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-level-fill": {
+          "from": {
+            "transform": "scaleX(0)"
+          },
+          "to": {
+            "transform": "none"
+          }
+        },
+        ".muriki-submit-pop": {
+          "animation": "muriki-submit-pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+        },
+        ".muriki-level-fill": {
+          "transform-origin": "left center",
+          "animation": "muriki-level-fill 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-submit-pop, .muriki-level-fill": {
+            "animation": "none"
+          }
+        }
+      }
     },
     {
       "name": "trail-map",
