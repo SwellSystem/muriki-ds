@@ -120,6 +120,24 @@ function TrailMapAuto(props: TrailMapProps) {
   )
 }
 
+// O foco numa estação nunca rola a página: o focus() vai com preventScroll, e o próprio mapa traz a
+// estação para a vista — no horizontal, centrando no contêiner dele (scrollLeft); no vertical, só na
+// direção de cima e de baixo. Sem isso o navegador rolava todos os ancestrais, a página junto.
+function mostrarEstacao(el: SVGGElement) {
+  const caixa = el.closest<HTMLElement>(".muriki-trail-scroll")
+  const reduzir = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+  if (caixa) {
+    const r = el.getBoundingClientRect()
+    const c = caixa.getBoundingClientRect()
+    caixa.scrollTo({ left: caixa.scrollLeft + r.left + r.width / 2 - (c.left + c.width / 2), behavior: reduzir ? "auto" : "smooth" })
+    return
+  }
+  const r = el.getBoundingClientRect()
+  if (r.top < 0 || r.bottom > window.innerHeight) {
+    window.scrollBy({ top: r.top + r.height / 2 - window.innerHeight / 2, behavior: reduzir ? "auto" : "smooth" })
+  }
+}
+
 /** A descrição de cada estação e o foco itinerante: setas, Home, End e Enter. */
 function useEstacoes(steps: TrailMapStep[], onStepClick?: (index: number) => void) {
   const t = useTranslate()
@@ -143,7 +161,11 @@ function useEstacoes(steps: TrailMapStep[], onStepClick?: (index: number) => voi
     e.preventDefault()
     const j = Math.min(n - 1, Math.max(0, alvo))
     setFoco(j)
-    refs.current[j]?.focus()
+    const el = refs.current[j]
+    if (el) {
+      el.focus({ preventScroll: true })
+      mostrarEstacao(el)
+    }
   }
   // as props da estação: botão com tabindex itinerante, ou só desenho
   const estacao = (i: number) =>
@@ -450,7 +472,9 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   const larguraNome = Math.min(passo - 14, 176)
 
   return (
-    <div className={cn("relative w-full min-w-0", className)}>
+    // contain: inline-size: a largura do caminho (milhares de px) nunca empurra a tela que recebe o
+    // mapa, mesmo sem min-w-0 no flex dela; o mapa ocupa a largura que tem e anda pelas setas
+    <div className={cn("relative w-full min-w-0 [contain:inline-size]", className)}>
       <div
         ref={prender}
         onScroll={medirLados}
