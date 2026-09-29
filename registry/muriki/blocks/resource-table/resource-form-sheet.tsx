@@ -133,6 +133,12 @@ export interface ResourceConfirmDialogProps {
   onConfirm: () => void | Promise<void>
   /** Vermelho cheio. Desligue para confirmações que não destroem nada. */
   destructive?: boolean
+  /**
+   * O ícone do cabeçalho, ex.: <KeyIcon /> no reativar. Destrutivo, fica no
+   * círculo vermelho no lugar do alerta; sem `destructive`, no azul. Sem
+   * ícone, o destrutivo mostra o alerta e o brando não mostra nada.
+   */
+  icon?: React.ReactNode
   /** Enviando: o botão gira, e Cancelar e Esc ficam travados até o caller resolver. */
   pending?: boolean
 }
@@ -147,6 +153,7 @@ export function ResourceConfirmDialog({
   cancelLabel,
   onConfirm,
   destructive = true,
+  icon,
   pending = false,
 }: ResourceConfirmDialogProps) {
   const t = useResourceLabel()
@@ -161,7 +168,7 @@ export function ResourceConfirmDialog({
       }}
     >
       <AlertDialogContent>
-        <AlertDialogHeader icon={destructive}>
+        <AlertDialogHeader icon={icon ?? destructive} tone={destructive ? "destructive" : "info"}>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>

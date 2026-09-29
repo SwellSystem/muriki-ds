@@ -70,21 +70,31 @@ function AlertDialogContent({
  * O cabeçalho traz o sinal de alerta tingido. Círculo de fundo tênue, não
  * bloco cheio: a cor cheia é do botão que confirma, e dois vermelhos
  * sólidos na mesma caixa cancelam um ao outro.
+ *
+ * `icon` troca o sinal por outro ícone (ex.: a chave do reativar) e `false`
+ * tira o círculo. `tone="info"` pinta o círculo de azul: é o das
+ * confirmações que não destroem nada.
  */
 function AlertDialogHeader({
   className,
   icon = true,
+  tone = "destructive",
   children,
   ...props
-}: React.ComponentProps<"div"> & { icon?: boolean }) {
+}: React.ComponentProps<"div"> & { icon?: boolean | React.ReactNode; tone?: "destructive" | "info" }) {
   return (
     <div data-slot="alert-dialog-header" className={cn("flex gap-3", className)} {...props}>
       {icon ? (
         <span
           aria-hidden
-          className="flex size-9 shrink-0 items-center justify-center rounded-full bg-destructive-subtle text-destructive-subtle-foreground"
+          className={cn(
+            "flex size-9 shrink-0 items-center justify-center rounded-full [&_svg]:size-[18px]",
+            tone === "info"
+              ? "bg-tone-blue text-tone-blue-foreground"
+              : "bg-destructive-subtle text-destructive-subtle-foreground"
+          )}
         >
-          <WarningIcon className="size-[18px]" weight="bold" />
+          {icon === true ? <WarningIcon weight="bold" /> : icon}
         </span>
       ) : null}
       <div className="flex min-w-0 flex-col gap-1.5">{children}</div>
