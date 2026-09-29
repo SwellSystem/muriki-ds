@@ -380,39 +380,34 @@ function MurikiAqui({ rotulo, pequeno }: { rotulo: string; pequeno?: boolean }) 
 }
 
 /** Mede o contêiner e cuida da rolagem: centra na etapa de agora e diz se ainda há caminho de cada lado. */
-function useRolagem(centro: number | null) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [largura, setLargura] = useState(0)
+function useRolagem(centro: number | null, aoMedir: (largura: number) => void) {
+  // o contêiner chega por callback ref num estado: nada de ref.current lido no render
+  const [el, prender] = useState<HTMLDivElement | null>(null)
   const [lados, setLados] = useState({ antes: false, depois: false })
   const centrado = useRef(false)
   const medirLados = () => {
-    const el = ref.current
     if (!el) return
     setLados({ antes: el.scrollLeft > 4, depois: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 })
   }
   useEffect(() => {
-    const el = ref.current
     if (!el) return
-    const ro = new ResizeObserver(([e]) => setLargura(e.contentRect.width))
+    const ro = new ResizeObserver(([e]) => {
+      aoMedir(e.contentRect.width)
+      if (!centrado.current && centro !== null && e.contentRect.width) {
+        el.scrollLeft = Math.max(0, centro - el.clientWidth / 2)
+        centrado.current = true
+      }
+      setLados({ antes: el.scrollLeft > 4, depois: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 })
+    })
     ro.observe(el)
     return () => ro.disconnect()
-  }, [])
-  useEffect(() => {
-    const el = ref.current
-    if (!el || !largura) return
-    if (!centrado.current && centro !== null) {
-      el.scrollLeft = Math.max(0, centro - el.clientWidth / 2)
-      centrado.current = true
-    }
-    medirLados()
-  }, [largura, centro])
+  }, [el, centro, aoMedir])
   const andar = (sentido: 1 | -1) => {
-    const el = ref.current
     if (!el) return
     const reduzir = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
     el.scrollBy({ left: sentido * el.clientWidth * 0.7, behavior: reduzir ? "auto" : "smooth" })
   }
-  return { ref, largura, lados, medirLados, andar }
+  return { prender, lados, medirLados, andar }
 }
 
 function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClick, className }: TrailMapProps) {
@@ -425,9 +420,9 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   const fimFeito = chegou ? n : atual >= 0 ? atual : ultimaFeita
 
   // o vão entre as estações: cabe na largura quando dá; senão fica no mínimo e o mapa rola
-  const [centroInicial, setCentroInicial] = useState<number | null>(null)
-  const rolagem = useRolagem(centroInicial)
-  const disponivel = rolagem.largura || 1100
+  // o centro inicial vem da etapa de agora, calculado com a largura da vez; o hook só centra uma vez
+  const [largura, setLargura] = useState(0)
+  const disponivel = largura || 1100
   const livre = n > 1 ? (disponivel - 2 * BORDA - FIM) / (n - 1) : PASSO_MAX
   const passo = Math.min(PASSO_MAX, Math.max(PASSO_MIN, livre))
   const larguraTotal = Math.max(disponivel, 2 * BORDA + FIM + Math.max(0, n - 1) * passo)
@@ -439,9 +434,7 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   const feito = fimFeito >= 0 ? curva([[0, pontos[0]?.[1] ?? MEIO_Y], ...(fimFeito >= n ? [...pontos, chegada] : pontos.slice(0, fimFeito + 1))]) : ""
   const alvo = atual >= 0 ? pontos[atual] : chegou ? chegada : null
 
-  useEffect(() => {
-    if (alvo && rolagem.largura) setCentroInicial(alvo[0])
-  }, [alvo?.[0], rolagem.largura]) // eslint-disable-line react-hooks/exhaustive-deps
+  const { prender, lados, medirLados, andar } = useRolagem(alvo ? alvo[0] : null, setLargura)
 
   // as regiões viram terrenos: da metade do vão antes da primeira etapa à metade do vão depois da última
   const terrenos = regions.map((r, k) => {
@@ -459,12 +452,12 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   return (
     <div className={cn("relative w-full min-w-0", className)}>
       <div
-        ref={rolagem.ref}
-        onScroll={rolagem.medirLados}
+        ref={prender}
+        onScroll={medirLados}
         // sem rolagem da pessoa (nem barra, nem roda, nem arrastar): só as setas e o foco andam
         className="muriki-trail-scroll overflow-hidden rounded-[inherit]"
         style={{
-          maskImage: `linear-gradient(to right, ${rolagem.lados.antes ? "transparent" : "#000"}, #000 48px, #000 calc(100% - 48px), ${rolagem.lados.depois ? "transparent" : "#000"})`,
+          maskImage: `linear-gradient(to right, ${lados.antes ? "transparent" : "#000"}, #000 48px, #000 calc(100% - 48px), ${lados.depois ? "transparent" : "#000"})`,
         }}
       >
         <div className="relative" style={{ width: larguraTotal, height: ALTURA }}>
@@ -590,10 +583,10 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
         </div>
       </div>
 
-      {rolagem.lados.antes ? (
+      {lados.antes ? (
         <button
           type="button"
-          onClick={() => rolagem.andar(-1)}
+          onClick={() => andar(-1)}
           aria-label={t("trail_map.scroll_prev")}
           className="absolute top-1/2 left-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-card text-foreground shadow-[var(--float)] hover:text-foreground-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
@@ -602,10 +595,10 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
           </svg>
         </button>
       ) : null}
-      {rolagem.lados.depois ? (
+      {lados.depois ? (
         <button
           type="button"
-          onClick={() => rolagem.andar(1)}
+          onClick={() => andar(1)}
           aria-label={t("trail_map.scroll_next")}
           className="absolute top-1/2 right-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-card text-foreground shadow-[var(--float)] hover:text-foreground-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
         >
