@@ -10,7 +10,8 @@
  *   se enche até o nível novo, discreta), o retorno da avaliação e a nota da explicação. Os testes
  *   ocultos mostram só o nome e o status, nunca o esperado.
  * - `error`: `rate_limit` (429, com a contagem até poder enviar de novo), `runner` (os ocultos não
- *   rodaram) e `network`.
+ *   rodaram), `rejected` (a API respondeu e recusou: 422 e afins, com a `message` do app) e
+ *   `network` (a conexão falhou antes). O `requestId` vai numa linha discreta, como na página de erro.
  *
  * O texto fala da tarefa e da explicação, não da pessoa: "Arrays confirmado em Junior", "a
  * explicação mostra o porquê".
@@ -46,8 +47,11 @@ export interface ExerciseSubmissionResult {
 }
 
 export interface ExerciseSubmissionError {
-  kind: "rate_limit" | "runner" | "network"
+  kind: "rate_limit" | "runner" | "rejected" | "network"
+  /** No runner, o erro do código (em fonte de código); no rejected, o motivo já traduzido pelo app. */
   message?: string
+  /** O código do pedido para o suporte, ex.: "req_7f3a91c2". */
+  requestId?: string
   /** No rate_limit: em quantos segundos dá para enviar de novo. */
   retryIn?: number
 }
@@ -330,11 +334,23 @@ function Erro({ error, onRetry, onBack }: { error: ExerciseSubmissionError; onRe
           </span>
         </span>
       </ModalHeader>
-      {error.message && error.kind !== "rate_limit" ? (
-        <ModalBody>
-          <p className="m-0 rounded-lg bg-sunken px-3 py-2.5 font-mono text-[11.5px] leading-4 break-words whitespace-pre-wrap text-foreground">
-            {error.message}
-          </p>
+      {(error.message || error.requestId) && error.kind !== "rate_limit" ? (
+        <ModalBody className="flex flex-col gap-3">
+          {error.message ? (
+            error.kind === "runner" ? (
+              <p className="m-0 rounded-lg bg-sunken px-3 py-2.5 font-mono text-[11.5px] leading-4 break-words whitespace-pre-wrap text-foreground">
+                {error.message}
+              </p>
+            ) : (
+              <p className="m-0 text-sm leading-[21px] text-foreground">{error.message}</p>
+            )
+          ) : null}
+          {error.requestId ? (
+            <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              {t("exercise_workspace.submission.error.request_id")}
+              <code className="font-mono text-xs text-foreground-strong select-all">{error.requestId}</code>
+            </span>
+          ) : null}
         </ModalBody>
       ) : null}
       <ModalFooter>
