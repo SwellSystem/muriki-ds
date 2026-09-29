@@ -472,7 +472,9 @@ function TrailMapDefault({ steps, regions = [], hereLabel, ariaLabel, onStepClic
   const larguraNome = Math.min(passo - 14, 176)
 
   return (
-    <div className={cn("relative w-full min-w-0", className)}>
+    // contain: inline-size: a largura do caminho (milhares de px) nunca empurra a tela que recebe o
+    // mapa, mesmo sem min-w-0 no flex dela; o mapa ocupa a largura que tem e anda pelas setas
+    <div className={cn("relative w-full min-w-0 [contain:inline-size]", className)}>
       <div
         ref={prender}
         onScroll={medirLados}
