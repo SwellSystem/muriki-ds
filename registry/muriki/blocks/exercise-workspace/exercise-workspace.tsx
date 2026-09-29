@@ -17,6 +17,7 @@
  * (passo 1), os testes (2) e a explicação (3), cada um com o anel e o balão ao lado.
  */
 import * as React from "react"
+import { createPortal } from "react-dom"
 import {
   CaretDownIcon,
   CaretRightIcon,
@@ -62,46 +63,95 @@ const GuiaContexto = React.createContext<ExerciseGuide | null>(null)
 
 const PASSOS = 3
 
-// onde o balão fica em cada passo: ao lado no desktop, embaixo abaixo de lg
-const BALAO = {
-  1: "top-24 left-14",
-  2: "max-lg:top-[calc(100%+12px)] max-lg:left-2 lg:top-0 lg:left-[calc(100%+14px)]",
-  3: "max-lg:top-[calc(100%+12px)] max-lg:left-0 lg:top-0 lg:left-[calc(100%+16px)]",
-} as const
+// O balão mora num portal no body, com a posição tirada da área do passo: dentro dela, a lateral
+// do editor tem overflow e cortava o balão (e dava rolagem horizontal à página). No passo 1 ele
+// fica dentro do editor, no alto; nos outros, ao lado da área, ou embaixo quando não cabe.
+const LARGURA_DO_BALAO = 320
+const MARGEM = 16
 
-/** O que a área do passo `n` precisa: subir acima do véu com o anel, e o balão dentro dela. */
-function usePassoDoGuia(n: 1 | 2 | 3, anel: "inset" | "fora" = "inset") {
+type Lugar = "dentro" | "lado"
+
+function posicionar(area: DOMRect, lugar: Lugar, altura: number) {
+  const largura = Math.min(LARGURA_DO_BALAO, window.innerWidth - 2 * MARGEM)
+  const esquerda = (left: number) => Math.max(MARGEM, Math.min(left, window.innerWidth - largura - MARGEM))
+  // sempre inteiro na tela: sobe o que passar da borda de baixo
+  const alto = (top: number) => Math.max(MARGEM, Math.min(top, window.innerHeight - altura - MARGEM))
+  if (lugar === "dentro") return { top: alto(area.top + 96), left: esquerda(area.left + 56) }
+  if (area.right + 14 + largura <= window.innerWidth - MARGEM) return { top: alto(area.top), left: area.right + 14 }
+  // sem lado: embaixo da área, ou em cima dela quando embaixo não cabe
+  const embaixo = area.bottom + 12
+  const top = embaixo + altura <= window.innerHeight - MARGEM ? embaixo : area.top - 12 - altura
+  return { top: alto(top), left: esquerda(area.left) }
+}
+
+/** O que a área do passo `n` precisa: subir acima do véu com o anel, e o balão ao lado dela. */
+function usePassoDoGuia<T extends HTMLElement>(n: 1 | 2 | 3, anel: "inset" | "fora" = "inset", lugar: Lugar = "lado") {
   const guia = React.useContext(GuiaContexto)
   const ativo = guia?.step === n
+  const ref = React.useRef<T>(null)
   return {
+    ref,
     classe: ativo
       ? cn(
           "relative z-[41]",
           anel === "inset" ? "shadow-[inset_0_0_0_2px_var(--primary)]" : "ring-2 ring-primary"
         )
       : undefined,
-    balao: ativo && guia ? <BalaoDoGuia n={n} guia={guia} /> : null,
+    balao: ativo && guia ? <BalaoDoGuia n={n} guia={guia} area={ref} lugar={lugar} /> : null,
   }
 }
 
-function BalaoDoGuia({ n, guia }: { n: 1 | 2 | 3; guia: ExerciseGuide }) {
+function BalaoDoGuia({
+  n,
+  guia,
+  area,
+  lugar,
+}: {
+  n: 1 | 2 | 3
+  guia: ExerciseGuide
+  area: React.RefObject<HTMLElement | null>
+  lugar: Lugar
+}) {
   const t = useTranslate()
   const ultimo = n === PASSOS
   const principal = React.useRef<HTMLButtonElement>(null)
+  const balao = React.useRef<HTMLDivElement>(null)
   const id = React.useId()
-  // cada passo novo leva o foco ao botão que segue: o balão é o que a pessoa lê agora
+  const [pos, setPos] = React.useState<{ top: number; left: number } | null>(null)
+
+  // a área rola com a página e muda com a janela: a posição segue. Efeito, não layout: o balão é
+  // filho da área, e o ref dela só existe depois que os filhos montam.
   React.useEffect(() => {
-    principal.current?.focus({ preventScroll: false })
-  }, [n])
-  return (
+    const el = area.current
+    if (!el) return
+    const medir = () => setPos(posicionar(el.getBoundingClientRect(), lugar, balao.current?.offsetHeight ?? 200))
+    medir()
+    const observador = new ResizeObserver(medir)
+    observador.observe(el)
+    window.addEventListener("resize", medir)
+    window.addEventListener("scroll", medir, true)
+    return () => {
+      observador.disconnect()
+      window.removeEventListener("resize", medir)
+      window.removeEventListener("scroll", medir, true)
+    }
+  }, [area, lugar, n])
+
+  // cada passo novo leva a área para a tela e o foco ao botão que segue
+  React.useEffect(() => {
+    area.current?.scrollIntoView({ block: "nearest" })
+    principal.current?.focus({ preventScroll: true })
+  }, [area, n])
+
+  if (typeof document === "undefined") return null
+  return createPortal(
     <div
+      ref={balao}
       role="dialog"
       aria-labelledby={`${id}-t`}
       aria-describedby={`${id}-d`}
-      className={cn(
-        "absolute z-[42] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl bg-card px-[18px] pt-[18px] pb-3.5 text-left whitespace-normal shadow-[0_0_0_1px_var(--input),var(--float)]",
-        BALAO[n]
-      )}
+      style={pos ? { top: pos.top, left: pos.left } : { top: 0, left: 0, visibility: "hidden" }}
+      className="fixed z-[42] flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-xl bg-card px-[18px] pt-[18px] pb-3.5 text-left whitespace-normal shadow-[0_0_0_1px_var(--input),var(--float)]"
     >
       <span className="font-mono text-[11px] tracking-[0.08em] text-primary">
         {t("exercise_workspace.guide.step", { n, total: PASSOS })}
@@ -127,7 +177,8 @@ function BalaoDoGuia({ n, guia }: { n: 1 | 2 | 3; guia: ExerciseGuide }) {
           {ultimo ? t("exercise_workspace.guide.finish") : t("exercise_workspace.guide.next")}
         </Button>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -338,9 +389,10 @@ export function ExerciseExplanation({
 }: ExerciseExplanationProps) {
   const t = useTranslate()
   const id = React.useId()
-  const passo = usePassoDoGuia(3, "fora")
+  const passo = usePassoDoGuia<HTMLElement>(3, "fora")
   return (
     <section
+      ref={passo.ref}
       data-slot="exercise-explanation"
       className={cn("relative flex flex-col gap-2.5 rounded-xl bg-card px-5 py-4 shadow-xs", passo.classe, className)}
     >
@@ -419,6 +471,7 @@ export function ExerciseHints({ total, used, onRequest, onView, loading, classNa
 // ── Seções da lateral do editor ─────────────────────────────────────────
 
 export interface ExerciseSectionProps {
+  ref?: React.Ref<HTMLElement>
   title: string
   /** À direita do título: ações ou o resumo. */
   end?: React.ReactNode
@@ -429,12 +482,12 @@ export interface ExerciseSectionProps {
 }
 
 /** A seção recolhível da lateral (Código, Testes): título mono com a seta, e o que vem à direita. */
-export function ExerciseSection({ title, end, divider = true, className, children }: ExerciseSectionProps) {
+export function ExerciseSection({ ref, title, end, divider = true, className, children }: ExerciseSectionProps) {
   const [aberta, setAberta] = React.useState(true)
   const id = React.useId()
   const Seta = aberta ? CaretDownIcon : CaretRightIcon
   return (
-    <section className={cn("relative flex flex-col", divider && "border-t border-muted", className)}>
+    <section ref={ref} className={cn("relative flex flex-col", divider && "border-t border-muted", className)}>
       <div className="flex h-[38px] items-center gap-1.5 pr-1.5 pl-2.5">
         <button
           type="button"
@@ -479,7 +532,7 @@ const TIPOS_DE_ERRO = new Set(["timeout", "build", "runtime", "unavailable"])
 
 export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, className }: ExerciseTestsProps) {
   const t = useTranslate()
-  const passo = usePassoDoGuia(2)
+  const passo = usePassoDoGuia<HTMLElement>(2)
 
   let resumo: React.ReactNode
   if (error) resumo = <Badge tone="red" dot>{t("exercise_workspace.tests.error_badge")}</Badge>
@@ -493,6 +546,7 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, classN
 
   return (
     <ExerciseSection
+      ref={passo.ref}
       title={t("exercise_workspace.tests.title")}
       end={resumo}
       className={cn("bg-rail", passo.classe, className)}
@@ -623,7 +677,7 @@ export function ExerciseEditor({
   className,
 }: ExerciseEditorProps) {
   const t = useTranslate()
-  const passo = usePassoDoGuia(1)
+  const passo = usePassoDoGuia<HTMLDivElement>(1, "inset", "dentro")
   const podeRodar = !!onRun && !runDisabledReason && !running
   const listaDeAbas = React.useRef<HTMLDivElement>(null)
 
@@ -729,6 +783,7 @@ export function ExerciseEditor({
           </span>
         </div>
         <div
+          ref={passo.ref}
           role="tabpanel"
           aria-label={activeTab}
           className={cn("relative flex min-h-0 flex-1 flex-col bg-card", passo.classe)}
