@@ -55,6 +55,7 @@ TELAS = [
     ('inicio_movel', 'InicioMovel', 'Início', 'Celular · o Início do primeiro dia', 1, 14, 15),
     ('trilhas_movel', 'TrilhasMovel', 'Trilhas', 'Celular · Trilhas com o minimapa', 2, 14, 15),
     ('trilha_movel', 'TrilhaMovel', 'Testes que dão confiança', 'Celular · a trilha em mapa vertical', 3, 14, 15),
+    ('trilha_lista_movel', 'TrilhaListaMovel', 'Testes que dão confiança', 'Celular · a trilha em lista: a linha inteira abre a etapa', 7, 14, 15),
     ('exercicios_movel', 'ExerciciosMovel', 'Exercícios', 'Celular · o catálogo em cartões', 4, 14, 15),
     ('conta_movel', 'ContaMovel', 'Minha conta', 'Celular · Minha conta, meus dados', 5, 14, 15),
     ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
@@ -98,7 +99,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         w, h = W, H
         if id_.endswith('_movel'):
             # o celular: 390 de largura, a altura da página, e as colunas mais juntas
-            chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha',
+            chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha', 'trilha_lista_movel': 'trilha_lista',
                      'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas'}[id_]
             x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
             y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)

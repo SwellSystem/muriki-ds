@@ -865,6 +865,22 @@
    "h": 844,
    "title": "Celular · as boas-vindas às trilhas numa folha que sobe de baixo · escuro",
    "is_interactive": true
+  },
+  "TrilhaListaMovel.dc.html": {
+   "x": 3290,
+   "y": 18480,
+   "w": 390,
+   "h": 1064,
+   "title": "Celular · a trilha em lista: a linha inteira abre a etapa",
+   "is_interactive": true
+  },
+  "TrilhaListaMovelEscuro.dc.html": {
+   "x": 3290,
+   "y": 20800,
+   "w": 390,
+   "h": 1064,
+   "title": "Celular · a trilha em lista: a linha inteira abre a etapa · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1113,7 +1129,9 @@
   "ContaMovel.dc.html",
   "ContaMovelEscuro.dc.html",
   "BoasVindasMovel.dc.html",
-  "BoasVindasMovelEscuro.dc.html"
+  "BoasVindasMovelEscuro.dc.html",
+  "TrilhaListaMovel.dc.html",
+  "TrilhaListaMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

@@ -12,7 +12,7 @@
 import os
 
 from base import *  # noqa: F401,F403
-from aprender import (TRILHAS_DADOS, ETAPAS, EXERCICIOS, MINI, MARCOS, _progresso, CSS_SPLASH,
+from aprender import (linha_etapa, TRILHAS_DADOS, ETAPAS, EXERCICIOS, MINI, MARCOS, _progresso, CSS_SPLASH,
                       ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS)
 from conta import _cartao, _campo, _botao_perigo, ABAS
 from inicio import _chip, _em_breve, ANTES_INICIO, PROPS_INICIO  # noqa: F401
@@ -28,7 +28,7 @@ I.update(
 )
 
 # a altura de cada quadro: a página rolada inteira (medida no Chrome e arredondada)
-ALTURAS = dict(menu=844, inicio=1600, trilhas=1900, trilha=1710, exercicios=1850, conta=1420, boas_vindas=844)
+ALTURAS = dict(menu=844, inicio=1600, trilhas=1900, trilha=1710, trilha_lista=1064, exercicios=1850, conta=1420, boas_vindas=844)
 # MEDIR=1 solta a altura (para medir a página no Chrome)
 MEDIR = os.environ.get('MEDIR') == '1'
 
@@ -411,14 +411,15 @@ def _mapa_vertical(k):
             f'{faixas}{caminho}{nos}{aqui}</svg>{"".join(textos)}</div>')
 
 
-def _vista_movel(k, sufixo):
+def _vista_movel(k, sufixo, atual='mapa'):
     op = lambda chave, dest, at: (f'<a href="{dest}" style="flex:1;display:flex;align-items:center;justify-content:center;height:36px;border-radius:999px;'
                                   f'font-size:13px;font-weight:500;'
                                   + (f'background:{k["card"]};color:{k["pri"]};box-shadow:0 1px 2px rgba(0,0,0,0.12), inset 0 0 0 1px {k["input"]};' if at
                                      else f'color:{k["mfg"]};') + f'">{T(chave)}</a>')
     return (f'<span role="navigation" style="display:flex;width:100%;padding:2px;border-radius:999px;background:{k["sunken"]};'
             f'box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">'
-            + op('vMapa', f'TrilhaMovel{sufixo}.dc.html', True) + op('vLista', f'TrilhaLista{sufixo}.dc.html', False) + '</span>')
+            + op('vMapa', f'TrilhaMovel{sufixo}.dc.html', atual == 'mapa')
+            + op('vLista', f'TrilhaListaMovel{sufixo}.dc.html', atual == 'lista') + '</span>')
 
 
 def tela_trilha_movel(k, sufixo):
@@ -441,6 +442,16 @@ def tela_trilha_movel(k, sufixo):
                     f'<span style="font-size:13px;color:{k["mfg"]};flex:1;min-width:140px;">{T("conta")}</span>'
                     f'{badge("Testing", k, "blue")}{badge("Debugging", k)}</div>', gap=10)
     return app_movel(k, 'trilha', T('tTitulo'), cab + agora + mapa + nivel)
+
+
+def tela_trilha_lista_movel(k, sufixo):
+    # a mesma lista do desktop: a linha inteira abre o exercício, a seta à direita, alvo de 48px;
+    # sem hover no toque, o rótulo da ação não aparece, a seta basta
+    cab = titulo_movel(k, T('dTitulo'), T('dSub'), voltar_para=(T('tTitulo'), f'TrilhasMovel{sufixo}.dc.html'))
+    passos = ''.join(linha_etapa(k, n, sufixo, movel=True, exercicio=f'Exercicio{sufixo}.dc.html') for n in range(len(ETAPAS)))
+    lista = card(k, f'<div style="display:flex;align-items:center;">{rotulo(T("mapa"), k["mfg"])}</div>{_vista_movel(k, sufixo, "lista")}'
+                    f'<div style="display:flex;flex-direction:column;">{passos}</div>', pad='16px 16px 8px', gap=12)
+    return app_movel(k, 'trilha_lista', T('tTitulo'), cab + lista)
 
 
 # ── Exercícios ──
