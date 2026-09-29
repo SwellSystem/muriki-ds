@@ -138,8 +138,14 @@ def rail(k, ativo):
         f = f'background:{k["prisub"]};color:{k["prisubfg"]};' if at else f'color:{k["mfg"]};'
         cur = ' aria-current="page"' if at else ''
         alvo = href(destino) if destino else '#'
-        return (f'<a href="{alvo}" aria-label="{nome}" title="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
+        return (f'<a href="{alvo}" aria-label="{nome}"{cur} style="display:flex;align-items:center;justify-content:center;'
                 f'width:40px;height:40px;border-radius:10px;{f}">{ic(icone, 17)}</a>')
+
+    def grupo(titulo, itens, extra):
+        cartao_ = (f'<div class="flyout" aria-hidden="true">'
+                   f'<div style="height:30px;display:flex;align-items:center;padding:0 10px;">{rotulo(titulo, k["mfg"])}</div>'
+                   + ''.join(item(c, n, i, d, extra(c)) for c, n, i, d in itens) + '</div>')
+        return '<div class="grupo">' + ''.join(item_icone(c, n, i, d) for c, n, i, d in itens) + cartao_ + '</div>'
 
     conta = lambda n: f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{n}</span>'
     nav = ''.join(item(c, n, i, d, conta('1.284') if c == 'clientes' else '') for c, n, i, d in MENU)
@@ -172,9 +178,9 @@ def rail(k, ativo):
         f'align-items:center;gap:4px;padding:18px 0 12px;{sombra}">'
         f'<span style="display:flex;width:30px;height:30px;margin-bottom:6px;">{LOGO}</span>{_botao_rail(k, 36)}'
         f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
-        + ''.join(item_icone(c, n, i, d) for c, n, i, d in MENU)
+        + grupo('Operação', MENU, lambda c: conta('1.284') if c == 'clientes' else '')
         + f'<span style="width:24px;height:1px;background:{k["muted"]};margin:6px 0;"></span>'
-        + ''.join(item_icone(c, n, i, d) for c, n, i, d in EQUIPE)
+        + grupo('Equipe', EQUIPE, lambda c: '')
         + f'<div style="flex:1;"></div>{botao_tema(k, 36)}{sair}'
         f'<span title="Ana Lima · Administradora" style="margin-top:6px;display:flex;">{avatar("AL", k, "yellow")}</span></nav>')
     return aberto + fechado

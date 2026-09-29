@@ -8,7 +8,9 @@
 // Não sabe de roteador nem de API. Cada item chega pronto: rótulo, ícone,
 // se está ativo, e o elemento que navega em `render` (o <Link> do app) ou
 // um `href`. Recolhido, o rail vira a coluna de ícones do rail_compacto —
-// é o eixo `collapsible="icon"` do Sidebar, com o tooltip de cada item. O
+// é o eixo `collapsible="icon"` do Sidebar. Passar o mouse (ou o foco) num
+// grupo abre o flyout ao lado: o cartão com o rótulo e os itens do grupo,
+// clicáveis, sem abrir o rail. O
 // botão de recolher mora no topo do rail (o SidebarControls da casa); no
 // celular, o rail vira gaveta e o gatilho vai para o topo do palco.
 //
@@ -17,6 +19,7 @@
 // ex.: um max-width.
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react"
 import { ArrowsLeftRightIcon, CaretRightIcon, GearSixIcon, ListIcon, SignOutIcon, XIcon } from "@phosphor-icons/react"
+import { PreviewCard } from "@base-ui/react/preview-card"
 
 import {
   Sidebar,
@@ -60,7 +63,7 @@ export interface AppShellNavItem {
   /**
    * A tela ainda não existe: o item aparece esmaecido, com o selo mono
    * "em breve", não navega e é anunciado como desativado. Recolhido, o
-   * selo some e o tooltip diz "Evolução · em breve". O rótulo vem do
+   * selo aparece no flyout do grupo. O rótulo vem do
    * i18n (app_shell.soon) ou de `soonLabel` no AppShell.
    */
   soon?: boolean
@@ -130,11 +133,6 @@ export interface AppShellProps {
   /** O selo dos itens `soon`. Sem isto, vem do i18n (app_shell.soon). */
   soonLabel?: string
   defaultOpen?: boolean
-  /**
-   * Recolhido, passar o mouse abre o rail por cima do conteúdo, com nomes e
-   * grupos, e sair fecha. Padrão `true`; `false` deixa só os tooltips.
-   */
-  peekOnHover?: boolean
   className?: string
   /** O palco: padding do desenho por padrão; aqui entra um max-width, por exemplo. */
   stageClassName?: string
@@ -164,13 +162,12 @@ function iconeDoItem(item: AppShellNavItem) {
 
 function Item({ item, soonLabel }: { item: AppShellNavItem; soonLabel: string }) {
   if (item.soon) {
-    // Sem destino e sem clique, mas ainda com hover: o tooltip do rail
+    // Sem destino e sem clique, mas ainda com hover: o flyout do rail
     // recolhido precisa dele. Por isso não usa o aria-disabled do botão,
     // que tira os eventos do ponteiro.
     return (
       <SidebarMenuItem>
         <SidebarMenuButton
-          tooltip={`${item.label} · ${soonLabel}`}
           aria-disabled="true"
           data-soon=""
           onClick={(event) => event.preventDefault()}
@@ -189,7 +186,6 @@ function Item({ item, soonLabel }: { item: AppShellNavItem; soonLabel: string })
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
-        tooltip={item.label}
         isActive={item.active}
         aria-current={item.active ? "page" : undefined}
         onClick={item.onClick}
@@ -208,6 +204,55 @@ function Item({ item, soonLabel }: { item: AppShellNavItem; soonLabel: string })
   )
 }
 
+// Recolhido, o grupo inteiro é o gatilho: o cartão abre à direita da coluna, alinhado ao topo do
+// grupo, com o rótulo e os mesmos itens do rail aberto (a contagem, o selo, o em breve). O rail
+// não se mexe. No portal, fora do rail, os itens não pegam o encolhido do collapsible="icon".
+function FlyoutDoGrupo({
+  label,
+  items,
+  soonLabel,
+  children,
+}: {
+  label?: string
+  items: AppShellNavItem[]
+  soonLabel: string
+  children: ReactElement
+}) {
+  const { state, isMobile } = useSidebar()
+  if (state !== "collapsed" || isMobile || items.length === 0) return children
+  return (
+    <PreviewCard.Root>
+      <PreviewCard.Trigger delay={90} closeDelay={200} render={<div />}>
+        {children}
+      </PreviewCard.Trigger>
+      <PreviewCard.Portal>
+        <PreviewCard.Positioner side="right" align="start" sideOffset={12} className="isolate z-50">
+          <PreviewCard.Popup
+            data-slot="app-shell-flyout"
+            className={cn(
+              "flex w-56 origin-(--transform-origin) flex-col rounded-[var(--radius-float)] bg-popover p-1.5 text-sm text-popover-foreground shadow-[var(--float)] outline-none",
+              "transition-[opacity,transform] duration-100 ease-out",
+              "data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
+              "data-[ending-style]:scale-95 data-[ending-style]:opacity-0"
+            )}
+          >
+            {label ? (
+              <span className="flex h-[30px] items-center px-2.5 font-mono text-[10px] tracking-[0.2em] text-muted-foreground uppercase">
+                {label}
+              </span>
+            ) : null}
+            <SidebarMenu className="gap-0.5">
+              {items.map((item) => (
+                <Item key={item.key} item={item} soonLabel={soonLabel} />
+              ))}
+            </SidebarMenu>
+          </PreviewCard.Popup>
+        </PreviewCard.Positioner>
+      </PreviewCard.Portal>
+    </PreviewCard.Root>
+  )
+}
+
 export function AppShell({
   product,
   groups,
@@ -222,7 +267,6 @@ export function AppShell({
   mobileEnd,
   soonLabel,
   defaultOpen = true,
-  peekOnHover = true,
   className,
   stageClassName,
   banner,
@@ -252,7 +296,7 @@ export function AppShell({
 
   return (
     <SidebarProvider defaultOpen={defaultOpen} className={className}>
-      <Sidebar collapsible="icon" peekOnHover={peekOnHover}>
+      <Sidebar collapsible="icon">
         <SidebarHeader className="px-2.5 pt-3 pb-1.5">
           {/* Marca e recolher na mesma linha; recolhido, empilham. */}
           <div className="flex items-center gap-1 group-data-[collapsible=icon]:flex-col">
@@ -295,11 +339,13 @@ export function AppShell({
                 </SidebarGroupLabel>
               ) : null}
               <SidebarGroupContent>
-                <SidebarMenu className="gap-0.5">
-                  {group.items.map((item) => (
-                    <Item key={item.key} item={item} soonLabel={emBreve} />
-                  ))}
-                </SidebarMenu>
+                <FlyoutDoGrupo label={group.label} items={group.items} soonLabel={emBreve}>
+                  <SidebarMenu className="gap-0.5">
+                    {group.items.map((item) => (
+                      <Item key={item.key} item={item} soonLabel={emBreve} />
+                    ))}
+                  </SidebarMenu>
+                </FlyoutDoGrupo>
               </SidebarGroupContent>
             </SidebarGroup>
           ))}
@@ -307,11 +353,13 @@ export function AppShell({
 
         <SidebarFooter className="gap-0.5">
           {footerItems.length > 0 ? (
-            <SidebarMenu className="gap-0.5">
-              {footerItems.map((item) => (
-                <Item key={item.key} item={item} soonLabel={emBreve} />
-              ))}
-            </SidebarMenu>
+            <FlyoutDoGrupo items={footerItems} soonLabel={emBreve}>
+              <SidebarMenu className="gap-0.5">
+                {footerItems.map((item) => (
+                  <Item key={item.key} item={item} soonLabel={emBreve} />
+                ))}
+              </SidebarMenu>
+            </FlyoutDoGrupo>
           ) : null}
           {footerItems.length > 0 && (language || utilities || user) ? (
             <SidebarSeparator className="mx-1 my-2 bg-muted" />
@@ -390,8 +438,8 @@ function IdiomaDoRail({ language }: { language: ReactElement }) {
   // O invólucro é que tem a largura: o Base UI põe um foco-guarda antes do gatilho quando o menu
   // abre, e uma regra de :first-child na linha fazia o seletor encolher e andar. Recolhido, o
   // seletor vira o compacto (globo e sigla).
-  const { state, isMobile, peeking } = useSidebar()
-  const recolhido = state === "collapsed" && !isMobile && !peeking
+  const { state, isMobile } = useSidebar()
+  const recolhido = state === "collapsed" && !isMobile
   return (
     <div
       className={cn(
