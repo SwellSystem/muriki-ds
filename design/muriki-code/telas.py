@@ -16,9 +16,10 @@ from sistema import tela_sistema, SISTEMA_TELAS
 from inicio import tela_inicio as tela_inicio_primeiro_dia, ANTES_INICIO, PROPS_INICIO
 from textos_aprender import TRILHAS, TRILHA, CATALOGO, PEER_WEB, MAPA, BOAS_VINDAS, TRILHAS_VAZIA
 from textos_movel import MOVEL
-from movel_code import (ALTURAS as ALTURAS_MOVEL, casca_movel, tela_menu_movel, tela_inicio_movel, tela_trilhas_movel, tela_trilha_movel,
+from movel_code import (ALTURAS as ALTURAS_MOVEL, casca_movel, tela_menu_movel, tela_inicio_movel, tela_trilhas_movel, tela_trilha_movel, tela_trilha_lista_movel,
                    tela_exercicios_movel, tela_conta_movel, tela_boas_vindas_movel)
 from aprender import (tela_trilhas, tela_trilhas_vazia, tela_trilha, tela_catalogo, tela_peer_web, tela_trilha_mapa, tela_trilha_boas_vindas,
+                      ANTES_ETAPAS, VALORES_ETAPAS, PROPS_ETAPAS, CSS_ETAPAS,
                       ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)
 from textos_onboarding import PREFERENCIAS
 from onboarding import VALORES_PREFERENCIAS, PROPS_PREFERENCIAS
@@ -1621,7 +1622,7 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'trilha':
         return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha_mapa(k, sufixo))
     if tela['id'] == 'trilha_lista':
-        return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha(k, sufixo))
+        return web(juntar(TRILHAS, TRILHA, MAPA), tela_trilha(k, sufixo), ANTES_ETAPAS, VALORES_ETAPAS, PROPS_ETAPAS, CSS_ETAPAS)
     if tela['id'] == 'trilhas_boas_vindas':
         return web(juntar(TRILHAS, BOAS_VINDAS), tela_trilha_boas_vindas(k, sufixo), ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS,
                    PROPS_BOAS_VINDAS, CSS_SPLASH)
@@ -1635,6 +1636,8 @@ def _montar(tela, tema, sufixo):
         'inicio_movel': ('inicio', lambda: web(juntar(INICIO, MOVEL), tela_inicio_movel(k, sufixo), ANTES_INICIO, 'ini: ini', PROPS_INICIO)),
         'trilhas_movel': ('trilhas', lambda: web(juntar(TRILHAS, MOVEL), tela_trilhas_movel(k, sufixo))),
         'trilha_movel': ('trilha', lambda: web(juntar(TRILHAS, TRILHA, MAPA, MOVEL), tela_trilha_movel(k, sufixo))),
+        'trilha_lista_movel': ('trilha_lista', lambda: web(juntar(TRILHAS, TRILHA, MAPA, MOVEL), tela_trilha_lista_movel(k, sufixo),
+                                                           ANTES_ETAPAS, VALORES_ETAPAS, PROPS_ETAPAS, CSS_ETAPAS)),
         'exercicios_movel': ('exercicios', lambda: web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}, MOVEL),
                                                        tela_exercicios_movel(k, sufixo))),
         'conta_movel': ('conta', lambda: web(juntar(MINHA_CONTA, MOVEL), tela_conta_movel(k, sufixo))),

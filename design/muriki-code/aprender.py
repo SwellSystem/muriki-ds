@@ -162,30 +162,79 @@ ETAPAS = [
 ]
 
 
+# o estado de cada etapa na API: presumed (já coberta), todo, diagnostic (a de entrada) e elective
+# (leitura opcional, que pode não ter exercício). A de agora é todo ou diagnostic (o prop `agora`).
+API_ETAPAS = ['presumed', 'todo', 'todo', 'agora', 'todo', 'todo', 'elective', 'todo']
+
+# a linha inteira abre o exercício da etapa, como a estação do mapa; a seta fica sempre, e o rótulo
+# da ação (Abrir, Refazer) aparece no hover ou no foco. Sem exercício, a linha não é link e diz isso.
+CSS_ETAPAS = (
+    '.mc a.etapa,.mc a.etapa:hover{color:inherit;}'
+    '.mc .etapa{display:flex;align-items:center;gap:12px;margin:0 -10px;padding:6px 10px;border-radius:10px;outline:0;}'
+    '.mc a.etapa:is(:hover,:focus-visible){background:var(--muted);}'
+    '.mc a.etapa:focus-visible{box-shadow:0 0 0 2px var(--pri);}'
+    '.mc .etapa .acao-rot{opacity:0;transition:opacity 120ms ease-out;}'
+    '.mc a.etapa:is(:hover,:focus-visible) .acao-rot{opacity:1;}'
+    '.mc a.etapa .acao-seta{transition:transform 160ms cubic-bezier(0.16,1,0.3,1);}'
+    '.mc a.etapa:hover .acao-seta{transform:translateX(2px);}'
+    '@media (prefers-reduced-motion: reduce){.mc .etapa .acao-rot,.mc a.etapa .acao-seta{transition:none;}}'
+)
+ANTES_ETAPAS = 'const entrada = (s.agora || this.props.agora) === "diagnostic";'
+VALORES_ETAPAS = 'entrada: entrada, naoEntrada: !entrada'
+PROPS_ETAPAS = {'agora': {'editor': 'enum', 'options': ['todo', 'diagnostic'], 'default': 'todo'}}
+
+
+def linha_etapa(k, n, sufixo, movel=False, exercicio=None):
+    tit, tipo, mins, estado, nota = ETAPAS[n]
+    api = API_ETAPAS[n]
+    feita, agora = estado == 'feita', estado == 'agora'
+    sem_exercicio = api == 'elective'
+    destino = exercicio or f'Exercicio{sufixo}.dc.html'
+    bola = (f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;flex:0 0 auto;'
+            + (f'background:{k["pri"]};color:{k["prifg"]};">{ic("check", 13)}' if feita else
+               f'background:{k["card"]};box-shadow:0 0 0 2px {k["pri"]};color:{k["pri"]};font-family:{MONO};font-size:11px;font-weight:600;">{n + 1}' if agora else
+               f'background:{k["sunken"]};color:{k["mfg"]};font-family:{MONO};font-size:11px;">{n + 1}') + '</span>')
+    fio = (f'<span style="flex:1;width:2px;min-height:12px;background:{k["pri"] if feita else k["muted"]};"></span>'
+           if n < len(ETAPAS) - 1 else '')
+    extra = ''
+    if api == 'presumed':
+        extra = f' · {T("coberto")}'
+    elif sem_exercicio:
+        extra = f' · {T("opcional")} · {T("semExercicio")}'
+    # o ícone fica na primeira linha e o texto quebra ao lado dele, com o selo de entrada no fim
+    meta = (f'<span style="display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:17px;color:{k["mfg"]};">'
+            f'<span style="display:flex;margin-top:2.5px;">{ic("arquivo" if tipo == "leitura" else "exercicios", 12)}</span>'
+            f'<span style="min-width:0;">{T("leitura" if tipo == "leitura" else "exercicio")} · {mins} {T("min")}'
+            + (f' · {T("nota")} <b style="font-weight:600;color:{k["fgs"]};">{nota}</b>' if nota else '') + extra
+            + (f'<sc-if value="{{{{entrada}}}}" hint-placeholder-val="{{{{ false }}}}"><span style="display:inline-flex;margin-left:8px;vertical-align:-3px;">'
+               f'{badge(T("entrada"), k, "blue")}</span></sc-if>' if agora else '')
+            + '</span></span>')
+    cor = k['mfg'] if (estado == 'depois' and not agora) or sem_exercicio else k['fgs']
+    textos = (f'<span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">'
+              f'<span style="font-size:14px;font-weight:{600 if agora else 500};color:{cor};">{T(tit)}</span>{meta}</span>')
+    if agora or sem_exercicio:
+        # a de agora tem o Começar no cartão; a sem exercício não abre nada
+        linha = f'<div class="etapa">{textos}</div>'
+    else:
+        rot = '' if movel else f'<span class="acao-rot" style="font-size:12.5px;font-weight:500;color:{k["pri"]};">{T("refazerEtapa" if feita and api != "presumed" else "abrirEtapa")}</span>'
+        linha = (f'<a class="etapa" href="{destino}" style="{"min-height:48px;" if movel else ""}">{textos}'
+                 f'<span style="display:flex;align-items:center;gap:6px;flex:0 0 auto;">{rot}'
+                 f'<span class="acao-seta" style="display:flex;color:{k["mfg"]};">{ic("direita", 14)}</span></span></a>')
+    cartao_agora = ''
+    if agora:
+        cartao_agora = (f'<div style="margin-top:6px;display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:10px;background:{k["prisub"]};">'
+                        f'<sc-if value="{{{{naoEntrada}}}}" hint-placeholder-val="{{{{ true }}}}">'
+                        f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:{k["prisubfg"]};">{ic("recarregar", 13)}{T("repetiu")}</span>'
+                        f'<span style="font-size:13px;line-height:19px;color:{k["fg"]};">{T("repetiuTxt")}</span></sc-if>'
+                        f'<div>{botao_link(T("comecar"), destino, k, "solid", 40 if movel else 36, "seta")}</div></div>')
+    return (f'<div style="display:flex;gap:{12 if movel else 14}px;"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:6px;">{bola}{fio}</div>'
+            f'<div style="display:flex;flex-direction:column;flex:1;min-width:0;padding-bottom:10px;">{linha}{cartao_agora}</div></div>')
+
+
 def tela_trilha(k, sufixo):
     cab = cabecalho(k, [(T('tTitulo'), f'Trilhas{sufixo}.dc.html'), (T('dTitulo'), '')], T('dTitulo'), T('dSub'),
                     direita=botao(T('sair'), k, 'ghost', 32))
-    passos = ''
-    for n, (tit, tipo, mins, estado, nota) in enumerate(ETAPAS):
-        feita, agora = estado == 'feita', estado == 'agora'
-        bola = (f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:999px;flex:0 0 auto;'
-                + (f'background:{k["pri"]};color:{k["prifg"]};">{ic("check", 13)}' if feita else
-                   f'background:{k["card"]};box-shadow:0 0 0 2px {k["pri"]};color:{k["pri"]};font-family:{MONO};font-size:11px;font-weight:600;">{n + 1}' if agora else
-                   f'background:{k["sunken"]};color:{k["mfg"]};font-family:{MONO};font-size:11px;">{n + 1}') + '</span>')
-        fio = (f'<span style="flex:1;width:2px;min-height:12px;background:{k["pri"] if feita else k["muted"]};"></span>'
-               if n < len(ETAPAS) - 1 else '')
-        meta = (f'<span style="display:flex;align-items:center;gap:8px;font-size:12px;color:{k["mfg"]};">'
-                f'{ic("arquivo" if tipo == "leitura" else "exercicios", 12)}{T("leitura" if tipo == "leitura" else "exercicio")} · {mins} {T("min")}'
-                + (f' · {T("nota")} <b style="font-weight:600;color:{k["fgs"]};">{nota}</b>' if nota else '') + '</span>')
-        corpo_ = (f'<div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;padding-bottom:14px;">'
-                  f'<span style="font-size:14px;font-weight:{600 if agora else 500};color:{k["fgs"] if estado != "depois" else k["mfg"]};">{T(tit)}</span>{meta}'
-                  + (f'<div style="margin-top:10px;display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:10px;background:{k["prisub"]};">'
-                     f'<span style="display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:{k["prisubfg"]};">{ic("recarregar", 13)}{T("repetiu")}</span>'
-                     f'<span style="font-size:13px;line-height:19px;color:{k["fg"]};">{T("repetiuTxt")}</span>'
-                     f'<div>{botao_link(T("comecar"), f"Exercicio{sufixo}.dc.html", k, "solid", 36, "seta")}</div></div>' if agora else '')
-                  + '</div>')
-        passos += (f'<div style="display:flex;gap:14px;"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;">{bola}{fio}</div>'
-                   f'{corpo_}</div>')
+    passos = ''.join(linha_etapa(k, n, sufixo) for n in range(len(ETAPAS)))
     caminho = cartao(f'<div style="display:flex;align-items:center;">{rotulo(T("mapa"), k["mfg"])}<span style="margin-left:auto;">{_vista(k, sufixo, "lista")}</span></div>'
                      f'<div style="display:flex;flex-direction:column;">{passos}</div>',
                      k, pad='20px 24px', extra='flex:1.7;min-width:0;gap:16px;')

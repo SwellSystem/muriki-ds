@@ -71,6 +71,8 @@ TRILHA = {
         nivelTxt='Duas etapas com nota alta confirmam Pleno. As três últimas contam para Senior.',
         conta='O que esta trilha conta', contaTxt='Cada etapa enviada vira evidência em Testing; algumas também em Debugging.',
         sair='Sair da trilha', sairTxt='O progresso fica guardado.',
+        abrirEtapa='Abrir', refazerEtapa='Refazer', coberto='já coberto', entrada='exercício de entrada',
+        opcional='leitura opcional', semExercicio='ainda sem exercício',
     ),
     'en-US': dict(
         dTitulo='Tests you can trust',
@@ -85,6 +87,8 @@ TRILHA = {
         nivelTxt='Two steps with a high score confirm Mid-level. The last three count toward Senior.',
         conta='What this track counts', contaTxt='Every submitted step becomes evidence in Testing; some also in Debugging.',
         sair='Leave the track', sairTxt='Your progress is saved.',
+        abrirEtapa='Open', refazerEtapa='Redo', coberto='already covered', entrada='entry exercise',
+        opcional='optional reading', semExercicio='no exercise yet',
     ),
     'es-ES': dict(
         dTitulo='Pruebas que dan confianza',
@@ -99,6 +103,8 @@ TRILHA = {
         nivelTxt='Dos pasos con nota alta confirman Intermedio. Los tres últimos cuentan para Senior.',
         conta='Lo que cuenta esta ruta', contaTxt='Cada paso enviado se vuelve evidencia en Testing; algunos también en Debugging.',
         sair='Dejar la ruta', sairTxt='El progreso queda guardado.',
+        abrirEtapa='Abrir', refazerEtapa='Rehacer', coberto='ya cubierta', entrada='ejercicio de entrada',
+        opcional='lectura opcional', semExercicio='aún sin ejercicio',
     ),
 }
 
