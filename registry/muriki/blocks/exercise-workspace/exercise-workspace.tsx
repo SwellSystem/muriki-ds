@@ -84,20 +84,23 @@ function posicionar(area: DOMRect, lugar: Lugar, altura: number) {
   return { top: alto(top), left: esquerda(area.left) }
 }
 
-/** O que a área do passo `n` precisa: subir acima do véu com o anel, e o balão ao lado dela. */
+/**
+ * O que a área do passo `n` precisa: subir acima do véu com o anel, e o balão ao lado dela. A área
+ * chega por callback ref num estado (e não num useRef lido no render, que o react-hooks/refs barra).
+ */
 function usePassoDoGuia<T extends HTMLElement>(n: 1 | 2 | 3, anel: "inset" | "fora" = "inset", lugar: Lugar = "lado") {
   const guia = React.useContext(GuiaContexto)
   const ativo = guia?.step === n
-  const ref = React.useRef<T>(null)
+  const [area, setArea] = React.useState<T | null>(null)
   return {
-    ref,
+    ancorar: setArea,
     classe: ativo
       ? cn(
           "relative z-[41]",
           anel === "inset" ? "shadow-[inset_0_0_0_2px_var(--primary)]" : "ring-2 ring-primary"
         )
       : undefined,
-    balao: ativo && guia ? <BalaoDoGuia n={n} guia={guia} area={ref} lugar={lugar} /> : null,
+    balao: ativo && guia && area ? <BalaoDoGuia n={n} guia={guia} area={area} lugar={lugar} /> : null,
   }
 }
 
@@ -109,7 +112,7 @@ function BalaoDoGuia({
 }: {
   n: 1 | 2 | 3
   guia: ExerciseGuide
-  area: React.RefObject<HTMLElement | null>
+  area: HTMLElement
   lugar: Lugar
 }) {
   const t = useTranslate()
@@ -119,11 +122,9 @@ function BalaoDoGuia({
   const id = React.useId()
   const [pos, setPos] = React.useState<{ top: number; left: number } | null>(null)
 
-  // a área rola com a página e muda com a janela: a posição segue. Efeito, não layout: o balão é
-  // filho da área, e o ref dela só existe depois que os filhos montam.
+  // a área rola com a página e muda com a janela: a posição segue
   React.useEffect(() => {
-    const el = area.current
-    if (!el) return
+    const el = area
     const medir = () => setPos(posicionar(el.getBoundingClientRect(), lugar, balao.current?.offsetHeight ?? 200))
     medir()
     const observador = new ResizeObserver(medir)
@@ -139,7 +140,7 @@ function BalaoDoGuia({
 
   // cada passo novo leva a área para a tela e o foco ao botão que segue
   React.useEffect(() => {
-    area.current?.scrollIntoView({ block: "nearest" })
+    area.scrollIntoView({ block: "nearest" })
     principal.current?.focus({ preventScroll: true })
   }, [area, n])
 
@@ -389,12 +390,12 @@ export function ExerciseExplanation({
 }: ExerciseExplanationProps) {
   const t = useTranslate()
   const id = React.useId()
-  const passo = usePassoDoGuia<HTMLElement>(3, "fora")
+  const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(3, "fora")
   return (
     <section
-      ref={passo.ref}
+      ref={ancorar}
       data-slot="exercise-explanation"
-      className={cn("relative flex flex-col gap-2.5 rounded-xl bg-card px-5 py-4 shadow-xs", passo.classe, className)}
+      className={cn("relative flex flex-col gap-2.5 rounded-xl bg-card px-5 py-4 shadow-xs", destaque, className)}
     >
       <div className="flex items-center gap-2">
         <Rotulo>{t("exercise_workspace.explain")}</Rotulo>
@@ -415,7 +416,7 @@ export function ExerciseExplanation({
         className="resize-none"
       />
       <span className="text-xs text-muted-foreground">{note ?? t("exercise_workspace.explain_note")}</span>
-      {passo.balao}
+      {balaoDoGuia}
     </section>
   )
 }
@@ -532,7 +533,7 @@ const TIPOS_DE_ERRO = new Set(["timeout", "build", "runtime", "unavailable"])
 
 export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, className }: ExerciseTestsProps) {
   const t = useTranslate()
-  const passo = usePassoDoGuia<HTMLElement>(2)
+  const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(2)
 
   let resumo: React.ReactNode
   if (error) resumo = <Badge tone="red" dot>{t("exercise_workspace.tests.error_badge")}</Badge>
@@ -546,10 +547,10 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, classN
 
   return (
     <ExerciseSection
-      ref={passo.ref}
+      ref={ancorar}
       title={t("exercise_workspace.tests.title")}
       end={resumo}
-      className={cn("bg-rail", passo.classe, className)}
+      className={cn("bg-rail", destaque, className)}
     >
       {error ? (
         <div role="alert" className="mx-2 mb-1.5 flex flex-col gap-1 rounded-lg bg-destructive-subtle px-3 py-2.5 text-destructive-subtle-foreground">
@@ -601,7 +602,7 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, classN
       <span className="block px-4 pt-1.5 pb-2.5 text-[11.5px] text-muted-foreground">
         {summary || error ? ranAt : t("exercise_workspace.tests.run_hint")}
       </span>
-      {passo.balao}
+      {balaoDoGuia}
     </ExerciseSection>
   )
 }
@@ -677,7 +678,7 @@ export function ExerciseEditor({
   className,
 }: ExerciseEditorProps) {
   const t = useTranslate()
-  const passo = usePassoDoGuia<HTMLDivElement>(1, "inset", "dentro")
+  const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLDivElement>(1, "inset", "dentro")
   const podeRodar = !!onRun && !runDisabledReason && !running
   const listaDeAbas = React.useRef<HTMLDivElement>(null)
 
@@ -783,13 +784,13 @@ export function ExerciseEditor({
           </span>
         </div>
         <div
-          ref={passo.ref}
+          ref={ancorar}
           role="tabpanel"
           aria-label={activeTab}
-          className={cn("relative flex min-h-0 flex-1 flex-col bg-card", passo.classe)}
+          className={cn("relative flex min-h-0 flex-1 flex-col bg-card", destaque)}
         >
           {children}
-          {passo.balao}
+          {balaoDoGuia}
         </div>
         <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
           {status ? <span className="truncate">{status}</span> : null}
