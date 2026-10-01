@@ -146,7 +146,9 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="dialog-header"
       className={cn(
         "flex flex-col gap-1.5 pr-8",
-        framed && "shrink-0 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)]",
+        // as faixas são da MESMA superfície, então o traço é o --divider (tinta com transparência,
+        // o mesmo degrau sobre qualquer fundo), não o --border, que no escuro some sobre o --popover
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_-1px_0_var(--divider)]",
         className
       )}
       {...props}
@@ -164,7 +166,7 @@ function DialogSection({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="dialog-section"
       className={cn(
-        "flex flex-col gap-3 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)] last:shadow-none",
+        "flex flex-col gap-3 px-5 py-4 shadow-[inset_0_-1px_0_var(--divider)] last:shadow-none",
         className
       )}
       {...props}
@@ -209,7 +211,7 @@ function DialogFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="dialog-footer"
       className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        framed && "shrink-0 px-5 py-4 shadow-[inset_0_1px_0_var(--border)]",
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_1px_0_var(--divider)]",
         className
       )}
       {...props}

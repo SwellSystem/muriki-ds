@@ -159,7 +159,9 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sheet-header"
       className={cn(
         "flex flex-col gap-1.5 pr-8",
-        framed && "shrink-0 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)]",
+        // as faixas são da MESMA superfície, então o traço é o --divider (tinta com transparência,
+        // o mesmo degrau sobre qualquer fundo), não o --border, que no escuro some sobre o --popover
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_-1px_0_var(--divider)]",
         className
       )}
       {...props}
@@ -173,7 +175,7 @@ function SheetSection({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sheet-section"
       className={cn(
-        "flex flex-col gap-3 px-5 py-4 shadow-[inset_0_-1px_0_var(--border)] last:shadow-none",
+        "flex flex-col gap-3 px-5 py-4 shadow-[inset_0_-1px_0_var(--divider)] last:shadow-none",
         className
       )}
       {...props}
@@ -204,7 +206,7 @@ function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
       data-slot="sheet-footer"
       className={cn(
         "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
-        framed && "shrink-0 px-5 py-4 shadow-[inset_0_1px_0_var(--border)]",
+        framed && "shrink-0 px-5 py-4 shadow-[inset_0_1px_0_var(--divider)]",
         className
       )}
       {...props}
