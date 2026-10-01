@@ -5,6 +5,8 @@ from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL,
 from textos_exercicio import TEXTOS as EXERCICIO
 from textos_arquitetura import TEXTOS as ARQUITETURA
 from arquitetura import tela_exercicio_arquitetura
+from textos_evolucao import TEXTOS as EVOLUCAO_NOVA
+from evolucao import tela_evolucao_nova, tela_evolucao_movel
 from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
@@ -156,60 +158,6 @@ def tabela_perfil(k, perfil, dica=None):
     return (f'<section aria-label="{T("competencias")}" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;'
             f'box-shadow:{k["sombra"]};padding:4px 0 12px;display:flex;flex-direction:column;overflow:hidden;">'
             f'{cab_tab}{grupo(T("grupoLing"), LINGUAGENS)}{grupo(T("grupoEng"), ENGENHARIA)}{legenda_}</section>')
-
-
-def item_evidencia(k, fonte, forte, txt, onde, quando, borda):
-    b = f'border-top:1px solid {k["muted"]};' if borda else ''
-    peso = badge(T('pesoForte'), k, 'blue') if forte else badge(T('pesoLeve'), k, tracejado=True)
-    return (f'<li style="display:flex;flex-direction:column;gap:4px;padding:9px 0;{b}">'
-            f'<div style="display:flex;align-items:center;gap:6px;">{badge(T(fonte), k, "gray", mono=True)}{peso}'
-            f'<span style="margin-left:auto;font-size:11.5px;color:{k["mfg"]};">{quando}</span></div>'
-            f'<span style="font-size:13px;color:{k["fg"]};">{txt}</span>'
-            + (f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{onde}</span>' if onde else '') + '</li>')
-
-
-EVIDENCIAS = [
-    ('fontePeer', False, T('ev1'), 'agenda-slots · IDE', T('q1')),
-    ('fontePlayground', False, T('ev2'), 'horas.py', T('q2')),
-    ('fonteExercicio', True, T('ev3'), 'Testing · Design Patterns', T('q3')),
-    ('fonteExplicacao', True, T('ev4'), 'Testing', T('q4')),
-]
-
-
-def tela_evolucao(k):
-    cab = cabecalho(
-        k, None, T('titulo'), T('sub'),
-        direita=(f'<div style="display:flex;gap:8px;">{botao_link(T("trajetoria"), "Competencia__SUF__.dc.html", k, "outline", 32, "relogio")}'
-                 f'{botao(T("comoMedido"), k, "ghost")}</div>'))
-
-    proximo = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">{rotulo(T("proximoPasso"), k["mfg"])}'
-        f'{badge("Testing · " + T("confirma") + " Senior", k, "yellow")}</div>'
-        f'<div style="display:flex;flex-direction:column;gap:6px;">'
-        f'<h2 style="margin:0;font-size:17px;line-height:23px;font-weight:600;color:{k["fgs"]};">{T("proxTitulo")}</h2>'
-        f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("proxTxt")}</p></div>'
-        f'<div style="display:flex;gap:8px;">{botao(T("comecar"), k, "solid", 36)}'
-        f'{botao_link(T("verOsTres"), "Competencia__SUF__.dc.html", k, "ghost", 36)}</div>', k, pad='18px 22px', extra='gap:12px;')
-
-    ev_linhas = ''.join(item_evidencia(k, f, forte, txt, onde, quando, i > 0)
-                        for i, (f, forte, txt, onde, quando) in enumerate(EVIDENCIAS))
-    recente = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">{rotulo(T("evRecente"), k["mfg"])}'
-        f'<a href="#" style="font-size:12.5px;">{T("verTodas")}</a></div>'
-        f'<ul style="margin:-6px 0 -8px;padding:0;list-style:none;">{ev_linhas}</ul>', k, pad='16px 22px', extra='gap:12px;')
-
-    trajetoria = cartao(
-        f'{rotulo(T("trajTit"), k["mfg"])}'
-        f'<div style="display:flex;align-items:baseline;gap:10px;">'
-        f'<span style="font-size:22px;line-height:26px;font-weight:600;color:{k["mfg"]};">{T("trajAntes")}</span>'
-        f'<span style="display:flex;width:16px;height:16px;color:{k["mfg"]};align-self:center;">{I["seta"]}</span>'
-        f'<span style="font-size:22px;line-height:26px;font-weight:600;color:{k["fgs"]};">{T("trajDepois")}</span></div>'
-        f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("trajTxt")}</p>'
-        f'<a href="Competencia__SUF__.dc.html" style="font-size:12.5px;">{T("trajLink")}</a>', k, pad='16px 22px', extra='gap:8px;')
-
-    lado = f'<aside style="width:348px;flex:0 0 348px;display:flex;flex-direction:column;gap:14px;">{proximo}{recente}{trajetoria}</aside>'
-    return app(k, 'evolucao', cab + f'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;min-height:0;">'
-                               f'{tabela_perfil(k, PERFIL)}{lado}</div>', gap=20)
 
 
 # ── 1b · Uma competência: o caminho para confirmar, o histórico e a trajetória ──
@@ -1594,8 +1542,8 @@ def _montar(tela, tema, sufixo):
         return web(juntar(EXERCICIO, PRIMEIRO), tela_exercicio(k, primeira=True), ANTES_PRIMEIRO, VALORES_PRIMEIRO, PROPS_PRIMEIRO)
     if tela['id'] == 'vazio':
         return web(juntar(EVOLUCAO, PERFIL_VAZIO), tela_perfil_vazio(k, sufixo))
-    if tela['id'] == 'evolucao':
-        return web(EVOLUCAO, tela_evolucao(k))
+    if tela['id'] in ('evolucao', 'evolucao_tempo'):
+        return web(EVOLUCAO_NOVA, tela_evolucao_nova(k, rolada=tela['id'] == 'evolucao_tempo'))
     if tela['id'] == 'exercicio':
         return web(EXERCICIO, tela_exercicio(k), valores=VALORES_EXERCICIO)
     if tela['id'] == 'arquitetura':
@@ -1645,6 +1593,7 @@ def _montar(tela, tema, sufixo):
         'exercicios_movel': ('exercicios', lambda: web(juntar(CATALOGO, {l: {'t1': TRILHAS[l]['t1']} for l in TRILHAS}, MOVEL),
                                                        tela_exercicios_movel(k, sufixo))),
         'conta_movel': ('conta', lambda: web(juntar(MINHA_CONTA, MOVEL), tela_conta_movel(k, sufixo))),
+        'evolucao_movel': ('evolucao', lambda: web(juntar(EVOLUCAO_NOVA, MOVEL), tela_evolucao_movel(k))),
         'boas_vindas_movel': ('boas_vindas', lambda: web(juntar(TRILHAS, BOAS_VINDAS, MOVEL), tela_boas_vindas_movel(k, sufixo),
                                                          ANTES_BOAS_VINDAS, VALORES_BOAS_VINDAS, PROPS_BOAS_VINDAS, CSS_SPLASH)),
     }
