@@ -10,9 +10,10 @@
  *     foot={<><ExerciseExplanation …/><ExerciseHints …/></>}
  *     editor={<ExerciseEditor sidebar={<><ExerciseFileTree …/><ExerciseTests …/></>}>{editor}</ExerciseEditor>} />
  *
- * No desktop (lg), a lateral é um painel de 372px com a mesma pele do editor e três seções
- * recolhíveis, como Código e Testes no rail: o enunciado ocupa o que sobra e só o corpo dele rola;
- * a explicação e as dicas ficam fixas embaixo. Quem quer mais espaço para ler recolhe a explicação.
+ * No desktop (lg), a lateral é uma coluna de 372px com três cartões recolhíveis, como Código e
+ * Testes no rail: o enunciado aberto ocupa o que sobra e só o corpo dele rola, com o cartão parado;
+ * a explicação e as dicas vêm embaixo, no tamanho delas. Recolhido, o enunciado vira só o título e
+ * os outros sobem. Quem quer mais espaço para ler recolhe a explicação.
  * O editor ocupa o resto, na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo
  * empilha: cabeçalho, painel (na altura do conteúdo, sem rolar por dentro), editor, e dentro do
  * editor a árvore e os testes sobem para cima do código.
@@ -219,14 +220,10 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
       >
         {header}
         <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
-          {/* Só o corpo do enunciado rola. A rolagem do painel inteiro é a rede para a tela baixa
-              demais, em que o enunciado já está no mínimo e o pé não cabe: aí ele rola junto. */}
-          <div
-            data-slot="exercise-side"
-            className="muriki-scroll flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs lg:min-h-0 lg:w-[372px] lg:shrink-0 lg:overflow-y-auto"
-          >
-            <div className="flex flex-col lg:min-h-0 lg:flex-1">{side}</div>
-            {foot ? <div className="flex shrink-0 flex-col">{foot}</div> : null}
+          {/* Só o corpo do enunciado rola, dentro do cartão dele: os cartões ficam parados. */}
+          <div data-slot="exercise-side" className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0">
+            {side}
+            {foot}
           </div>
           {editor}
         </div>
@@ -351,6 +348,13 @@ function EmBreve() {
 
 // ── Painel da esquerda ──────────────────────────────────────────────────
 
+/** Cada seção da coluna é um cartão. A pele é a do editor ao lado. */
+const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
+
+/** O título da seção na coluna fala mais alto que no rail: ao lado de texto corrido de 14px, o
+ *  rótulo cinza de 9,5px some, e o negrito do próprio enunciado passava a parecer o título. */
+const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
+
 /** Aberta ou recolhida: controlada por `open`, ou solta a partir de `defaultOpen`. */
 function useAberta(open: boolean | undefined, defaultOpen: boolean, onOpenChange?: (open: boolean) => void) {
   const [solta, setSolta] = React.useState(defaultOpen)
@@ -392,12 +396,13 @@ export function ExerciseStatement({
       data-slot="exercise-statement"
       title={label ?? t("exercise_workspace.statement")}
       divider={false}
+      titleClassName={TITULO_DO_CARTAO}
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      // encolhe até o que sobra (min-h-0), mas aberto nunca abaixo de umas cinco linhas de leitura;
-      // no corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
-      className={cn("lg:min-h-0 lg:flex-1 lg:data-[state=open]:min-h-[160px]", className)}
+      // aberto, ocupa o que sobra e encolhe até umas cinco linhas de leitura; recolhido, é só o
+      // título. No corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
+      className={cn(CARTAO, "lg:data-[state=open]:min-h-[160px] lg:data-[state=open]:flex-1 lg:data-[state=open]:shrink", className)}
       bodyClassName="muriki-scroll flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
     >
       {children}
@@ -453,9 +458,11 @@ export function ExerciseExplanation({
       data-slot="exercise-explanation"
       title={t("exercise_workspace.explain")}
       end={fim}
+      divider={false}
+      titleClassName={TITULO_DO_CARTAO}
       open={mostrar}
       onOpenChange={mudar}
-      className={cn("bg-card", destaque, className)}
+      className={cn(CARTAO, destaque, className)}
       bodyClassName="flex flex-col gap-2.5 px-4 pb-4"
     >
       <label htmlFor={id} className="text-sm leading-[21px] font-medium text-foreground-strong">
@@ -509,10 +516,12 @@ export function ExerciseHints({
     <ExerciseSection
       data-slot="exercise-hints"
       title={t("exercise_workspace.hints.title")}
+      divider={false}
+      titleClassName={TITULO_DO_CARTAO}
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      className={className}
+      className={cn(CARTAO, className)}
       bodyClassName="flex items-center gap-2.5 pr-3 pb-3 pl-4"
     >
       <LightbulbIcon aria-hidden className="size-4 shrink-0 text-warning" />
@@ -553,6 +562,8 @@ export interface ExerciseSectionProps extends ExerciseCollapsibleProps {
   className?: string
   /** O corpo, abaixo do título. */
   bodyClassName?: string
+  /** O título; sem isto, o rótulo mono cinza do rail. */
+  titleClassName?: string
   "data-slot"?: string
   children: React.ReactNode
 }
@@ -568,6 +579,7 @@ export function ExerciseSection({
   onOpenChange,
   className,
   bodyClassName,
+  titleClassName,
   "data-slot": slot,
   children,
 }: ExerciseSectionProps) {
@@ -590,7 +602,7 @@ export function ExerciseSection({
           className="flex h-[26px] items-center gap-1.5 rounded-md px-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
         >
           <Seta aria-hidden className="size-3" />
-          <span className="font-mono text-[9.5px] font-medium tracking-[0.2em] uppercase">{title}</span>
+          <span className={cn("font-mono text-[9.5px] font-medium tracking-[0.2em] uppercase", titleClassName)}>{title}</span>
         </button>
         {end ? <span className="ml-auto flex items-center gap-0.5">{end}</span> : null}
       </div>
