@@ -72,15 +72,6 @@ function limites(min?: string, max?: string) {
   return [...(antes ? [{ before: antes }] : []), ...(depois ? [{ after: depois }] : [])]
 }
 
-// O calendário vem com o amarelo da marca (--accent) no hover e no meio do
-// período. Num campo de formulário, o meio do período é o azul tingido da
-// seleção, e o hover é o neutro de qualquer item.
-const DIAS = {
-  outside: "data-selected:bg-transparent",
-  day_button:
-    "hover:not-in-data-selected:bg-muted group-[.range-middle]:group-data-selected:bg-primary-subtle group-[.range-middle]:group-data-selected:text-primary-subtle-foreground",
-}
-
 // ── o gatilho ───────────────────────────────────────────────────────────
 
 interface GatilhoProps {
@@ -205,7 +196,6 @@ export function DatePicker({
           }}
           disabled={limites(min, max)}
           locale={localeDoCalendario(locale)}
-          classNames={DIAS}
           className="p-2"
         />
         {clearable && value ? (
@@ -295,7 +285,6 @@ export function DateRangePicker({
           }}
           disabled={limites(min, max)}
           locale={localeDoCalendario(locale)}
-          classNames={DIAS}
           className="p-2"
         />
         {clearable && (value.from || value.to) ? (
