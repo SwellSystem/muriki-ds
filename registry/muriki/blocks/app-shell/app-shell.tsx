@@ -56,8 +56,10 @@ export interface AppShellNavItem {
   trailing?: ReactNode
   /**
    * O ícone em destaque, no amarelo da marca: o ícone do Phosphor vira
-   * duotone e a camada de fundo ganha o --accent cheio, com o traço na cor
-   * do texto. Amarelo só no traço sumiria no tema claro. Um item por rail.
+   * duotone e a camada de fundo ganha o --accent cheio, com o traço na
+   * tinta do amarelo (--accent-foreground), escura nos dois temas. Amarelo
+   * só no traço sumiria no claro; traço na cor do texto sumia no escuro,
+   * claro em cima do amarelo. Um item por rail.
    */
   accent?: boolean
   /**
@@ -192,8 +194,10 @@ function Item({ item, soonLabel }: { item: AppShellNavItem; soonLabel: string })
         render={navega(item)}
         className={cn(
           !item.active && "text-muted-foreground",
-          // a camada duotone do Phosphor é o path com opacity: vira o amarelo cheio
-          item.accent && "[&_svg_[opacity]]:fill-accent [&_svg_[opacity]]:opacity-100"
+          // a camada duotone do Phosphor é o path com opacity: vira o amarelo cheio, e o traço
+          // leva a tinta do amarelo, não a do texto (que no escuro é clara e some no amarelo)
+          item.accent &&
+            "[&_svg]:text-accent-foreground [&_svg_[opacity]]:fill-accent [&_svg_[opacity]]:opacity-100"
         )}
       >
         {iconeDoItem(item)}
