@@ -225,7 +225,7 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
             data-slot="exercise-side"
             className="muriki-scroll flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs lg:min-h-0 lg:w-[372px] lg:shrink-0 lg:overflow-y-auto"
           >
-            <div className="flex flex-col lg:flex-1">{side}</div>
+            <div className="flex flex-col lg:min-h-0 lg:flex-1">{side}</div>
             {foot ? <div className="flex shrink-0 flex-col">{foot}</div> : null}
           </div>
           {editor}
@@ -395,9 +395,10 @@ export function ExerciseStatement({
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      // aberto, nunca menos que umas cinco linhas de leitura, por menor que seja a tela
-      className={cn("lg:flex-1 lg:data-[state=open]:min-h-[160px]", className)}
-      bodyClassName="muriki-scroll flex flex-col gap-3 px-4 pb-4 text-sm leading-[22px] text-foreground lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+      // encolhe até o que sobra (min-h-0), mas aberto nunca abaixo de umas cinco linhas de leitura;
+      // no corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
+      className={cn("lg:min-h-0 lg:flex-1 lg:data-[state=open]:min-h-[160px]", className)}
+      bodyClassName="muriki-scroll flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
     >
       {children}
     </ExerciseSection>
