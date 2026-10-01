@@ -1320,6 +1320,38 @@
       }
     },
     {
+      "name": "architecture-board",
+      "type": "registry:block",
+      "title": "Architecture Board",
+      "description": "A bancada do exercício de arquitetura do Code, no slot editor do ExerciseWorkspace e com a mesma pele: rail com Peças (a paleta do exercício) e Regras (as visíveis, com o status da última verificação), barra com a ação da seleção e \"Verificar\", o canvas e a barra de status. Recebe e devolve o ArchitectureGraph v1 da Muriki (peças tipadas, cinco tipos de ligação, rótulo de até 60), nunca o formato do motor. Tudo tem caminho de teclado: \"Ligar a…\", os tipos da ligação, Renomear e Apagar na barra, ⌘↵ verifica. React Flow por baixo. Só apresentação: nada chama API nem avalia regra.",
+      "dependencies": [
+        "@xyflow/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/popover",
+        "SwellSystem/muriki-ds/exercise-workspace"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/architecture-board/architecture-board.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/architecture-board/architecture-board.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/architecture-board/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/architecture-board/index.ts"
+        }
+      ],
+      "docs": "<ExerciseWorkspace … editor={<ArchitectureBoard graph={graph} onGraphChange={setGraph} palette={exercise.palette} rules={exercise.visibleRules.map((r) => ({ ...r, status: statusDe(r.id) }))} summary={check ? { passing, total } : null} onCheck={verificar} checking={verificando} checkError={erro} />} />. graph é controlado, no formato ArchitectureGraph v1 (exportado, com GRAPH_LIMITS e RELATIONS); onGraphChange chega a cada mudança, inclusive no arrasto: salve o rascunho com espera. palette: [{ id, title, description? }]; os ids da paleta neutra (client, api, service, database, cache, queue, worker, cdn, load-balancer, object-storage) têm ícone próprio, e id desconhecido cai num quadrado. rules: as visíveis, com status \"pass\" | \"fail\" ou sem status (não verificou). checkError: { kind: invalid | rate_limit | network, message?, retryIn? }. checkDisabledReason troca o Verificar ativo por um texto curto. readOnly trava tudo. A ligação nasce \"chama\"; o bloco não deixa ligação repetida (mesmas peças e mesmo tipo), nem de uma peça para ela mesma, nem passar de 40 peças e 80 ligações. O lado por onde a ligação sai é só desenho. Textos em architecture_board.* no i18n. Importa @xyflow/react/dist/base.css."
+    },
+    {
       "name": "trail-map",
       "type": "registry:block",
       "title": "Trail Map",

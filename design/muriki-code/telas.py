@@ -3,6 +3,8 @@ from base import *
 from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL, ACESSO, PRIMEIRO, PERFIL_VAZIO,
                     COMPETENCIA, PLAYGROUND, juntar)
 from textos_exercicio import TEXTOS as EXERCICIO
+from textos_arquitetura import TEXTOS as ARQUITETURA
+from arquitetura import tela_exercicio_arquitetura
 from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
@@ -1596,6 +1598,8 @@ def _montar(tela, tema, sufixo):
         return web(EVOLUCAO, tela_evolucao(k))
     if tela['id'] == 'exercicio':
         return web(EXERCICIO, tela_exercicio(k), valores=VALORES_EXERCICIO)
+    if tela['id'] == 'arquitetura':
+        return web(ARQUITETURA, tela_exercicio_arquitetura(k))
     if tela['id'] == 'avaliacao':
         return web(AVALIACAO, tela_avaliacao(k))
     if tela['id'] == 'peer':
