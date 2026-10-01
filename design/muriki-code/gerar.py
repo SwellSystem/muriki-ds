@@ -19,12 +19,13 @@ TELAS = [
     ('pagamento', 'Pagamento', 'Pagamento', 'Volta do pagamento · confirmado ou cancelado', 5, 0, 1),
     ('primeiro', 'PrimeiroExercicio', 'Primeiro exercício', 'Primeiro exercício · guia de três passos', 7, 0, 1),
     ('vazio', 'PerfilVazio', 'Perfil vazio', 'Evolução · perfil antes da primeira evidência', 8, 0, 1),
-    ('evolucao', 'Main', 'Evolução', 'Evolução · declarado, observado e estado', 0, 2, 3),
+    ('evolucao', 'Main', 'Evolução', 'Evolução · fatia 1: competências com nível, origem e caminho na trilha, e o progresso nas trilhas', 0, 2, 3),
     ('competencia', 'Competencia', 'Testing', 'Competência · Testing: caminho, histórico e trajetória', 1, 2, 3),
     ('exercicio', 'Exercicio', 'Exercício', 'Exercício · editor, testes e explicação', 2, 2, 3),
     ('avaliacao', 'Avaliacao', 'Avaliação', 'Avaliação · rubrica, explicação e o porquê', 3, 2, 3),
     ('playground', 'Playground', 'Playground', 'Playground · código livre com o Peer', 4, 2, 3),
     ('inicio', 'Inicio', 'Início', 'Início · o primeiro dia, antes de qualquer prática', 5, 2, 3),
+    ('evolucao_tempo', 'EvolucaoNoTempo', 'Evolução', 'Evolução, rolada · fatia 2: evolução no tempo e trajetória', 7, 2, 3),
     ('arquitetura', 'ExercicioArquitetura', 'Exercício de arquitetura', 'Exercício de arquitetura · a bancada: peças, ligações, regras e Verificar', 6, 2, 3),
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
@@ -59,6 +60,7 @@ TELAS = [
     ('trilha_lista_movel', 'TrilhaListaMovel', 'Testes que dão confiança', 'Celular · a trilha em lista: a linha inteira abre a etapa', 7, 14, 15),
     ('exercicios_movel', 'ExerciciosMovel', 'Exercícios', 'Celular · o catálogo em cartões', 4, 14, 15),
     ('conta_movel', 'ContaMovel', 'Minha conta', 'Celular · Minha conta, meus dados', 5, 14, 15),
+    ('evolucao_movel', 'EvolucaoMovel', 'Evolução', 'Celular · a Evolução inteira, em cartões', 8, 14, 15),
     ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
@@ -101,7 +103,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         if id_.endswith('_movel'):
             # o celular: 390 de largura, a altura da página, e as colunas mais juntas
             chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha', 'trilha_lista_movel': 'trilha_lista',
-                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas'}[id_]
+                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao'}[id_]
             x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
             y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)
         b = boards.setdefault(arquivo, {})
@@ -116,8 +118,8 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
-    ('web', 2, 7, 'Code web: perfil, competência, exercício, avaliação, playground, o início do primeiro dia e o exercício de arquitetura'),
-    ('webEscuro', 3, 7, 'Code web no tema escuro'),
+    ('web', 2, 8, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura e a evolução rolada'),
+    ('webEscuro', 3, 8, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
     ('conta', 6, 5, 'Conta: segundo fator, esqueci a senha, criar e redefinir senha pelo link do email, acesso suspenso'),
@@ -133,10 +135,10 @@ for chave, lin, n, texto in [
     notas[chave].setdefault('w', 240)
 # as notas do celular: a fileira escura começa depois do quadro mais alto do claro
 for chave, y, texto in [
-    ('celular', 14 * LINHA_Y - 300, 'Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical e as boas-vindas numa folha'),
+    ('celular', 14 * LINHA_Y - 300, 'Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical, as boas-vindas numa folha e a Evolução'),
     ('celularEscuro', 14 * LINHA_Y + ALTURA_MOVEL_MAX + 120, 'Code no celular no tema escuro'),
 ]:
-    notas.setdefault(chave, {}).update(x=0, y=y, text=texto, kind='title1', maxW=min(7 * (WM + 80), 8000))
+    notas.setdefault(chave, {}).update(x=0, y=y, text=texto, kind='title1', maxW=min(9 * (WM + 80), 8000))
     notas[chave].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=1)

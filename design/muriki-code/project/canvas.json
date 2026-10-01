@@ -28,7 +28,7 @@
   },
   "Main.dc.html": {
    "h": 900,
-   "title": "Evolução · declarado, observado e estado",
+   "title": "Evolução · fatia 1: competências com nível, origem e caminho na trilha, e o progresso nas trilhas",
    "w": 1440,
    "x": 0,
    "y": 2640,
@@ -55,7 +55,7 @@
    "y": 3960,
    "w": 1440,
    "h": 900,
-   "title": "Evolução · declarado, observado e estado · escuro",
+   "title": "Evolução · fatia 1: competências com nível, origem e caminho na trilha, e o progresso nas trilhas · escuro",
    "is_interactive": true
   },
   "ExercicioEscuro.dc.html": {
@@ -764,7 +764,7 @@
   },
   "MenuMovelEscuro.dc.html": {
    "x": 0,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 844,
    "title": "Celular · a barra de topo e a gaveta do menu · escuro",
@@ -780,7 +780,7 @@
   },
   "InicioMovelEscuro.dc.html": {
    "x": 470,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1600,
    "title": "Celular · o Início do primeiro dia · escuro",
@@ -796,7 +796,7 @@
   },
   "TrilhasMovelEscuro.dc.html": {
    "x": 940,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1900,
    "title": "Celular · Trilhas com o minimapa · escuro",
@@ -812,7 +812,7 @@
   },
   "TrilhaMovelEscuro.dc.html": {
    "x": 1410,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1710,
    "title": "Celular · a trilha em mapa vertical · escuro",
@@ -828,7 +828,7 @@
   },
   "ExerciciosMovelEscuro.dc.html": {
    "x": 1880,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1850,
    "title": "Celular · o catálogo em cartões · escuro",
@@ -844,7 +844,7 @@
   },
   "ContaMovelEscuro.dc.html": {
    "x": 2350,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1420,
    "title": "Celular · Minha conta, meus dados · escuro",
@@ -860,7 +860,7 @@
   },
   "BoasVindasMovelEscuro.dc.html": {
    "x": 2820,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 844,
    "title": "Celular · as boas-vindas às trilhas numa folha que sobe de baixo · escuro",
@@ -876,7 +876,7 @@
   },
   "TrilhaListaMovelEscuro.dc.html": {
    "x": 3290,
-   "y": 20800,
+   "y": 21360,
    "w": 390,
    "h": 1064,
    "title": "Celular · a trilha em lista: a linha inteira abre a etapa · escuro",
@@ -896,6 +896,38 @@
    "w": 1440,
    "h": 900,
    "title": "Exercício de arquitetura · a bancada: peças, ligações, regras e Verificar · escuro",
+   "is_interactive": true
+  },
+  "EvolucaoNoTempo.dc.html": {
+   "x": 10640,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Evolução, rolada · fatia 2: evolução no tempo e trajetória",
+   "is_interactive": true
+  },
+  "EvolucaoNoTempoEscuro.dc.html": {
+   "x": 10640,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Evolução, rolada · fatia 2: evolução no tempo e trajetória · escuro",
+   "is_interactive": true
+  },
+  "EvolucaoMovel.dc.html": {
+   "x": 3760,
+   "y": 18480,
+   "w": 390,
+   "h": 2460,
+   "title": "Celular · a Evolução inteira, em cartões",
+   "is_interactive": true
+  },
+  "EvolucaoMovelEscuro.dc.html": {
+   "x": 3760,
+   "y": 21360,
+   "w": 390,
+   "h": 2460,
+   "title": "Celular · a Evolução inteira, em cartões · escuro",
    "is_interactive": true
   }
  },
@@ -919,7 +951,7 @@
   "web": {
    "kind": "title1",
    "maxW": 8000,
-   "text": "Code web: perfil, competência, exercício, avaliação, playground, o início do primeiro dia e o exercício de arquitetura",
+   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura e a evolução rolada",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -1023,17 +1055,17 @@
   "celular": {
    "x": 0,
    "y": 18180,
-   "text": "Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical e as boas-vindas numa folha",
+   "text": "Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical, as boas-vindas numa folha e a Evolução",
    "kind": "title1",
-   "maxW": 3290,
+   "maxW": 4230,
    "w": 240
   },
   "celularEscuro": {
    "x": 0,
-   "y": 20500,
+   "y": 21060,
    "text": "Code no celular no tema escuro",
    "kind": "title1",
-   "maxW": 3290,
+   "maxW": 4230,
    "w": 240
   }
  },
@@ -1149,7 +1181,11 @@
   "TrilhaListaMovel.dc.html",
   "TrilhaListaMovelEscuro.dc.html",
   "ExercicioArquitetura.dc.html",
-  "ExercicioArquiteturaEscuro.dc.html"
+  "ExercicioArquiteturaEscuro.dc.html",
+  "EvolucaoNoTempo.dc.html",
+  "EvolucaoNoTempoEscuro.dc.html",
+  "EvolucaoMovel.dc.html",
+  "EvolucaoMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
