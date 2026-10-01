@@ -604,6 +604,11 @@ const STRINGS: Record<string, unknown> = {
     open_menu: "Abrir o menu",
     close_menu: "Fechar o menu",
   },
+  date_picker: {
+    placeholder: "Escolher data",
+    range_placeholder: "Escolher período",
+    clear: "Limpar",
+  },
   sidebar: {
     collapse: "Recolher menu",
     expand: "Expandir menu",
