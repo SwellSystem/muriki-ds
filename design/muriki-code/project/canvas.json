@@ -881,6 +881,22 @@
    "h": 1064,
    "title": "Celular · a trilha em lista: a linha inteira abre a etapa · escuro",
    "is_interactive": true
+  },
+  "ExercicioArquitetura.dc.html": {
+   "x": 9120,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Exercício de arquitetura · a bancada: peças, ligações, regras e Verificar",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaEscuro.dc.html": {
+   "x": 9120,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Exercício de arquitetura · a bancada: peças, ligações, regras e Verificar · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -903,7 +919,7 @@
   "web": {
    "kind": "title1",
    "maxW": 8000,
-   "text": "Code web: perfil, competência, exercício, avaliação, playground e o início do primeiro dia",
+   "text": "Code web: perfil, competência, exercício, avaliação, playground, o início do primeiro dia e o exercício de arquitetura",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -1131,7 +1147,9 @@
   "BoasVindasMovel.dc.html",
   "BoasVindasMovelEscuro.dc.html",
   "TrilhaListaMovel.dc.html",
-  "TrilhaListaMovelEscuro.dc.html"
+  "TrilhaListaMovelEscuro.dc.html",
+  "ExercicioArquitetura.dc.html",
+  "ExercicioArquiteturaEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
