@@ -422,7 +422,9 @@ const STRINGS: Record<string, unknown> = {
     goes_to_review: "vai para a avaliação",
     explain_placeholder: "Escreva com as suas palavras. Não precisa ser longo.",
     explain_note: "Entra na avaliação e no seu perfil.",
+    explain_draft: "rascunho escrito",
     hints: {
+      title: "Dicas",
       available_one: "1 dica disponível",
       available_other: "{{count}} dicas disponíveis",
       used: "Dica {{used}} de {{total}} usada",

@@ -6,14 +6,16 @@
  *
  * Só apresentação: nada chama API nem roda código. As peças se montam como no desenho:
  *
- *   <ExerciseWorkspace header={<ExerciseHeader …/>} side={<>enunciado, explicação</>} foot={<ExerciseHints …/>}
+ *   <ExerciseWorkspace header={<ExerciseHeader …/>} side={<ExerciseStatement …/>}
+ *     foot={<><ExerciseExplanation …/><ExerciseHints …/></>}
  *     editor={<ExerciseEditor sidebar={<><ExerciseFileTree …/><ExerciseTests …/></>}>{editor}</ExerciseEditor>} />
  *
- * No desktop (lg), a lateral é um painel de 372px com a mesma pele do editor: o enunciado e a
- * explicação rolam por dentro, com a moldura parada, e as dicas são o pé; o editor ocupa o resto,
- * na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo empilha: cabeçalho, painel
- * (na altura do conteúdo, sem rolar por dentro), editor, e dentro do editor a árvore e os testes
- * sobem para cima do código.
+ * No desktop (lg), a lateral é um painel de 372px com a mesma pele do editor e três seções
+ * recolhíveis, como Código e Testes no rail: o enunciado ocupa o que sobra e só o corpo dele rola;
+ * a explicação e as dicas ficam fixas embaixo. Quem quer mais espaço para ler recolhe a explicação.
+ * O editor ocupa o resto, na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo
+ * empilha: cabeçalho, painel (na altura do conteúdo, sem rolar por dentro), editor, e dentro do
+ * editor a árvore e os testes sobem para cima do código.
  *
  * O guia do primeiro exercício (`guide`) cobre a tela com o véu e sobe, um de cada vez, o editor
  * (passo 1), os testes (2) e a explicação (3), cada um com o anel e o balão ao lado.
@@ -189,9 +191,9 @@ function BalaoDoGuia({
 
 export interface ExerciseWorkspaceProps {
   header: React.ReactNode
-  /** O que rola dentro do painel da esquerda: enunciado e explicação. */
+  /** O que ocupa o painel da esquerda e rola por dentro: o enunciado. */
   side: React.ReactNode
-  /** O pé do painel, sempre à vista: as dicas. */
+  /** O que fica fixo embaixo do painel: a explicação e as dicas. */
   foot?: React.ReactNode
   editor: React.ReactNode
   /** O guia do primeiro exercício. Sem isto, nada de véu. */
@@ -217,12 +219,14 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
       >
         {header}
         <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
+          {/* Só o corpo do enunciado rola. A rolagem do painel inteiro é a rede para a tela baixa
+              demais, em que o enunciado já está no mínimo e o pé não cabe: aí ele rola junto. */}
           <div
             data-slot="exercise-side"
-            className="flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs lg:min-h-0 lg:w-[372px] lg:shrink-0"
+            className="muriki-scroll flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs lg:min-h-0 lg:w-[372px] lg:shrink-0 lg:overflow-y-auto"
           >
-            <div className="muriki-scroll flex min-h-0 flex-1 flex-col lg:overflow-y-auto">{side}</div>
-            {foot}
+            <div className="flex flex-col lg:flex-1">{side}</div>
+            {foot ? <div className="flex shrink-0 flex-col">{foot}</div> : null}
           </div>
           {editor}
         </div>
@@ -347,15 +351,26 @@ function EmBreve() {
 
 // ── Painel da esquerda ──────────────────────────────────────────────────
 
-function Rotulo({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="font-mono text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
-      {children}
-    </span>
-  )
+/** Aberta ou recolhida: controlada por `open`, ou solta a partir de `defaultOpen`. */
+function useAberta(open: boolean | undefined, defaultOpen: boolean, onOpenChange?: (open: boolean) => void) {
+  const [solta, setSolta] = React.useState(defaultOpen)
+  const aberta = open ?? solta
+  const mudar = (v: boolean) => {
+    if (open === undefined) setSolta(v)
+    onOpenChange?.(v)
+  }
+  return [aberta, mudar] as const
 }
 
-export interface ExerciseStatementProps {
+/** O que toda seção do painel aceita para recolher. O app lembra o estado por pessoa, se quiser. */
+export interface ExerciseCollapsibleProps {
+  open?: boolean
+  /** Sem isto, aberta. */
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   /** O enunciado já renderizado (o app transforma o Markdown). */
   children: React.ReactNode
   /** O rótulo mono. Sem isto, "Enunciado". */
@@ -363,20 +378,33 @@ export interface ExerciseStatementProps {
   className?: string
 }
 
-export function ExerciseStatement({ children, label, className }: ExerciseStatementProps) {
+export function ExerciseStatement({
+  children,
+  label,
+  open,
+  defaultOpen = true,
+  onOpenChange,
+  className,
+}: ExerciseStatementProps) {
   const t = useTranslate()
   return (
-    <section
+    <ExerciseSection
       data-slot="exercise-statement"
-      className={cn("flex flex-col gap-3 px-5 py-4", className)}
+      title={label ?? t("exercise_workspace.statement")}
+      divider={false}
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      // aberto, nunca menos que umas cinco linhas de leitura, por menor que seja a tela
+      className={cn("lg:flex-1 lg:data-[state=open]:min-h-[160px]", className)}
+      bodyClassName="muriki-scroll flex flex-col gap-3 px-4 pb-4 text-sm leading-[22px] text-foreground lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
     >
-      <Rotulo>{label ?? t("exercise_workspace.statement")}</Rotulo>
-      <div className="flex flex-col gap-3 text-sm leading-[22px] text-foreground">{children}</div>
-    </section>
+      {children}
+    </ExerciseSection>
   )
 }
 
-export interface ExerciseExplanationProps {
+export interface ExerciseExplanationProps extends ExerciseCollapsibleProps {
   /** A pergunta que a pessoa responde, ex.: "Por que o texto vazio lança erro…?" */
   question: React.ReactNode
   value: string
@@ -396,26 +424,43 @@ export function ExerciseExplanation({
   placeholder,
   note,
   badge,
+  open,
+  defaultOpen = true,
+  onOpenChange,
   className,
 }: ExerciseExplanationProps) {
   const t = useTranslate()
   const id = React.useId()
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(3)
+  const [aberta, mudar] = useAberta(open, defaultOpen, onOpenChange)
+  // o passo 3 do guia aponta a explicação: recolhida, ela abre enquanto o passo durar
+  const noGuia = React.useContext(GuiaContexto)?.step === 3
+  const mostrar = aberta || noGuia
+  // recolhida com texto, o selo vira o aviso de que há rascunho: ninguém esquece que ele vai junto
+  const fim =
+    !mostrar && value.trim() ? (
+      <span className="flex items-center gap-1.5 pr-1 text-[11.5px] text-muted-foreground">
+        <span aria-hidden className="size-1.5 rounded-full bg-success" />
+        {t("exercise_workspace.explain_draft")}
+      </span>
+    ) : badge === null ? null : (
+      (badge ?? <Badge tone="blue">{t("exercise_workspace.goes_to_review")}</Badge>)
+    )
   return (
-    <section
+    <ExerciseSection
       ref={ancorar}
       data-slot="exercise-explanation"
-      className={cn("relative flex flex-col gap-2.5 border-t border-muted bg-card px-5 py-4", destaque, className)}
+      title={t("exercise_workspace.explain")}
+      end={fim}
+      open={mostrar}
+      onOpenChange={mudar}
+      className={cn("bg-card", destaque, className)}
+      bodyClassName="flex flex-col gap-2.5 px-4 pb-4"
     >
-      <div className="flex items-center gap-2">
-        <Rotulo>{t("exercise_workspace.explain")}</Rotulo>
-        {badge === null ? null : (
-          <span className="ml-auto">{badge ?? <Badge tone="blue">{t("exercise_workspace.goes_to_review")}</Badge>}</span>
-        )}
-      </div>
       <label htmlFor={id} className="text-sm leading-[21px] font-medium text-foreground-strong">
         {question}
       </label>
+      {/* cresce com o texto até umas sete linhas e depois rola por dentro: não esmaga o enunciado */}
       <Textarea
         id={id}
         rows={4}
@@ -423,15 +468,16 @@ export function ExerciseExplanation({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? t("exercise_workspace.explain_placeholder")}
-        className="resize-none"
+        className="muriki-scroll max-h-40 resize-none"
+        style={{ overflowY: "auto" }}
       />
       <span className="text-xs text-muted-foreground">{note ?? t("exercise_workspace.explain_note")}</span>
       {balaoDoGuia}
-    </section>
+    </ExerciseSection>
   )
 }
 
-export interface ExerciseHintsProps {
+export interface ExerciseHintsProps extends ExerciseCollapsibleProps {
   /** Quantas dicas o exercício tem. */
   total: number
   /** Quantas a pessoa já revelou. */
@@ -444,14 +490,29 @@ export interface ExerciseHintsProps {
   className?: string
 }
 
-export function ExerciseHints({ total, used, onRequest, onView, loading, className }: ExerciseHintsProps) {
+export function ExerciseHints({
+  total,
+  used,
+  onRequest,
+  onView,
+  loading,
+  open,
+  defaultOpen = true,
+  onOpenChange,
+  className,
+}: ExerciseHintsProps) {
   const t = useTranslate()
   if (total <= 0) return null
   const acabou = used >= total
   return (
-    <div
+    <ExerciseSection
       data-slot="exercise-hints"
-      className={cn("flex shrink-0 items-center gap-2.5 border-t border-muted py-2.5 pr-3 pl-4", className)}
+      title={t("exercise_workspace.hints.title")}
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={onOpenChange}
+      className={className}
+      bodyClassName="flex items-center gap-2.5 pr-3 pb-3 pl-4"
     >
       <LightbulbIcon aria-hidden className="size-4 shrink-0 text-warning" />
       <span className="flex min-w-0 flex-1 flex-col items-start">
@@ -475,13 +536,13 @@ export function ExerciseHints({ total, used, onRequest, onView, loading, classNa
           {used === 0 ? t("exercise_workspace.hints.request") : t("exercise_workspace.hints.next")}
         </Button>
       )}
-    </div>
+    </ExerciseSection>
   )
 }
 
-// ── Seções da lateral do editor ─────────────────────────────────────────
+// ── Seção recolhível (o painel da esquerda e o rail do editor) ──────────
 
-export interface ExerciseSectionProps {
+export interface ExerciseSectionProps extends ExerciseCollapsibleProps {
   ref?: React.Ref<HTMLElement>
   title: string
   /** À direita do título: ações ou o resumo. */
@@ -489,22 +550,42 @@ export interface ExerciseSectionProps {
   /** O fio em cima. */
   divider?: boolean
   className?: string
+  /** O corpo, abaixo do título. */
+  bodyClassName?: string
+  "data-slot"?: string
   children: React.ReactNode
 }
 
-/** A seção recolhível da lateral (Código, Testes): título mono com a seta, e o que vem à direita. */
-export function ExerciseSection({ ref, title, end, divider = true, className, children }: ExerciseSectionProps) {
-  const [aberta, setAberta] = React.useState(true)
+/** A seção recolhível: título mono com a seta, e o que vem à direita. Serve ao rail (Código, Testes) e ao painel. */
+export function ExerciseSection({
+  ref,
+  title,
+  end,
+  divider = true,
+  open,
+  defaultOpen = true,
+  onOpenChange,
+  className,
+  bodyClassName,
+  "data-slot": slot,
+  children,
+}: ExerciseSectionProps) {
+  const [aberta, mudar] = useAberta(open, defaultOpen, onOpenChange)
   const id = React.useId()
   const Seta = aberta ? CaretDownIcon : CaretRightIcon
   return (
-    <section ref={ref} className={cn("relative flex flex-col", divider && "border-t border-muted", className)}>
-      <div className="flex h-[38px] items-center gap-1.5 pr-1.5 pl-2.5">
+    <section
+      ref={ref}
+      data-slot={slot}
+      data-state={aberta ? "open" : "closed"}
+      className={cn("relative flex flex-col", divider && "border-t border-muted", className)}
+    >
+      <div className="flex h-[38px] shrink-0 items-center gap-1.5 pr-1.5 pl-2.5">
         <button
           type="button"
           aria-expanded={aberta}
           aria-controls={id}
-          onClick={() => setAberta((v) => !v)}
+          onClick={() => mudar(!aberta)}
           className="flex h-[26px] items-center gap-1.5 rounded-md px-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
         >
           <Seta aria-hidden className="size-3" />
@@ -512,7 +593,7 @@ export function ExerciseSection({ ref, title, end, divider = true, className, ch
         </button>
         {end ? <span className="ml-auto flex items-center gap-0.5">{end}</span> : null}
       </div>
-      <div id={id} hidden={!aberta}>
+      <div id={id} hidden={!aberta} className={bodyClassName}>
         {children}
       </div>
     </section>
