@@ -1473,6 +1473,83 @@
       }
     },
     {
+      "name": "level-scale",
+      "type": "registry:ui",
+      "title": "Level Scale",
+      "description": "O nível de uma competência em quatro traços (Fundamentos, Junior, Pleno, Senior): cheio até o confirmado, contorno até o declarado que ainda não foi confirmado, e o resto vazio. E de onde ele vem (LevelOrigin): selo azul para o confirmado nos exercícios, cinza para o que a pessoa contou, nota para a estimativa pelo tempo de código. Sem número, sem queda: o nível só sobe.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/level-scale.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "import { LevelScale, LevelOrigin, useLevelName, LEVELS } from \"@/components/ui/level-scale\". <LevelScale level={confirmed} declared={declared} />: level é o cheio (null = nada confirmado), declared é o contorno acima dele (opcional). Só desenho (aria-hidden); passe label para virar imagem com nome (\"Nível Pleno confirmado, Senior declarado\"). size sm, default ou lg. <LevelOrigin source={competency.source} /> lê o source de GET /code/competencies: selo de assessed e declared, nota de declared_from_experience; showEstimate={false} some com a nota. Textos em level_scale.* no i18n."
+    },
+    {
+      "name": "level-profile",
+      "type": "registry:block",
+      "title": "Level Profile",
+      "description": "As competências da pessoa agrupadas (por linguagem), na forma de GET /code/evolution/profile: a escala com o confirmado e o declarado, os dois por escrito, e o próximo nível com as etapas que faltam. Linha quando cabe, cartão quando a coluna é estreita (container query). Sempre contra o próprio histórico: sem ranking nem queda. A primeira visão da Evolução do Code.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/level-scale"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/level-profile/level-profile.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/level-profile/level-profile.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/level-profile/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/level-profile/index.ts"
+        }
+      ],
+      "docs": "<LevelProfile groups={porLinguagem(profile.competencies).map(([language, itens]) => ({ id: language, label: rotuloDa(language), items: itens.map((c) => ({ id: c.id, title: c.title, declared: c.declared, confirmed: c.confirmed, next: c.next, render: <Link to=\"/evolution/$id\" params={{ id: c.id }} /> })) }))} />. declared, confirmed e next vêm de GET /code/evolution/profile sem conversão; o app só agrupa por language (js, neutral…) e escolhe o rótulo do grupo. next null = \"no último nível\"; next com missing vazio = \"Senior: sem etapas ainda\"; senão \"Senior: faltam N etapas\". Sem render nem href, a linha não é link. title troca \"Suas competências\"; null tira. A troca de linha para cartão é por container query (44rem). Textos em level_profile.* no i18n."
+    },
+    {
+      "name": "track-progress",
+      "type": "registry:block",
+      "title": "Track Progress",
+      "description": "O progresso em cada trilha numa barra de quatro partes: feitas (por exercício), puladas pelo exercício de entrada, cobertas pelo nível (presumed) e pendentes, com as contagens. A segunda visão da Evolução do Code.",
+      "dependencies": [
+        "@base-ui/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/track-progress/track-progress.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/track-progress/track-progress.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/track-progress/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/track-progress/index.ts"
+        }
+      ],
+      "docs": "<TrackProgress tracks={trilhas.map((tr) => ({ id: tr.id, title: tr.title, done: conta(p => p.status === \"done\" && p.demonstratedBy === \"exercise\"), skipped: conta(p => p.status === \"done\" && p.demonstratedBy === \"diagnostic\"), covered: conta(p => p.status === \"presumed\"), todo: conta(p => p.status === \"todo\" || p.status === \"diagnostic\"), render: <Link to=\"/tracks/$trackId\" params={{ trackId: tr.id }} /> }))} />, contando o path de GET /code/tracks/{id}; elective fica fora. title troca \"Nas trilhas\"; null tira. Textos em track_progress.* no i18n."
+    },
+    {
       "name": "metric-card",
       "type": "registry:block",
       "title": "Metric Card",
