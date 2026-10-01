@@ -151,7 +151,7 @@
    "y": 0,
    "w": 1440,
    "h": 900,
-   "title": "Evolução · perfil antes da primeira evidência",
+   "title": "Evolução · o primeiro dia: só o declarado, antes de qualquer exercício",
    "is_interactive": true
   },
   "PerfilVazioEscuro.dc.html": {
@@ -159,7 +159,7 @@
    "y": 1320,
    "w": 1440,
    "h": 900,
-   "title": "Evolução · perfil antes da primeira evidência · escuro",
+   "title": "Evolução · o primeiro dia: só o declarado, antes de qualquer exercício · escuro",
    "is_interactive": true
   },
   "Competencia.dc.html": {
@@ -167,7 +167,7 @@
    "y": 2640,
    "w": 1440,
    "h": 900,
-   "title": "Competência · Testing: caminho, histórico e trajetória",
+   "title": "Competência · Funções e escopo: caminho na trilha, histórico do nível e trajetória",
    "is_interactive": true
   },
   "CompetenciaEscuro.dc.html": {
@@ -175,7 +175,7 @@
    "y": 3960,
    "w": 1440,
    "h": 900,
-   "title": "Competência · Testing: caminho, histórico e trajetória · escuro",
+   "title": "Competência · Funções e escopo: caminho na trilha, histórico do nível e trajetória · escuro",
    "is_interactive": true
   },
   "Playground.dc.html": {

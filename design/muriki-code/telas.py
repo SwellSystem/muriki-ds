@@ -1,12 +1,11 @@
 import json
 from base import *
-from textos import (COMUM, EVOLUCAO, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL, ACESSO, PRIMEIRO, PERFIL_VAZIO,
-                    COMPETENCIA, PLAYGROUND, juntar)
+from textos import (COMUM, AVALIACAO, CONECTAR, PLANOS, PLANO_INICIAL, ACESSO, PRIMEIRO, PLAYGROUND, juntar)
 from textos_exercicio import TEXTOS as EXERCICIO
 from textos_arquitetura import TEXTOS as ARQUITETURA
 from arquitetura import tela_exercicio_arquitetura
 from textos_evolucao import TEXTOS as EVOLUCAO_NOVA
-from evolucao import tela_evolucao_nova, tela_evolucao_movel
+from evolucao import tela_evolucao_nova, tela_evolucao_movel, tela_competencia_nova, tela_evolucao_vazia
 from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
@@ -31,237 +30,6 @@ from conta import (tela_suspenso, tela_conta_dados, tela_conta_aprendizado, tela
                    ANTES_CONTA_DADOS, VALORES_CONTA_DADOS, PROPS_CONTA_DADOS, ANTES_CONTA_SEGURANCA,
                    VALORES_CONTA_SEGURANCA, PROPS_CONTA_SEGURANCA, ANTES_CONFIRMAR_EMAIL, PROPS_CONFIRMAR_EMAIL,
                    FLUXOS, antes_fluxo, VALORES_FLUXO, props_fluxo)
-
-
-def nivel_nome(n):
-    return NIVEIS[n - 1]
-
-
-# ── 1 · Evolução: declarado e observado convivem, por competência ──────
-# Estados de cada linha: confirmado, a confirmar, próximo nível em progresso, declarado (sem evidência
-# forte ainda) e não uso (linguagem que a pessoa não marcou). Nunca "rebaixado", nunca seta para baixo.
-LINGUAGENS = ['TypeScript', 'Python', 'Go']
-ENGENHARIA = ['Testing', 'Debugging', 'Architecture', 'APIs', 'Databases', 'Security',
-              'Design Patterns', 'System Design', 'DDD', 'Observability']
-
-# nome: (declarado, observado, evidências, estado, alvo)  — declarado None = não uso; observado 0 = sem confirmação
-# Níveis na escala da muriki-api: 1 Fundamentos, 2 Junior, 3 Pleno, 4 Senior. O declarado vem do perfil
-# de aprendizado (source declared_from_experience): nunca, aprendendo e "ainda não sei" → fundamentos,
-# menos de 2 anos → junior, de 2 a 5 → pleno, mais de 5 → senior. A familiaridade com uma família de
-# linguagem (source declared: nunca usei → fundamentos, o básico → junior, uso todo dia → pleno,
-# domino → senior) vale para as competências da família e ganha da experiência. O observado (assessed)
-# nunca muda com o perfil. O Rafael marcou "De 2 a 5 anos" e, em JavaScript/TypeScript, "Uso todo dia":
-# tudo começa em Pleno, TypeScript pela familiaridade, e o que passa disso vem das evidências.
-PERFIL = {
-    'TypeScript': (3, 3, 64, 'confirmado', None),
-    'Python': (3, 0, 3, 'declarado', None),
-    'Go': (None, 0, 0, 'naoUso', None),
-    'Testing': (3, 3, 41, 'progresso', 4),
-    'Debugging': (3, 3, 37, 'progresso', 4),
-    'Architecture': (3, 2, 9, 'aConfirmar', 3),
-    'APIs': (3, 3, 28, 'confirmado', None),
-    'Databases': (3, 3, 15, 'confirmado', None),
-    'Security': (3, 0, 6, 'declarado', None),
-    'Design Patterns': (3, 3, 12, 'confirmado', None),
-    'System Design': (3, 0, 4, 'declarado', None),
-    'DDD': (3, 0, 0, 'declarado', None),
-    'Observability': (3, 0, 3, 'declarado', None),
-}
-# competências da família js: o declarado delas vem da familiaridade, não da experiência
-FAMILIA_JS = {'TypeScript'}
-# o dia do primeiro acesso: só o declarado, Pleno em tudo (Intermediário), e Go fora das linguagens marcadas
-PERFIL_INICIAL = {nome: (3, 0, 0, 'declarado', None) for nome in LINGUAGENS + ENGENHARIA}
-PERFIL_INICIAL.update(Go=(None, 0, 0, 'naoUso', None))
-
-COLUNAS_PERFIL = '160px 112px 92px 116px minmax(0,1fr)'
-
-
-def escala_perfil(decl, obs, progresso, k, larg=20):
-    # preenchido = observado; contorno = declarado acima do observado; meio-tom = próximo nível em progresso
-    segs = ''
-    for i in range(len(NIVEIS)):
-        if i < obs:
-            s = f'background:{k["pri"]};'
-        elif progresso and i == obs:
-            s = f'background:color-mix(in oklch, {k["pri"]} 35%, transparent);'
-        elif decl and i < decl:
-            s = f'background:transparent;box-shadow:inset 0 0 0 1px {k["pri"]};'
-        else:
-            s = f'background:{k["sunken"]};box-shadow:inset 0 1px 1px rgba(0,0,0,0.06);'
-        segs += f'<span style="width:{larg}px;height:6px;border-radius:2px;{s}"></span>'
-    op = 'opacity:0.5;' if decl is None else ''
-    return f'<span style="display:flex;gap:3px;align-items:center;{op}">{segs}</span>'
-
-
-def tabela_perfil(k, perfil, dica=None):
-    dica = dica or {}
-
-    def linha(nome):
-        decl, obs, ev, estado, alvo = perfil[nome]
-        link_nome = 'Competencia__SUF__.dc.html' if nome == 'Testing' else '#'
-        segunda = ''
-        if estado == 'confirmado':
-            selo = badge(T('estConfirmado'), k, 'green')
-        elif estado == 'aConfirmar':
-            selo = badge(f'{nivel_nome(alvo)} {T("aConfirmar")}', k, 'yellow', ponto=True)
-            chave = 'confirmam3' if alvo == 4 else 'confirmam2'
-            segunda = (f'<a href="{link_nome}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;">'
-                       f'{T(chave)}{ic("direita", 12)}</a>')
-        elif estado == 'progresso':
-            selo = badge(f'{nivel_nome(alvo)} {T("emProgresso")}', k, 'blue', ponto=True)
-            if link_nome != '#':
-                segunda = (f'<a href="{link_nome}" style="display:inline-flex;align-items:center;gap:4px;font-size:12px;">'
-                           f'{T("confirmam3")}{ic("direita", 12)}</a>')
-            else:
-                segunda = f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{T("doisDeTres")}</span>'
-        elif estado == 'naoUso':
-            selo = badge(T('estNaoUso'), k, tracejado=True)
-            segunda = f'<a href="#" style="font-size:12px;">{T("adicionar")}</a>'
-        else:
-            selo = badge(T('estDeclarado'), k, tracejado=True)
-        if nome in dica:
-            segunda = f'<span style="font-size:12px;color:{k["pri"]};">{T(dica[nome])}</span>'
-        # o declarado vem da experiência (dito no subtítulo); na família js, marca que veio do que a pessoa disse de JS/TS
-        fonte = (f'<span style="font-size:11px;line-height:14px;color:{k["mfg"]};">{T("fonteFam")}</span>'
-                 if nome in FAMILIA_JS else '')
-        declarado = (f'<span style="display:flex;flex-direction:column;gap:1px;">'
-                     f'<span style="font-size:13px;color:{k["fg"]};">{nivel_nome(decl)}</span>{fonte}</span>' if decl
-                     else f'<span style="color:{k["mfg"]};">—</span>')
-        observado = (f'<span style="display:flex;align-items:baseline;gap:8px;">'
-                     + (f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{nivel_nome(obs)}</span>' if obs
-                        else f'<span style="color:{k["mfg"]};">—</span>')
-                     + f'{mono(str(ev), k, k["mfg"], 11.5)}</span>')
-        cor_nome = k['mfg'] if decl is None else k['fgs']
-        nome_html = (f'<a href="{link_nome}" style="font-size:13.5px;font-weight:500;color:{cor_nome};">{nome}</a>' if link_nome != '#'
-                     else f'<span style="font-size:13.5px;font-weight:500;color:{cor_nome};">{nome}</span>')
-        return (f'<div style="display:grid;grid-template-columns:{COLUNAS_PERFIL};align-items:center;gap:12px;'
-                f'min-height:40px;padding:5px 18px;border-top:1px solid {k["muted"]};">'
-                f'{nome_html}{escala_perfil(decl, obs, estado == "progresso", k)}{declarado}{observado}'
-                f'<span style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;">{selo}{segunda}</span></div>')
-
-    def grupo(titulo, nomes):
-        return (f'<div style="display:flex;align-items:center;height:28px;padding:0 18px;border-top:1px solid {k["muted"]};'
-                f'background:{k["rail"]};">{rotulo(titulo, k["mfg"], 9.5)}</div>' + ''.join(linha(n) for n in nomes))
-
-    cab_tab = (f'<div style="display:grid;grid-template-columns:{COLUNAS_PERFIL};gap:12px;align-items:center;height:34px;padding:0 18px;">'
-               + ''.join(rotulo(T(c), k['mfg'], 9.5) for c in ['colComp', 'colEscala', 'colDecl', 'colObs', 'colEstado'])
-               + '</div>')
-    item = lambda amostra, txt: (f'<span style="display:flex;align-items:center;gap:8px;">{amostra}'
-                                 f'<span style="font-size:12px;color:{k["mfg"]};">{txt}</span></span>')
-    amostra = lambda estilo: f'<span style="width:14px;height:6px;border-radius:2px;{estilo}"></span>'
-    legenda_ = (f'<div style="display:flex;align-items:center;gap:18px;padding:10px 18px 0;border-top:1px solid {k["muted"]};">'
-                f'{item(amostra("background:" + k["pri"] + ";"), T("legObs"))}'
-                f'{item(amostra("box-shadow:inset 0 0 0 1px " + k["pri"] + ";"), T("legDecl"))}'
-                f'{item(amostra("background:color-mix(in oklch, " + k["pri"] + " 35%, transparent);"), T("legProg"))}'
-                f'<span style="margin-left:auto;font-family:{MONO};font-size:11px;color:{k["mfg"]};">'
-                f'{" · ".join(NIVEIS)}</span></div>')
-    return (f'<section aria-label="{T("competencias")}" style="flex:1;min-width:0;background:{k["card"]};border-radius:12px;'
-            f'box-shadow:{k["sombra"]};padding:4px 0 12px;display:flex;flex-direction:column;overflow:hidden;">'
-            f'{cab_tab}{grupo(T("grupoLing"), LINGUAGENS)}{grupo(T("grupoEng"), ENGENHARIA)}{legenda_}</section>')
-
-
-# ── 1b · Uma competência: o caminho para confirmar, o histórico e a trajetória ──
-def tela_competencia(k):
-    chips = (badge(f'{T("pleno")} {T("declaradoSuf")}', k, tracejado=True)
-             + badge(f'{T("pleno")} {T("confirmadoPor")}', k, 'green')
-             + badge(f'Senior {T("emProgressoSuf")}', k, 'blue', ponto=True))
-    # o declarado não se edita por competência (a API guarda uma experiência só): muda nas Preferências
-    cab = cabecalho(k, [(T('evolucao'), destino('evolucao')), ('Testing', '')], 'Testing', chips=chips,
-                    direita=botao_link(T('mudarExp'), 'Preferencias__SUF__.dc.html', k, 'outline', 36, 'lapis'))
-
-    def exercicio(n, titulo, proximo):
-        numero = (f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;flex:0 0 auto;'
-                  f'border-radius:999px;font-family:{MONO};font-size:12px;'
-                  + (f'background:{k["prisub"]};color:{k["prisubfg"]};">' if proximo
-                     else f'box-shadow:inset 0 0 0 1px {k["input"]};color:{k["mfg"]};">') + f'{n}</span>')
-        acao = (f'<span style="display:flex;align-items:center;gap:8px;">{badge(T("proximo"), k, "blue")}'
-                f'{botao(T("comecar"), k, "solid", 32)}</span>' if proximo else '')
-        return (f'<li style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid {k["muted"]};">{numero}'
-                f'<span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">'
-                f'<span style="font-size:14px;font-weight:500;color:{k["fgs"] if proximo else k["fg"]};">{titulo}</span>'
-                f'<span style="display:flex;gap:6px;">{badge("Testing", k, "gray")}{badge("Senior", k, "gray")}</span></span>{acao}</li>')
-
-    caminho = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">'
-        f'{rotulo(T("caminhoTit") + " Senior", k["mfg"])}{mono(T("zeroDeTres"), k, k["mfg"], 12)}</div>'
-        f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["fg"]};">{T("caminhoTxt")}</p>'
-        f'<ol style="margin:0;padding:0;list-style:none;">{exercicio(1, T("exA"), True)}{exercicio(2, T("exB"), False)}{exercicio(3, T("exC"), False)}</ol>'
-        f'<p style="margin:0;display:flex;align-items:center;gap:8px;font-size:12.5px;line-height:18px;color:{k["mfg"]};">'
-        f'{ic("dica", 14, k["mfg"])}<span><a href="Avaliacao__SUF__.dc.html" style="font-family:{MONO};font-size:12px;">agenda-slots</a> '
-        f'{T("agendaNota")}</span></p>', k, pad='18px 22px', extra='gap:12px;')
-
-    ref = lambda t: (f'<a href="#" style="display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:4px;'
-                     f'background:{k["muted"]};font-family:{MONO};font-size:11.5px;color:{k["fgs"]};">{t}</a>')
-
-    def marco(data, titulo, tom, desc, refs='', ultimo=False):
-        ponto = {'yellow': f'background:{k["warn"]};', 'green': f'background:{k["ok"]};', 'blue': f'background:{k["pri"]};',
-                 'dashed': f'box-shadow:inset 0 0 0 1.5px {k["mfg"]};'}[tom]
-        trilho = '' if ultimo else f'<span style="flex:1;width:1px;background:{k["input"]};margin-top:4px;"></span>'
-        return (f'<li style="display:grid;grid-template-columns:56px 14px minmax(0,1fr);gap:12px;">'
-                f'<span style="font-family:{MONO};font-size:11.5px;line-height:20px;color:{k["mfg"]};">{data}</span>'
-                f'<span style="display:flex;flex-direction:column;align-items:center;padding-top:5px;">'
-                f'<span style="width:10px;height:10px;border-radius:999px;{ponto}"></span>{trilho}</span>'
-                f'<span style="display:flex;flex-direction:column;gap:4px;padding-bottom:16px;">'
-                f'<span style="font-size:13.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{titulo}</span>'
-                f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">{desc}</span>'
-                + (f'<span style="display:flex;gap:6px;flex-wrap:wrap;padding-top:2px;">{refs}</span>' if refs else '')
-                + '</span></li>')
-
-    historico = cartao(
-        f'{rotulo(T("historicoTit"), k["mfg"])}'
-        f'<ol style="margin:0;padding:0;list-style:none;">'
-        f'{marco(T("d1"), "Senior " + T("emProgressoSuf"), "blue", T("h1d"))}'
-        f'{marco(T("d3"), T("pleno") + " " + T("confirmadoSuf"), "green", T("h3d"), ref("fila-emails") + ref("cadastro-usuarios") + ref("parse-duration"))}'
-        f'{marco(T("d4"), T("pleno") + " " + T("declaradoSuf"), "dashed", T("h4d"), ultimo=True)}'
-        f'</ol>', k, pad='18px 22px', extra='gap:14px;')
-
-    def fonte(nome, forte, n):
-        peso = badge(T('pesoForte'), k, 'blue') if forte else badge(T('pesoLeve'), k, tracejado=True)
-        return (f'<li style="display:grid;grid-template-columns:minmax(0,1fr) auto 36px;align-items:center;gap:12px;height:38px;'
-                f'border-top:1px solid {k["muted"]};"><span style="font-size:13.5px;color:{k["fg"]};">{T(nome)}</span>{peso}'
-                f'<span style="text-align:right;">{mono(str(n), k, k["fgs"], 13)}</span></li>')
-    fontes = cartao(
-        f'{rotulo(T("fontesTit"), k["mfg"])}'
-        f'<ul style="margin:-4px 0 0;padding:0;list-style:none;">'
-        f'{fonte("fonteExercicio", True, 6)}{fonte("fonteExplicacao", True, 6)}{fonte("fontePeer", False, 26)}{fonte("fontePlayground", False, 3)}'
-        f'<li style="display:grid;grid-template-columns:minmax(0,1fr) 36px;align-items:center;gap:12px;height:38px;border-top:1px solid {k["input"]};">'
-        f'<span style="font-size:13.5px;font-weight:600;color:{k["fgs"]};">{T("total")}</span>'
-        f'<span style="text-align:right;">{mono("41", k, k["fgs"], 13)}</span></li></ul>'
-        f'<p style="margin:0;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("fontesNota")}</p>', k, pad='18px 22px', extra='gap:12px;')
-
-    kw = lambda t: f'<span style="color:{k["pri"]};">{t}</span>'
-    st = lambda t: f'<span style="color:{k["ok"]};">{t}</span>'
-    fn = lambda t: f'<span style="color:{k["warn"]};">{t}</span>'
-
-    def codigo(titulo, linhas):
-        corpo = ''.join(f'<span style="white-space:pre;">{l}</span>' for l in linhas)
-        return (f'<div style="display:flex;flex-direction:column;gap:6px;">'
-                f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{titulo}</span>'
-                f'<div style="display:flex;flex-direction:column;padding:10px 12px;border-radius:8px;background:{k["sunken"]};'
-                f'font-family:{MONO};font-size:11.5px;line-height:18px;color:{k["fg"]};">{corpo}</div></div>')
-    antes = codigo(f'{T("junho")} · fila-emails.test.ts', [
-        f'{fn("test")}({st("&quot;envia&quot;")}, {kw("async")} () =&gt; {{',
-        f'  {kw("const")} r = {kw("await")} enviar(fila)',
-        f'  {fn("expect")}(r).toBeTruthy()',
-        '})'])
-    depois = codigo(f'{T("hoje")} · agenda-slots.test.ts', [
-        f'{fn("test")}({st("&quot;slots do expediente&quot;")}, () =&gt; {{',
-        f'  {kw("const")} slots = gerarSlots(dia)',
-        f'  {fn("expect")}(slots).toHaveLength(18)',
-        f'  {fn("expect")}(slots[0].inicio).toBe({st("&quot;09:00&quot;")})',
-        '})'])
-    trajetoria = cartao(
-        f'<div style="display:flex;flex-direction:column;gap:4px;">{rotulo(T("trajTit"), k["mfg"])}'
-        f'<span style="font-size:13px;color:{k["mfg"]};">{T("trajSub")}</span></div>'
-        f'<div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:13px;color:{k["fg"]};">{T("trajMetric")}</span>'
-        f'<span style="font-size:17px;font-weight:600;color:{k["mfg"]};">{T("trajAntes")}</span>'
-        f'<span style="display:flex;width:14px;height:14px;color:{k["mfg"]};align-self:center;">{I["seta"]}</span>'
-        f'<span style="font-size:17px;font-weight:600;color:{k["fgs"]};">{T("trajDepois")}</span></div>'
-        f'{antes}{depois}', k, pad='18px 22px', extra='gap:12px;')
-
-    esquerda = f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;">{caminho}{historico}</div>'
-    direita = f'<div style="width:440px;flex:0 0 440px;display:flex;flex-direction:column;gap:16px;">{fontes}{trajetoria}</div>'
-    return app(k, 'evolucao', cab + f'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;min-height:0;">{esquerda}{direita}</div>')
 
 
 # ── 2 · Exercício: escrever, montar o projeto, rodar os testes e explicar ──
@@ -1149,33 +917,6 @@ mudarSenha: (e) => this.setState({ senha: e.target.value }),
 alternarSenha: () => this.setState({ verSenha: !ver })"""
 
 
-# ── Perfil vazio: o que a pessoa vê antes da primeira evidência ─────────
-def tela_perfil_vazio(k, sufixo):
-    cab = cabecalho(k, None, T('titulo'), T('subVazio'),
-                    direita=f'<div style="display:flex;gap:8px;">{botao(T("comoMedido"), k, "ghost")}</div>')
-    tabela = tabela_perfil(k, PERFIL_INICIAL, dica={'Testing': 'entraPrimeiro', 'Debugging': 'entraPrimeiro'})
-
-    proximo = cartao(
-        f'<div style="display:flex;align-items:center;justify-content:space-between;">{rotulo(T("proximoPasso"), k["mfg"])}'
-        f'{badge("Testing · Debugging", k, "blue")}</div>'
-        f'<div style="display:flex;flex-direction:column;gap:6px;">'
-        f'<h2 style="margin:0;font-size:17px;line-height:23px;font-weight:600;color:{k["fgs"]};">{T("primeiroTitulo")}</h2>'
-        f'<p style="margin:0;font-size:13px;color:{k["mfg"]};">{T("primeiroTxt")}</p></div>'
-        f'<div style="display:flex;gap:8px;">{botao_link(T("comecar"), f"PrimeiroExercicio{sufixo}.dc.html", k, "solid", 36)}'
-        f'{botao_link(T("trocarJornada"), f"Preferencias{sufixo}.dc.html", k, "ghost", 36)}</div>', k)
-    fontes = ''.join(badge(T(f), k, mono=True, tracejado=True)
-                     for f in ['fonteExercicio', 'fonteExplicacao', 'fontePeer', 'fontePlayground'])
-    recente = cartao(
-        f'{rotulo(T("evRecente"), k["mfg"])}'
-        f'<p style="margin:0;font-size:13px;line-height:20px;color:{k["fg"]};">{T("nadaAinda")}</p>'
-        f'<div style="display:flex;gap:6px;flex-wrap:wrap;">{fontes}</div>', k, pad='18px 22px')
-    trajetoria = cartao(
-        f'{rotulo(T("trajetoria"), k["mfg"])}'
-        f'<p style="margin:0;font-size:13px;line-height:20px;color:{k["fg"]};">{T("trajVazio")}</p>', k, pad='18px 22px')
-    lado = f'<aside style="width:348px;flex:0 0 348px;display:flex;flex-direction:column;gap:14px;">{proximo}{recente}{trajetoria}</aside>'
-    return app(k, 'evolucao', cab + f'<div style="display:flex;gap:20px;align-items:flex-start;flex:1;min-height:0;">{tabela}{lado}</div>', gap=20)
-
-
 # ── Primeiro acesso, passo 3: o plano ──────────────────────────────────
 # Vem depois do perfil, que conclui o onboarding e já dá 7 dias de Pro a todos. Aqui a pessoa
 # escolhe como continuar depois deles: fica no Starter (sem cartão) ou assina o Pro, com cupom.
@@ -1500,7 +1241,7 @@ def _montar(tela, tema, sufixo):
         {**PROPS_IDIOMA, **props_tema(tema), **(props or {})}, css)
     k = K
     if tela['id'] == 'competencia':
-        return web(COMPETENCIA, tela_competencia(k))
+        return web(EVOLUCAO_NOVA, tela_competencia_nova(k))
     if tela['id'] == 'plano_inicial':
         textos = {l: {**COMUM_ONB[l], **PLANOS[l], **PLANO_INICIAL[l]} for l in PLANOS}
         return web(textos, tela_plano_inicial(k, sufixo), ANTES_PLANO_INICIAL, VALORES_PLANO_INICIAL,
@@ -1541,7 +1282,7 @@ def _montar(tela, tema, sufixo):
     if tela['id'] == 'primeiro':
         return web(juntar(EXERCICIO, PRIMEIRO), tela_exercicio(k, primeira=True), ANTES_PRIMEIRO, VALORES_PRIMEIRO, PROPS_PRIMEIRO)
     if tela['id'] == 'vazio':
-        return web(juntar(EVOLUCAO, PERFIL_VAZIO), tela_perfil_vazio(k, sufixo))
+        return web(EVOLUCAO_NOVA, tela_evolucao_vazia(k))
     if tela['id'] in ('evolucao', 'evolucao_tempo'):
         return web(EVOLUCAO_NOVA, tela_evolucao_nova(k, rolada=tela['id'] == 'evolucao_tempo'))
     if tela['id'] == 'exercicio':
