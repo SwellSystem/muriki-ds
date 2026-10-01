@@ -4,6 +4,10 @@
    Superfície em hue 82-100; tinta em hue ~250. As duas famílias de neutro
    são o que faz a tela descansar — não invente um cinza puro no meio. */
 :root {
+  /* A janela segue o tema: a barra de rolagem da página, o select e o date
+     nativos. Sem isto, no escuro a barra da janela fica clara. */
+  color-scheme: light;
+
   /* 0.968, não 0.980. A página desceu um degrau para abrir espaço acima
      dela: ver a nota do --rail. Tudo que ficava abaixo da página desceu
      junto, para as relações não mudarem — muted, secondary e sunken. */
@@ -137,6 +141,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.175 0.004 107);
   --foreground: oklch(0.925 0.004 100);
   --foreground-strong: oklch(0.97 0.003 100);
@@ -346,6 +351,37 @@
     transform: none !important;
     animation: none !important;
   }
+}
+
+/* Quem rola por dentro de uma superfície (sheet, dialog, select, o painel do
+   exercício) leva a barra sutil: fina, sem trilho, o polegar a 14% da tinta
+   em repouso e 32% no hover. scrollbar-* para Chrome e Firefox,
+   ::-webkit-scrollbar para o Safari. */
+.muriki-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 14%, transparent) transparent;
+}
+.muriki-scroll:hover {
+  scrollbar-color: color-mix(in oklab, var(--foreground) 32%, transparent) transparent;
+}
+.muriki-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.muriki-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.muriki-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+.muriki-scroll::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 14%, transparent);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+.muriki-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 32%, transparent);
 }
 
 /* Scroll lateral do sistema: a barra nativa some (overlay scrollbars de

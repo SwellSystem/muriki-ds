@@ -6,12 +6,14 @@
  *
  * Só apresentação: nada chama API nem roda código. As peças se montam como no desenho:
  *
- *   <ExerciseWorkspace header={<ExerciseHeader …/>} side={<>enunciado, explicação, dicas</>}
+ *   <ExerciseWorkspace header={<ExerciseHeader …/>} side={<>enunciado, explicação</>} foot={<ExerciseHints …/>}
  *     editor={<ExerciseEditor sidebar={<><ExerciseFileTree …/><ExerciseTests …/></>}>{editor}</ExerciseEditor>} />
  *
- * No desktop (lg), o enunciado fica numa coluna de 372px e o editor ocupa o resto, na altura que
- * o app der à tela (a moldura estica). Abaixo de lg, tudo empilha: cabeçalho, coluna, editor, e
- * dentro do editor a árvore e os testes sobem para cima do código.
+ * No desktop (lg), a lateral é um painel de 372px com a mesma pele do editor: o enunciado e a
+ * explicação rolam por dentro, com a moldura parada, e as dicas são o pé; o editor ocupa o resto,
+ * na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo empilha: cabeçalho, painel
+ * (na altura do conteúdo, sem rolar por dentro), editor, e dentro do editor a árvore e os testes
+ * sobem para cima do código.
  *
  * O guia do primeiro exercício (`guide`) cobre a tela com o véu e sobe, um de cada vez, o editor
  * (passo 1), os testes (2) e a explicação (3), cada um com o anel e o balão ao lado.
@@ -187,15 +189,17 @@ function BalaoDoGuia({
 
 export interface ExerciseWorkspaceProps {
   header: React.ReactNode
-  /** A coluna da esquerda: enunciado, explicação e dicas. */
+  /** O que rola dentro do painel da esquerda: enunciado e explicação. */
   side: React.ReactNode
+  /** O pé do painel, sempre à vista: as dicas. */
+  foot?: React.ReactNode
   editor: React.ReactNode
   /** O guia do primeiro exercício. Sem isto, nada de véu. */
   guide?: ExerciseGuide
   className?: string
 }
 
-export function ExerciseWorkspace({ header, side, editor, guide, className }: ExerciseWorkspaceProps) {
+export function ExerciseWorkspace({ header, side, foot, editor, guide, className }: ExerciseWorkspaceProps) {
   const ativo = !!guide && guide.step >= 1 && guide.step <= PASSOS
   React.useEffect(() => {
     if (!ativo || !guide) return
@@ -213,7 +217,13 @@ export function ExerciseWorkspace({ header, side, editor, guide, className }: Ex
       >
         {header}
         <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
-          <div className="flex min-w-0 flex-col gap-3 lg:w-[372px] lg:shrink-0 lg:overflow-y-auto">{side}</div>
+          <div
+            data-slot="exercise-side"
+            className="flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs lg:min-h-0 lg:w-[372px] lg:shrink-0"
+          >
+            <div className="muriki-scroll flex min-h-0 flex-1 flex-col lg:overflow-y-auto">{side}</div>
+            {foot}
+          </div>
           {editor}
         </div>
         {/* o véu cobre a tela; só a área do passo atual sobe acima dele */}
@@ -335,7 +345,7 @@ function EmBreve() {
   )
 }
 
-// ── Coluna da esquerda ──────────────────────────────────────────────────
+// ── Painel da esquerda ──────────────────────────────────────────────────
 
 function Rotulo({ children }: { children: React.ReactNode }) {
   return (
@@ -358,7 +368,7 @@ export function ExerciseStatement({ children, label, className }: ExerciseStatem
   return (
     <section
       data-slot="exercise-statement"
-      className={cn("flex flex-col gap-3 rounded-xl bg-card px-5 py-4 shadow-xs", className)}
+      className={cn("flex flex-col gap-3 px-5 py-4", className)}
     >
       <Rotulo>{label ?? t("exercise_workspace.statement")}</Rotulo>
       <div className="flex flex-col gap-3 text-sm leading-[22px] text-foreground">{children}</div>
@@ -390,12 +400,12 @@ export function ExerciseExplanation({
 }: ExerciseExplanationProps) {
   const t = useTranslate()
   const id = React.useId()
-  const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(3, "fora")
+  const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(3)
   return (
     <section
       ref={ancorar}
       data-slot="exercise-explanation"
-      className={cn("relative flex flex-col gap-2.5 rounded-xl bg-card px-5 py-4 shadow-xs", destaque, className)}
+      className={cn("relative flex flex-col gap-2.5 border-t border-muted bg-card px-5 py-4", destaque, className)}
     >
       <div className="flex items-center gap-2">
         <Rotulo>{t("exercise_workspace.explain")}</Rotulo>
@@ -441,7 +451,7 @@ export function ExerciseHints({ total, used, onRequest, onView, loading, classNa
   return (
     <div
       data-slot="exercise-hints"
-      className={cn("flex items-center gap-2.5 rounded-xl bg-card py-2.5 pr-3 pl-4 shadow-xs", className)}
+      className={cn("flex shrink-0 items-center gap-2.5 border-t border-muted py-2.5 pr-3 pl-4", className)}
     >
       <LightbulbIcon aria-hidden className="size-4 shrink-0 text-warning" />
       <span className="flex min-w-0 flex-1 flex-col items-start">
@@ -710,7 +720,7 @@ export function ExerciseEditor({
       )}
     >
       {sidebar ? (
-        <div className="flex shrink-0 flex-col border-muted bg-rail max-lg:border-b lg:w-[248px] lg:overflow-y-auto lg:border-r">
+        <div className="muriki-scroll flex shrink-0 flex-col border-muted bg-rail max-lg:border-b lg:w-[248px] lg:overflow-y-auto lg:border-r">
           {sidebar}
           <div className="flex-1" />
           {legend ? (
