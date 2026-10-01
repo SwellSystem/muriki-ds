@@ -1886,6 +1886,32 @@
       "docs": "Usa `buttonVariants` para as setas de navegação — instalar traz o @muriki/button junto."
     },
     {
+      "name": "date-picker",
+      "type": "registry:ui",
+      "title": "Date Picker",
+      "description": "O campo de data da casa, no lugar do <input type=\"date\">: gatilho com a pele e as alturas do InputGroup e o calendário como afixo, popover com o calendar do DS, claro e escuro, no idioma do app. DatePicker escolhe um dia; DateRangePicker escolhe um período num campo só, com dois meses lado a lado. Valor em texto \"AAAA-MM-DD\", min e max no mesmo formato. Dentro de um <Field> é o controle: label, erro e invalid se ligam sozinhos.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react",
+        "react-day-picker"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/date-format",
+        "SwellSystem/muriki-ds/calendar",
+        "SwellSystem/muriki-ds/popover"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/date-picker.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "import { DatePicker, DateRangePicker } from \"@/components/ui/date-picker\". Data única: <Field invalid={!!erro}><FieldLabel>Vale até</FieldLabel><DatePicker size=\"lg\" value={draft.expiresOn} onValueChange={(v) => change(\"expiresOn\", v)} min={hoje} clearable locale={i18n.language} /><FieldError>{erro}</FieldError></Field>. Período: <DateRangePicker size=\"lg\" value={{ from: period.from, to: period.to }} onValueChange={setPeriod} max={hoje} locale={i18n.language} />. O valor é \"AAAA-MM-DD\" e vazio é \"\" (no período, { from: \"\", to: \"\" }); onValueChange devolve no mesmo formato. No período, o 1º clique marca o começo e o 2º o fim (invertidos, trocam); o calendário só fecha com os dois. clearable põe \"Limpar\" embaixo do calendário. size sm, default ou lg, as alturas do InputGroup. ref e id vão para o <button> do gatilho (o foco no erro, por exemplo). numberOfMonths no período, 2 por padrão. Textos em date_picker.* no i18n: placeholder, range_placeholder e clear."
+    },
+    {
       "name": "status-pill",
       "type": "registry:block",
       "title": "Status Pill",
