@@ -8,6 +8,9 @@
  *   MySQL, Rust e Ruby, em 24 × 24. O JavaScript ganha o fundo preto atrás do quadrado amarelo, para
  *   as letras lerem em preto como no logo oficial.
  * - devicon (MIT, github.com/devicons/devicon): a AWS, que o Simple Icons não tem, o logotipo em 128 × 128.
+ * - Streamline Color (CC BY 4.0, streamlinehq.com, by Streamline): "Industry Innovation And Infrastructure",
+ *   os cubos empilhados que fazem as vezes de logo da Arquitetura, que não é uma tecnologia com marca,
+ *   em 14 × 14. A licença pede o crédito: ele fica aqui e na descrição do item no registry.
  *
  * As cores são da marca e não mudam com o tema. Como o Rust é preto e o texto da AWS é escuro, `tile`
  * põe o logo num ladrilho branco com sombra, que lê igual no claro e no escuro — o mesmo do splash das
@@ -20,10 +23,10 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-export const BRANDS = ["ts", "js", "py", "go", "docker", "postgres", "mysql", "rust", "ruby", "aws"] as const
+export const BRANDS = ["ts", "js", "py", "go", "docker", "postgres", "mysql", "rust", "ruby", "aws", "architecture"] as const
 export type Brand = (typeof BRANDS)[number]
 
-const SIMPLE: Record<Exclude<Brand, "aws">, { name: string; color: string; d: string }> = {
+const SIMPLE: Record<Exclude<Brand, "aws" | "architecture">, { name: string; color: string; d: string }> = {
   ts: { name: "TypeScript", color: "#3178C6", d: "M1.125 0C.502 0 0 .502 0 1.125v21.75C0 23.498.502 24 1.125 24h21.75c.623 0 1.125-.502 1.125-1.125V1.125C24 .502 23.498 0 22.875 0zm17.363 9.75c.612 0 1.154.037 1.627.111a6.38 6.38 0 0 1 1.306.34v2.458a3.95 3.95 0 0 0-.643-.361 5.093 5.093 0 0 0-.717-.26 5.453 5.453 0 0 0-1.426-.2c-.3 0-.573.028-.819.086a2.1 2.1 0 0 0-.623.242c-.17.104-.3.229-.393.374a.888.888 0 0 0-.14.49c0 .196.053.373.156.529.104.156.252.304.443.444s.423.276.696.41c.273.135.582.274.926.416.47.197.892.407 1.266.628.374.222.695.473.963.753.268.279.472.598.614.957.142.359.214.776.214 1.253 0 .657-.125 1.21-.373 1.656a3.033 3.033 0 0 1-1.012 1.085 4.38 4.38 0 0 1-1.487.596c-.566.12-1.163.18-1.79.18a9.916 9.916 0 0 1-1.84-.164 5.544 5.544 0 0 1-1.512-.493v-2.63a5.033 5.033 0 0 0 3.237 1.2c.333 0 .624-.03.872-.09.249-.06.456-.144.623-.25.166-.108.29-.234.373-.38a1.023 1.023 0 0 0-.074-1.089 2.12 2.12 0 0 0-.537-.5 5.597 5.597 0 0 0-.807-.444 27.72 27.72 0 0 0-1.007-.436c-.918-.383-1.602-.852-2.053-1.405-.45-.553-.676-1.222-.676-2.005 0-.614.123-1.141.369-1.582.246-.441.58-.804 1.004-1.089a4.494 4.494 0 0 1 1.47-.629 7.536 7.536 0 0 1 1.77-.201zm-15.113.188h9.563v2.166H9.506v9.646H6.789v-9.646H3.375z" },
   js: { name: "JavaScript", color: "#F7DF1E", d: "M0 0h24v24H0V0zm22.034 18.276c-.175-1.095-.888-2.015-3.003-2.873-.736-.345-1.554-.585-1.797-1.14-.091-.33-.105-.51-.046-.705.15-.646.915-.84 1.515-.66.39.12.75.42.976.9 1.034-.676 1.034-.676 1.755-1.125-.27-.42-.404-.601-.586-.78-.63-.705-1.469-1.065-2.834-1.034l-.705.089c-.676.165-1.32.525-1.71 1.005-1.14 1.291-.811 3.541.569 4.471 1.365 1.02 3.361 1.244 3.616 2.205.24 1.17-.87 1.545-1.966 1.41-.811-.18-1.26-.586-1.755-1.336l-1.83 1.051c.21.48.45.689.81 1.109 1.74 1.756 6.09 1.666 6.871-1.004.029-.09.24-.705.074-1.65l.046.067zm-8.983-7.245h-2.248c0 1.938-.009 3.864-.009 5.805 0 1.232.063 2.363-.138 2.711-.33.689-1.18.601-1.566.48-.396-.196-.597-.466-.83-.855-.063-.105-.11-.196-.127-.196l-1.825 1.125c.305.63.75 1.172 1.324 1.517.855.51 2.004.675 3.207.405.783-.226 1.458-.691 1.811-1.411.51-.93.402-2.07.397-3.346.012-2.054 0-4.109 0-6.179l.004-.056z" },
   py: { name: "Python", color: "#3776AB", d: "M14.25.18l.9.2.73.26.59.3.45.32.34.34.25.34.16.33.1.3.04.26.02.2-.01.13V8.5l-.05.63-.13.55-.21.46-.26.38-.3.31-.33.25-.35.19-.35.14-.33.1-.3.07-.26.04-.21.02H8.77l-.69.05-.59.14-.5.22-.41.27-.33.32-.27.35-.2.36-.15.37-.1.35-.07.32-.04.27-.02.21v3.06H3.17l-.21-.03-.28-.07-.32-.12-.35-.18-.36-.26-.36-.36-.35-.46-.32-.59-.28-.73-.21-.88-.14-1.05-.05-1.23.06-1.22.16-1.04.24-.87.32-.71.36-.57.4-.44.42-.33.42-.24.4-.16.36-.1.32-.05.24-.01h.16l.06.01h8.16v-.83H6.18l-.01-2.75-.02-.37.05-.34.11-.31.17-.28.25-.26.31-.23.38-.2.44-.18.51-.15.58-.12.64-.1.71-.06.77-.04.84-.02 1.27.05zm-6.3 1.98l-.23.33-.08.41.08.41.23.34.33.22.41.09.41-.09.33-.22.23-.34.08-.41-.08-.41-.23-.33-.33-.22-.41-.09-.41.09zm13.09 3.95l.28.06.32.12.35.18.36.27.36.35.35.47.32.59.28.73.21.88.14 1.04.05 1.23-.06 1.23-.16 1.04-.24.86-.32.71-.36.57-.4.45-.42.33-.42.24-.4.16-.36.09-.32.05-.24.02-.16-.01h-8.22v.82h5.84l.01 2.76.02.36-.05.34-.11.31-.17.29-.25.25-.31.24-.38.2-.44.17-.51.15-.58.13-.64.09-.71.07-.77.04-.84.01-1.27-.04-1.07-.14-.9-.2-.73-.25-.59-.3-.45-.33-.34-.34-.25-.34-.16-.33-.1-.3-.04-.25-.02-.2.01-.13v-5.34l.05-.64.13-.54.21-.46.26-.38.3-.32.33-.24.35-.2.35-.14.33-.1.3-.06.26-.04.21-.02.13-.01h5.84l.69-.05.59-.14.5-.21.41-.28.33-.32.27-.35.2-.36.15-.36.1-.35.07-.32.04-.28.02-.21V6.07h2.09l.14.01zm-6.47 14.25l-.23.33-.08.41.08.41.23.33.33.23.41.08.41-.08.33-.23.23-.33.08-.41-.08-.41-.23-.33-.33-.23-.41-.08-.41.08z" },
@@ -40,8 +43,21 @@ const AWS_PATHS: { fill: string; d: string; fillRule?: "evenodd" | "nonzero" }[]
   { fill: "#f90", d: "M118 73.348c-4.432.063-9.664 1.052-13.621 3.832-1.223.883-1.012 2.062.336 1.894 4.508-.547 14.44-1.726 16.21.547 1.77 2.23-1.976 11.62-3.663 15.79-.504 1.26.59 1.769 1.726.8 7.41-6.231 9.348-19.242 7.832-21.137-.757-.925-4.388-1.79-8.82-1.726zM1.63 75.859c-.927.116-1.347 1.236-.368 2.121 16.508 14.902 38.359 23.872 62.613 23.872 17.305 0 37.43-5.43 51.281-15.66 2.273-1.688.297-4.254-2.02-3.204-15.534 6.57-32.421 9.77-47.788 9.77-22.778 0-44.8-6.273-62.653-16.633-.39-.231-.755-.304-1.064-.266z" },
 ]
 
+// a Arquitetura (a trilha e as competências de language "architecture"): cubos empilhados, preenchimento
+// claro e traço índigo, com cor própria como o JavaScript amarelo
+const ARQUITETURA_PATHS: { d: string; fill?: string; stroke?: string; evenodd?: boolean }[] = [
+  { fill: "#d7e0ff", evenodd: true, d: "M.65 8.074v3.62l3.167 1.357l3.167-1.357l3.166 1.357l3.167-1.357v-3.62l-.008-.003l-3.159 1.353l-3.166-1.357l3.166-1.35l.002-3.621l-.002.026L6.983 4.48L3.82 3.123l-.002 3.594l3.167 1.35l-3.167 1.359z" },
+  { fill: "#fff", d: "m6.985 1.738l3.167 1.357l-.002.027l-3.167 1.357l-3.166-1.357l.002-.027zm3.165 4.979l3.158 1.354l-3.158 1.353l-3.166-1.357l-3.167 1.359L.65 8.074l3.167-1.357l3.167 1.35z" },
+  { stroke: "#4147d5", d: "m.65 8.067l3.167 1.357l3.167-1.357M3.817 3.122l3.166 1.357l3.167-1.357" },
+  { stroke: "#4147d5", d: "m6.983 8.067l3.167 1.357l3.167-1.357M.65 11.694v-3.62l3.167-1.357l3.167 1.357v3.62L3.817 13.05z" },
+  { stroke: "#4147d5", d: "M3.819 6.715v-3.62l3.166-1.357l3.167 1.357v3.62L6.985 8.072zm3.164 4.979v-3.62l3.167-1.357l3.167 1.357v3.62L10.15 13.05zM3.817 9.426v3.625m6.335-3.625v3.625M6.983 4.48v3.624" },
+]
+
+/** O nome da marca. Para "architecture" é o nome em inglês: no app, traduza o rótulo ("Arquitetura"). */
 export function brandName(brand: Brand): string {
-  return brand === "aws" ? "AWS" : SIMPLE[brand].name
+  if (brand === "aws") return "AWS"
+  if (brand === "architecture") return "Architecture"
+  return SIMPLE[brand].name
 }
 
 export interface BrandLogoProps extends Omit<React.ComponentProps<"span">, "children" | "title"> {
@@ -60,6 +76,24 @@ function Svg({ brand, size }: { brand: Brand; size: number }) {
       <svg viewBox="0 0 128 128" width={size} height={size} aria-hidden className="block shrink-0">
         {AWS_PATHS.map((p, i) => (
           <path key={i} fill={p.fill} d={p.d} fillRule={p.fillRule} />
+        ))}
+      </svg>
+    )
+  }
+  if (brand === "architecture") {
+    return (
+      <svg viewBox="0 0 14 14" width={size} height={size} fill="none" aria-hidden className="block shrink-0">
+        {ARQUITETURA_PATHS.map((p, i) => (
+          <path
+            key={i}
+            d={p.d}
+            fill={p.fill ?? "none"}
+            fillRule={p.evenodd ? "evenodd" : undefined}
+            clipRule={p.evenodd ? "evenodd" : undefined}
+            stroke={p.stroke}
+            strokeLinecap={p.stroke ? "round" : undefined}
+            strokeLinejoin={p.stroke ? "round" : undefined}
+          />
         ))}
       </svg>
     )

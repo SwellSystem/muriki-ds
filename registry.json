@@ -1932,7 +1932,7 @@
       "name": "brand-logo",
       "type": "registry:ui",
       "title": "Brand Logo",
-      "description": "O logo de uma tecnologia em SVG inline, com a cor oficial: TypeScript, JavaScript, Python, Go, Docker, PostgreSQL, MySQL, Rust e Ruby (Simple Icons, CC0) e AWS (devicon, MIT). Com tile, num ladrilho branco que lê igual nos dois temas.",
+      "description": "O logo de uma tecnologia em SVG inline, com a cor oficial: TypeScript, JavaScript, Python, Go, Docker, PostgreSQL, MySQL, Rust e Ruby (Simple Icons, CC0) AWS (devicon, MIT) e a Arquitetura, os cubos empilhados \"Industry Innovation And Infrastructure\" do Streamline Color (CC BY 4.0, por Streamline, streamlinehq.com). Com tile, num ladrilho branco que lê igual nos dois temas.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -1943,7 +1943,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "<BrandLogo brand=\"ts\" size={16} /> ao lado do nome (decorativo, aria-hidden). brand: ts | js | py | go | docker | postgres | mysql | rust | ruby | aws; BRANDS lista todos e brandName(brand) dá o nome (\"PostgreSQL\", \"AWS\"). tile: o ladrilho branco com sombra e raio (size é o lado do ladrilho; o logo ocupa ~56%), para o Rust preto e o texto escuro da AWS lerem no tema escuro. Sem o nome ao lado, passe title=\"TypeScript\" e ele vira role=\"img\". Nos chips de linguagem: <span className=\"flex size-[18px] items-center justify-center rounded-full bg-white\"><BrandLogo brand=\"py\" size={12} /></span> Python."
+      "docs": "<BrandLogo brand=\"ts\" size={16} /> ao lado do nome (decorativo, aria-hidden). brand: ts | js | py | go | docker | postgres | mysql | rust | ruby | aws | architecture; architecture é a trilha e as competências de language \"architecture\" (o brandName dela é \"Architecture\": traduza o rótulo no app); BRANDS lista todos e brandName(brand) dá o nome (\"PostgreSQL\", \"AWS\"). tile: o ladrilho branco com sombra e raio (size é o lado do ladrilho; o logo ocupa ~56%), para o Rust preto e o texto escuro da AWS lerem no tema escuro. Sem o nome ao lado, passe title=\"TypeScript\" e ele vira role=\"img\". Nos chips de linguagem: <span className=\"flex size-[18px] items-center justify-center rounded-full bg-white\"><BrandLogo brand=\"py\" size={12} /></span> Python."
     },
     {
       "name": "qr-code",
