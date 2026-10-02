@@ -46,6 +46,8 @@ export interface LevelGatePathProps {
   level: Level
   /** O nível confirmado da pessoa na competência que libera (`null` = nada confirmado). */
   current: Level | null
+  /** O declarado, em contorno acima do confirmado, como na Evolução. */
+  declared?: Level | null
   /** Onde o nível se confirma, ex.: "JavaScript". Sem isto, a frase para no nível. */
   via?: string
   /** As etapas que faltam, na ordem (os nomes vêm da API). Mostra as duas primeiras e "+N". */
@@ -54,7 +56,7 @@ export interface LevelGatePathProps {
 }
 
 /** O caminho até o `startTier`, no fundo afundado do cartão. */
-export function LevelGatePath({ level, current, via, missing = [], className }: LevelGatePathProps) {
+export function LevelGatePath({ level, current, declared, via, missing = [], className }: LevelGatePathProps) {
   const t = useTranslate()
   const nome = useLevelName()
   const resto = missing.length - 2
@@ -66,7 +68,7 @@ export function LevelGatePath({ level, current, via, missing = [], className }: 
           : t("level_gate.reach", { level: nome(level) })}
       </span>
       <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-        <LevelScale level={current} size="sm" label />
+        <LevelScale level={current} declared={declared} size="sm" label />
         {missing.length > 0 ? (
           <span className="text-xs text-muted-foreground">
             {[
@@ -84,7 +86,7 @@ export function LevelGatePath({ level, current, via, missing = [], className }: 
 export interface LevelGateProps {
   /** O `startTier` da trilha. */
   level: Level
-  /** O nível da pessoa, para a frase "Você está em Junior". `null` tira a frase. */
+  /** O nível efetivo da pessoa (o maior entre declarado e confirmado), para "Você está em Junior". `null` tira a frase. */
   current?: Level | null
   /** Quantas etapas faltam para chegar ao `level` (o `next.missing` da Evolução). */
   missing?: number
