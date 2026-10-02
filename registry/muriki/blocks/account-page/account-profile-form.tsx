@@ -5,6 +5,11 @@
 // suporte). O telefone vem mascarado da API, então o campo não mostra o
 // atual: a dica diz como ele termina e o campo recebe o novo.
 //
+// O telefone ganha máscara enquanto a pessoa digita: o número brasileiro vira
+// "(11) 91234-5678" ou "(11) 3123-4567", até 11 dígitos, como no onboarding do
+// Code. Começou com "+", é internacional: fica o "+" e só os dígitos, até 15
+// (o tamanho do E.164). O app converte para E.164 antes de mandar.
+//
 // Devolve por `onSubmit` só o que mudou, que é o que o PATCH do perfil
 // espera. Erros por campo vêm de fora (o details[].path do 422).
 import { useState, type FormEvent } from "react"
@@ -16,6 +21,19 @@ import { Input } from "@/components/ui/input"
 import { useTranslate } from "@/lib/i18n"
 
 import { AccountCard } from "./account-card"
+
+/** A máscara do campo de telefone: brasileiro formatado, internacional ("+…") só com os dígitos. */
+export function formatPhoneInput(raw: string): string {
+  if (raw.trimStart().startsWith("+")) return `+${raw.replace(/\D/g, "").slice(0, 15)}`
+  const d = raw.replace(/\D/g, "").slice(0, 11)
+  // sem o ")" enquanto só há o DDD: assim o apagar não trava no parêntese
+  if (d.length <= 2) return d ? `(${d}` : ""
+  const resto = d.slice(2)
+  const corte = d.length === 11 ? 5 : 4
+  return resto.length > 4
+    ? `(${d.slice(0, 2)}) ${resto.slice(0, corte)}-${resto.slice(corte)}`
+    : `(${d.slice(0, 2)}) ${resto}`
+}
 
 export interface AccountProfileValues {
   displayName: string
@@ -109,7 +127,7 @@ export function AccountProfileForm({
             placeholder={t("account.profile.phone_placeholder")}
             value={telefone}
             disabled={removerTelefone}
-            onChange={(e) => setTelefone(e.target.value)}
+            onChange={(e) => setTelefone(formatPhoneInput(e.target.value))}
           />
           {errors.phone ? (
             <FieldError>{errors.phone}</FieldError>
