@@ -1277,6 +1277,250 @@
       "docs": "<ComingSoon backLink={{ label: trilha.title, render: <Link to=\"/tracks/$trackId\" params={{ trackId }} /> }} title=\"Os exercícios da trilha Arquitetura de sistemas chegam em breve\" description=\"A trilha já está no seu caminho. Quando os exercícios abrirem, eles aparecem aqui e na trilha.\" actions={<Button variant=\"outline\" render={<Link to=\"/tracks\" />}>Ver as trilhas</Button>} />. Vai dentro do palco do AppShell, não no lugar dele (a tela fora do app é a notice-page; o erro de sistema é a status-page). Os textos vêm do app e dizem o que vem e de onde. label troca o selo \"em breve\"; null tira. illustration troca o mascote de olhos fechados. Textos em coming_soon.* no i18n."
     },
     {
+      "name": "level-gate",
+      "type": "registry:block",
+      "title": "Level Gate",
+      "description": "A trilha que começa acima do nível da pessoa, no desbloqueio suave (nada trava): o selo \"libera em Pleno\" com o cadeado (LevelGateBadge), o caminho até o startTier no cartão, com a escala e as etapas que faltam (LevelGatePath), e o aviso above_level no topo da trilha aberta mesmo assim, em azul tingido com a bússola, \"Ver o caminho na Evolução\" e \"Entendi\" (LevelGate). O aviso entra devagar; com prefers-reduced-motion, só aparece.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/level-scale"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/level-gate/level-gate.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/level-gate/level-gate.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/level-gate/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/level-gate/index.ts"
+        }
+      ],
+      "css": {
+        "@keyframes muriki-level-gate-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(-4px)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        ".muriki-level-gate": {
+          "animation": "muriki-level-gate-in 0.4s ease-out 0.2s both"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-level-gate": {
+            "animation": "none"
+          }
+        }
+      },
+      "docs": "import { LevelGate, LevelGateBadge, LevelGatePath } from \"@/components/blocks/level-gate\". Vale para toda trilha com startTier acima do nível da conta (GET /code/tracks devolve startTier e advice). No cartão, em Trilhas: <LevelGateBadge level={track.startTier} /> no canto, <LevelGatePath level={track.startTier} current={nivelConfirmado} via=\"JavaScript\" missing={next.missing.map(s => s.title)} /> no meio (mostra as duas primeiras etapas e \"+N\") e o link \"Abrir mesmo assim\" do app no pé; a trilha abre sempre. Na trilha aberta com advice above_level: <LevelGate level={track.startTier} current={nivelDaConta} missing={next.missing.length} via=\"JavaScript\" pathRender={<Link to=\"/evolution\" />} onDismiss={dispensar} />, no topo, até a pessoa dispensar ou chegar ao nível. description troca o texto, title o título, labels os dois links. Textos em level_gate.* no i18n. Regra: swell-docs/muriki-api/ideas/2026-10-01-desbloqueio-de-trilha.md."
+    },
+    {
+      "name": "track-unlock",
+      "type": "registry:block",
+      "title": "Track Unlock",
+      "description": "O ganho de trilha, uma vez, quando o nível da conta alcança o startTier: o véu desfocando a janela, o diálogo (folha que sobe de baixo no celular) com o mascote comemorando num halo com brilhos, \"Trilha liberada\", o título, uma frase, a linha da trilha em que o selo \"libera em Pleno\" vira \"liberada\" e o traço do nível se enche, e \"Começar a trilha\" com \"Agora não\". TRACK_UNLOCK_RING pulsa o cartão liberado em Trilhas. Movimento desligado com prefers-reduced-motion.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/brand-logo",
+        "SwellSystem/muriki-ds/level-scale",
+        "SwellSystem/muriki-ds/muriki-logo",
+        "SwellSystem/muriki-ds/level-gate"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/track-unlock/track-unlock.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/track-unlock/track-unlock.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/track-unlock/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/track-unlock/index.ts"
+        }
+      ],
+      "css": {
+        "@keyframes muriki-unlock-veil": {
+          "from": {
+            "opacity": "0"
+          },
+          "to": {
+            "opacity": "1"
+          }
+        },
+        "@keyframes muriki-unlock-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(16px) scale(0.96)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-unlock-up": {
+          "from": {
+            "transform": "translateY(100%)"
+          },
+          "to": {
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-unlock-mascot": {
+          "0%": {
+            "opacity": "0",
+            "transform": "scale(0.6) rotate(-8deg)"
+          },
+          "60%": {
+            "opacity": "1",
+            "transform": "scale(1.08) rotate(3deg)"
+          },
+          "100%": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-unlock-float": {
+          "0%, 100%": {
+            "transform": "translateY(0)"
+          },
+          "50%": {
+            "transform": "translateY(-5px)"
+          }
+        },
+        "@keyframes muriki-unlock-halo": {
+          "from": {
+            "opacity": "0",
+            "transform": "scale(0.7)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-unlock-sparkle": {
+          "0%, 100%": {
+            "opacity": "0.25",
+            "transform": "scale(0.6)"
+          },
+          "50%": {
+            "opacity": "1",
+            "transform": "scale(1)"
+          }
+        },
+        "@keyframes muriki-unlock-out": {
+          "to": {
+            "opacity": "0",
+            "transform": "translateY(-6px)"
+          }
+        },
+        "@keyframes muriki-unlock-swap": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(6px)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-unlock-fill": {
+          "from": {
+            "background-size": "0% 100%"
+          },
+          "to": {
+            "background-size": "100% 100%"
+          }
+        },
+        "@keyframes muriki-unlock-ring": {
+          "from": {
+            "outline-color": "color-mix(in oklch, var(--primary) 45%, transparent)",
+            "outline-offset": "0px"
+          },
+          "to": {
+            "outline-color": "transparent",
+            "outline-offset": "14px"
+          }
+        },
+        ".muriki-unlock-veil": {
+          "animation": "muriki-unlock-veil 0.3s ease-out both"
+        },
+        ".muriki-unlock-modal": {
+          "animation": "muriki-unlock-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both"
+        },
+        ".muriki-unlock-sheet": {
+          "animation": "muriki-unlock-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+        },
+        "@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference)": {
+          ".muriki-unlock-modal.muriki-unlock-auto": {
+            "animation": "muriki-unlock-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+          }
+        },
+        ".muriki-unlock-halo": {
+          "animation": "muriki-unlock-halo 0.6s ease-out 0.3s both"
+        },
+        ".muriki-unlock-mascot": {
+          "animation": "muriki-unlock-mascot 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both, muriki-unlock-float 3.2s ease-in-out 1.2s infinite"
+        },
+        ".muriki-unlock-sparkle": {
+          "animation": "muriki-unlock-sparkle 1.8s ease-in-out infinite both"
+        },
+        ".muriki-unlock-before": {
+          "animation": "muriki-unlock-out 0.3s ease-in 1.1s both"
+        },
+        ".muriki-unlock-after": {
+          "animation": "muriki-unlock-swap 0.35s ease-out 1.35s both"
+        },
+        ".muriki-unlock-scale[data-fill=\"1\"] [data-slot=\"level-scale\"] > span:nth-child(1)": {
+          "background": "linear-gradient(var(--primary), var(--primary)) left / 100% 100% no-repeat var(--sunken)",
+          "animation": "muriki-unlock-fill 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both"
+        },
+        ".muriki-unlock-scale[data-fill=\"2\"] [data-slot=\"level-scale\"] > span:nth-child(2)": {
+          "background": "linear-gradient(var(--primary), var(--primary)) left / 100% 100% no-repeat var(--sunken)",
+          "animation": "muriki-unlock-fill 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both"
+        },
+        ".muriki-unlock-scale[data-fill=\"3\"] [data-slot=\"level-scale\"] > span:nth-child(3)": {
+          "background": "linear-gradient(var(--primary), var(--primary)) left / 100% 100% no-repeat var(--sunken)",
+          "animation": "muriki-unlock-fill 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both"
+        },
+        ".muriki-unlock-scale[data-fill=\"4\"] [data-slot=\"level-scale\"] > span:nth-child(4)": {
+          "background": "linear-gradient(var(--primary), var(--primary)) left / 100% 100% no-repeat var(--sunken)",
+          "animation": "muriki-unlock-fill 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s both"
+        },
+        ".muriki-unlock-ring": {
+          "outline": "2px solid transparent",
+          "animation": "muriki-unlock-ring 1.1s ease-out 0.3s 2"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-unlock-veil, .muriki-unlock-modal, .muriki-unlock-sheet, .muriki-unlock-halo, .muriki-unlock-mascot, .muriki-unlock-sparkle, .muriki-unlock-after, .muriki-unlock-ring, .muriki-unlock-scale [data-slot=\"level-scale\"] > span": {
+            "animation": "none"
+          },
+          ".muriki-unlock-before": {
+            "display": "none"
+          }
+        }
+      },
+      "docs": "Em Trilhas, quando a API disser que há desbloqueio não visto: <TrackUnlock open={!!naoVisto} onOpenChange={(aberto) => !aberto && marcarVisto()} track={{ title: \"Arquitetura de sistemas\", label: \"Arquitetura\", brand: \"architecture\" }} level={track.startTier} via=\"JavaScript\" steps={etapasNoNivel} description=\"Você confirmou Pleno em JavaScript. A trilha que desenha como as peças de um sistema web conversam começa aqui.\" startRender={<Link to=\"/tracks/$trackId\" params={{ trackId }} />} />. Aparece uma vez: o app marca como visto ao fechar, por \"Começar a trilha\", \"Agora não\", Esc ou clique fora (onStart e onDismiss separam os dois). Quem já começou no startTier nunca vê. Sem description, a frase é \"Você confirmou Pleno em JavaScript. A trilha começa aqui.\"; title troca \"{track} está liberada\"; labels troca eyebrow, start e dismiss. variant \"auto\" (padrão) é folha abaixo de md; \"dialog\" e \"sheet\" fixam. Depois de fechar, ponha TRACK_UNLOCK_RING (import { TRACK_UNLOCK_RING }) no className do cartão da trilha liberada, só nessa visita: o anel pulsa duas vezes. Textos em track_unlock.* e level_gate.unlocks_at no i18n. As animações moram no css deste item (muriki-unlock-*); com prefers-reduced-motion, o estado final direto."
+    },
+    {
       "name": "bar-chart",
       "type": "registry:block",
       "title": "Bar Chart",
