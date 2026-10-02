@@ -52,6 +52,9 @@ TELAS = [
     ('trilha_lista', 'TrilhaLista', 'Testes que dão confiança', 'Trilha · a lista: o mesmo caminho em linha', 3, 12, 13),
     ('catalogo', 'Exercicios', 'Exercícios', 'Exercícios · o catálogo, com filtros e o uso do mês', 4, 12, 13),
     ('peer_web', 'PeerWeb', 'Peer', 'Peer na web · conversas da IDE, o trecho visto e onde ele olha', 5, 12, 13),
+    ('desb_trilhas', 'DesbloqueioTrilhas', 'Trilhas', 'Trilhas · Arquitetura bloqueada: o caminho até Pleno e o abrir mesmo assim', 7, 12, 13),
+    ('desb_trilha', 'DesbloqueioTrilha', 'Arquitetura de sistemas', 'Trilha acima do seu nível · o aviso above_level, que não trava', 8, 12, 13),
+    ('desb_liberada', 'TrilhaLiberada', 'Trilha liberada', 'Ganho de trilha · o momento, uma vez, quando o nível alcança o startTier', 9, 12, 13),
     # o Code no celular (390), na fileira 14 (claro) e 15 (escuro); o tamanho vem de movel.ALTURAS
     ('menu_movel', 'MenuMovel', 'Menu', 'Celular · a barra de topo e a gaveta do menu', 0, 14, 15),
     ('inicio_movel', 'InicioMovel', 'Início', 'Celular · o Início do primeiro dia', 1, 14, 15),
@@ -61,6 +64,7 @@ TELAS = [
     ('exercicios_movel', 'ExerciciosMovel', 'Exercícios', 'Celular · o catálogo em cartões', 4, 14, 15),
     ('conta_movel', 'ContaMovel', 'Minha conta', 'Celular · Minha conta, meus dados', 5, 14, 15),
     ('evolucao_movel', 'EvolucaoMovel', 'Evolução', 'Celular · a Evolução inteira, em cartões', 8, 14, 15),
+    ('liberada_movel', 'TrilhaLiberadaMovel', 'Trilha liberada', 'Celular · o ganho de trilha numa folha', 9, 14, 15),
     ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
@@ -103,7 +107,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         if id_.endswith('_movel'):
             # o celular: 390 de largura, a altura da página, e as colunas mais juntas
             chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha', 'trilha_lista_movel': 'trilha_lista',
-                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao'}[id_]
+                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao', 'liberada_movel': 'liberada'}[id_]
             x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
             y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)
         b = boards.setdefault(arquivo, {})
@@ -128,8 +132,8 @@ for chave, lin, n, texto in [
     ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
     ('sistema', 10, 6, 'Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform'),
     ('sistemaEscuro', 11, 6, 'Páginas de sistema no tema escuro'),
-    ('aprenderMais', 12, 7, 'Trilhas, catálogo de exercícios e Peer na web: o formato das trilhas é proposta (a visão ainda deixa em aberto)'),
-    ('aprenderMaisEscuro', 13, 7, 'Trilhas, exercícios e Peer na web no tema escuro'),
+    ('aprenderMais', 12, 10, 'Trilhas, catálogo de exercícios, Peer na web, e a trilha bloqueada com o ganho de trilha'),
+    ('aprenderMaisEscuro', 13, 10, 'Trilhas, exercícios e Peer na web no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
     notas[chave].setdefault('w', 240)
@@ -138,7 +142,7 @@ for chave, y, texto in [
     ('celular', 14 * LINHA_Y - 300, 'Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical, as boas-vindas numa folha e a Evolução'),
     ('celularEscuro', 14 * LINHA_Y + ALTURA_MOVEL_MAX + 120, 'Code no celular no tema escuro'),
 ]:
-    notas.setdefault(chave, {}).update(x=0, y=y, text=texto, kind='title1', maxW=min(9 * (WM + 80), 8000))
+    notas.setdefault(chave, {}).update(x=0, y=y, text=texto, kind='title1', maxW=min(10 * (WM + 80), 8000))
     notas[chave].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=1)
