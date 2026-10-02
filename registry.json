@@ -1249,6 +1249,34 @@
       "docs": "<NoticePage brand={<Marca />} utilities={<><LanguageSwitcher …/><ThemeToggle /></>} account=\"rafael@moura.dev\" icon={<LockIcon />} tone=\"attention\" title=\"Seu acesso ao Muriki Code está suspenso\" description=\"A sua conta Muriki continua ativa, mas o Code está bloqueado para ela no momento. Fale com o suporte para entender o que aconteceu e como voltar.\" actions={<><Button variant=\"solid\" size=\"touch\" render={<a href={suporte} />}>Falar com o suporte</Button><Button variant=\"ghost\" onClick={sair}><SignOutIcon />Sair da conta</Button></>} footer={<>Você está na conta <b className=\"font-mono font-medium text-foreground-strong\">rafael@moura.dev</b></>} />. Tons: neutral, success (confirmado), attention (suspenso, pendente), danger. O ícone é do app (Phosphor) e ganha 28px."
     },
     {
+      "name": "coming-soon",
+      "type": "registry:block",
+      "title": "Coming Soon",
+      "description": "O \"em breve\" de dentro do app, no palco do AppShell: o voltar para de onde a pessoa veio, e no centro, numa coluna estreita, o mascote de olhos fechados, o selo \"em breve\", o título que diz o que vem e de onde, uma frase e a ação opcional. Serve ao item de menu em breve, à trilha ou etapa sem exercício e ao exercício que ainda não abre. Claro e escuro, celular.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/back-link",
+        "SwellSystem/muriki-ds/muriki-logo"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/coming-soon/coming-soon.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/coming-soon/coming-soon.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/coming-soon/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/coming-soon/index.ts"
+        }
+      ],
+      "docs": "<ComingSoon backLink={{ label: trilha.title, render: <Link to=\"/tracks/$trackId\" params={{ trackId }} /> }} title=\"Os exercícios da trilha Arquitetura de sistemas chegam em breve\" description=\"A trilha já está no seu caminho. Quando os exercícios abrirem, eles aparecem aqui e na trilha.\" actions={<Button variant=\"outline\" render={<Link to=\"/tracks\" />}>Ver as trilhas</Button>} />. Vai dentro do palco do AppShell, não no lugar dele (a tela fora do app é a notice-page; o erro de sistema é a status-page). Os textos vêm do app e dizem o que vem e de onde. label troca o selo \"em breve\"; null tira. illustration troca o mascote de olhos fechados. Textos em coming_soon.* no i18n."
+    },
+    {
       "name": "bar-chart",
       "type": "registry:block",
       "title": "Bar Chart",
