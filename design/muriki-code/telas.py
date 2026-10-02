@@ -6,6 +6,9 @@ from textos_arquitetura import TEXTOS as ARQUITETURA
 from arquitetura import tela_exercicio_arquitetura
 from textos_evolucao import TEXTOS as EVOLUCAO_NOVA
 from evolucao import tela_evolucao_nova, tela_evolucao_movel, tela_competencia_nova, tela_evolucao_vazia
+from textos_desbloqueio import TEXTOS as DESBLOQUEIO
+from desbloqueio import (tela_trilhas_bloqueada, tela_trilha_acima, tela_trilha_liberada, tela_trilha_liberada_movel,
+                         ALTURA_MOVEL as ALTURA_LIBERADA, CSS_DESBLOQUEIO)
 from textos_conta import CONTA
 from textos_onboarding import COMUM_ONB, VERIFICACAO, PREFERENCIAS, PAGAMENTO, PERFIL as PERFIL_ONB
 from onboarding import (cabecalho_passo, tela_verificacao, tela_perfil, tela_preferencias, tela_pagamento,
@@ -1289,6 +1292,14 @@ def _montar(tela, tema, sufixo):
         return web(EXERCICIO, tela_exercicio(k), valores=VALORES_EXERCICIO)
     if tela['id'] == 'arquitetura':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k))
+    if tela['id'] == 'desb_trilhas':
+        return web(DESBLOQUEIO, tela_trilhas_bloqueada(k))
+    if tela['id'] == 'desb_trilha':
+        return web(DESBLOQUEIO, tela_trilha_acima(k), css=CSS_DESBLOQUEIO)
+    if tela['id'] == 'desb_liberada':
+        return web(DESBLOQUEIO, tela_trilha_liberada(k), css=CSS_DESBLOQUEIO)
+    if tela['id'] == 'liberada_movel':
+        return casca_movel(web(juntar(DESBLOQUEIO, MOVEL), tela_trilha_liberada_movel(k), css=CSS_DESBLOQUEIO), ALTURA_LIBERADA)
     if tela['id'] == 'avaliacao':
         return web(AVALIACAO, tela_avaliacao(k))
     if tela['id'] == 'peer':

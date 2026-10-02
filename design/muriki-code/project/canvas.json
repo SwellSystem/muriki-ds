@@ -929,6 +929,70 @@
    "h": 2460,
    "title": "Celular · a Evolução inteira, em cartões · escuro",
    "is_interactive": true
+  },
+  "DesbloqueioTrilhas.dc.html": {
+   "x": 10640,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · Arquitetura bloqueada: o caminho até Pleno e o abrir mesmo assim",
+   "is_interactive": true
+  },
+  "DesbloqueioTrilhasEscuro.dc.html": {
+   "x": 10640,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilhas · Arquitetura bloqueada: o caminho até Pleno e o abrir mesmo assim · escuro",
+   "is_interactive": true
+  },
+  "DesbloqueioTrilha.dc.html": {
+   "x": 12160,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha acima do seu nível · o aviso above_level, que não trava",
+   "is_interactive": true
+  },
+  "DesbloqueioTrilhaEscuro.dc.html": {
+   "x": 12160,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Trilha acima do seu nível · o aviso above_level, que não trava · escuro",
+   "is_interactive": true
+  },
+  "TrilhaLiberada.dc.html": {
+   "x": 13680,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Ganho de trilha · o momento, uma vez, quando o nível alcança o startTier",
+   "is_interactive": true
+  },
+  "TrilhaLiberadaEscuro.dc.html": {
+   "x": 13680,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Ganho de trilha · o momento, uma vez, quando o nível alcança o startTier · escuro",
+   "is_interactive": true
+  },
+  "TrilhaLiberadaMovel.dc.html": {
+   "x": 4230,
+   "y": 18480,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · o ganho de trilha numa folha",
+   "is_interactive": true
+  },
+  "TrilhaLiberadaMovelEscuro.dc.html": {
+   "x": 4230,
+   "y": 21360,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · o ganho de trilha numa folha · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1039,7 +1103,7 @@
   "aprenderMais": {
    "x": 0,
    "y": 15540,
-   "text": "Trilhas, catálogo de exercícios e Peer na web: o formato das trilhas é proposta (a visão ainda deixa em aberto)",
+   "text": "Trilhas, catálogo de exercícios, Peer na web, e a trilha bloqueada com o ganho de trilha",
    "kind": "title1",
    "maxW": 8000,
    "w": 240
@@ -1057,7 +1121,7 @@
    "y": 18180,
    "text": "Code no celular (390): barra de topo e gaveta, tudo empilhado, a trilha em mapa vertical, as boas-vindas numa folha e a Evolução",
    "kind": "title1",
-   "maxW": 4230,
+   "maxW": 4700,
    "w": 240
   },
   "celularEscuro": {
@@ -1065,7 +1129,7 @@
    "y": 21060,
    "text": "Code no celular no tema escuro",
    "kind": "title1",
-   "maxW": 4230,
+   "maxW": 4700,
    "w": 240
   }
  },
@@ -1185,7 +1249,15 @@
   "EvolucaoNoTempo.dc.html",
   "EvolucaoNoTempoEscuro.dc.html",
   "EvolucaoMovel.dc.html",
-  "EvolucaoMovelEscuro.dc.html"
+  "EvolucaoMovelEscuro.dc.html",
+  "DesbloqueioTrilhas.dc.html",
+  "DesbloqueioTrilhasEscuro.dc.html",
+  "DesbloqueioTrilha.dc.html",
+  "DesbloqueioTrilhaEscuro.dc.html",
+  "TrilhaLiberada.dc.html",
+  "TrilhaLiberadaEscuro.dc.html",
+  "TrilhaLiberadaMovel.dc.html",
+  "TrilhaLiberadaMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
