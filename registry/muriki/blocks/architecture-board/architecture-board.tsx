@@ -175,7 +175,7 @@ function lados(de: GraphNode, para: GraphNode) {
 
 function rotuloLimpo(texto: string) {
   // sem caractere de controle e no limite do schema; vazio vira "sem rótulo"
-  const limpo = texto.replace(/[\u0000-\u001f\u007f]/g, "").trim().slice(0, GRAPH_LIMITS.label)
+  const limpo = texto.replace(/\p{Cc}/gu, "").trim().slice(0, GRAPH_LIMITS.label)
   return limpo || undefined
 }
 
@@ -366,9 +366,9 @@ function Moldura({
   const palco = React.useRef<HTMLDivElement>(null)
   const [selecao, setSelecao] = React.useState<Selecao>(null)
   const [editando, setEditando] = React.useState<string | null>(null)
-  // o React Flow mede cada peça e precisa receber a medida de volta; ela não é do grafo
-  const medidas = React.useRef(new Map<string, { width: number; height: number }>())
-  const [, remedir] = React.useReducer((n: number) => n + 1, 0)
+  // o React Flow mede cada peça e precisa receber a medida de volta; ela não é do grafo, e fica em
+  // estado (não numa ref lida no render, que o react-hooks/refs dos apps barra)
+  const [medidas, setMedidas] = React.useState(() => new Map<string, { width: number; height: number }>())
 
   const titulos = React.useMemo(() => new Map(palette.map((p) => [p.id, p.title])), [palette])
   const cheioDePecas = graph.nodes.length >= GRAPH_LIMITS.nodes
@@ -382,7 +382,7 @@ function Moldura({
     position: { x: n.x, y: n.y },
     data: { kind: n.kind, label: n.label },
     selected: selecao?.tipo === "peca" && selecao.id === n.id,
-    measured: medidas.current.get(n.id),
+    measured: medidas.get(n.id),
   }))
   const porId = new Map(graph.nodes.map((n) => [n.id, n]))
   const edges: LigacaoEdge[] = graph.edges.map((e) => {
@@ -487,10 +487,10 @@ function Moldura({
     let nos = graph.nodes
     let mudou = false
     let removidos: string[] = []
+    const medidasNovas: [string, { width: number; height: number }][] = []
     for (const c of changes) {
       if (c.type === "dimensions" && c.dimensions) {
-        medidas.current.set(c.id, c.dimensions)
-        remedir()
+        medidasNovas.push([c.id, c.dimensions])
       } else if (c.type === "position" && c.position && !readOnly) {
         const { x, y } = c.position
         nos = nos.map((n) => (n.id === c.id ? { ...n, x: Math.round(x), y: Math.round(y) } : n))
@@ -502,6 +502,7 @@ function Moldura({
         removidos = [...removidos, c.id]
       }
     }
+    if (medidasNovas.length) setMedidas((antes) => new Map([...antes, ...medidasNovas]))
     if (removidos.length) {
       nos = nos.filter((n) => !removidos.includes(n.id))
       mudar(
