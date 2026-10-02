@@ -384,6 +384,41 @@
   background-color: color-mix(in oklab, var(--foreground) 32%, transparent);
 }
 
+/* A barra da JANELA, a mesma barra fina das superfícies: no macOS com "mostrar barras: sempre" o
+   Chrome desenhava a clássica, larga e clara mesmo no escuro. Com o AppShell, ela só aparece
+   enquanto a pessoa rola: o html marca data-scroll="idle" em repouso e "active" ao rolar. Sem a
+   marca, ela fica fina e discreta, sempre à vista. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--foreground) 14%, transparent) transparent;
+}
+html[data-scroll="idle"] {
+  scrollbar-color: transparent transparent;
+}
+html[data-scroll="active"] {
+  scrollbar-color: color-mix(in oklab, var(--foreground) 32%, transparent) transparent;
+}
+html::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+html::-webkit-scrollbar-track,
+html::-webkit-scrollbar-corner {
+  background: transparent;
+}
+html::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 14%, transparent);
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+html[data-scroll="idle"]::-webkit-scrollbar-thumb {
+  background-color: transparent;
+}
+html[data-scroll="active"]::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklab, var(--foreground) 32%, transparent);
+}
+
 /* Scroll lateral do sistema: a barra nativa some (overlay scrollbars de
    sistema ignoram customização) — o indicador de encaixe é desenhado pelo
    componente que usa a classe (ver o bloco kanban). */

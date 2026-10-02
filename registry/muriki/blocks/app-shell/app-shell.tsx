@@ -17,7 +17,7 @@
 // O palco já vem com o respiro do desenho (32px em cima, 40px dos lados no
 // desktop): as telas não resolvem isso cada uma. `stageClassName` ajusta,
 // ex.: um max-width.
-import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react"
+import { cloneElement, isValidElement, useEffect, type ReactElement, type ReactNode } from "react"
 import { ArrowsLeftRightIcon, CaretRightIcon, GearSixIcon, ListIcon, SignOutIcon, XIcon } from "@phosphor-icons/react"
 import { PreviewCard } from "@base-ui/react/preview-card"
 
@@ -279,6 +279,7 @@ export function AppShell({
 }: AppShellProps) {
   const t = useTranslate()
   const emBreve = soonLabel ?? t("app_shell.soon")
+  useBarraDaJanela()
   const utilidadesComUsuario = !language && Boolean(utilities) && Boolean(user)
   const marca = (
     <>
@@ -600,4 +601,28 @@ function Settings({ settings }: { settings: NonNullable<AppShellProps["settings"
       <GearSixIcon aria-hidden data-motion="turn" />
     </SidebarMenuButton>
   )
+}
+
+// A barra da janela só aparece enquanto a pessoa rola: o tema a deixa fina e na cor do texto, e
+// transparente quando o html marca data-scroll="idle". Aqui a marca vira "active" a cada rolagem e
+// volta a "idle" um pouco depois da última. Sem o AppShell, a barra fica fina e discreta, à vista.
+function useBarraDaJanela() {
+  useEffect(() => {
+    const raiz = document.documentElement
+    let espera: ReturnType<typeof setTimeout> | undefined
+    raiz.dataset.scroll = "idle"
+    const rolou = () => {
+      raiz.dataset.scroll = "active"
+      clearTimeout(espera)
+      espera = setTimeout(() => {
+        raiz.dataset.scroll = "idle"
+      }, 900)
+    }
+    window.addEventListener("scroll", rolou, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", rolou)
+      clearTimeout(espera)
+      delete raiz.dataset.scroll
+    }
+  }, [])
 }

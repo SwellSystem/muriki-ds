@@ -7,7 +7,7 @@
       "name": "theme",
       "type": "registry:theme",
       "title": "Tema Muriki",
-      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover. Ícone em movimento: no item da sidebar o ícone sobe e cresce no hover; data-motion=\"turn|swing|nudge|tick|hop|stamp\" dá o movimento com significado em qualquer botão ou link; nada se mexe com prefers-reduced-motion. color-scheme segue o tema: a barra da janela e os controles nativos escurecem junto.",
+      "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover. A barra da janela é a mesma, e com o AppShell só aparece enquanto a pessoa rola (html[data-scroll]). Ícone em movimento: no item da sidebar o ícone sobe e cresce no hover; data-motion=\"turn|swing|nudge|tick|hop|stamp\" dá o movimento com significado em qualquer botão ou link; nada se mexe com prefers-reduced-motion. color-scheme segue o tema: a barra da janela e os controles nativos escurecem junto.",
       "cssVars": {
         "theme": {
           "radius": "14px"
@@ -184,6 +184,35 @@
           "background-clip": "padding-box"
         },
         ".muriki-scroll:hover::-webkit-scrollbar-thumb": {
+          "background-color": "color-mix(in oklab, var(--foreground) 32%, transparent)"
+        },
+        "html": {
+          "scrollbar-width": "thin",
+          "scrollbar-color": "color-mix(in oklab, var(--foreground) 14%, transparent) transparent"
+        },
+        "html[data-scroll=\"idle\"]": {
+          "scrollbar-color": "transparent transparent"
+        },
+        "html[data-scroll=\"active\"]": {
+          "scrollbar-color": "color-mix(in oklab, var(--foreground) 32%, transparent) transparent"
+        },
+        "html::-webkit-scrollbar": {
+          "width": "10px",
+          "height": "10px"
+        },
+        "html::-webkit-scrollbar-track, html::-webkit-scrollbar-corner": {
+          "background": "transparent"
+        },
+        "html::-webkit-scrollbar-thumb": {
+          "background-color": "color-mix(in oklab, var(--foreground) 14%, transparent)",
+          "border": "3px solid transparent",
+          "border-radius": "999px",
+          "background-clip": "padding-box"
+        },
+        "html[data-scroll=\"idle\"]::-webkit-scrollbar-thumb": {
+          "background-color": "transparent"
+        },
+        "html[data-scroll=\"active\"]::-webkit-scrollbar-thumb": {
           "background-color": "color-mix(in oklab, var(--foreground) 32%, transparent)"
         },
         ".muriki-scroll-x": {
