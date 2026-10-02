@@ -685,6 +685,9 @@ const STRINGS: Record<string, unknown> = {
     todo: "pendentes",
     summary: "{{done}} feitas, {{skipped}} puladas pelo exercício de entrada, {{covered}} cobertas pelo seu nível, {{todo}} pendentes",
   },
+  coming_soon: {
+    label: "em breve",
+  },
   date_picker: {
     placeholder: "Escolher data",
     range_placeholder: "Escolher período",
