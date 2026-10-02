@@ -35,6 +35,8 @@ export interface ExerciseSubmissionResult {
   tests: { passed: number; total: number }
   /** Os testes ocultos: só o nome e o status. */
   items?: { name: string; status: "pass" | "fail" }[]
+  /** No exercício de arquitetura (unit "rules"): as regras, só com o título e o status. */
+  rules?: { title: string; status: "pass" | "fail"; visibility: "visible" | "hidden" }[]
   /** A nota da explicação: 0, 1 ou 2; null quando não houve explicação. */
   understanding: 0 | 1 | 2 | null
   /** Um parágrafo de texto, nunca o gabarito. */
@@ -60,6 +62,11 @@ export interface ExerciseSubmissionProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   state: "running" | "sending" | "result" | "error"
+  /**
+   * Do que o envio fala: testes (o exercício de código, padrão) ou regras (o de arquitetura). Com
+   * regras não há passo no navegador: a API confere o grafo, então o "running" vira "sending".
+   */
+  unit?: "tests" | "rules"
   result?: ExerciseSubmissionResult
   error?: ExerciseSubmissionError
   onRetry?: () => void
@@ -76,6 +83,7 @@ export function ExerciseSubmission({
   open,
   onOpenChange,
   state,
+  unit = "tests",
   result,
   error,
   onRetry,
@@ -98,7 +106,7 @@ export function ExerciseSubmission({
     >
       <ModalContent showClose={!ocupado} className={cn("sm:max-w-[520px]", className)}>
         {ocupado ? (
-          <Enviando state={state} />
+          <Enviando state={state} unit={unit} />
         ) : state === "error" && error ? (
           <Erro error={error} onRetry={onRetry} onBack={voltar} />
         ) : result ? (
@@ -115,9 +123,16 @@ export function ExerciseSubmission({
                   {result.passed ? <CheckIcon weight="bold" className="size-5" /> : <XIcon weight="bold" className="size-5" />}
                 </span>
                 <span className="flex min-w-0 flex-col gap-0.5">
-                  <ModalTitle>{result.passed ? t("exercise_workspace.submission.passed") : t("exercise_workspace.submission.failed")}</ModalTitle>
+                  <ModalTitle>
+                    {unit === "rules"
+                      ? t(result.passed ? "exercise_workspace.submission.passed_rules" : "exercise_workspace.submission.failed_rules")
+                      : t(result.passed ? "exercise_workspace.submission.passed" : "exercise_workspace.submission.failed")}
+                  </ModalTitle>
                   <ModalDescription>
-                    {t("exercise_workspace.submission.tests", { passed: result.tests.passed, total: result.tests.total })}
+                    {t(unit === "rules" ? "exercise_workspace.submission.rules" : "exercise_workspace.submission.tests", {
+                      passed: result.tests.passed,
+                      total: result.tests.total,
+                    })}
                   </ModalDescription>
                 </span>
               </span>
@@ -139,7 +154,11 @@ export function ExerciseSubmission({
                 </ul>
               ) : null}
 
-              {!result.passed && result.items?.length ? (
+              {unit === "rules" && !result.passed && result.rules?.length ? (
+                <ListaDeRegras regras={result.rules} />
+              ) : null}
+
+              {unit === "tests" && !result.passed && result.items?.length ? (
                 <section className="flex flex-col gap-2">
                   <Rotulo>{t("exercise_workspace.submission.hidden_tests")}</Rotulo>
                   <ul className="m-0 flex list-none flex-col gap-1 p-0">
@@ -193,18 +212,24 @@ function Rotulo({ children }: { children: React.ReactNode }) {
   return <span className="font-mono text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">{children}</span>
 }
 
-function Enviando({ state }: { state: "running" | "sending" }) {
+function Enviando({ state, unit }: { state: "running" | "sending"; unit: "tests" | "rules" }) {
   const t = useTranslate()
-  const passos = [
-    { chave: "running", rotulo: t("exercise_workspace.submission.step_run") },
-    { chave: "sending", rotulo: t("exercise_workspace.submission.step_send") },
-  ] as const
-  const atual = state === "running" ? 0 : 1
+  // com regras, a API confere tudo de uma vez: um passo só
+  const passos =
+    unit === "rules"
+      ? [{ chave: "sending", rotulo: t("exercise_workspace.submission.step_send_rules") }]
+      : [
+          { chave: "running", rotulo: t("exercise_workspace.submission.step_run") },
+          { chave: "sending", rotulo: t("exercise_workspace.submission.step_send") },
+        ]
+  const atual = unit === "rules" ? 0 : state === "running" ? 0 : 1
   return (
     <>
       <ModalHeader>
         <ModalTitle>{t("exercise_workspace.submission.sending_title")}</ModalTitle>
-        <ModalDescription>{t("exercise_workspace.submission.sending_text")}</ModalDescription>
+        <ModalDescription>
+          {t(unit === "rules" ? "exercise_workspace.submission.sending_text_rules" : "exercise_workspace.submission.sending_text")}
+        </ModalDescription>
       </ModalHeader>
       <ModalBody>
         <ol className="m-0 flex list-none flex-col gap-3 p-0" aria-live="polite">
@@ -363,6 +388,45 @@ function Erro({ error, onRetry, onBack }: { error: ExerciseSubmissionError; onRe
           </Button>
         ) : null}
       </ModalFooter>
+    </>
+  )
+}
+
+// As regras do envio por grafo, em dois grupos: as visíveis (as mesmas de "Verificar") e as ocultas,
+// que aparecem só agora e só pelo título, que diz o requisito e nunca a solução.
+function ListaDeRegras({ regras }: { regras: NonNullable<ExerciseSubmissionResult["rules"]> }) {
+  const t = useTranslate()
+  const grupos = [
+    { chave: "visible", rotulo: t("exercise_workspace.submission.visible_rules"), itens: regras.filter((r) => r.visibility === "visible") },
+    { chave: "hidden", rotulo: t("exercise_workspace.submission.hidden_rules"), itens: regras.filter((r) => r.visibility === "hidden") },
+  ].filter((g) => g.itens.length)
+  return (
+    <>
+      {grupos.map((g) => (
+        <section key={g.chave} className="flex flex-col gap-2">
+          <Rotulo>{g.rotulo}</Rotulo>
+          <ul className="m-0 flex list-none flex-col gap-1 p-0">
+            {g.itens.map((regra, i) => (
+              <li key={`${regra.title}-${i}`} className="flex items-start gap-2 text-[13px] leading-[18px]">
+                {regra.status === "pass" ? (
+                  <CheckIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-success" />
+                ) : (
+                  <XIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+                )}
+                <span className={regra.status === "fail" ? "text-foreground-strong" : "text-foreground"}>
+                  <span className="sr-only">
+                    {regra.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
+                  </span>
+                  {regra.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {g.chave === "hidden" ? (
+            <span className="text-xs text-muted-foreground">{t("exercise_workspace.submission.hidden_rules_note")}</span>
+          ) : null}
+        </section>
+      ))}
     </>
   )
 }
