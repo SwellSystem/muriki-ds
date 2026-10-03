@@ -1,17 +1,19 @@
 // O estado da assinatura, numa faixa acima dos cards de plano: um selo
 // que diz O QUE a assinatura é agora, uma frase que diz o que acontece
-// depois, e a ação que resolve, quando há uma. Quatro tons, porque são
-// quatro conversas: teste (azul), em dia (neutro), cancelamento marcado
-// (amarelo) e pagamento em atraso (vermelho, a única que pede ação já).
+// depois, e a ação que resolve, quando há uma. Cinco tons, porque são
+// cinco conversas: falta escolher (azul, sem ponto: é um passo, não um
+// estado), teste (azul), em dia (neutro), cancelamento marcado (amarelo) e
+// pagamento em atraso (vermelho, a única que pede ação já).
 import { SpinnerGap } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export type SubscriptionStatusTone = "trial" | "active" | "canceling" | "overdue"
+export type SubscriptionStatusTone = "required" | "trial" | "active" | "canceling" | "overdue"
 
 const TOM = {
+  required: "blue",
   trial: "blue",
   active: "gray",
   canceling: "yellow",
@@ -44,12 +46,12 @@ export function SubscriptionStatus({
     <section
       role={tone === "overdue" ? "alert" : "status"}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border bg-card px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:gap-4",
-        tone === "overdue" ? "border-destructive/40" : "border-border",
+        "flex flex-col gap-3 rounded-lg border px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:gap-4",
+        tone === "overdue" ? "border-destructive/40 bg-card" : tone === "required" ? "border-primary-subtle-border bg-primary-subtle" : "border-border bg-card",
         className
       )}
     >
-      <Badge tone={TOM[tone]} dot className="self-start sm:self-auto">
+      <Badge tone={TOM[tone]} dot={tone !== "required"} className="self-start sm:self-auto">
         {label}
       </Badge>
       <p className="flex-1 text-sm leading-snug text-foreground">{description}</p>

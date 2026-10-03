@@ -993,6 +993,38 @@
    "h": 844,
    "title": "Celular · o ganho de trilha numa folha · escuro",
    "is_interactive": true
+  },
+  "PlanosEscolha.dc.html": {
+   "x": 4560,
+   "y": 5280,
+   "w": 1440,
+   "h": 900,
+   "title": "Planos · escolha obrigatória: Starter, o teste do Pro e o Pro pago",
+   "is_interactive": true
+  },
+  "PlanosEscolhaEscuro.dc.html": {
+   "x": 4560,
+   "y": 6600,
+   "w": 1440,
+   "h": 900,
+   "title": "Planos · escolha obrigatória: Starter, o teste do Pro e o Pro pago · escuro",
+   "is_interactive": true
+  },
+  "PlanosEscolhaMovel.dc.html": {
+   "x": 4700,
+   "y": 18480,
+   "w": 390,
+   "h": 1680,
+   "title": "Celular · a escolha obrigatória de plano",
+   "is_interactive": true
+  },
+  "PlanosEscolhaMovelEscuro.dc.html": {
+   "x": 4700,
+   "y": 21360,
+   "w": 390,
+   "h": 1680,
+   "title": "Celular · a escolha obrigatória de plano · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1257,7 +1289,11 @@
   "TrilhaLiberada.dc.html",
   "TrilhaLiberadaEscuro.dc.html",
   "TrilhaLiberadaMovel.dc.html",
-  "TrilhaLiberadaMovelEscuro.dc.html"
+  "TrilhaLiberadaMovelEscuro.dc.html",
+  "PlanosEscolha.dc.html",
+  "PlanosEscolhaEscuro.dc.html",
+  "PlanosEscolhaMovel.dc.html",
+  "PlanosEscolhaMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
