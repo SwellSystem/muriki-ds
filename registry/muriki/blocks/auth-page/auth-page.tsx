@@ -55,7 +55,7 @@ export function AuthPage({
   mascotHidden,
   hidden = false,
   utilities,
-  year = new Date().getFullYear(),
+  year,
   className,
   children,
 }: AuthPageProps) {
@@ -64,7 +64,8 @@ export function AuthPage({
   const peekDefault = mascot ?? brand
   const peekHidden = mascotHidden ?? brandHidden
   const peek = hidden && peekHidden ? peekHidden : peekDefault
-  const copyright = t("login.footer_copyright", { year })
+  // o ano vem do app, que tem o relógio; sem ele, o rodapé sai sem ano (nada de ler a data aqui)
+  const copyright = year ? t("login.footer_copyright", { year }) : t("login.footer_copyright_plain")
 
   return (
     <div className={cn("relative min-h-svh bg-background text-foreground", className)}>

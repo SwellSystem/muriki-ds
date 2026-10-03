@@ -10,7 +10,10 @@
       "description": "Papel quente e tinta fria, azul e amarelo da logo, nove matizes de badge. Duas famílias de neutro: superfície em hue 82-100, tinta em hue ~250. Superfície flutuante em token (--float), véu de tinta (--scrim), recipiente que flutua um degrau mais seco (--radius-float, 12px). Barra de rolagem sutil (.muriki-scroll): fina, sem trilho, some em repouso e aparece no hover. A barra da janela é a mesma, e com o AppShell só aparece enquanto a pessoa rola (html[data-scroll]). Ícone em movimento: no item da sidebar o ícone sobe e cresce no hover; data-motion=\"turn|swing|nudge|tick|hop|stamp\" dá o movimento com significado em qualquer botão ou link; nada se mexe com prefers-reduced-motion. color-scheme segue o tema: a barra da janela e os controles nativos escurecem junto.",
       "cssVars": {
         "theme": {
-          "radius": "14px"
+          "radius": "14px",
+          "shadow-float": "var(--float)",
+          "shadow-float-strong": "var(--float-strong)",
+          "shadow-sunken": "var(--relief-sunken)"
         },
         "light": {
           "background": "oklch(0.968 0.009 93)",
@@ -80,7 +83,8 @@
           "chart-2": "oklch(0.62 0.12 175)",
           "chart-3": "oklch(0.56 0.21 269.11)",
           "chart-4": "oklch(0.64 0.17 22)",
-          "chart-5": "oklch(0.6 0.16 305)"
+          "chart-5": "oklch(0.6 0.16 305)",
+          "relief-sunken": "inset 0 1px 2px rgba(0, 0, 0, 0.09), inset 0 0 0 1px var(--input)"
         },
         "dark": {
           "background": "oklch(0.175 0.004 107)",
@@ -150,7 +154,8 @@
           "chart-2": "oklch(0.62 0.12 175)",
           "chart-3": "oklch(0.56 0.21 269.11)",
           "chart-4": "oklch(0.64 0.17 22)",
-          "chart-5": "oklch(0.6 0.16 305)"
+          "chart-5": "oklch(0.6 0.16 305)",
+          "relief-sunken": "inset 0 1px 0 rgba(255, 255, 255, 0.045), inset 0 0 0 1px oklch(0.325 0.006 107)"
         }
       },
       "css": {

@@ -847,6 +847,7 @@ const STRINGS: Record<string, unknown> = {
     pitch_description:
       "Colaboração natural para equipes que fluem. Organize tarefas, crie calendários e transforme anotações em ações concretas.",
     footer_copyright: "© {{year}} Muriki — Todos os direitos",
+    footer_copyright_plain: "© Muriki — Todos os direitos",
     hero_line1: "Bem-vindo",
     hero_line2: "de volta.",
     subtitle: "Não tem uma conta?",

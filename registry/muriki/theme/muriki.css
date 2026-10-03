@@ -44,6 +44,8 @@
      Mais escura que o fundo nos DOIS temas: no dark o --muted é mais CLARO que
      o card, então reaproveitá-lo inverteria o relevo. */
   --sunken: oklch(0.943 0.012 95);
+  /* O relevo do encaixe vazio (o checkbox desmarcado): sombra caindo por dentro e o filete. */
+  --relief-sunken: inset 0 1px 2px rgba(0, 0, 0, 0.09), inset 0 0 0 1px var(--input);
 
   /* Superfície do RAIL, e a razão de o conteúdo ter descido.
 
@@ -177,6 +179,8 @@
   --warning: oklch(0.75 0.15 60);
 
   --sunken: oklch(0.14 0.004 107);
+  /* No escuro, o relevo vem de luz: um fio claro na borda de cima e o filete. */
+  --relief-sunken: inset 0 1px 0 rgba(255, 255, 255, 0.045), inset 0 0 0 1px oklch(0.325 0.006 107);
   --field: oklch(0.14 0.004 107);
   /* Abaixo da página (0.175) e acima do sunken (0.14). Ver a nota no tema
      claro. Esteve em 0.195, que é ACIMA da página — o comentário dizia
@@ -245,6 +249,7 @@
   --color-scrim: var(--scrim);
   --shadow-float: var(--float);
   --shadow-float-strong: var(--float-strong);
+  --shadow-sunken: var(--relief-sunken);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
