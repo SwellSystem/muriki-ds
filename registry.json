@@ -1824,6 +1824,47 @@
       "docs": "<LevelProfile groups={porLinguagem(profile.competencies).map(([language, itens]) => ({ id: language, label: rotuloDa(language), items: itens.map((c) => ({ id: c.id, title: c.title, declared: c.declared, confirmed: c.confirmed, next: c.next, render: <Link to=\"/evolution/$id\" params={{ id: c.id }} /> })) }))} />. declared, confirmed e next vêm de GET /code/evolution/profile sem conversão; o app só agrupa por language (js, neutral…) e escolhe o rótulo do grupo. next null = \"no último nível\"; next com missing vazio = \"Senior: sem etapas ainda\"; senão \"Senior: faltam N etapas\". Sem render nem href, a linha não é link. title troca \"Suas competências\"; null tira. A troca de linha para cartão é por container query (44rem). Textos em level_profile.* no i18n."
     },
     {
+      "name": "competency-detail",
+      "type": "registry:block",
+      "title": "Competency Detail",
+      "description": "A página de uma competência na Evolução do Code, em três peças: o caminho por nível nas trilhas, com feita, pulada, coberta e pendente (CompetencyPath); o histórico do nível numa linha do tempo, com o ponto de partida em quadrado e as confirmações em círculo (LevelHistory); e a trajetória de uma etapa, a primeira aprovação ao lado da mais recente, em cinco medidas sem nota nem comparação (SkillTrajectory).",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/date-format",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/level-scale"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/competency-detail/competency-path.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/competency-detail/competency-path.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/competency-detail/level-history.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/competency-detail/level-history.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/competency-detail/skill-trajectory.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/competency-detail/skill-trajectory.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/competency-detail/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/competency-detail/index.ts"
+        }
+      ],
+      "docs": "import { CompetencyPath, LevelHistory, SkillTrajectory } from \"@/components/blocks/competency-detail\". A página /evolution/$competencyId (canvas: Competencia): no topo, o BackLink \"Evolução\", o título, a LevelScale com confirmado e declarado e os selos; embaixo, à esquerda (flex-1) o CompetencyPath e à direita (520px) o LevelHistory e a SkillTrajectory; abaixo de lg, uma coluna. <CompetencyPath tiers={[{ tier: \"junior\", steps: [{ id, title, status, demonstratedBy, render: <Link … /> }] }, …]} />: as etapas do caminho da trilha (GET /code/tracks/{id}) que são da competência, agrupadas por tier, status e demonstratedBy como vêm; eletiva fora. Os quatro níveis aparecem sempre; nível sem etapa vira a frase. <LevelHistory changes={levelChanges} locale={i18n.language} />, de GET /code/evolution/level-changes?competencyId ({ from, to, cause: \"baseline\" | \"assessment\", occurredAt }); ordena do mais recente para o mais antigo. <SkillTrajectory skill=\"Closures\" first={tr.first} latest={tr.latest} locale={i18n.language} />, de GET /code/evolution/trajectories/{skillId}; latest null vira a frase de uma aprovação só, understanding null vira traço, retired leva \"saiu do catálogo\". Qual etapa mostrar é do app (ex.: a última aprovada desta competência). Na Evolução, o LevelProfile já leva à página: passe render={<Link to=\"/evolution/$competencyId\" params={{ competencyId }} />} em cada item. title troca ou tira (null) o título de cada peça. Textos em competency_path.*, level_history.* e skill_trajectory.* no i18n."
+    },
+    {
       "name": "track-progress",
       "type": "registry:block",
       "title": "Track Progress",
