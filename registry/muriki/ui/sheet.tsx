@@ -53,10 +53,13 @@ const SIDE: Record<SheetSide, string> = {
 }
 
 /**
- * O segundo eixo, o mesmo do sidebar: encostado (padrão) ou flutuando. Flutuando, o painel
- * se solta 8px das três bordas e ganha raio nos quatro cantos: vira um objeto sobre a
- * página, não uma parede. É o que o backoffice desenhou para os sheets de CRUD e de
- * detalhe. A saída anda o próprio tamanho mais o respiro, para sumir inteiro.
+ * O segundo eixo, o mesmo do sidebar: encostado ou flutuando. Flutuando, o painel se solta 8px
+ * das três bordas e ganha raio nos quatro cantos: vira um objeto sobre a página, não uma
+ * parede. É o que o backoffice desenhou para os sheets de CRUD e de detalhe, e desde 2026-10-03
+ * é o PADRÃO do painel lateral (direita e esquerda): todo painel de conteúdo do sistema abre
+ * assim. Encostado fica para a navegação (o menu do sidebar no celular passa floating={false})
+ * e a folha de baixo continua encostada. A saída anda o próprio tamanho mais o respiro, para
+ * sumir inteiro.
  */
 const SIDE_FLOATING: Record<SheetSide, string> = {
   right: [
@@ -91,7 +94,7 @@ interface SheetContentProps extends DialogPrimitive.Popup.Props {
   closeLabel?: string
   /** `padded` (padrão) é solto; `framed` divide em faixas com filete. */
   anatomy?: SheetAnatomy
-  /** Solto 8px das bordas e com raio nos quatro cantos. Padrão: encostado. */
+  /** Solto 8px das bordas e com raio nos quatro cantos. Padrão: solto nas laterais, encostado embaixo. */
   floating?: boolean
 }
 
@@ -102,10 +105,11 @@ function SheetContent({
   showClose = true,
   closeLabel = "Fechar",
   anatomy = "padded",
-  floating = false,
+  floating: floatingProp,
   ...props
 }: SheetContentProps) {
   const framed = anatomy === "framed"
+  const floating = floatingProp ?? side !== "bottom"
   return (
     <DialogPrimitive.Portal>
       <DialogPrimitive.Backdrop

@@ -292,7 +292,7 @@ export function TaskModal({
         <SheetContent
           side="right"
           anatomy="framed"
-          className="w-full sm:max-w-[468px]"
+          className="sm:max-w-[468px]"
           data-testid="task-modal-drawer"
         >
           <SheetTitle className="sr-only">{a11yTitle}</SheetTitle>

@@ -425,6 +425,8 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
+          // navegação: o menu do celular fica encostado (o painel lateral de conteúdo é que flutua)
+          floating={false}
           className="w-(--sidebar-width) bg-card p-0 text-foreground [&>button]:hidden"
           style={
             {
