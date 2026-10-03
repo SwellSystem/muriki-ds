@@ -10,7 +10,8 @@
  *
  * É a forma de GET /code/evolution/trajectories/{skillId}. Com uma aprovação só (`latest` null), a
  * segunda coluna vira a frase que diz que a próxima aparece ao lado. Explicação sem nota
- * (`understanding` null) é um traço. Exercício que saiu do catálogo (`retired`) leva a nota.
+ * (`understanding` null) é um traço; tempo sem medida (`secondsToPass` null) também, com o porquê
+ * no title e para leitor de tela. Exercício que saiu do catálogo (`retired`) leva a nota.
  */
 import * as React from "react"
 
@@ -27,7 +28,8 @@ export interface SkillTrajectoryPass {
   hintsRevealed: number
   /** A nota da explicação, de 0 a 2; `null` quando não houve. */
   understanding: 0 | 1 | 2 | null
-  secondsToPass: number
+  /** `null` quando o envio que passou foi a primeira atividade no exercício: não há como medir. */
+  secondsToPass: number | null
   peerInteractions: number
 }
 
@@ -48,11 +50,18 @@ const MEDIDAS = ["attempts", "hints", "understanding", "time", "peer"] as const
 
 export function SkillTrajectory({ skill, first, latest, locale = "pt-BR", title, className }: SkillTrajectoryProps) {
   const t = useTranslate()
-  const valor = (p: SkillTrajectoryPass, m: (typeof MEDIDAS)[number]) => {
+  const valor = (p: SkillTrajectoryPass, m: (typeof MEDIDAS)[number]): React.ReactNode => {
     if (m === "attempts") return String(p.attempts)
     if (m === "hints") return String(p.hintsRevealed)
     if (m === "peer") return String(p.peerInteractions)
     if (m === "understanding") return p.understanding === null ? "—" : t("skill_trajectory.of_two", { value: p.understanding })
+    if (p.secondsToPass === null)
+      return (
+        <span title={t("skill_trajectory.time_unknown")}>
+          <span aria-hidden>—</span>
+          <span className="sr-only">{t("skill_trajectory.time_unknown")}</span>
+        </span>
+      )
     return p.secondsToPass < 60
       ? t("skill_trajectory.seconds", { count: p.secondsToPass })
       : t("skill_trajectory.minutes", { count: Math.round(p.secondsToPass / 60) })
