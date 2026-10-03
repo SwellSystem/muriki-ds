@@ -728,6 +728,7 @@ const STRINGS: Record<string, unknown> = {
     of_two: "{{value}} de 2",
     minutes: "{{count}} min",
     seconds: "{{count}} s",
+    time_unknown: "Sem como medir: o envio que passou foi a primeira coisa feita no exercício.",
     retired: "saiu do catálogo",
     only_one: "Até agora, uma aprovação só. Quando vier a próxima, ela aparece ao lado para você ver o caminho.",
   },
