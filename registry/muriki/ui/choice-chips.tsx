@@ -14,6 +14,12 @@
  * não só a cor. `soon` é a opção que existe mas ainda não está disponível:
  * aparece, travada, com o selo mono ("em breve"), porque esconder faria a
  * pessoa achar que a linguagem dela não está no plano.
+ *
+ * `upcoming` é o outro "em breve": o mesmo selo, mas o chip continua
+ * marcável, porque marcar diz que a pessoa quer (ex.: uma linguagem que a
+ * API aceita mas que ainda não tem trilha). Quando uma dessas está marcada
+ * num grupo, `upcomingHint` aparece numa linha embaixo dele ("avisamos
+ * quando chegar"): na hora em que a pessoa escolhe, e não antes.
  */
 import * as React from "react"
 import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
@@ -27,6 +33,8 @@ export interface ChoiceChip {
   label: string
   /** Existe, mas ainda não está disponível: aparece travado com `soonLabel`. */
   soon?: boolean
+  /** Chega em breve, mas já dá para marcar: o mesmo selo, sem travar. */
+  upcoming?: boolean
 }
 
 export interface ChoiceChipGroup {
@@ -41,6 +49,8 @@ export interface ChoiceChipsProps {
   onValueChange?: (value: string[]) => void
   /** "em breve", no idioma do app. */
   soonLabel: string
+  /** A linha embaixo do grupo com `upcoming` marcado; recebe quantos estão marcados nele. */
+  upcomingHint?: (count: number) => React.ReactNode
   "aria-label"?: string
   className?: string
 }
@@ -51,6 +61,7 @@ function ChoiceChips({
   defaultValue = [],
   onValueChange,
   soonLabel,
+  upcomingHint,
   className,
   ...props
 }: ChoiceChipsProps) {
@@ -71,41 +82,49 @@ function ChoiceChips({
       aria-label={props["aria-label"]}
       className={cn("flex flex-col gap-2.5", className)}
     >
-      {groups.map((g) => (
-        <div key={g.label} className="flex items-start gap-3.5">
-          <span className="w-24 shrink-0 pt-1.5 text-xs text-muted-foreground">{g.label}</span>
-          <ToggleGroupPrimitive
-            multiple
-            aria-label={g.label}
-            value={atual.filter((v) => g.items.some((i) => i.value === v))}
-            onValueChange={(next) => mudarGrupo(g.items, next as string[])}
-            className="flex flex-wrap gap-1.5"
-          >
-            {g.items.map((item) => (
-              <TogglePrimitive
-                key={item.value}
-                value={item.value}
-                disabled={item.soon}
-                className={cn(
-                  "inline-flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[13px] font-medium outline-none",
-                  "bg-card text-foreground shadow-[inset_0_0_0_1px_var(--input)] transition-[background-color,box-shadow,color]",
-                  "hover:shadow-[inset_0_0_0_1px_var(--foreground)] focus-visible:ring-2 focus-visible:ring-ring/50",
-                  "data-[pressed]:bg-primary-subtle data-[pressed]:text-primary-subtle-foreground data-[pressed]:shadow-[inset_0_0_0_1px_var(--primary)]",
-                  "data-[disabled]:cursor-not-allowed data-[disabled]:bg-transparent data-[disabled]:text-muted-foreground data-[disabled]:shadow-[inset_0_0_0_1px_var(--divider)]"
-                )}
+      {groups.map((g) => {
+        const emBreve = g.items.filter((i) => i.upcoming && atual.includes(i.value)).length
+        return (
+          <div key={g.label} className="flex items-start gap-3.5">
+            <span className="w-24 shrink-0 pt-1.5 text-xs text-muted-foreground">{g.label}</span>
+            <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+              <ToggleGroupPrimitive
+                multiple
+                aria-label={g.label}
+                value={atual.filter((v) => g.items.some((i) => i.value === v))}
+                onValueChange={(next) => mudarGrupo(g.items, next as string[])}
+                className="flex flex-wrap gap-1.5"
               >
-                {atual.includes(item.value) ? <CheckIcon aria-hidden weight="bold" className="size-3" /> : null}
-                {item.label}
-                {item.soon ? (
-                  <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
-                    {soonLabel}
-                  </span>
-                ) : null}
-              </TogglePrimitive>
-            ))}
-          </ToggleGroupPrimitive>
-        </div>
-      ))}
+                {g.items.map((item) => (
+                  <TogglePrimitive
+                    key={item.value}
+                    value={item.value}
+                    disabled={item.soon}
+                    className={cn(
+                      "inline-flex h-[30px] items-center gap-1.5 rounded-full px-3 text-[13px] font-medium outline-none",
+                      "bg-card text-foreground shadow-[inset_0_0_0_1px_var(--input)] transition-[background-color,box-shadow,color]",
+                      "hover:shadow-[inset_0_0_0_1px_var(--foreground)] focus-visible:ring-2 focus-visible:ring-ring/50",
+                      "data-[pressed]:bg-primary-subtle data-[pressed]:text-primary-subtle-foreground data-[pressed]:shadow-[inset_0_0_0_1px_var(--primary)]",
+                      "data-[disabled]:cursor-not-allowed data-[disabled]:bg-transparent data-[disabled]:text-muted-foreground data-[disabled]:shadow-[inset_0_0_0_1px_var(--divider)]"
+                    )}
+                  >
+                    {atual.includes(item.value) ? <CheckIcon aria-hidden weight="bold" className="size-3" /> : null}
+                    {item.label}
+                    {item.soon || item.upcoming ? (
+                      <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
+                        {soonLabel}
+                      </span>
+                    ) : null}
+                  </TogglePrimitive>
+                ))}
+              </ToggleGroupPrimitive>
+              <span aria-live="polite" className="text-xs text-muted-foreground empty:hidden">
+                {upcomingHint && emBreve > 0 ? upcomingHint(emBreve) : null}
+              </span>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }

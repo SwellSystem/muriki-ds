@@ -50,7 +50,10 @@ export interface AccountLearningValues {
 
 export interface AccountLearningFormProps {
   values: AccountLearningValues
-  /** O catálogo já agrupado por categoria, com `soon` nas que ainda não têm suporte. */
+  /**
+   * O catálogo já agrupado por categoria: `soon` na linguagem que a API não aceita (travada) e
+   * `upcoming` na que a API aceita mas ainda não tem trilha (marcável, com o aviso embaixo).
+   */
   languageGroups: ChoiceChipGroup[]
   /** As famílias com a pergunta de familiaridade. Padrão: só JavaScript/TypeScript. */
   families?: LearningFamily[]
@@ -123,7 +126,13 @@ export function AccountLearningForm({
         <Separator />
         <div className="flex flex-col gap-3">
           <Rotulo>{t("account.learning.languages")}</Rotulo>
-          <ChoiceChips groups={languageGroups} value={langs} onValueChange={setLangs} soonLabel={t("account.learning.soon")} />
+          <ChoiceChips
+            groups={languageGroups}
+            value={langs}
+            onValueChange={setLangs}
+            soonLabel={t("account.learning.soon")}
+            upcomingHint={(count) => t("account.learning.upcoming_hint", { count })}
+          />
         </div>
         {ativas.map((f) => {
           const pergunta = t("account.learning.familiarity", { family: f.label })
