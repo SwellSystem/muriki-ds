@@ -19,7 +19,7 @@ import * as React from "react"
 import { CompassIcon, LockSimpleIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
-import { LevelScale, useLevelName, type Level } from "@/components/ui/level-scale"
+import { LEVELS, LevelScale, useLevelName, type Level } from "@/components/ui/level-scale"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -65,60 +65,62 @@ export interface LevelGatePathProps {
   className?: string
 }
 
-function Faltam({ c }: { c: LevelGateCompetency }) {
-  const t = useTranslate()
-  const resto = c.missing.length - 2
+/** A escala e o que falta, numa linha: o primeiro item é a contagem, depois até dois nomes e "+N". */
+function Linha({ level, declared, count, names }: { level: Level | null; declared?: Level | null; count: string; names: string[] }) {
+  const resto = names.length - 2
   return (
     <span className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
       <LevelScale
-        level={c.confirmed !== undefined ? c.confirmed : c.current}
-        declared={c.confirmed !== undefined ? c.current : undefined}
+        level={level}
+        declared={declared}
         size="sm"
         label
         // no fundo afundado, o traço vazio (bg-sunken) sumiria: ganha a cor do filete
         className="[&>.bg-sunken]:bg-input"
       />
-      {c.missing.length > 0 ? (
-        <span className="text-xs text-muted-foreground">
-          {[
-            t("level_gate.missing", { count: c.missing.length }),
-            ...c.missing.slice(0, 2).map((m) => m.title),
-            ...(resto > 0 ? [`+${resto}`] : []),
-          ].join(" · ")}
-        </span>
-      ) : null}
+      <span className="text-xs text-muted-foreground">
+        {[count, ...names.slice(0, 2), ...(resto > 0 ? [`+${resto}`] : [])].join(" · ")}
+      </span>
     </span>
   )
 }
 
+const ordem = (l: Level | null) => (l ? LEVELS.indexOf(l) : -1)
+
 /**
- * O caminho até o `startTier`, no fundo afundado do cartão. Uma competência: a frase diz onde
- * ("chegue a Pleno em JavaScript") e vem uma linha. Mais de uma: a frase para no nível e cada
- * linha leva o nome da competência.
+ * O caminho até o `startTier`, no fundo afundado do cartão, sempre em duas linhas, para o cartão
+ * bloqueado ter a altura dos outros. Uma competência: a frase diz onde ("chegue a Pleno em
+ * JavaScript") e a linha traz as skills que faltam. Mais de uma: a frase para no nível, a escala
+ * mostra o menor nível entre elas e a linha soma as etapas e nomeia as competências. O detalhe por
+ * competência fica para dentro da trilha.
  */
 export function LevelGatePath({ level, competencies, className }: LevelGatePathProps) {
   const t = useTranslate()
   const nome = useLevelName()
   if (competencies.length === 0) return null
-  const uma = competencies.length === 1
+  const uma = competencies.length === 1 ? competencies[0] : undefined
+  const etapas = competencies.reduce((soma, c) => soma + c.missing.length, 0)
+  const menor = competencies.reduce((a, c) => (ordem(c.current) < ordem(a.current) ? c : a))
   return (
     <div data-slot="level-gate-path" className={cn("flex flex-col gap-2 rounded-[10px] bg-sunken px-3.5 py-3", className)}>
       <span className="text-[12.5px] font-medium text-foreground-strong">
         {uma
-          ? t("level_gate.reach_via", { level: nome(level), via: competencies[0].title })
+          ? t("level_gate.reach_via", { level: nome(level), via: uma.title })
           : t("level_gate.reach", { level: nome(level) })}
       </span>
       {uma ? (
-        <Faltam c={competencies[0]} />
+        <Linha
+          level={uma.confirmed !== undefined ? uma.confirmed : uma.current}
+          declared={uma.confirmed !== undefined ? uma.current : undefined}
+          count={t("level_gate.missing", { count: uma.missing.length })}
+          names={uma.missing.map((m) => m.title)}
+        />
       ) : (
-        <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
-          {competencies.map((c) => (
-            <li key={c.id} className="flex flex-col gap-1">
-              <span className="text-xs font-medium text-foreground">{c.title}</span>
-              <Faltam c={c} />
-            </li>
-          ))}
-        </ul>
+        <Linha
+          level={menor.current}
+          count={t("level_gate.missing_in", { count: etapas, competencies: competencies.length })}
+          names={competencies.map((c) => c.title)}
+        />
       )}
     </div>
   )
