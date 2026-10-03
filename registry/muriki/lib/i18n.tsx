@@ -702,6 +702,8 @@ const STRINGS: Record<string, unknown> = {
     reach_via: "Para liberar, chegue a {{level}} em {{via}}",
     missing_one: "falta {{count}} etapa",
     missing_other: "faltam {{count}} etapas",
+    missing_in_one: "falta {{count}} etapa em {{competencies}} competências",
+    missing_in_other: "faltam {{count}} etapas em {{competencies}} competências",
     notice_title: "Esta trilha começa em {{level}}",
     notice_current: "Você está em {{current}}.",
     notice_go_on: "Dá para seguir mesmo assim: os exercícios vão pedir o que você ainda não confirmou.",
