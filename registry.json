@@ -601,7 +601,7 @@
           "type": "registry:ui"
         }
       ],
-      "docs": "side: right (padrão), left ou bottom. SheetBody rola; cabeçalho e rodapé ficam."
+      "docs": "side: right (padrão), left ou bottom. SheetBody rola; cabeçalho e rodapé ficam. Nas laterais o painel abre solto 8px das bordas, com raio nos quatro cantos (floating, o padrão desde 2026-10-03, o mesmo do Backoffice); painel de conteúdo usa também anatomy=\"framed\". floating={false} deixa encostado, para navegação (o menu do sidebar no celular). Embaixo, encostado."
     },
     {
       "name": "modal",
