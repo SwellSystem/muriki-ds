@@ -22,6 +22,9 @@ TELAS = [
     ('evolucao', 'Main', 'Evolução', 'Evolução · fatia 1: competências com nível, origem e caminho na trilha, e o progresso nas trilhas', 0, 2, 3),
     ('competencia', 'Competencia', 'Funções e escopo', 'Competência · Funções e escopo: caminho na trilha, histórico do nível e trajetória', 1, 2, 3),
     ('exercicio', 'Exercicio', 'Exercício', 'Exercício · editor, testes e explicação', 2, 2, 3),
+    ('peer_testes', 'ExercicioPeerTestes', 'Exercício', 'Peer no exercício · a pergunta embaixo do teste que falhou', 8, 2, 3),
+    ('peer_faixa', 'ExercicioPeerFaixa', 'Exercício', 'Peer no exercício · a dica de uma pausa, acima da barra de status', 9, 2, 3),
+    ('peer_retorno', 'ExercicioPeerRetorno', 'Exercício', 'Peer no exercício · o retorno do envio na voz do Peer', 10, 2, 3),
     ('avaliacao', 'Avaliacao', 'Avaliação', 'Avaliação · rubrica, explicação e o porquê', 3, 2, 3),
     ('playground', 'Playground', 'Playground', 'Playground · código livre com o Peer', 4, 2, 3),
     ('inicio', 'Inicio', 'Início', 'Início · o primeiro dia, antes de qualquer prática', 5, 2, 3),
@@ -124,7 +127,7 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
-    ('web', 2, 8, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura e a evolução rolada'),
+    ('web', 2, 11, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada e o Peer no exercício (testes, faixa e retorno)'),
     ('webEscuro', 3, 8, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
