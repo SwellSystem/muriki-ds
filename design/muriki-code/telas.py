@@ -7,6 +7,8 @@ from arquitetura import tela_exercicio_arquitetura
 from textos_evolucao import TEXTOS as EVOLUCAO_NOVA
 from evolucao import tela_evolucao_nova, tela_evolucao_movel, tela_competencia_nova, tela_evolucao_vazia
 from textos_desbloqueio import TEXTOS as DESBLOQUEIO
+from textos_planos_escolha import TEXTOS as PLANOS_ESCOLHA
+from planos_escolha import tela_planos_escolha, tela_planos_escolha_movel, ALTURA_MOVEL as ALTURA_PLANOS_ESCOLHA
 from desbloqueio import (tela_trilhas_bloqueada, tela_trilha_acima, tela_trilha_liberada, tela_trilha_liberada_movel,
                          ALTURA_MOVEL as ALTURA_LIBERADA, CSS_DESBLOQUEIO)
 from textos_conta import CONTA
@@ -1298,6 +1300,10 @@ def _montar(tela, tema, sufixo):
         return web(DESBLOQUEIO, tela_trilha_acima(k), css=CSS_DESBLOQUEIO)
     if tela['id'] == 'desb_liberada':
         return web(DESBLOQUEIO, tela_trilha_liberada(k), css=CSS_DESBLOQUEIO)
+    if tela['id'] == 'planos_escolha':
+        return web(PLANOS_ESCOLHA, tela_planos_escolha(k))
+    if tela['id'] == 'planos_escolha_movel':
+        return casca_movel(web(juntar(PLANOS_ESCOLHA, MOVEL), tela_planos_escolha_movel(k)), ALTURA_PLANOS_ESCOLHA)
     if tela['id'] == 'liberada_movel':
         return casca_movel(web(juntar(DESBLOQUEIO, MOVEL), tela_trilha_liberada_movel(k), css=CSS_DESBLOQUEIO), ALTURA_LIBERADA)
     if tela['id'] == 'avaliacao':

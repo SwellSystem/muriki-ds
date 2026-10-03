@@ -12,6 +12,12 @@
 // 1200px, que cresce com o palco: o seletor de período termina alinhado
 // com a borda do último card, e não sobra faixa morta à direita.
 //
+// A escolha pode ser obrigatória (conta nova que ainda não escolheu: a API
+// responde 403 PLAN_CHOICE_REQUIRED e o app segura a pessoa em /plans). Aí
+// vêm três cards, Starter, o teste do Pro e o Pro pago, e a faixa de status
+// no tom "required": informativa, sem alarme. Três cards ficam lado a lado
+// só do lg para cima; abaixo, empilham, para nenhum ficar sozinho na linha.
+//
 // Controlada e sem API: recebe os planos já precificados no período e
 // devolve a escolha por `onSelectPlan`.
 import { useId, type ReactNode } from "react"
@@ -42,6 +48,8 @@ export interface PlansPagePlan {
   features: string[]
   /** O que ainda não tem número: esmaecido, com o selo tracejado. */
   pendingFeatures?: string[]
+  /** O selo verde ao lado do nome, ex.: "teste grátis" no card do teste do Pro. */
+  badge?: string
   /** O plano de quem está vendo: botão desligado e, fora do destacado, o selo "atual". */
   current?: boolean
   /** O destaque do onboarding (anel, fio de luz, brilho, leve scale no md), normalmente o Pro.
@@ -157,7 +165,12 @@ export function PlansPage({
       <div className="flex w-full flex-col gap-6">
         {status}
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div
+          className={cn(
+            "grid gap-6",
+            (loading ? loadingCount : plans.length) >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"
+          )}
+        >
           {loading
             ? Array.from({ length: loadingCount }, (_, i) => <PlanTileSkeleton key={i} />)
             : plans.map((plan) => (
@@ -250,6 +263,7 @@ function PlanTile({
         {plan.current && !plan.emphasized ? (
           <Badge tone="blue">{labels.current}</Badge>
         ) : null}
+        {plan.badge ? <Badge tone="green">{plan.badge}</Badge> : null}
       </div>
 
       <div className="relative flex flex-col gap-1">

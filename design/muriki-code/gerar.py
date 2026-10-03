@@ -30,6 +30,7 @@ TELAS = [
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
     ('planos', 'Planos', 'Planos', 'Planos · Starter e Pro', 2, 4, 5),
+    ('planos_escolha', 'PlanosEscolha', 'Escolha seu plano', 'Planos · escolha obrigatória: Starter, o teste do Pro e o Pro pago', 3, 4, 5),
     ('codigo', 'SegundoFator', 'Segundo fator', 'Entrar · segundo fator (app ou código de backup)', 0, 6, 7),
     ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
     ('criarSenha', 'CriarSenha', 'Criar senha', 'Conta · criar senha (link do email)', 2, 6, 7),
@@ -65,6 +66,7 @@ TELAS = [
     ('conta_movel', 'ContaMovel', 'Minha conta', 'Celular · Minha conta, meus dados', 5, 14, 15),
     ('evolucao_movel', 'EvolucaoMovel', 'Evolução', 'Celular · a Evolução inteira, em cartões', 8, 14, 15),
     ('liberada_movel', 'TrilhaLiberadaMovel', 'Trilha liberada', 'Celular · o ganho de trilha numa folha', 9, 14, 15),
+    ('planos_escolha_movel', 'PlanosEscolhaMovel', 'Escolha seu plano', 'Celular · a escolha obrigatória de plano', 10, 14, 15),
     ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
@@ -107,7 +109,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         if id_.endswith('_movel'):
             # o celular: 390 de largura, a altura da página, e as colunas mais juntas
             chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha', 'trilha_lista_movel': 'trilha_lista',
-                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao', 'liberada_movel': 'liberada'}[id_]
+                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao', 'liberada_movel': 'liberada', 'planos_escolha_movel': 'planos_escolha'}[id_]
             x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
             y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)
         b = boards.setdefault(arquivo, {})
