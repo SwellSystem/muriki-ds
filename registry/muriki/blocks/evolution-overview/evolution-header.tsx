@@ -9,7 +9,9 @@
  * (decisão do Guilherme, 2026-10-03). A frase muda no primeiro dia (sem exercício enviado): o app
  * passa a outra.
  *
- * O PAINEL EXPLICA, NÃO VENDE. Abre do lado direito (no celular, ocupa a tela) com cinco partes
+ * O PAINEL EXPLICA, NÃO VENDE. É o painel lateral de conteúdo do sistema, o mesmo do Backoffice:
+ * solto 8px das bordas e em faixas (floating, anatomy framed), cada parte numa seção com filete.
+ * Abre do lado direito (no celular, ocupa a largura) com cinco partes
  * curtas: declarado e confirmado, só sobe, as marcas do caminho, a trajetória e "só você". É o
  * que a pessoa precisa para ler a página, na língua do produto: nada de fórmula nem de número.
  * O conteúdo vem do i18n (evolution_how.*) e pode ser trocado por `sections`.
@@ -24,6 +26,7 @@ import {
   SheetContent,
   SheetDescription,
   SheetHeader,
+  SheetSection,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
@@ -52,18 +55,18 @@ export function EvolutionHowMeasured({ trigger, sections }: EvolutionHowMeasured
           {t("evolution_how.open")}
         </SheetTrigger>
       )}
-      <SheetContent side="right" closeLabel={t("evolution_how.close")}>
+      <SheetContent side="right" anatomy="framed" floating closeLabel={t("evolution_how.close")}>
         <SheetHeader>
           <SheetTitle>{t("evolution_how.title")}</SheetTitle>
           <SheetDescription>{t("evolution_how.description")}</SheetDescription>
         </SheetHeader>
         <SheetBody>
-          <dl className="m-0 flex flex-col gap-5">
+          <dl className="m-0">
             {partes.map((p, i) => (
-              <div key={i} className="flex flex-col gap-1.5">
+              <SheetSection key={i} className="gap-1.5">
                 <dt className="text-sm font-semibold text-foreground-strong">{p.title}</dt>
                 <dd className="m-0 text-[13.5px] leading-[21px] text-pretty text-muted-foreground">{p.text}</dd>
-              </div>
+              </SheetSection>
             ))}
           </dl>
         </SheetBody>
