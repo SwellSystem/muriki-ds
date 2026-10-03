@@ -357,6 +357,8 @@ const STRINGS: Record<string, unknown> = {
       declared_note: "O declarado da Evolução vem da experiência: mudar aqui muda o declarado de todas as competências. O observado continua vindo das suas evidências.",
       languages: "Linguagens que você usa",
       soon: "em breve",
+      upcoming_hint_one: "Essa ainda não tem trilha. Avisamos quando chegar.",
+      upcoming_hint_other: "Essas ainda não têm trilha. Avisamos quando chegarem.",
       goals: "O que você quer daqui",
       goals_limit: "até 3, se quiser",
       goal: {
