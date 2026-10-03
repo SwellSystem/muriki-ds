@@ -23,9 +23,8 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
         "peer inline-flex size-4 shrink-0 items-center justify-center rounded-[4px] align-middle outline-none transition-colors",
         "after:absolute after:-inset-2.5",
         "relative",
-        // vazio: encaixe
-        "data-unchecked:bg-sunken data-unchecked:shadow-[inset_0_1px_2px_rgba(0,0,0,0.09),inset_0_0_0_1px_var(--input)]",
-        "dark:data-unchecked:shadow-[inset_0_1px_0_rgba(255,255,255,0.045),inset_0_0_0_1px_oklch(0.325_0.006_107)]",
+        // vazio: encaixe, com o relevo do tema (--relief-sunken muda de sombra para luz no escuro)
+        "data-unchecked:bg-sunken data-unchecked:shadow-sunken",
         // marcado e indeterminado: preenchimento chapado, sem relevo
         "data-checked:bg-primary data-checked:text-primary-foreground",
         "data-indeterminate:bg-primary data-indeterminate:text-primary-foreground",
