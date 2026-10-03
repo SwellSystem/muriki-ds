@@ -280,7 +280,7 @@ function WelcomeDialog({
                 </Button>
               ) : null}
               {ultimo ? (
-                <Button variant="solid" size="lg" onClick={onFinish} render={finishRender} className={f.principal}>
+                <Button variant="solid" size="lg" onClick={onFinish} render={finishRender} nativeButton={!finishRender} className={f.principal}>
                   {rotulo("finish")}
                   <ArrowRightIcon aria-hidden data-motion="nudge" />
                 </Button>

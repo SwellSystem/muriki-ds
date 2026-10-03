@@ -763,6 +763,52 @@ const STRINGS: Record<string, unknown> = {
     start: "Começar a trilha",
     dismiss: "Agora não",
   },
+  evolution_header: {
+    title: "Evolução",
+    subtitle: "Sempre contra o seu próprio histórico. O nível só sobe, e nada aqui compara você com outra pessoa.",
+    subtitle_empty: "Ainda sem exercício enviado. Cada competência mostra o nível que você declarou no primeiro acesso, até um exercício confirmar.",
+  },
+  evolution_how: {
+    open: "Como o nível é medido",
+    close: "Fechar",
+    title: "Como o nível é medido",
+    description: "O que cada parte da Evolução quer dizer.",
+    levels: {
+      title: "Declarado e confirmado",
+      text: "O declarado é o nível que você contou no primeiro acesso. O confirmado vem dos exercícios: um nível se confirma quando você demonstra todas as etapas dele numa competência, nas trilhas. Na escala, o confirmado é cheio e o declarado é contorno.",
+    },
+    only_up: {
+      title: "O nível só sobe",
+      text: "O confirmado nunca desce. Errar um exercício, voltar a uma etapa ou passar um tempo parado não tira nada do que você já mostrou. Por isso a linha do tempo só sobe.",
+    },
+    marks: {
+      title: "Feita, pulada, coberta",
+      text: "Feita é a etapa que um exercício seu demonstrou. Pulada é a que o exercício de entrada mostrou que você já sabia. Coberta é a que o seu nível dispensa. Pendente é a que ainda vem.",
+    },
+    trajectory: {
+      title: "A trajetória",
+      text: "Põe a primeira aprovação de uma etapa ao lado da mais recente: tentativas, dicas, a nota da explicação, o tempo e as conversas com o Peer. O código e a explicação somem em 90 dias; esses sinais ficam.",
+    },
+    only_you: {
+      title: "Só você",
+      text: "Nada aqui compara você com outra pessoa. Não tem ranking, média nem posição.",
+    },
+  },
+  evolution_start: {
+    title: "No tempo e trajetória",
+    description: "O histórico começa no seu primeiro nível confirmado. Depois disso, aqui aparecem o nível semana a semana e a sua primeira aprovação, que vira o ponto de comparação das próximas.",
+    action: "Começar o primeiro exercício",
+  },
+  level_timeline: {
+    title: "Evolução no tempo",
+    subtitle: "O nível confirmado de cada competência, semana a semana. A linha começa no seu ponto de partida e só sobe.",
+    pick: "Competências no gráfico",
+    no_level: "Ainda sem nível confirmado",
+    full: "Até {{count}} ao mesmo tempo",
+    baseline: "ponto de partida",
+    confirmation: "confirmação",
+    point: "{{level}} em {{date}}",
+  },
   date_picker: {
     placeholder: "Escolher data",
     range_placeholder: "Escolher período",

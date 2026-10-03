@@ -224,6 +224,7 @@ function TrackUnlock({
                 onOpenChange?.(false)
               }}
               render={startRender}
+              nativeButton={!startRender}
               className={f.botao}
             >
               {labels?.start ?? t("track_unlock.start")}
