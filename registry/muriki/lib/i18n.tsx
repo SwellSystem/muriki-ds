@@ -478,6 +478,29 @@ const STRINGS: Record<string, unknown> = {
       pleno: "Pleno",
       senior: "Senior",
     },
+    peer: {
+      name: "Peer",
+      following: "Peer acompanhando",
+      paused: "Peer em pausa",
+      history: "Peer neste exercício",
+      dismiss: "Entendi",
+      action: {
+        question: "pergunta",
+        hint: "dica",
+        explanation: "explicação",
+        answer: "resposta",
+      },
+      escalate: {
+        hint: "Me dá uma dica",
+        explanation: "Explica",
+      },
+      trigger: {
+        tests_ran: "depois de rodar os testes",
+        paused: "numa pausa",
+        unit_closed: "ao fechar um trecho",
+        question: "você perguntou",
+      },
+    },
     submission: {
       sending_title: "Enviando a solução",
       sending_text: "Os testes ocultos rodam aqui no navegador; depois a solução vai com a explicação.",
@@ -501,6 +524,7 @@ const STRINGS: Record<string, unknown> = {
       hidden_tests: "Testes ocultos",
       hidden_note: "Os testes ocultos mostram só o nome: o esperado fica com eles.",
       feedback: "Retorno",
+      feedback_peer: "O Peer leu a sua solução",
       understanding: "A explicação",
       understanding_0: "Ainda não mostra o porquê da solução.",
       understanding_1: "Mostra parte do porquê.",

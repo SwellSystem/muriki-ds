@@ -251,6 +251,8 @@ export interface ExerciseHeaderProps {
   chips?: React.ReactNode
   /** Texto pronto, ex.: "salvo há 5 s". */
   savedLabel?: React.ReactNode
+  /** Ao lado do "salvo há": o <PeerStatus />. */
+  peerStatus?: React.ReactNode
   onContinueInIde?: () => void
   /** Desativa "Continuar na IDE" com o selo "em breve". */
   continueInIdeSoon?: boolean
@@ -269,6 +271,7 @@ export function ExerciseHeader({
   title,
   chips,
   savedLabel,
+  peerStatus,
   onContinueInIde,
   continueInIdeSoon,
   onSubmit,
@@ -320,6 +323,7 @@ export function ExerciseHeader({
         {chips ? <div className="flex flex-wrap gap-1.5">{chips}</div> : null}
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        {peerStatus ? <span className="mr-2.5 flex">{peerStatus}</span> : null}
         {savedLabel ? <span className="mr-1.5 text-xs text-muted-foreground">{savedLabel}</span> : null}
         <Button variant="ghost" size="lg" onClick={onContinueInIde} disabled={continueInIdeSoon}>
           <LaptopIcon aria-hidden />
@@ -349,11 +353,11 @@ function EmBreve() {
 // ── Painel da esquerda ──────────────────────────────────────────────────
 
 /** Cada seção da coluna é um cartão. A pele é a do editor ao lado. */
-const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
+export const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
 
 /** O título da seção na coluna fala mais alto que no rail: ao lado de texto corrido de 14px, o
  *  rótulo cinza de 9,5px some, e o negrito do próprio enunciado passava a parecer o título. */
-const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
+export const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
 
 /** Aberta ou recolhida: controlada por `open`, ou solta a partir de `defaultOpen`. */
 function useAberta(open: boolean | undefined, defaultOpen: boolean, onOpenChange?: (open: boolean) => void) {
@@ -630,12 +634,14 @@ export interface ExerciseTestsProps {
   /** Texto pronto, ex.: "rodou há 40 s". */
   ranAt?: React.ReactNode
   onOpenTest?: (name: string) => void
+  /** A fala do Peer depois de rodar os testes, embaixo do teste `test`: <PeerNote variant="inline" />. */
+  peerNote?: { test: string; node: React.ReactNode } | null
   className?: string
 }
 
 const TIPOS_DE_ERRO = new Set(["timeout", "build", "runtime", "unavailable"])
 
-export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, className }: ExerciseTestsProps) {
+export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, peerNote, className }: ExerciseTestsProps) {
   const t = useTranslate()
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(2)
 
@@ -700,6 +706,7 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, classN
                 </span>
               ) : null}
             </button>
+            {peerNote && peerNote.test === item.name ? <div className="pt-0.5 pr-1 pb-1.5 pl-6">{peerNote.node}</div> : null}
           </li>
         ))}
       </ul>
@@ -757,6 +764,8 @@ export interface ExerciseEditorProps {
   statusEnd?: React.ReactNode | null
   /** A legenda do cadeado e do ponto verde, no pé da lateral. */
   legend?: boolean
+  /** Acima da barra de status: a fala do Peer de uma pausa, <PeerNote variant="bar" />. */
+  peerBar?: React.ReactNode
   /** O editor do app (CodeMirror, por exemplo). */
   children: React.ReactNode
   className?: string
@@ -778,6 +787,7 @@ export function ExerciseEditor({
   shortcutLabel,
   statusEnd,
   legend = true,
+  peerBar,
   children,
   className,
 }: ExerciseEditorProps) {
@@ -896,6 +906,7 @@ export function ExerciseEditor({
           {children}
           {balaoDoGuia}
         </div>
+        {peerBar}
         <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
           {status ? <span className="truncate">{status}</span> : null}
           {shortcutLabel === null ? null : (
