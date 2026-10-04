@@ -502,6 +502,13 @@ const STRINGS: Record<string, unknown> = {
         question: "você perguntou",
       },
     },
+    save: {
+      saving: "Salvando…",
+      saved: "Salvo",
+      saved_at: "salvo às {{time}}",
+      error: "Não salvo",
+      error_hint: "copie o código para não perder",
+    },
     submission: {
       sending_title: "Enviando a solução",
       sending_text: "Os testes ocultos rodam aqui no navegador; depois a solução vai com a explicação.",
