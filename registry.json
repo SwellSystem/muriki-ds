@@ -2005,6 +2005,31 @@
       "docs": "Card Vendas por mês, com GET /admin/billing/sales/monthly (12 meses, total em centavos, count): const brl = new Intl.NumberFormat(\"pt-BR\", { style: \"currency\", currency: \"BRL\", maximumFractionDigits: 0 }); <AreaChart labels={meses.map((m) => formatMonth(m.month))} series={[{ key: \"platform\", label: \"Muriki Platform\", values: meses.map((m) => m.total / 100) }]} formatValue={(v) => brl.format(v)} current={meses.length - 1} extra={(_, i) => `${meses[i].count} vendas`} ariaLabel=\"Vendas por mês, de out de 2025 a set de 2026. Pico em ago, R$ 44.930.\" loading={isPending} />. É a mesma API do bar-chart: trocar um pelo outro é trocar o nome do componente. Os valores vão na unidade do eixo (reais, não centavos). Uma moeda por gráfico: BRL e USD na mesma escala enganam; cada moeda vai no seu gráfico, ou o card ganha um seletor de produto (view-toggle). Duas séries da mesma moeda saem sobrepostas, com legenda. color é opcional (padrão: --primary, --chart-1, --chart-3); a key vira --color-<key> dentro do gráfico, então use letras, números e hífen. current: o trecho do período anterior até o em curso sai tracejado, com o preenchimento mais fraco e o ponto vazado; o tooltip e a tabela marcam \"em curso\". Negativos (um reembolso no mês): o eixo inclui o zero e o que está abaixo, a área preenche até o zero e a linha do zero aparece. Tudo zero ou sem rótulos: estado vazio (bar_chart.empty). loading: AreaChartSkeleton, que também sai à parte. Textos reaproveitados de bar_chart.* (current, as_table, as_chart, empty, period). Precisa do recharts (vem pelo item chart). Compacto (celular): abaixo de 480px de largura do próprio gráfico, liga sozinho 3 degraus no eixo Y (0, meio e teto, arredondado para cima) e os rótulos de baixo de 2 em 2, contados do último para trás (o período em curso sempre aparece). yTicks={3} e xTickEvery={2} mandam quando passados; compact força (true) ou desliga (false); o padrão é \"auto\". No desktop nada muda. Ex.: no InicioMovel, <AreaChart height={196} … /> e, no MetricasMovel, <BarChart height={170} … />. No compacto, o \"Ver como tabela\" desce para baixo do gráfico, à esquerda, e a legenda fica sozinha na linha de cima (container query na largura do gráfico)."
     },
     {
+      "name": "screen-skeletons",
+      "type": "registry:block",
+      "title": "Screen Skeletons",
+      "description": "O carregamento com o formato das telas que o Code monta com as próprias peças: o Início (FirstDaySkeleton), Trilhas (TracksSkeleton, com o cartão de continuar, o minimapa e a grade com trilha, bloqueada e em breve), uma trilha (TrackSkeleton, com o mapa e o agora) e o catálogo de exercícios (ExerciseCatalogSkeleton, cartões no celular e tabela no md). As mesmas colunas, quebras e alturas das telas carregadas.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/skeleton"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/screen-skeletons/screen-skeletons.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/screen-skeletons/screen-skeletons.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/screen-skeletons/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/screen-skeletons/index.ts"
+        }
+      ],
+      "docs": "import { FirstDaySkeleton, TracksSkeleton, TrackSkeleton, ExerciseCatalogSkeleton } from \"@/components/blocks/screen-skeletons\". No lugar do <Skeleton className=\"h-96 rounded-2xl\" /> de cada rota, dentro do palco do AppShell: if (isPending) return <TracksSkeleton />. TracksSkeleton cards={[\"track\", \"track\", \"locked\", \"soon\"]} segue a grade de verdade, se o app já souber quantas trilhas vêm; TrackSkeleton levels={4}; ExerciseCatalogSkeleton rows={8}. Tudo é aria-hidden: marque a região com aria-busy enquanto carrega. As peças do DS dessas telas trazem o próprio esqueleto (LevelProfileSkeleton, TrackProgressSkeleton e os da Evolução). Copiam o layout de features/home/first-day, features/tracks/tracks-screen e track-screen e features/exercises/exercises-screen do Code: quando uma dessas telas mudar de colunas ou alturas, o esqueleto muda junto aqui."
+    },
+    {
       "name": "status-page",
       "type": "registry:block",
       "title": "Status Page",
