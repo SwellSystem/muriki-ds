@@ -1530,7 +1530,7 @@
       "name": "track-language-switch",
       "type": "registry:block",
       "title": "Track Language Switch",
-      "description": "A troca de linguagem da trilha no Starter, que estuda uma família de linguagem por vez: o véu desfocando a janela, o diálogo (folha que sobe de baixo no celular) com as duas trilhas e, no meio, o logo da linguagem ativa com as setas fazendo a passagem. Trocar congela a de agora (gelo, sem cor, \"Guardado · 5 de 12 etapas\") e abre a nova (o primeiro ponto acende, \"comece aqui\"); na volta, a guardada descongela \"de onde parou\". Confirmar, trocando e concluído; com not_in_plan, a data em que libera e \"Ver o Pro\". Movimento desligado com prefers-reduced-motion.",
+      "description": "A troca de linguagem da trilha no Starter, que estuda uma família de linguagem por vez: o véu desfocando a janela, o diálogo (folha que sobe de baixo no celular) com as duas trilhas e, no meio, o logo da linguagem ativa com as setas fazendo a passagem. Trocar congela a de agora (gelo, sem cor, \"Guardado · 5 de 12 etapas\": o histórico fica) e abre a nova do começo (o primeiro ponto acende, \"comece aqui\"); a confirmação avisa que voltar no Starter recomeça do zero (regra B). Confirmar, trocando e concluído; com not_in_plan, a data em que libera e \"Ver o Pro\". Movimento desligado com prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"
@@ -1550,7 +1550,7 @@
           "target": "components/blocks/track-language-switch/track-language-switch.tsx"
         }
       ],
-      "docs": "Em Trilhas, no \"Começar a trilha\" de uma trilha com access \"switch\" ou \"not_in_plan\" no GET /code/tracks (o Pro nunca chega aqui): <TrackLanguageSwitch open={!!alvo} onOpenChange={(aberto) => !aberto && setAlvo(null)} access={alvo.access} changeAllowedAt={alvo.changeAllowedAt} locale={i18n.language} from={{ brand: \"js\", title: \"JavaScript do zero\", done: 5, total: 12, current: \"Funções e escopo\" }} to={{ brand: \"py\", title: \"Python do zero\", done: 0, total: 12 }} onConfirm={() => api.put(\"/code/language-choice\", { family: \"py\" })} startRender={<Link to=\"/tracks/$trackId\" params={{ trackId: alvo.id }} />} proRender={<Link to=\"/plans\" />} />. from é a trilha da linguagem de agora (a que congela: done e total dela); to é a clicada: done 0 abre do começo (\"Trocar para Python\", \"comece aqui\", \"Começar a trilha\"), done > 0 é a volta (\"Voltar para JavaScript\", descongela \"de onde parou\", \"Continuar a trilha\"). onConfirm devolve a promessa do PUT: a animação dura o tempo dela, no mínimo 2,2 s (sem espera com prefers-reduced-motion); se rejeitar, volta para a confirmação com track_language_switch.error. Depois do concluído, recarregue GET /code/tracks. Fechar: \"Continuar em JavaScript\", Esc e clique fora chamam onDismiss na confirmação e no not_in_plan; trocando, nada fecha; no concluído, Esc fecha sem onDismiss. not_in_plan: changeAllowedAt vira \"Python libera em 12 de novembro\" e o selo \"libera em 12 de nov.\" (Intl com locale); \"Ver o Pro\" e \"No Pro as duas ficam abertas\" só aparecem com onSeePro ou proRender. language troca o nome do chip (padrão brandName); current vai na linha de baixo do cartão. Ao abrir, o logo do meio dá uma prévia da troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta); depois de um erro, não repete. Textos em track_language_switch.* (os _zero são para from.done 0). defaultPhase abre numa fase (prévias). variant \"auto\" (folha abaixo de md), \"dialog\" ou \"sheet\".",
+      "docs": "Em Trilhas, no \"Começar a trilha\" de uma trilha com access \"switch\" ou \"not_in_plan\" no GET /code/tracks (o Pro nunca chega aqui): <TrackLanguageSwitch open={!!alvo} onOpenChange={(aberto) => !aberto && setAlvo(null)} access={alvo.access} changeAllowedAt={alvo.changeAllowedAt} locale={i18n.language} from={{ brand: \"js\", title: \"JavaScript do zero\", done: 5, total: 12, current: \"Funções e escopo\" }} to={{ brand: \"py\", title: \"Python do zero\", done: 0, total: 12 }} onConfirm={() => api.put(\"/code/language-choice\", { family: \"py\" })} startRender={<Link to=\"/tracks/$trackId\" params={{ trackId: alvo.id }} />} proRender={<Link to=\"/plans\" />} />. from é a trilha da linguagem de agora (a que congela: done e total dela); to é a clicada, que sempre abre do começo (\"Trocar para Python\", \"comece aqui\", \"Começar a trilha\"), mesmo quando é a volta para uma linguagem deixada: pela regra B do Starter, voltar recomeça do zero (a \"época\" da API), então o done de to não conta. A confirmação avisa o recomeço (track_language_switch.note) e o not_in_plan também (locked_note); nada promete voltar de onde parou. onConfirm devolve a promessa do PUT: a animação dura o tempo dela, no mínimo 2,2 s (sem espera com prefers-reduced-motion); se rejeitar, volta para a confirmação com track_language_switch.error. Depois do concluído, recarregue GET /code/tracks. Fechar: \"Continuar em JavaScript\", Esc e clique fora chamam onDismiss na confirmação e no not_in_plan; trocando, nada fecha; no concluído, Esc fecha sem onDismiss. not_in_plan: changeAllowedAt vira \"Python libera em 12 de novembro\" e o selo \"libera em 12 de nov.\" (Intl com locale); \"Ver o Pro\" e \"No Pro as duas ficam abertas\" só aparecem com onSeePro ou proRender. language troca o nome do chip (padrão brandName); current vai na linha de baixo do cartão. Ao abrir, o logo do meio dá uma prévia da troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta); depois de um erro, não repete. Textos em track_language_switch.*. defaultPhase abre numa fase (prévias). variant \"auto\" (folha abaixo de md), \"dialog\" ou \"sheet\".",
       "css": {
         "@keyframes muriki-langswitch-preview-from": {
           "0%": {
@@ -1658,16 +1658,6 @@
           "to": {
             "opacity": "1",
             "clip-path": "inset(0 0 0 0)"
-          }
-        },
-        "@keyframes muriki-langswitch-thaw": {
-          "from": {
-            "opacity": "1",
-            "clip-path": "inset(0 0 0 0)"
-          },
-          "to": {
-            "opacity": "0",
-            "clip-path": "inset(100% 0 0 0)"
           }
         },
         "@keyframes muriki-langswitch-out": {
@@ -1792,13 +1782,6 @@
         ":is([data-role=\"new\"], [data-role=\"locked\"]) .muriki-langswitch-body": {
           "filter": "saturate(0.35)"
         },
-        "[data-role=\"back\"] .muriki-langswitch-body": {
-          "filter": "saturate(0.1)",
-          "opacity": "0.7"
-        },
-        "[data-role=\"back\"] .muriki-langswitch-ice": {
-          "opacity": "1"
-        },
         "[data-slot=\"track-language-switch\"]:is([data-phase=\"switching\"],[data-phase=\"done\"]) .muriki-langswitch-to": {
           "opacity": "1",
           "transform": "translateY(-3px)",
@@ -1810,12 +1793,6 @@
         },
         "[data-slot=\"track-language-switch\"][data-phase=\"switching\"] .muriki-langswitch-to, [data-slot=\"track-language-switch\"][data-phase=\"switching\"] .muriki-langswitch-to .muriki-langswitch-body": {
           "transition-delay": "1s"
-        },
-        "[data-slot=\"track-language-switch\"]:is([data-phase=\"switching\"],[data-phase=\"done\"]) [data-role=\"back\"] .muriki-langswitch-ice": {
-          "opacity": "0"
-        },
-        "[data-slot=\"track-language-switch\"][data-phase=\"switching\"] [data-role=\"back\"] .muriki-langswitch-ice": {
-          "animation": "muriki-langswitch-thaw 0.9s cubic-bezier(0.4, 0, 0.2, 1) 0.95s both"
         },
         ".muriki-langswitch-light": {
           "transform-box": "fill-box",

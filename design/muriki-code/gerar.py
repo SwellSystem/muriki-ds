@@ -63,7 +63,7 @@ TELAS = [
     ('desb_trilha', 'DesbloqueioTrilha', 'Arquitetura de sistemas', 'Trilha acima do seu nível · o aviso above_level, que não trava', 8, 12, 13),
     ('desb_liberada', 'TrilhaLiberada', 'Trilha liberada', 'Ganho de trilha · o momento, uma vez, quando o nível alcança o startTier', 9, 12, 13),
     ('troca_ida', 'TrocaLinguagem', 'Trocar de linguagem', 'Troca de linguagem · Starter: JavaScript congela e Python se abre (Trocar anima)', 10, 12, 13),
-    ('troca_volta', 'TrocaLinguagemVolta', 'Trocar de linguagem', 'Troca de linguagem · a volta: Python congela e JavaScript descongela de onde parou', 11, 12, 13),
+    ('troca_volta', 'TrocaLinguagemVolta', 'Trocar de linguagem', 'Troca de linguagem · a volta: Python congela e JavaScript recomeça do zero (regra B)', 11, 12, 13),
     ('troca_plano', 'TrocaLinguagemPlano', 'Trocar de linguagem', 'Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt', 12, 12, 13),
     # o Code no celular (390), na fileira 14 (claro) e 15 (escuro); o tamanho vem de movel.ALTURAS
     ('menu_movel', 'MenuMovel', 'Menu', 'Celular · a barra de topo e a gaveta do menu', 0, 14, 15),

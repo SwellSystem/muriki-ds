@@ -5,9 +5,10 @@
 # nunca vê o modal.
 #
 # O gesto: a trilha da linguagem de agora congela (o gelo desce por cima, a cor sai, "Guardado · 5 de 12
-# etapas": nada se perde) e a da nova se abre (o primeiro ponto acende, "comece aqui"). No meio, o logo da
-# linguagem ativa vira o da nova, e as setas fazem a passagem de um lado para o outro. Na volta, o mesmo
-# gesto ao contrário: a que estava guardada descongela "de onde parou" e a de agora congela.
+# etapas": o histórico fica, nada é apagado) e a da nova se abre do começo (o primeiro ponto acende, "comece
+# aqui"). No meio, o logo da linguagem ativa vira o da nova, e as setas fazem a passagem de um lado para o
+# outro. Regra B: voltar no Starter para uma linguagem deixada recomeça do zero (a "época" da API), então a
+# volta é o mesmo gesto com as linguagens trocadas, e a confirmação avisa o recomeço. O Pro vê tudo.
 #
 # Três fases no mesmo quadro: confirmar (o que acontece, Trocar ou Continuar na atual), trocando (a
 # animação, ~2,4 s) e concluído (Começar ou Continuar a trilha). Com prefers-reduced-motion, cada fase
@@ -30,7 +31,6 @@ CSS_TROCA = (
     '\n@keyframes tl-texto{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}'
     '\n@keyframes tl-fluxo{0%,100%{opacity:0.22;transform:translateX(-2px);}45%{opacity:1;transform:translateX(2px);}}'
     '\n@keyframes tl-congela{from{opacity:0;clip-path:inset(0 0 100% 0);}to{opacity:1;clip-path:inset(0 0 0 0);}}'
-    '\n@keyframes tl-derrete{from{opacity:1;clip-path:inset(0 0 0 0);}to{opacity:0;clip-path:inset(100% 0 0 0);}}'
     '\n@keyframes tl-sai{from{opacity:1;transform:none;}to{opacity:0;transform:rotateY(90deg) scale(0.8);}}'
     '\n@keyframes tl-gira{from{opacity:0;transform:rotateY(-90deg) scale(0.8);}to{opacity:1;transform:none;}}'
     '\n@keyframes tl-onda{from{opacity:0.55;transform:scale(1);}to{opacity:0;transform:scale(1.5);}}'
@@ -58,17 +58,13 @@ CSS_TROCA = (
     '\n.mc .tl-trocando .tl-de .tl-gelo{animation:tl-congela 1s cubic-bezier(.3,.7,.2,1) .15s both;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-de .tl-conteudo{filter:saturate(0.1);opacity:0.7;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-de{transform:scale(0.97);}'
-    # a nova se abre; a que volta descongela
+    # a nova se abre do começo
     '\n.mc .tl-nova{opacity:0.62;}'
     '\n.mc .tl-nova .tl-conteudo{filter:saturate(0.35);}'
-    '\n.mc .tl-volta .tl-conteudo{filter:saturate(0.1);opacity:0.7;}'
-    '\n.mc .tl-volta .tl-gelo{opacity:1;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-para{opacity:1;transform:translateY(-3px);'
     'box-shadow:0 0 0 2px var(--pri),0 14px 30px -12px color-mix(in oklch, var(--pri) 45%, transparent);}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-para .tl-conteudo{filter:none;opacity:1;}'
     '\n.mc .tl-trocando .tl-para,.mc .tl-trocando .tl-para .tl-conteudo{transition-delay:1s;}'
-    '\n.mc :is(.tl-trocando,.tl-concluido) .tl-volta .tl-gelo{opacity:0;}'
-    '\n.mc .tl-trocando .tl-volta .tl-gelo{animation:tl-derrete .9s cubic-bezier(.4,0,.2,1) .95s both;}'
     '\n.mc .tl-acende{transform-box:fill-box;transform-origin:center;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-acende{fill:var(--pri);stroke:var(--pri);}'
     '\n.mc .tl-trocando .tl-acende{animation:tl-acende .45s cubic-bezier(.2,.8,.2,1.3) 1.45s both;}'
@@ -202,7 +198,7 @@ def _selo_libera(k):
 def _palco(k, cenario, movel=False):
     if cenario == 'volta':
         de = _cartao(k, 'tl-de', 'py', 'tlPyTrilha', 'tlPyMeta', 1, gelo='tlPyFeitas', movel=movel)
-        para = _cartao(k, 'tl-para tl-volta', 'js', 'tlJsTrilha', 'tlJsMeta', 3, gelo='tlJsFeitas', balao='tlDeOndeParou', movel=movel)
+        para = _cartao(k, 'tl-para tl-nova', 'js', 'tlJsTrilha', 'tlJsMetaNova', 0, nova=True, balao='tlComeceAqui', movel=movel)
         centro = _centro(k, 'py', 'js', movel)
     else:
         de = _cartao(k, 'tl-de', 'js', 'tlJsTrilha', 'tlJsMeta', 3, gelo='tlJsFeitas', movel=movel)
@@ -243,24 +239,31 @@ def _rodape(k, principal, secundario, link=None, movel=False):
     return (f'<div style="display:flex;align-items:center;gap:10px;">{esq}<span style="flex:1;"></span>{secundario}{principal}</div>')
 
 
+def _aviso(k, chave):
+    # o recomeço do zero no Starter, dito antes de trocar: guardado não é continuar de onde parou
+    return (f'<p class="tl-texto" style="margin:0;display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;'
+            f'background:{k["sunken"]};font-size:13.5px;line-height:20px;color:{k["fg"]};">'
+            f'<span style="display:flex;margin-top:2px;color:{k["mfg"]};">{ic("recarregar", 15)}</span><span>{T(chave)}</span></p>')
+
+
 def _fases(k, cenario, movel=False):
     alt = 48 if movel else 40
     alt2 = 44 if movel else 40
     larg = '100%' if movel else None
     if cenario == 'plano':
-        return (_texto(k, 'tlPlanoTit', 'tlPlanoTxt', movel)
+        return (_texto(k, 'tlPlanoTit', 'tlPlanoTxt', movel) + _aviso(k, 'tlPlanoAviso')
                 + f'<p style="margin:-6px 0 0;font-size:13.5px;color:{k["mfg"]};">{T("tlPlanoPro")}</p>'
                 + _rodape(k, botao(T('tlFicarJs'), k, 'solid', alt, largura=larg),
                           botao_link(T('tlVerPro'), 'Planos__SUF__.dc.html', k, 'outline', alt2, largura=larg), movel=movel))
+    c = 'Ida' if cenario == 'ida' else 'Volta'
     ida = cenario == 'ida'
-    confirmar = (_texto(k, 'tlIdaTit' if ida else 'tlVoltaTit', 'tlIdaTxt' if ida else 'tlVoltaTxt', movel)
-                 + _rodape(k, _botao_seta(T('tlTrocarPy' if ida else 'tlVoltarJs'), k, alt, larg, 'tlTrocar'),
+    confirmar = (_texto(k, f'tl{c}Tit', f'tl{c}Txt', movel) + _aviso(k, f'tl{c}Aviso')
+                 + _rodape(k, _botao_seta(T('tlTrocarPy' if ida else 'tlTrocarJs'), k, alt, larg, 'tlTrocar'),
                            botao(T('tlFicarJs' if ida else 'tlFicarPy'), k, 'ghost', alt2, largura=larg), 'tlProLink', movel))
     trocando = (f'<div role="status" style="display:contents;">'
-                + _texto(k, 'tlIdaTrocandoTit' if ida else 'tlVoltaTrocandoTit', 'tlIdaTrocandoTxt' if ida else 'tlVoltaTrocandoTxt', movel)
-                + '</div>')
-    concluido = (_texto(k, 'tlIdaFimTit' if ida else 'tlVoltaFimTit', 'tlIdaFimTxt' if ida else 'tlVoltaFimTxt', movel)
-                 + _rodape(k, botao_link(T('tlComecar' if ida else 'tlContinuar'), 'Trilha__SUF__.dc.html', k, 'solid', alt, 'seta', larg), '', movel=movel))
+                + _texto(k, f'tl{c}TrocandoTit', f'tl{c}TrocandoTxt', movel) + '</div>')
+    concluido = (_texto(k, f'tl{c}FimTit', f'tl{c}FimTxt', movel)
+                 + _rodape(k, botao_link(T('tlComecar'), 'Trilha__SUF__.dc.html', k, 'solid', alt, 'seta', larg), '', movel=movel))
     return se('tl.confirmar', confirmar, True) + se('tl.trocando', trocando) + se('tl.concluido', concluido)
 
 
@@ -273,7 +276,7 @@ def _modal(k, cenario):
             f'style="width:720px;max-width:calc(100% - 32px);display:flex;flex-direction:column;gap:22px;padding:26px 32px 28px;'
             f'border-radius:18px;background:{k["card"]};box-shadow:0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px {k["border"]};">'
             f'{rotulo(T("tlRotulo"), k["mfg"])}{_palco(k, cenario)}'
-            f'<div style="display:flex;flex-direction:column;gap:18px;min-height:156px;">{_fases(k, cenario)}</div></section>')
+            f'<div style="display:flex;flex-direction:column;gap:18px;min-height:220px;">{_fases(k, cenario)}</div></section>')
 
 
 def tela_troca(k, sufixo, cenario):
@@ -293,7 +296,7 @@ def tela_troca_movel(k):
              f'padding:10px {PAD + 4}px 28px;border-radius:20px 20px 0 0;background:{k["card"]};box-shadow:{k["sombraFlut"]};">'
              f'<span style="align-self:center;width:40px;height:4px;border-radius:999px;background:{k["input"]};"></span>'
              f'{rotulo(T("tlRotulo"), k["mfg"])}{_palco(k, "ida", movel=True)}'
-             f'<div style="display:flex;flex-direction:column;gap:16px;min-height:200px;">{_fases(k, "ida", movel=True)}</div></section>')
+             f'<div style="display:flex;flex-direction:column;gap:16px;">{_fases(k, "ida", movel=True)}</div></section>')
     pagina = (f'<main style="padding:18px {PAD}px;display:flex;flex-direction:column;gap:16px;">'
               f'<h1 style="margin:0;font-size:24px;line-height:30px;font-weight:600;color:{k["fgs"]};">{T("trTitulo")}</h1>'
               + ''.join(_cartao_trilha(k, *t) for t in TRILHAS_JS[:3]) + '</main>')
