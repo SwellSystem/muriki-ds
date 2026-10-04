@@ -7,6 +7,8 @@ from arquitetura import tela_exercicio_arquitetura
 from textos_evolucao import TEXTOS as EVOLUCAO_NOVA
 from evolucao import tela_evolucao_nova, tela_evolucao_movel, tela_competencia_nova, tela_evolucao_vazia
 from textos_desbloqueio import TEXTOS as DESBLOQUEIO
+from textos_troca import TEXTOS as TROCA
+from troca import tela_troca, tela_troca_movel, ALTURA_MOVEL as ALTURA_TROCA, CSS_TROCA, ANTES_TROCA, VALORES_TROCA, PROPS_TROCA
 from textos_planos_escolha import TEXTOS as PLANOS_ESCOLHA
 from planos_escolha import tela_planos_escolha, tela_planos_escolha_movel, ALTURA_MOVEL as ALTURA_PLANOS_ESCOLHA
 from desbloqueio import (tela_trilhas_bloqueada, tela_trilha_acima, tela_trilha_liberada, tela_trilha_liberada_movel,
@@ -1330,6 +1332,13 @@ def _montar(tela, tema, sufixo):
         return web(DESBLOQUEIO, tela_trilha_acima(k), css=CSS_DESBLOQUEIO)
     if tela['id'] == 'desb_liberada':
         return web(DESBLOQUEIO, tela_trilha_liberada(k), css=CSS_DESBLOQUEIO)
+    if tela['id'] in ('troca_ida', 'troca_volta'):
+        return web(juntar(TRILHAS, TROCA), tela_troca(k, sufixo, tela['id'][6:]), ANTES_TROCA, VALORES_TROCA, PROPS_TROCA, CSS_TROCA)
+    if tela['id'] == 'troca_plano':
+        return web(juntar(TRILHAS, TROCA), tela_troca(k, sufixo, 'plano'), css=CSS_TROCA)
+    if tela['id'] == 'troca_movel':
+        return casca_movel(web(juntar(DESBLOQUEIO, TROCA, MOVEL), tela_troca_movel(k), ANTES_TROCA, VALORES_TROCA, PROPS_TROCA, CSS_TROCA),
+                           ALTURA_TROCA)
     if tela['id'] == 'planos_escolha':
         return web(PLANOS_ESCOLHA, tela_planos_escolha(k))
     if tela['id'] == 'planos_escolha_movel':
