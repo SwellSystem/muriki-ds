@@ -1137,6 +1137,70 @@
    "h": 1000,
    "title": "Celular · a lição com o passo a passo empilhado · escuro",
    "is_interactive": true
+  },
+  "TrocaLinguagem.dc.html": {
+   "x": 15200,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · Starter: JavaScript congela e Python se abre (Trocar anima)",
+   "is_interactive": true
+  },
+  "TrocaLinguagemEscuro.dc.html": {
+   "x": 15200,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · Starter: JavaScript congela e Python se abre (Trocar anima) · escuro",
+   "is_interactive": true
+  },
+  "TrocaLinguagemVolta.dc.html": {
+   "x": 16720,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · a volta: Python congela e JavaScript descongela de onde parou",
+   "is_interactive": true
+  },
+  "TrocaLinguagemVoltaEscuro.dc.html": {
+   "x": 16720,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · a volta: Python congela e JavaScript descongela de onde parou · escuro",
+   "is_interactive": true
+  },
+  "TrocaLinguagemPlano.dc.html": {
+   "x": 18240,
+   "y": 15840,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt",
+   "is_interactive": true
+  },
+  "TrocaLinguagemPlanoEscuro.dc.html": {
+   "x": 18240,
+   "y": 17160,
+   "w": 1440,
+   "h": 900,
+   "title": "Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt · escuro",
+   "is_interactive": true
+  },
+  "TrocaLinguagemMovel.dc.html": {
+   "x": 5640,
+   "y": 18480,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · a troca de linguagem numa folha: os cartões empilham e as setas descem",
+   "is_interactive": true
+  },
+  "TrocaLinguagemMovelEscuro.dc.html": {
+   "x": 5640,
+   "y": 21360,
+   "w": 390,
+   "h": 844,
+   "title": "Celular · a troca de linguagem numa folha: os cartões empilham e as setas descem · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1247,7 +1311,7 @@
   "aprenderMais": {
    "x": 0,
    "y": 15540,
-   "text": "Trilhas, catálogo de exercícios, Peer na web, e a trilha bloqueada com o ganho de trilha",
+   "text": "Trilhas, catálogo de exercícios, Peer na web, a trilha bloqueada com o ganho de trilha e a troca de linguagem do Starter",
    "kind": "title1",
    "maxW": 8000,
    "w": 240
@@ -1419,7 +1483,15 @@
   "ExercicioPeerVoceSabia.dc.html",
   "ExercicioPeerVoceSabiaEscuro.dc.html",
   "LicaoMovel.dc.html",
-  "LicaoMovelEscuro.dc.html"
+  "LicaoMovelEscuro.dc.html",
+  "TrocaLinguagem.dc.html",
+  "TrocaLinguagemEscuro.dc.html",
+  "TrocaLinguagemVolta.dc.html",
+  "TrocaLinguagemVoltaEscuro.dc.html",
+  "TrocaLinguagemPlano.dc.html",
+  "TrocaLinguagemPlanoEscuro.dc.html",
+  "TrocaLinguagemMovel.dc.html",
+  "TrocaLinguagemMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

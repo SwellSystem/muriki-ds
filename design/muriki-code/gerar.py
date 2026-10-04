@@ -62,6 +62,9 @@ TELAS = [
     ('desb_trilhas', 'DesbloqueioTrilhas', 'Trilhas', 'Trilhas · Arquitetura bloqueada: o caminho até Pleno e o abrir mesmo assim', 7, 12, 13),
     ('desb_trilha', 'DesbloqueioTrilha', 'Arquitetura de sistemas', 'Trilha acima do seu nível · o aviso above_level, que não trava', 8, 12, 13),
     ('desb_liberada', 'TrilhaLiberada', 'Trilha liberada', 'Ganho de trilha · o momento, uma vez, quando o nível alcança o startTier', 9, 12, 13),
+    ('troca_ida', 'TrocaLinguagem', 'Trocar de linguagem', 'Troca de linguagem · Starter: JavaScript congela e Python se abre (Trocar anima)', 10, 12, 13),
+    ('troca_volta', 'TrocaLinguagemVolta', 'Trocar de linguagem', 'Troca de linguagem · a volta: Python congela e JavaScript descongela de onde parou', 11, 12, 13),
+    ('troca_plano', 'TrocaLinguagemPlano', 'Trocar de linguagem', 'Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt', 12, 12, 13),
     # o Code no celular (390), na fileira 14 (claro) e 15 (escuro); o tamanho vem de movel.ALTURAS
     ('menu_movel', 'MenuMovel', 'Menu', 'Celular · a barra de topo e a gaveta do menu', 0, 14, 15),
     ('inicio_movel', 'InicioMovel', 'Início', 'Celular · o Início do primeiro dia', 1, 14, 15),
@@ -74,6 +77,7 @@ TELAS = [
     ('liberada_movel', 'TrilhaLiberadaMovel', 'Trilha liberada', 'Celular · o ganho de trilha numa folha', 9, 14, 15),
     ('planos_escolha_movel', 'PlanosEscolhaMovel', 'Escolha seu plano', 'Celular · a escolha obrigatória de plano', 10, 14, 15),
     ('licao_movel', 'LicaoMovel', 'Lição', 'Celular · a lição com o passo a passo empilhado', 11, 14, 15),
+    ('troca_movel', 'TrocaLinguagemMovel', 'Trocar de linguagem', 'Celular · a troca de linguagem numa folha: os cartões empilham e as setas descem', 12, 14, 15),
     ('boas_vindas_movel', 'BoasVindasMovel', 'Trilhas', 'Celular · as boas-vindas às trilhas numa folha que sobe de baixo', 6, 14, 15),
     ('sem_internet', 'SemInternet', 'Sem internet', 'Sistema · sem internet', 0, 10, 11),
     ('nao_encontrada', 'NaoEncontrada', 'Página não encontrada', 'Sistema · página não encontrada (404)', 1, 10, 11),
@@ -116,7 +120,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         if id_.endswith('_movel'):
             # o celular: 390 de largura, a altura da página, e as colunas mais juntas
             chave = {'menu_movel': 'menu', 'inicio_movel': 'inicio', 'trilhas_movel': 'trilhas', 'trilha_movel': 'trilha', 'trilha_lista_movel': 'trilha_lista',
-                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao', 'liberada_movel': 'liberada', 'planos_escolha_movel': 'planos_escolha', 'licao_movel': 'licao'}[id_]
+                     'exercicios_movel': 'exercicios', 'conta_movel': 'conta', 'boas_vindas_movel': 'boas_vindas', 'evolucao_movel': 'evolucao', 'liberada_movel': 'liberada', 'planos_escolha_movel': 'planos_escolha', 'licao_movel': 'licao', 'troca_movel': 'troca'}[id_]
             x, w, h = col * (WM + 80), WM, ALTURAS_MOVEL[chave]
             y = (14 * LINHA_Y) if tema == 'claro' else (14 * LINHA_Y + ALTURA_MOVEL_MAX + 420)
         b = boards.setdefault(arquivo, {})
@@ -141,7 +145,7 @@ for chave, lin, n, texto in [
     ('minhaContaEscuro', 9, 10, 'Minha conta no tema escuro'),
     ('sistema', 10, 6, 'Páginas de sistema do hub: sem internet, 404, erro, sessão expirada e manutenção — as mesmas no Code, no Backoffice e no Platform'),
     ('sistemaEscuro', 11, 6, 'Páginas de sistema no tema escuro'),
-    ('aprenderMais', 12, 10, 'Trilhas, catálogo de exercícios, Peer na web, e a trilha bloqueada com o ganho de trilha'),
+    ('aprenderMais', 12, 13, 'Trilhas, catálogo de exercícios, Peer na web, a trilha bloqueada com o ganho de trilha e a troca de linguagem do Starter'),
     ('aprenderMaisEscuro', 13, 10, 'Trilhas, exercícios e Peer na web no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))

@@ -29,7 +29,7 @@ I.update(
 
 # a altura de cada quadro: a página rolada inteira (medida no Chrome e arredondada)
 ALTURAS = dict(menu=844, inicio=1600, trilhas=1900, trilha=1710, trilha_lista=1064, exercicios=1850, conta=1420, boas_vindas=844,
-               evolucao=2460, liberada=844, planos_escolha=1680, licao=1000)
+               evolucao=2460, liberada=844, planos_escolha=1680, licao=1000, troca=844)
 # MEDIR=1 solta a altura (para medir a página no Chrome)
 MEDIR = os.environ.get('MEDIR') == '1'
 
