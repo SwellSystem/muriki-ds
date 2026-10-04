@@ -1303,6 +1303,18 @@ def _montar(tela, tema, sufixo):
         return web(EVOLUCAO_NOVA, tela_evolucao_vazia(k))
     if tela['id'] in ('evolucao', 'evolucao_tempo'):
         return web(EVOLUCAO_NOVA, tela_evolucao_nova(k, rolada=tela['id'] == 'evolucao_tempo'))
+    if tela['id'] in ('licao', 'guia_voce_sabia', 'peer_voce_sabia', 'licao_movel'):
+        from textos_licao import TEXTOS as LICAO
+        from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO
+        import licao as li
+        if tela['id'] == 'licao_movel':
+            return casca_movel(web(juntar(LICAO, MOVEL), li.tela_licao_movel(k), li.antes_licao(k), li.VALORES_LICAO), li.ALTURA_MOVEL)
+        if tela['id'] == 'licao':
+            return web(juntar(EXERCICIO, LICAO), li.tela_licao(k), li.antes_licao(k), VALORES_EXERCICIO + ',\n' + li.VALORES_LICAO)
+        if tela['id'] == 'guia_voce_sabia':
+            return web(juntar(EXERCICIO, LICAO), li.tela_guia_voce_sabia(k), valores=VALORES_EXERCICIO)
+        return web(juntar(EXERCICIO, LICAO, {l: {kk: v for kk, v in PEER_EXERCICIO[l].items() if kk in ('peerNome', 'entendi', 'peerAcompanhando', 'historicoTit', 'h2hora', 'h2Gatilho', 'tipoPergunta', 'peerPausa')} for l in PEER_EXERCICIO}),
+                   li.tela_peer_voce_sabia(k), valores=VALORES_EXERCICIO)
     if tela['id'] in ('peer_testes', 'peer_faixa', 'peer_retorno'):
         from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO
         import peer_exercicio as pe

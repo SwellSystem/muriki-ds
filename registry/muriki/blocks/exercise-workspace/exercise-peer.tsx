@@ -15,12 +15,17 @@
  *   `peerStatus`); "Peer em pausa" quando a cota ou o orçamento acabou.
  * - `PeerHistory`: o cartão "Peer neste exercício" na coluna da esquerda, embaixo das dicas, com o
  *   que ele disse, do mais recente para o mais antigo.
+ * - `PeerInsight`: quando o Peer acha uma armadilha da linguagem no código (ex.: `==`), a fala dele é
+ *   o "Você sabia?" (DidYouKnow), no amarelo, na mesma faixa (ExerciseEditor `peerBar`), com o
+ *   caso dele e "Ler no guia" para o texto inteiro.
  *
  * O retorno do envio (ExerciseSubmission) fala com a mesma voz e o mesmo ícone, para a IA ser uma
  * presença só. Regras: swell-docs/muriki-api/features/code/execucao-no-browser-e-peer.md.
  */
-import { ChatTeardropTextIcon } from "@phosphor-icons/react"
+import type * as React from "react"
+import { ChatTeardropTextIcon, SparkleIcon } from "@phosphor-icons/react"
 
+import { DID_YOU_KNOW_TONE } from "@/components/blocks/did-you-know"
 import { Badge } from "@/components/ui/badge"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -182,5 +187,54 @@ export function PeerHistory({ messages, locale = "pt-BR", open, defaultOpen = tr
         ))}
       </ol>
     </ExerciseSection>
+  )
+}
+
+export interface PeerInsightProps {
+  /** O título do "Você sabia?", já renderizado. */
+  title: React.ReactNode
+  /** O caso no código da pessoa, ex.: "Na linha 4 você usou ==…". */
+  children: React.ReactNode
+  /** "Ler no guia": abre o guia de sintaxe no "Você sabia?" inteiro. */
+  onReadMore?: () => void
+  onDismiss?: () => void
+  className?: string
+}
+
+export function PeerInsight({ title, children, onReadMore, onDismiss, className }: PeerInsightProps) {
+  const t = useTranslate()
+  const acao =
+    "-ml-1.5 h-6 rounded-md px-1.5 text-[12.5px] font-medium outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+  return (
+    <div
+      role="note"
+      aria-live="polite"
+      data-slot="peer-insight"
+      className={cn("flex items-start gap-3 border-t border-muted px-4 py-2.5 max-sm:flex-wrap", DID_YOU_KNOW_TONE.surface, className)}
+    >
+      <PeerAvatar size={22} />
+      <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+        <span className={cn("flex items-center gap-1.5 font-mono text-[9.5px] font-semibold tracking-[0.16em] uppercase", DID_YOU_KNOW_TONE.ink)}>
+          <SparkleIcon aria-hidden weight="fill" className="size-3" />
+          {t("exercise_workspace.peer.name")} · {t("did_you_know.label")}
+        </span>
+        <span className="text-[13.5px] leading-5 font-semibold text-foreground-strong [&_code]:font-mono">{title}</span>
+        <span className="text-[13px] leading-[19px] text-pretty text-foreground [&_code]:font-mono">{children}</span>
+      </div>
+      {onReadMore || onDismiss ? (
+        <span className="flex shrink-0 items-center gap-3 self-center">
+          {onReadMore ? (
+            <button type="button" onClick={onReadMore} className={cn(acao, "text-primary underline-offset-[3px] hover:underline")}>
+              {t("exercise_workspace.peer.read_more")}
+            </button>
+          ) : null}
+          {onDismiss ? (
+            <button type="button" onClick={onDismiss} className={cn(acao, "text-muted-foreground hover:text-foreground-strong")}>
+              {t("exercise_workspace.peer.dismiss")}
+            </button>
+          ) : null}
+        </span>
+      ) : null}
+    </div>
   )
 }
