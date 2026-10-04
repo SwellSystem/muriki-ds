@@ -20,6 +20,7 @@ import { useRender } from "@base-ui/react/use-render"
 
 import { cn } from "@/lib/utils"
 import { useTranslate } from "@/lib/i18n"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export interface TrackProgressItem {
   id: string
@@ -122,5 +123,45 @@ function Barra({ track }: { track: TrackProgressItem }) {
         ) : null
       )}
     </span>
+  )
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+export interface TrackProgressSkeletonProps {
+  /** Quantas trilhas. Padrão: 3. */
+  tracks?: number
+  className?: string
+}
+
+/** O TrackProgress carregando: o título, e por trilha o nome, a barra e a legenda de quatro partes. */
+export function TrackProgressSkeleton({ tracks = 3, className }: TrackProgressSkeletonProps) {
+  return (
+    <div aria-hidden data-slot="track-progress-skeleton" className={cn("flex min-w-0 flex-col rounded-xl bg-card px-5 pt-4 pb-1.5 shadow-xs", className)}>
+      <div className="mb-0.5">
+        <LinhaDeTexto h={20} className="w-28" />
+      </div>
+      {Array.from({ length: tracks }, (_, i) => (
+        <div key={i} className={cn("flex flex-col gap-2.5 py-3.5", i > 0 && "border-t border-muted")}>
+          <LinhaDeTexto h={20} className={["w-[52%]", "w-[64%]", "w-[44%]"][i % 3]} />
+          <Skeleton className="h-2 w-full rounded-[3px]" />
+          {/* as larguras das quatro partes da legenda, para quebrar onde a real quebra */}
+          <span className="flex flex-wrap gap-x-3.5 gap-y-1.5">
+            {["w-[64px]", "w-[214px]", "w-[156px]", "w-[86px]"].map((w, j) => (
+              <LinhaDeTexto key={j} h={16} className={w} />
+            ))}
+          </span>
+        </div>
+      ))}
+    </div>
   )
 }

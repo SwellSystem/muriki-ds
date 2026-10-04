@@ -16,6 +16,7 @@
 import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatShortDate } from "@/lib/date-format"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -118,5 +119,64 @@ export function SkillTrajectory({ skill, first, latest, locale = "pt-BR", title,
         )}
       </div>
     </section>
+  )
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+/** A SkillTrajectory carregando: o título com o selo, as duas colunas e as cinco medidas. */
+export function SkillTrajectorySkeleton({ className }: { className?: string }) {
+  const colunas = "grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]"
+  return (
+    <div aria-hidden data-slot="skill-trajectory-skeleton" className={cn("@container flex min-w-0 flex-col gap-3.5 rounded-xl bg-card px-5 pt-4 pb-3 shadow-xs", className)}>
+      <div className="flex items-start gap-3">
+        <div className="flex flex-1 flex-col gap-[3px]">
+          <LinhaDeTexto h={20} className="w-28" />
+          <LinhaDeTexto h={19} className="w-[95%]" />
+          <LinhaDeTexto h={19} className="w-[55%]" />
+          <span className="flex flex-col gap-[3px] @[28rem]:hidden">
+            <LinhaDeTexto h={19} className="w-[90%]" />
+            <LinhaDeTexto h={19} className="w-[35%]" />
+          </span>
+        </div>
+        <Skeleton className="h-[22px] w-20 rounded-[4px]" />
+      </div>
+      <div>
+        <div className={cn("grid items-end gap-3.5 pb-2.5", colunas)}>
+          <span />
+          {[0, 1].map((c) => (
+            <span key={c} className="flex flex-col gap-0.5">
+              <LinhaDeTexto h={14} className="w-20" />
+              <LinhaDeTexto h={20} className="w-24" />
+              <LinhaDeTexto h={16} className="w-16" />
+            </span>
+          ))}
+        </div>
+        {["w-[70%]", "w-[52%]", "w-[40%]", "w-[60%]", "w-[76%]"].map((w, i) => (
+          <div key={i} className={cn("grid min-h-[38px] items-center gap-3.5 border-t border-muted", colunas)}>
+            {/* no estreito, os rótulos longos quebram em duas linhas */}
+            <span className="flex flex-col py-1">
+              <LinhaDeTexto h={20} className={w} />
+              {i === 0 || i === 4 ? (
+                <span className="@[28rem]:hidden">
+                  <LinhaDeTexto h={20} className="w-[45%]" />
+                </span>
+              ) : null}
+            </span>
+            <LinhaDeTexto h={19} className="w-10" />
+            <LinhaDeTexto h={19} className="w-10" />
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }

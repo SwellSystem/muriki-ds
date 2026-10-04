@@ -16,6 +16,7 @@ import * as React from "react"
 
 import { useLevelName, type Level } from "@/components/ui/level-scale"
 import { formatShortDate } from "@/lib/date-format"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -90,5 +91,46 @@ export function LevelHistory({ changes, locale = "pt-BR", title, className }: Le
         </ol>
       )}
     </section>
+  )
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+/** O LevelHistory carregando: o título e os marcos (`items`), com a data, o ponto e as duas linhas. */
+export function LevelHistorySkeleton({ items = 2, className }: { items?: number; className?: string }) {
+  return (
+    <div aria-hidden data-slot="level-history-skeleton" className={cn("@container flex min-w-0 flex-col gap-3 rounded-xl bg-card px-5 pt-4 pb-1.5 shadow-xs", className)}>
+      <LinhaDeTexto h={20} className="w-36" />
+      <div>
+        {Array.from({ length: items }, (_, i) => (
+          <div key={i} className="grid grid-cols-[5.5rem_14px_minmax(0,1fr)] gap-3">
+            <LinhaDeTexto h={20} className="w-16" />
+            <span className="flex flex-col items-center pt-[5px]">
+              <Skeleton className="size-2.5 shrink-0 rounded-full" />
+              {i === items - 1 ? null : <span className="mt-1 w-px flex-1 bg-input" />}
+            </span>
+            <span className="flex flex-col gap-[3px] pb-3.5">
+              <LinhaDeTexto h={20} className="w-36" />
+              <LinhaDeTexto h={19} className="w-[92%]" />
+              {/* o ponto de partida, o último, tem a frase mais longa: ela quebra */}
+              {i === items - 1 ? <LinhaDeTexto h={19} className="w-[40%]" /> : null}
+              {/* no estreito, todas quebram uma linha a mais */}
+              <span className="@[30rem]:hidden">
+                <LinhaDeTexto h={19} className="w-[55%]" />
+              </span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
   )
 }
