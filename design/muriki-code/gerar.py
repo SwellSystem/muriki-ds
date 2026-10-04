@@ -33,6 +33,9 @@ TELAS = [
     ('inicio', 'Inicio', 'Início', 'Início · o primeiro dia, antes de qualquer prática', 5, 2, 3),
     ('evolucao_tempo', 'EvolucaoNoTempo', 'Evolução', 'Evolução, rolada · fatia 2: evolução no tempo e trajetória', 7, 2, 3),
     ('arquitetura', 'ExercicioArquitetura', 'Exercício de arquitetura', 'Exercício de arquitetura · a bancada: peças, ligações, regras e Verificar', 6, 2, 3),
+    ('starter_exercicio', 'ExercicioStarter', 'Exercício', 'Starter · o Peer sem a revisão da IA nos eventos: um complemento fixo no "Peer acompanhando"', 14, 2, 3),
+    ('starter_evolucao', 'EvolucaoStarter', 'Evolução', 'Starter · a Evolução nos últimos 7 dias: o aviso, a linha do tempo com a borda e a trajetória fora da janela', 15, 2, 3),
+    ('starter_competencia', 'CompetenciaStarter', 'Funções e escopo', 'Starter · a competência nos últimos 7 dias: o histórico sem mudança na janela e a trajetória fora dela', 16, 2, 3),
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
     ('planos', 'Planos', 'Planos', 'Planos · Starter e Pro', 2, 4, 5),
@@ -135,7 +138,7 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
-    ('web', 2, 14, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo e o guia de sintaxe'),
+    ('web', 2, 17, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)'),
     ('webEscuro', 3, 8, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),
