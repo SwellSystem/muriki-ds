@@ -11,8 +11,13 @@
  *
  * É a forma de GET /code/evolution/level-changes?competencyId. Sem nenhum marco, a frase diz que o
  * histórico começa no primeiro nível confirmado.
+ *
+ * No Starter, com `historyFrom`, a API só devolve os últimos dias: embaixo do último marco, a borda
+ * "desde 28 de set."; sem marco na janela, a frase diz que nada mudou nesses dias e que o nível de
+ * agora conta tudo. O aviso com o Pro é o HistoryWindowNote, embaixo do cabeçalho da página.
  */
 import * as React from "react"
+import { ClockIcon } from "@phosphor-icons/react"
 
 import { useLevelName, type Level } from "@/components/ui/level-scale"
 import { formatShortDate } from "@/lib/date-format"
@@ -34,10 +39,14 @@ export interface LevelHistoryProps {
   locale?: string
   /** Troca "Histórico do nível"; `null` tira. */
   title?: React.ReactNode | null
+  /** O `historyFrom` da API no Starter (ISO 8601). `null` no Pro. */
+  historyFrom?: string | null
+  /** Quantos dias a janela tem (o code.history_days do plano). */
+  days?: number
   className?: string
 }
 
-export function LevelHistory({ changes, locale = "pt-BR", title, className }: LevelHistoryProps) {
+export function LevelHistory({ changes, locale = "pt-BR", title, historyFrom, days = 7, className }: LevelHistoryProps) {
   const t = useTranslate()
   const nome = useLevelName()
   const marcos = [...changes].sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
@@ -50,7 +59,12 @@ export function LevelHistory({ changes, locale = "pt-BR", title, className }: Le
       {title === null ? null : (
         <h2 className="m-0 text-[15px] leading-5 font-semibold text-foreground-strong">{title ?? t("level_history.title")}</h2>
       )}
-      {marcos.length === 0 ? (
+      {marcos.length === 0 && historyFrom ? (
+        <p className="m-0 mb-3 flex items-start gap-2.5 rounded-[10px] px-3.5 py-3 text-[13px] leading-[19px] text-muted-foreground shadow-[inset_0_0_0_1px_var(--muted)]">
+          <ClockIcon aria-hidden className="mt-px size-[15px] shrink-0" />
+          {t("level_history.window_empty", { count: days })}
+        </p>
+      ) : marcos.length === 0 ? (
         <p className="m-0 pb-3 text-[13px] leading-[19px] text-muted-foreground">{t("level_history.empty")}</p>
       ) : (
         <ol className="m-0 list-none p-0">
@@ -90,6 +104,13 @@ export function LevelHistory({ changes, locale = "pt-BR", title, className }: Le
           })}
         </ol>
       )}
+      {marcos.length > 0 && historyFrom ? (
+        <p className="m-0 -mt-1.5 pb-3 pl-[calc(5.5rem+26px+0.75rem)] font-mono text-[11px] text-muted-foreground">
+          {t("history_window.since", {
+            date: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(new Date(historyFrom)),
+          })}
+        </p>
+      ) : null}
     </section>
   )
 }

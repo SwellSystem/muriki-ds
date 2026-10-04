@@ -12,8 +12,12 @@
  * segunda coluna vira a frase que diz que a próxima aparece ao lado. Explicação sem nota
  * (`understanding` null) é um traço; tempo sem medida (`secondsToPass` null) também, com o porquê
  * no title e para leitor de tela. Exercício que saiu do catálogo (`retired`) leva a nota.
+ *
+ * No Starter, a trajetória de uma etapa sem aprovação nos últimos dias responde 404: no lugar, a
+ * SkillTrajectoryOutOfWindow, o mesmo cartão com a frase da janela.
  */
 import * as React from "react"
+import { ClockIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -118,6 +122,45 @@ export function SkillTrajectory({ skill, first, latest, locale = "pt-BR", title,
           </p>
         )}
       </div>
+    </section>
+  )
+}
+
+export interface SkillTrajectoryOutOfWindowProps {
+  /** O nome da etapa, no selo do canto, ex.: "Closures". */
+  skill: string
+  /** Quantos dias a janela tem (o code.history_days do plano). */
+  days?: number
+  /** Troca "Trajetória"; `null` tira o título e a frase. */
+  title?: React.ReactNode | null
+  className?: string
+}
+
+/** A trajetória fora da janela do Starter (404): o mesmo cartão, com a frase no lugar das colunas. */
+export function SkillTrajectoryOutOfWindow({ skill, days = 7, title, className }: SkillTrajectoryOutOfWindowProps) {
+  const t = useTranslate()
+  return (
+    <section
+      data-slot="skill-trajectory"
+      data-state="out-of-window"
+      aria-label={typeof title === "string" ? title : t("skill_trajectory.title")}
+      className={cn("flex min-w-0 flex-col gap-3 rounded-xl bg-card px-5 pt-4 pb-[18px] shadow-xs", className)}
+    >
+      <div className="flex items-start gap-3">
+        {title === null ? (
+          <span className="flex-1" />
+        ) : (
+          <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+            <h2 className="m-0 text-[15px] leading-5 font-semibold text-foreground-strong">{title ?? t("skill_trajectory.title")}</h2>
+            <p className="m-0 text-[13px] leading-[19px] text-muted-foreground">{t("skill_trajectory.subtitle")}</p>
+          </div>
+        )}
+        <Badge tone="blue">{skill}</Badge>
+      </div>
+      <p className="m-0 flex items-start gap-2.5 rounded-[10px] px-3.5 py-3 text-[13px] leading-[19px] text-muted-foreground shadow-[inset_0_0_0_1px_var(--muted)]">
+        <ClockIcon aria-hidden className="mt-px size-[15px] shrink-0" />
+        {t("skill_trajectory.out_of_window", { count: days })}
+      </p>
     </section>
   )
 }
