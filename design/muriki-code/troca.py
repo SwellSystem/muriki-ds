@@ -36,6 +36,10 @@ CSS_TROCA = (
     '\n@keyframes tl-onda{from{opacity:0.55;transform:scale(1);}to{opacity:0;transform:scale(1.5);}}'
     '\n@keyframes tl-acende{0%{fill:var(--card);stroke:var(--input);transform:scale(0.7);}60%{fill:var(--pri);stroke:var(--pri);transform:scale(1.5);}100%{fill:var(--pri);stroke:var(--pri);transform:none;}}'
     '\n@keyframes tl-pop{from{opacity:0;transform:translate(var(--ax),calc(-100% - 4px));}to{opacity:1;transform:translate(var(--ax),calc(-100% - 10px));}}'
+    '\n@keyframes tl-previa-de{0%{opacity:1;transform:none;}15%,77%{opacity:0;transform:rotateY(90deg) scale(0.8);}92%,100%{opacity:1;transform:none;}}'
+    '\n@keyframes tl-previa-para{0%,15%{opacity:0;transform:rotateY(-90deg) scale(0.8);}32%,62%{opacity:1;transform:none;}77%,100%{opacity:0;transform:rotateY(90deg) scale(0.8);}}'
+    '\n@keyframes tl-nega-de{0%,100%{opacity:1;transform:none;}22%,62%{opacity:0;transform:rotateY(90deg) scale(0.8);}}'
+    '\n@keyframes tl-nega-cadeado{0%,22%{opacity:0;transform:rotateY(-90deg) scale(0.8);}36%,50%{opacity:1;transform:none;}62%,100%{opacity:0;transform:rotateY(90deg) scale(0.8);}}'
     '\n.mc .tl-veu{animation:tl-veu .3s ease-out both;}'
     '\n.mc .tl-entra{animation:tl-entra .5s cubic-bezier(.2,.8,.2,1) .1s both;}'
     '\n.mc .tl-folha{animation:tl-sobe .42s cubic-bezier(.2,.8,.2,1) both;}'
@@ -72,14 +76,19 @@ CSS_TROCA = (
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-aqui{opacity:1;}'
     '\n.mc .tl-trocando .tl-aqui{animation:tl-pop .4s ease-out 1.6s both;}'
     # no meio, o logo da linguagem ativa gira e vira o da nova, com uma onda
-    '\n.mc .tl-logo-para,.mc .tl-onda{opacity:0;}'
+    '\n.mc .tl-logo-para,.mc .tl-onda,.mc .tl-cadeado{opacity:0;}'
+    # ao abrir, uma prévia só: o logo gira para o da nova e volta (no not_in_plan, para o cadeado e volta)
+    '\n.mc .tl-confirmar .tl-logo-de{animation:tl-previa-de 2s ease-in-out .7s;}'
+    '\n.mc .tl-confirmar .tl-logo-para{animation:tl-previa-para 2s ease-in-out .7s;}'
+    '\n.mc .tl-plano .tl-logo-de{animation:tl-nega-de 1.6s ease-in-out .7s;}'
+    '\n.mc .tl-plano .tl-cadeado{animation:tl-nega-cadeado 1.6s ease-in-out .7s;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-logo-de{opacity:0;}'
     '\n.mc :is(.tl-trocando,.tl-concluido) .tl-logo-para{opacity:1;}'
     '\n.mc .tl-trocando .tl-logo-de{animation:tl-sai .3s ease-in .6s both;}'
     '\n.mc .tl-trocando .tl-logo-para{animation:tl-gira .35s cubic-bezier(.2,.8,.2,1) .85s both;}'
     '\n.mc .tl-trocando .tl-onda{animation:tl-onda .8s ease-out .9s both;}'
     '\n@media (prefers-reduced-motion: reduce){'
-    '.mc :is(.tl-veu,.tl-entra,.tl-folha,.tl-texto,.tl-seta,.tl-gelo,.tl-acende,.tl-aqui,.tl-logo-de,.tl-logo-para,.tl-onda){animation:none !important;}'
+    '.mc :is(.tl-veu,.tl-entra,.tl-folha,.tl-texto,.tl-seta,.tl-gelo,.tl-acende,.tl-aqui,.tl-logo-de,.tl-logo-para,.tl-cadeado,.tl-onda){animation:none !important;}'
     '.mc :is(.tl-card,.tl-conteudo){transition:none !important;}.mc .tl-confirmar .tl-seta{opacity:0.5;}}')
 
 ANTES_TROCA = """const tlF = s.fase || this.props.fase || "confirmar";
@@ -163,7 +172,7 @@ def _cartao(k, papel, ling, trilha, meta, agora, gelo=None, nova=False, balao=No
             f'background:{k["rail"]};">{conteudo}{_gelo(k, gelo) if gelo else ""}</div>')
 
 
-def _centro(k, de, para, movel=False):
+def _centro(k, de, para, movel=False, plano=False):
     # as setas dos dois lados do logo; no celular os cartões empilham e as setas apontam para baixo
     giro = 'transform:rotate(90deg);' if movel else ''
     grupo = lambda i0: (f'<span style="display:flex;flex-direction:{"column" if movel else "row"};align-items:center;gap:1px;">'
@@ -177,7 +186,9 @@ def _centro(k, de, para, movel=False):
             f'<span class="tl-onda" style="position:absolute;inset:0;border-radius:16px;box-shadow:0 0 0 2px {k["pri"]};"></span>'
             f'<span style="position:absolute;inset:0;border-radius:16px;background:#fff;'
             f'box-shadow:0 8px 20px -8px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.06);"></span>'
-            f'{camada("tl-logo-de", de)}{camada("tl-logo-para", para)}</span>')
+            f'{camada("tl-logo-de", de)}{camada("tl-logo-para", para)}'
+            + (f'<span class="tl-cadeado" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:{k["mfg"]};">'
+               f'<span style="display:flex;width:26px;height:26px;">{I["cadeado"]}</span></span>' if plano else '') + '</span>')
     return (f'<div aria-hidden="true" style="display:flex;align-items:center;justify-content:center;gap:{10 if movel else 6}px;flex:0 0 auto;">'
             f'{grupo(0)}{logo}{grupo(3)}</div>')
 
@@ -199,7 +210,7 @@ def _palco(k, cenario, movel=False):
             para = _cartao(k, 'tl-para tl-nova', 'py', 'tlPyTrilha', 'tlPyMetaNova', 0, selo=_selo_libera(k), movel=movel)
         else:
             para = _cartao(k, 'tl-para tl-nova', 'py', 'tlPyTrilha', 'tlPyMetaNova', 0, nova=True, balao='tlComeceAqui', movel=movel)
-        centro = _centro(k, 'js', 'py', movel)
+        centro = _centro(k, 'js', 'py', movel, plano=cenario == 'plano')
     direcao = 'flex-direction:column;align-items:stretch;gap:8px;' if movel else 'align-items:center;gap:14px;'
     return f'<div style="display:flex;{direcao}">{de}{centro}{para}</div>'
 

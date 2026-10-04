@@ -21,7 +21,8 @@
  * fecham; na confirmação e no not_in_plan são "Continuar na atual" (`onDismiss`).
  *
  * Movimento no css do item (`muriki-langswitch-*`). Com prefers-reduced-motion, nada se mexe: cada fase
- * aparece no estado final e a troca espera só o `onConfirm`. No celular (abaixo de md), a folha que sobe
+ * aparece no estado final e a troca espera só o `onConfirm`. Ao abrir, o logo do meio dá uma prévia da
+ * troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta). No celular (abaixo de md), a folha que sobe
  * de baixo, com os cartões empilhados e as setas descendo de um para o outro; `variant` fixa um dos dois.
  */
 import * as React from "react"
@@ -235,8 +236,9 @@ function Cartao({
   )
 }
 
-function Passagem({ de, para, f }: { de: Brand; para: Brand; f: (typeof FORMA)[keyof typeof FORMA] }) {
-  // as setas dos dois lados do logo da linguagem ativa; a onda vai da de agora para a nova
+function Passagem({ de, para, travado, f }: { de: Brand; para: Brand; travado?: boolean; f: (typeof FORMA)[keyof typeof FORMA] }) {
+  // as setas dos dois lados do logo da linguagem ativa; a onda vai da de agora para a nova. Ao abrir, o
+  // logo dá uma prévia só: gira para o da nova e volta (no not_in_plan, para o cadeado e volta)
   const grupo = (i0: number) => (
     <span className={cn("items-center gap-px", f.grupo)}>
       {[0, 1, 2].map((n) => (
@@ -263,6 +265,11 @@ function Passagem({ de, para, f }: { de: Brand; para: Brand; f: (typeof FORMA)[k
         <span className="muriki-langswitch-logo-to absolute inset-0 flex items-center justify-center">
           <BrandLogo brand={para} size={30} />
         </span>
+        {travado ? (
+          <span className="muriki-langswitch-lock absolute inset-0 flex items-center justify-center text-muted-foreground">
+            <LockSimpleIcon className="size-[26px]" />
+          </span>
+        ) : null}
       </span>
       {grupo(3)}
     </div>
@@ -378,6 +385,7 @@ function TrackLanguageSwitch({
           data-slot="track-language-switch"
           data-variant={variant}
           data-phase={bloqueado ? "locked" : fase}
+          data-error={erro || undefined}
           initialFocus={tituloRef}
           className={cn(
             "muriki-scroll fixed z-50 flex flex-col gap-4 overflow-y-auto bg-card text-card-foreground outline-none md:gap-[22px]",
@@ -391,7 +399,7 @@ function TrackLanguageSwitch({
 
           <div className={f.palco}>
             <Cartao track={from} papel="from" />
-            <Passagem de={from.brand} para={to.brand} f={f} />
+            <Passagem de={from.brand} para={to.brand} travado={bloqueado} f={f} />
             <Cartao
               track={to}
               papel={bloqueado ? "locked" : volta ? "back" : "new"}

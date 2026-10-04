@@ -1550,8 +1550,60 @@
           "target": "components/blocks/track-language-switch/track-language-switch.tsx"
         }
       ],
-      "docs": "Em Trilhas, no \"Começar a trilha\" de uma trilha com access \"switch\" ou \"not_in_plan\" no GET /code/tracks (o Pro nunca chega aqui): <TrackLanguageSwitch open={!!alvo} onOpenChange={(aberto) => !aberto && setAlvo(null)} access={alvo.access} changeAllowedAt={alvo.changeAllowedAt} locale={i18n.language} from={{ brand: \"js\", title: \"JavaScript do zero\", done: 5, total: 12, current: \"Funções e escopo\" }} to={{ brand: \"py\", title: \"Python do zero\", done: 0, total: 12 }} onConfirm={() => api.put(\"/code/language-choice\", { family: \"py\" })} startRender={<Link to=\"/tracks/$trackId\" params={{ trackId: alvo.id }} />} proRender={<Link to=\"/plans\" />} />. from é a trilha da linguagem de agora (a que congela: done e total dela); to é a clicada: done 0 abre do começo (\"Trocar para Python\", \"comece aqui\", \"Começar a trilha\"), done > 0 é a volta (\"Voltar para JavaScript\", descongela \"de onde parou\", \"Continuar a trilha\"). onConfirm devolve a promessa do PUT: a animação dura o tempo dela, no mínimo 2,2 s (sem espera com prefers-reduced-motion); se rejeitar, volta para a confirmação com track_language_switch.error. Depois do concluído, recarregue GET /code/tracks. Fechar: \"Continuar em JavaScript\", Esc e clique fora chamam onDismiss na confirmação e no not_in_plan; trocando, nada fecha; no concluído, Esc fecha sem onDismiss. not_in_plan: changeAllowedAt vira \"Python libera em 12 de novembro\" e o selo \"libera em 12 de nov.\" (Intl com locale); \"Ver o Pro\" e \"No Pro as duas ficam abertas\" só aparecem com onSeePro ou proRender. language troca o nome do chip (padrão brandName); current vai na linha de baixo do cartão. Textos em track_language_switch.* (os _zero são para from.done 0). defaultPhase abre numa fase (prévias). variant \"auto\" (folha abaixo de md), \"dialog\" ou \"sheet\".",
+      "docs": "Em Trilhas, no \"Começar a trilha\" de uma trilha com access \"switch\" ou \"not_in_plan\" no GET /code/tracks (o Pro nunca chega aqui): <TrackLanguageSwitch open={!!alvo} onOpenChange={(aberto) => !aberto && setAlvo(null)} access={alvo.access} changeAllowedAt={alvo.changeAllowedAt} locale={i18n.language} from={{ brand: \"js\", title: \"JavaScript do zero\", done: 5, total: 12, current: \"Funções e escopo\" }} to={{ brand: \"py\", title: \"Python do zero\", done: 0, total: 12 }} onConfirm={() => api.put(\"/code/language-choice\", { family: \"py\" })} startRender={<Link to=\"/tracks/$trackId\" params={{ trackId: alvo.id }} />} proRender={<Link to=\"/plans\" />} />. from é a trilha da linguagem de agora (a que congela: done e total dela); to é a clicada: done 0 abre do começo (\"Trocar para Python\", \"comece aqui\", \"Começar a trilha\"), done > 0 é a volta (\"Voltar para JavaScript\", descongela \"de onde parou\", \"Continuar a trilha\"). onConfirm devolve a promessa do PUT: a animação dura o tempo dela, no mínimo 2,2 s (sem espera com prefers-reduced-motion); se rejeitar, volta para a confirmação com track_language_switch.error. Depois do concluído, recarregue GET /code/tracks. Fechar: \"Continuar em JavaScript\", Esc e clique fora chamam onDismiss na confirmação e no not_in_plan; trocando, nada fecha; no concluído, Esc fecha sem onDismiss. not_in_plan: changeAllowedAt vira \"Python libera em 12 de novembro\" e o selo \"libera em 12 de nov.\" (Intl com locale); \"Ver o Pro\" e \"No Pro as duas ficam abertas\" só aparecem com onSeePro ou proRender. language troca o nome do chip (padrão brandName); current vai na linha de baixo do cartão. Ao abrir, o logo do meio dá uma prévia da troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta); depois de um erro, não repete. Textos em track_language_switch.* (os _zero são para from.done 0). defaultPhase abre numa fase (prévias). variant \"auto\" (folha abaixo de md), \"dialog\" ou \"sheet\".",
       "css": {
+        "@keyframes muriki-langswitch-preview-from": {
+          "0%": {
+            "opacity": "1",
+            "transform": "none"
+          },
+          "15%, 77%": {
+            "opacity": "0",
+            "transform": "rotateY(90deg) scale(0.8)"
+          },
+          "92%, 100%": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-langswitch-preview-to": {
+          "0%, 15%": {
+            "opacity": "0",
+            "transform": "rotateY(-90deg) scale(0.8)"
+          },
+          "32%, 62%": {
+            "opacity": "1",
+            "transform": "none"
+          },
+          "77%, 100%": {
+            "opacity": "0",
+            "transform": "rotateY(90deg) scale(0.8)"
+          }
+        },
+        "@keyframes muriki-langswitch-deny-from": {
+          "0%, 100%": {
+            "opacity": "1",
+            "transform": "none"
+          },
+          "22%, 62%": {
+            "opacity": "0",
+            "transform": "rotateY(90deg) scale(0.8)"
+          }
+        },
+        "@keyframes muriki-langswitch-deny-lock": {
+          "0%, 22%": {
+            "opacity": "0",
+            "transform": "rotateY(-90deg) scale(0.8)"
+          },
+          "36%, 50%": {
+            "opacity": "1",
+            "transform": "none"
+          },
+          "62%, 100%": {
+            "opacity": "0",
+            "transform": "rotateY(90deg) scale(0.8)"
+          }
+        },
         "@keyframes muriki-langswitch-veil": {
           "from": {
             "opacity": "0"
@@ -1786,8 +1838,20 @@
         "[data-slot=\"track-language-switch\"][data-phase=\"switching\"] .muriki-langswitch-here": {
           "animation": "muriki-langswitch-pop 0.4s ease-out 1.6s both"
         },
-        ".muriki-langswitch-logo-to, .muriki-langswitch-wave": {
+        ".muriki-langswitch-logo-to, .muriki-langswitch-wave, .muriki-langswitch-lock": {
           "opacity": "0"
+        },
+        "[data-slot=\"track-language-switch\"][data-phase=\"confirm\"]:not([data-error]) .muriki-langswitch-logo-from": {
+          "animation": "muriki-langswitch-preview-from 2s ease-in-out 0.7s"
+        },
+        "[data-slot=\"track-language-switch\"][data-phase=\"confirm\"]:not([data-error]) .muriki-langswitch-logo-to": {
+          "animation": "muriki-langswitch-preview-to 2s ease-in-out 0.7s"
+        },
+        "[data-slot=\"track-language-switch\"][data-phase=\"locked\"] .muriki-langswitch-logo-from": {
+          "animation": "muriki-langswitch-deny-from 1.6s ease-in-out 0.7s"
+        },
+        "[data-slot=\"track-language-switch\"][data-phase=\"locked\"] .muriki-langswitch-lock": {
+          "animation": "muriki-langswitch-deny-lock 1.6s ease-in-out 0.7s"
         },
         "[data-slot=\"track-language-switch\"]:is([data-phase=\"switching\"],[data-phase=\"done\"]) .muriki-langswitch-logo-from": {
           "opacity": "0"
@@ -1805,7 +1869,7 @@
           "animation": "muriki-langswitch-wave 0.8s ease-out 0.9s both"
         },
         "@media (prefers-reduced-motion: reduce)": {
-          ".muriki-langswitch-veil, .muriki-langswitch-modal, .muriki-langswitch-sheet, .muriki-langswitch-copy, .muriki-langswitch-arrow, .muriki-langswitch-ice, .muriki-langswitch-light, .muriki-langswitch-here, .muriki-langswitch-logo-from, .muriki-langswitch-logo-to, .muriki-langswitch-wave": {
+          ".muriki-langswitch-veil, .muriki-langswitch-modal, .muriki-langswitch-sheet, .muriki-langswitch-copy, .muriki-langswitch-arrow, .muriki-langswitch-ice, .muriki-langswitch-light, .muriki-langswitch-here, .muriki-langswitch-logo-from, .muriki-langswitch-logo-to, .muriki-langswitch-lock, .muriki-langswitch-wave": {
             "animation": "none !important"
           },
           ".muriki-langswitch-card, .muriki-langswitch-body": {
