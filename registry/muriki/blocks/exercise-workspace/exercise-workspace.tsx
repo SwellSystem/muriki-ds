@@ -26,6 +26,7 @@ import { createPortal } from "react-dom"
 import {
   CaretDownIcon,
   CaretRightIcon,
+  CheckCircleIcon,
   CheckIcon,
   CircleIcon,
   FileIcon,
@@ -34,6 +35,7 @@ import {
   LockIcon,
   PaperPlaneTiltIcon,
   PlayIcon,
+  WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
 
@@ -49,6 +51,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -236,6 +239,72 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
 
 // ── Cabeçalho ───────────────────────────────────────────────────────────
 
+// ── O estado do rascunho ────────────────────────────────────────────────
+
+export type ExerciseSaveState = "saving" | "saved" | "error"
+
+export interface ExerciseSaveStatusProps {
+  state: ExerciseSaveState
+  savedAt?: Date | string | number
+  locale?: string
+  className?: string
+}
+
+/**
+ * O estado do rascunho, no cabeçalho, ao lado das ações. Um estado, não um relógio: "Salvando…" em
+ * cinza enquanto a pessoa digita; "Salvo" com o check verde (só o ícone tem cor, para não brigar com
+ * "Enviar solução") quando ela para, e a hora fixa ("salvo às 21:42") só ao passar ou focar nele;
+ * "Não salvo" no tom de aviso, com a dica, quando o rascunho local falhou. O check entra de leve
+ * (muriki-saved-in, no css do item); com prefers-reduced-motion, só aparece.
+ */
+export function ExerciseSaveStatus({ state, savedAt, locale = "pt-BR", className }: ExerciseSaveStatusProps) {
+  const t = useTranslate()
+  if (state === "saving")
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("text-xs text-muted-foreground", className)}>
+        {t("exercise_workspace.save.saving")}
+      </span>
+    )
+  if (state === "error")
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
+        <WarningCircleIcon aria-hidden weight="fill" className="size-3.5 shrink-0 text-warning" />
+        <span className="font-medium text-foreground-strong">{t("exercise_workspace.save.error")}</span>
+        <span className="text-muted-foreground max-sm:hidden">{t("exercise_workspace.save.error_hint")}</span>
+      </span>
+    )
+  const hora =
+    savedAt !== undefined
+      ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(savedAt))
+      : null
+  const salvo = (
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+      <CheckCircleIcon key={String(savedAt)} aria-hidden weight="fill" className="muriki-saved-in size-3.5 shrink-0 text-success" />
+      {t("exercise_workspace.save.saved")}
+    </span>
+  )
+  if (!hora)
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={className}>
+        {salvo}
+      </span>
+    )
+  return (
+    <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("inline-flex", className)}>
+      <Tooltip>
+        <TooltipTrigger
+          render={<span tabIndex={0} />}
+          aria-label={t("exercise_workspace.save.saved_at", { time: hora })}
+          className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+        >
+          {salvo}
+        </TooltipTrigger>
+        <TooltipContent>{t("exercise_workspace.save.saved_at", { time: hora })}</TooltipContent>
+      </Tooltip>
+    </span>
+  )
+}
+
 export interface ExerciseCrumb {
   label: string
   /** O link do roteador, ex.: <Link to="/exercises" />. Ganha de `href`. */
@@ -249,8 +318,16 @@ export interface ExerciseHeaderProps {
   title: React.ReactNode
   /** Os chips: competências, nível e estado (Badge). */
   chips?: React.ReactNode
-  /** Texto pronto, ex.: "salvo há 5 s". */
+  /** O rascunho: "saving" (Salvando…), "saved" (o check e "Salvo") ou "error" (Não salvo). Sem isto, nada, como antes da primeira edição. */
+  saveState?: ExerciseSaveState
+  /** Quando salvou. Aparece fixo só ao passar ou focar no "Salvo": "salvo às 21:42". */
+  savedAt?: Date | string | number
+  /** O locale do app (i18n.language), para a hora. */
+  locale?: string
+  /** @deprecated Texto pronto, ex.: "salvo há 5 s". Use `saveState` e `savedAt`. */
   savedLabel?: React.ReactNode
+  /** Ao lado do "salvo há": o <PeerStatus />. */
+  peerStatus?: React.ReactNode
   onContinueInIde?: () => void
   /** Desativa "Continuar na IDE" com o selo "em breve". */
   continueInIdeSoon?: boolean
@@ -268,7 +345,11 @@ export function ExerciseHeader({
   breadcrumb,
   title,
   chips,
+  saveState,
+  savedAt,
+  locale,
   savedLabel,
+  peerStatus,
   onContinueInIde,
   continueInIdeSoon,
   onSubmit,
@@ -320,7 +401,12 @@ export function ExerciseHeader({
         {chips ? <div className="flex flex-wrap gap-1.5">{chips}</div> : null}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        {savedLabel ? <span className="mr-1.5 text-xs text-muted-foreground">{savedLabel}</span> : null}
+        {peerStatus ? <span className="mr-2.5 flex">{peerStatus}</span> : null}
+        {saveState ? (
+          <ExerciseSaveStatus state={saveState} savedAt={savedAt} locale={locale} className="mr-1.5" />
+        ) : savedLabel ? (
+          <span className="mr-1.5 text-xs text-muted-foreground">{savedLabel}</span>
+        ) : null}
         <Button variant="ghost" size="lg" onClick={onContinueInIde} disabled={continueInIdeSoon}>
           <LaptopIcon aria-hidden />
           {t("exercise_workspace.continue_in_ide")}
@@ -353,7 +439,7 @@ export const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
 
 /** O título da seção na coluna fala mais alto que no rail: ao lado de texto corrido de 14px, o
  *  rótulo cinza de 9,5px some, e o negrito do próprio enunciado passava a parecer o título. */
-const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
+export const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
 
 /** Aberta ou recolhida: controlada por `open`, ou solta a partir de `defaultOpen`. */
 function useAberta(open: boolean | undefined, defaultOpen: boolean, onOpenChange?: (open: boolean) => void) {
@@ -630,12 +716,14 @@ export interface ExerciseTestsProps {
   /** Texto pronto, ex.: "rodou há 40 s". */
   ranAt?: React.ReactNode
   onOpenTest?: (name: string) => void
+  /** A fala do Peer depois de rodar os testes, embaixo do teste `test`: <PeerNote variant="inline" />. */
+  peerNote?: { test: string; node: React.ReactNode } | null
   className?: string
 }
 
 const TIPOS_DE_ERRO = new Set(["timeout", "build", "runtime", "unavailable"])
 
-export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, className }: ExerciseTestsProps) {
+export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, peerNote, className }: ExerciseTestsProps) {
   const t = useTranslate()
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(2)
 
@@ -700,6 +788,7 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, classN
                 </span>
               ) : null}
             </button>
+            {peerNote && peerNote.test === item.name ? <div className="pt-0.5 pr-1 pb-1.5 pl-6">{peerNote.node}</div> : null}
           </li>
         ))}
       </ul>
@@ -757,6 +846,8 @@ export interface ExerciseEditorProps {
   statusEnd?: React.ReactNode | null
   /** A legenda do cadeado e do ponto verde, no pé da lateral. */
   legend?: boolean
+  /** Acima da barra de status: a fala do Peer de uma pausa, <PeerNote variant="bar" />. */
+  peerBar?: React.ReactNode
   /** O editor do app (CodeMirror, por exemplo). */
   children: React.ReactNode
   className?: string
@@ -778,6 +869,7 @@ export function ExerciseEditor({
   shortcutLabel,
   statusEnd,
   legend = true,
+  peerBar,
   children,
   className,
 }: ExerciseEditorProps) {
@@ -896,6 +988,7 @@ export function ExerciseEditor({
           {children}
           {balaoDoGuia}
         </div>
+        {peerBar}
         <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
           {status ? <span className="truncate">{status}</span> : null}
           {shortcutLabel === null ? null : (

@@ -26,6 +26,7 @@ import { useRender } from "@base-ui/react/use-render"
 import { cn } from "@/lib/utils"
 import { useTranslate } from "@/lib/i18n"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { LevelScale, type Level } from "@/components/ui/level-scale"
 
 export interface LevelProfileNext {
@@ -156,4 +157,78 @@ function Linha({ item }: { item: LevelProfileItem }) {
       { children: conteudo }
     ),
   })
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+const LARGURAS_NOME = ["w-[62%]", "w-[48%]", "w-[70%]", "w-[40%]", "w-[56%]", "w-[66%]"]
+
+export interface LevelProfileSkeletonProps {
+  /** Quantas linhas em cada grupo. Padrão: um grupo grande e um de uma linha, como JavaScript e Arquitetura. */
+  groups?: number[]
+  className?: string
+}
+
+/** O LevelProfile carregando: as mesmas colunas, a faixa do grupo e as linhas, com larguras variadas. */
+export function LevelProfileSkeleton({ groups = [5, 1], className }: LevelProfileSkeletonProps) {
+  return (
+    <div
+      aria-hidden
+      data-slot="level-profile-skeleton"
+      className={cn("@container/lp flex min-w-0 flex-col overflow-hidden rounded-xl bg-card shadow-xs", className)}
+    >
+      <div className="px-[18px] pt-4 pb-1.5">
+        <LinhaDeTexto h={20} className="w-40" />
+      </div>
+      <div className={cn("hidden h-9 px-[18px]", COLUNAS)}>
+        {["w-20", "w-10", "w-20", "w-16", "w-24"].map((w, i) => (
+          <Skeleton key={i} className={cn("h-2.5", w)} />
+        ))}
+        <span />
+      </div>
+      {groups.map((linhas, g) => (
+        <div key={g} className="flex flex-col">
+          <div className="flex h-[30px] items-center border-t border-muted bg-rail px-[18px]">
+            <Skeleton className="h-2.5 w-20" />
+          </div>
+          {Array.from({ length: linhas }, (_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex flex-col gap-2 px-[18px] py-3.5 @[44rem]/lp:min-h-11 @[44rem]/lp:py-1.5",
+                COLUNAS,
+                i > 0 && "border-t border-muted"
+              )}
+            >
+              <span className="flex items-center gap-2.5 @[44rem]/lp:contents">
+                <span className="min-w-0 flex-1 @[44rem]/lp:flex-none">
+                  <LinhaDeTexto h={20} className={LARGURAS_NOME[(i + g) % LARGURAS_NOME.length]} />
+                </span>
+                <span className="ml-auto flex gap-[3px] @[44rem]/lp:ml-0">
+                  {[0, 1, 2, 3].map((j) => (
+                    <Skeleton key={j} className="h-1.5 w-[18px] rounded-[2px]" />
+                  ))}
+                </span>
+              </span>
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5 @[44rem]/lp:contents">
+                <Skeleton className="h-[22px] w-28 rounded-[4px]" />
+                <LinhaDeTexto h={16} className="w-24" />
+                <LinhaDeTexto h={18} className={i % 2 ? "w-32" : "w-40"} />
+              </span>
+              <span className="hidden @[44rem]/lp:block" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  )
 }

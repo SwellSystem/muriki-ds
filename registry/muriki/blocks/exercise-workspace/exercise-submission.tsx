@@ -7,7 +7,8 @@
  * - `running` e `sending`: os dois passos, rodar os testes ocultos no navegador e enviar com a
  *   explicação. Não fecha no meio.
  * - `result`: passou ou não, "X de Y testes", a skill demonstrada, as mudanças de nível (a escala
- *   se enche até o nível novo, discreta), o retorno da avaliação e a nota da explicação. Os testes
+ *   se enche até o nível novo, discreta), o retorno da avaliação (na voz do Peer: "O Peer leu a sua
+ *   solução", com o ícone dele) e a nota da explicação. Os testes
  *   ocultos mostram só o nome e o status, nunca o esperado.
  * - `error`: `rate_limit` (429, com a contagem até poder enviar de novo), `runner` (os ocultos não
  *   rodaram), `rejected` (a API respondeu e recusou: 422 e afins, com a `message` do app) e
@@ -25,6 +26,8 @@ import { Modal, ModalBody, ModalContent, ModalDescription, ModalFooter, ModalHea
 import { Spinner } from "@/components/ui/spinner"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+
+import { PeerAvatar } from "./exercise-peer"
 
 export type ExerciseLevel = "fundamentos" | "junior" | "pleno" | "senior"
 
@@ -183,9 +186,15 @@ export function ExerciseSubmission({
               ) : null}
 
               {result.feedback ? (
-                <section className="flex flex-col gap-2">
-                  <Rotulo>{t("exercise_workspace.submission.feedback")}</Rotulo>
-                  <p className="m-0 text-sm leading-[22px] text-foreground">{result.feedback}</p>
+                // o retorno é a fala do Peer: o mesmo ícone e o mesmo tom do exercício
+                <section className="flex items-start gap-2.5 rounded-[10px] bg-primary-subtle px-3.5 py-3">
+                  <PeerAvatar size={24} />
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="text-[13px] font-semibold text-primary-subtle-foreground">
+                      {t("exercise_workspace.submission.feedback_peer")}
+                    </span>
+                    <p className="m-0 text-[13.5px] leading-[21px] text-pretty text-foreground">{result.feedback}</p>
+                  </div>
                 </section>
               ) : null}
 
@@ -196,7 +205,7 @@ export function ExerciseSubmission({
                 {t("exercise_workspace.submission.back")}
               </Button>
               {result.passed && (nextRender || onNext) ? (
-                <Button variant="solid" size="lg" render={nextRender} onClick={nextRender ? undefined : onNext}>
+                <Button variant="solid" size="lg" render={nextRender} nativeButton={!nextRender} onClick={nextRender ? undefined : onNext}>
                   {t("exercise_workspace.submission.next")}
                 </Button>
               ) : null}

@@ -20,6 +20,7 @@
 import * as React from "react"
 
 import { LEVELS, useLevelName, type Level } from "@/components/ui/level-scale"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatShortDate } from "@/lib/date-format"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -285,5 +286,61 @@ export function LevelTimeline({
         ))}
       </ul>
     </section>
+  )
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+/**
+ * O LevelTimeline carregando, para quando ele chega depois do resto da Evolução: o título, a fileira
+ * de competências, a legenda e o gráfico com as quatro faixas na altura certa (200px). As faixas
+ * já aparecem, porque são o chão do gráfico; só os rótulos e as linhas esperam.
+ */
+export function LevelTimelineSkeleton({ className }: { className?: string }) {
+  return (
+    <div aria-hidden data-slot="level-timeline-skeleton" className={cn("flex min-w-0 flex-col gap-3.5 rounded-xl bg-card px-5 pt-4 pb-[18px] shadow-xs", className)}>
+      <div className="@container flex flex-col gap-[3px]">
+        <LinhaDeTexto h={20} className="w-36" />
+        <LinhaDeTexto h={19} className="w-[92%]" />
+        <span className="@[44rem]:hidden">
+          <LinhaDeTexto h={19} className="w-[40%]" />
+        </span>
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-1.5">
+          {["w-[148px]", "w-[118px]", "w-[136px]", "w-[150px]", "w-[124px]", "w-[160px]"].map((w, i) => (
+            <Skeleton key={i} className={cn("h-7 rounded-full", w)} />
+          ))}
+        </div>
+        <LinhaDeTexto h={16} className="w-52" />
+      </div>
+      <div className="flex">
+        <div className="relative w-[72px] shrink-0 sm:w-[86px]" style={{ height: ALTURA }}>
+          {LEVELS.map((n, i) => (
+            <Skeleton key={n} className="absolute right-2.5 h-2.5 w-12 -translate-y-1/2" style={{ top: `${(3 - i) * 25 + 12.5}%` }} />
+          ))}
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div className="flex flex-col overflow-hidden rounded-md" style={{ height: ALTURA }}>
+            {LEVELS.map((n, i) => (
+              <span key={n} className={cn("flex-1", i % 2 ? "bg-sunken" : "bg-card")} />
+            ))}
+          </div>
+          <div className="flex h-4 justify-around">
+            <Skeleton className="h-3 w-8" />
+            <Skeleton className="h-3 w-8" />
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

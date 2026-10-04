@@ -1,0 +1,55 @@
+# Textos do Peer dentro do exercício (2026-10-03), nos três idiomas da web. O Peer não conversa: ele
+# acompanha e fala pouco, sempre perguntando antes de responder (pergunta, dica, explicação; o
+# gabarito nunca). Regras: swell-docs/muriki-api/features/code/execucao-no-browser-e-peer.md e
+# swell-docs/muriki-api/features/code-ai-launch/product-rules.md.
+
+TEXTOS = {
+    'pt-BR': dict(
+        peerNome='Peer', peerAcompanhando='Peer acompanhando',
+        tipoPergunta='pergunta', tipoDica='dica', tipoExplicacao='explicação',
+        meDaDica='Me dá uma dica', explica='Explica', entendi='Entendi',
+        peerTestes='O teste manda um texto vazio. Antes de calcular, o que a sua função faz com ele?',
+        peerPausa='Você parou no arredondamento. Em que unidade está o total quando chega no Math.round?',
+        peerDica='Os segundos entram no total como segundos. Converta para minutos antes de arredondar.',
+        historicoTit='Peer neste exercício', historicoSub='O que o Peer disse aqui, do mais recente para o mais antigo.',
+        h1hora='14:32', h2hora='14:27', h1Gatilho='depois de rodar os testes', h2Gatilho='numa pausa',
+        resultadoTit='Passou: 5 de 5 testes', resultadoSub='Os testes ocultos também passaram.',
+        ocultos='Testes ocultos', o1='aceita espaços entre as partes', o2='rejeita unidade desconhecida',
+        retornoPeer='O Peer leu a sua solução',
+        retornoTxt='A conversão por tabela de unidades deixa fácil acrescentar dias depois. Vale olhar o arredondamento: hoje ele acontece uma vez, no fim, e isso é o que o enunciado pede. Na explicação, conte por que o vazio lança em vez de devolver 0.',
+        explicacaoRot='A explicação', explicacaoNota='Mostra parte do porquê.',
+        skillConf='Testing demonstrado', continuarTrilha='Continuar a trilha', verSolucao='Voltar ao exercício',
+    ),
+    'en-US': dict(
+        peerNome='Peer', peerAcompanhando='Peer is following',
+        tipoPergunta='question', tipoDica='hint', tipoExplicacao='explanation',
+        meDaDica='Give me a hint', explica='Explain', entendi='Got it',
+        peerTestes='The test sends an empty string. Before calculating, what does your function do with it?',
+        peerPausa='You stopped at the rounding. What unit is the total in when it reaches Math.round?',
+        peerDica='Seconds go into the total as seconds. Convert them to minutes before rounding.',
+        historicoTit='Peer in this exercise', historicoSub='What the Peer said here, newest first.',
+        h1hora='2:32 PM', h2hora='2:27 PM', h1Gatilho='after running the tests', h2Gatilho='during a pause',
+        resultadoTit='Passed: 5 of 5 tests', resultadoSub='The hidden tests passed too.',
+        ocultos='Hidden tests', o1='accepts spaces between parts', o2='rejects an unknown unit',
+        retornoPeer='The Peer read your solution',
+        retornoTxt='Converting with a table of units makes it easy to add days later. Look at the rounding: today it happens once, at the end, which is what the task asks. In your explanation, say why an empty string throws instead of returning 0.',
+        explicacaoRot='The explanation', explicacaoNota='Shows part of the why.',
+        skillConf='Testing demonstrated', continuarTrilha='Continue the track', verSolucao='Back to the exercise',
+    ),
+    'es-ES': dict(
+        peerNome='Peer', peerAcompanhando='Peer acompañando',
+        tipoPergunta='pregunta', tipoDica='pista', tipoExplicacao='explicación',
+        meDaDica='Dame una pista', explica='Explica', entendi='Entendido',
+        peerTestes='La prueba manda un texto vacío. Antes de calcular, ¿qué hace tu función con él?',
+        peerPausa='Te detuviste en el redondeo. ¿En qué unidad está el total cuando llega a Math.round?',
+        peerDica='Los segundos entran al total como segundos. Pásalos a minutos antes de redondear.',
+        historicoTit='Peer en este ejercicio', historicoSub='Lo que el Peer dijo aquí, del más reciente al más antiguo.',
+        h1hora='14:32', h2hora='14:27', h1Gatilho='después de ejecutar las pruebas', h2Gatilho='en una pausa',
+        resultadoTit='Pasó: 5 de 5 pruebas', resultadoSub='Las pruebas ocultas también pasaron.',
+        ocultos='Pruebas ocultas', o1='acepta espacios entre las partes', o2='rechaza una unidad desconocida',
+        retornoPeer='El Peer leyó tu solución',
+        retornoTxt='Convertir con una tabla de unidades facilita agregar días después. Mira el redondeo: hoy ocurre una vez, al final, que es lo que pide el enunciado. En la explicación, cuenta por qué el vacío lanza en lugar de devolver 0.',
+        explicacaoRot='La explicación', explicacaoNota='Muestra parte del porqué.',
+        skillConf='Testing demostrado', continuarTrilha='Continuar la ruta', verSolucao='Volver al ejercicio',
+    ),
+}
