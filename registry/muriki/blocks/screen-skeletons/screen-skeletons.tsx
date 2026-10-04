@@ -278,6 +278,41 @@ export function TrackSkeleton({ levels = 4, className }: TrackSkeletonProps) {
 
 const COLUNAS_DO_CATALOGO = "md:grid md:grid-cols-[minmax(0,1fr)_110px_130px_196px] md:items-center md:gap-3.5"
 
+/**
+ * Só as linhas do catálogo carregando (cartões no celular, a tabela de quatro colunas no md), para
+ * quando o cabeçalho, a busca e os filtros já estão na tela e só a lista recarrega a cada busca.
+ */
+export function ExerciseCatalogRowsSkeleton({ rows = 8, className }: { rows?: number; className?: string }) {
+  return (
+    <div aria-hidden data-slot="exercise-catalog-rows-skeleton" className={cn("flex flex-col gap-3 md:gap-0 md:overflow-hidden md:rounded-xl md:bg-card md:shadow-sm", className)}>
+      {Array.from({ length: rows }, (_, i) => (
+        <div
+          key={i}
+          className={cn(
+            "flex flex-col gap-2 rounded-[14px] bg-card px-4 py-3.5 shadow-sm md:min-h-14 md:rounded-none md:px-[18px] md:py-2 md:shadow-none",
+            COLUNAS_DO_CATALOGO,
+            i > 0 && "md:border-t md:border-muted"
+          )}
+        >
+          <span className="flex flex-col">
+            <LinhaDeTexto h={22} className={["w-[64%]", "w-[50%]", "w-[72%]", "w-[44%]"][i % 4]} />
+            <LinhaDeTexto h={16} className="w-[36%]" />
+          </span>
+          {/* no celular, o selo vem antes do nível; no md, a ordem da tabela */}
+          <span className="max-md:order-3">
+            <LinhaDeTexto h={18} className="w-16" />
+          </span>
+          <Skeleton className="h-[22px] w-24 rounded-[4px] max-md:order-2" />
+          <span className="flex items-center justify-between border-t border-muted pt-2.5 max-md:order-4 md:border-t-0 md:pt-0">
+            <Skeleton className="h-[22px] w-20 rounded-[4px]" />
+            <LinhaDeTexto h={20} className="w-16" />
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 /** O catálogo carregando: a busca, os filtros, as abas e as linhas (cartões no celular, uma tabela no md). */
 export function ExerciseCatalogSkeleton({ rows = 8, className }: { rows?: number; className?: string }) {
   return (
@@ -296,32 +331,7 @@ export function ExerciseCatalogSkeleton({ rows = 8, className }: { rows?: number
           <Skeleton key={i} className={cn("h-8 rounded-[8px]", w)} />
         ))}
       </div>
-      <div className="flex flex-col gap-3 md:gap-0 md:overflow-hidden md:rounded-xl md:bg-card md:shadow-sm">
-        {Array.from({ length: rows }, (_, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex flex-col gap-2 rounded-[14px] bg-card px-4 py-3.5 shadow-sm md:min-h-14 md:rounded-none md:px-[18px] md:py-2 md:shadow-none",
-              COLUNAS_DO_CATALOGO,
-              i > 0 && "md:border-t md:border-muted"
-            )}
-          >
-            <span className="flex flex-col">
-              <LinhaDeTexto h={22} className={["w-[64%]", "w-[50%]", "w-[72%]", "w-[44%]"][i % 4]} />
-              <LinhaDeTexto h={16} className="w-[36%]" />
-            </span>
-            {/* no celular, o selo vem antes do nível; no md, a ordem da tabela */}
-            <span className="max-md:order-3">
-              <LinhaDeTexto h={18} className="w-16" />
-            </span>
-            <Skeleton className="h-[22px] w-24 rounded-[4px] max-md:order-2" />
-            <span className="flex items-center justify-between border-t border-muted pt-2.5 max-md:order-4 md:border-t-0 md:pt-0">
-              <Skeleton className="h-[22px] w-20 rounded-[4px]" />
-              <LinhaDeTexto h={20} className="w-16" />
-            </span>
-          </div>
-        ))}
-      </div>
+      <ExerciseCatalogRowsSkeleton rows={rows} />
     </div>
   )
 }
