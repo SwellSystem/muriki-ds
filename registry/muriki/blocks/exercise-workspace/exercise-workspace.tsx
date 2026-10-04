@@ -349,7 +349,7 @@ function EmBreve() {
 // ── Painel da esquerda ──────────────────────────────────────────────────
 
 /** Cada seção da coluna é um cartão. A pele é a do editor ao lado. */
-const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
+export const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
 
 /** O título da seção na coluna fala mais alto que no rail: ao lado de texto corrido de 14px, o
  *  rótulo cinza de 9,5px some, e o negrito do próprio enunciado passava a parecer o título. */
