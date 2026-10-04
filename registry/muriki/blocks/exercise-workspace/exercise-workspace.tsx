@@ -20,6 +20,12 @@
  *
  * O guia do primeiro exercício (`guide`) cobre a tela com o véu e sobe, um de cada vez, o editor
  * (passo 1), os testes (2) e a explicação (3), cada um com o anel e o balão ao lado.
+ *
+ * Expandir: o botão na barra do editor recolhe a coluna da esquerda e o editor fica com a largura
+ * toda (só no desktop). A tela sempre abre como hoje; `expanded` controla, se o app quiser lembrar.
+ *
+ * Console: com `output`, o ExerciseEditor mostra embaixo do código o que ele imprimiu ao rodar os
+ * testes, agrupado por teste, e o teste que falhou nos Testes aponta para as linhas dele.
  */
 import * as React from "react"
 import { createPortal } from "react-dom"
@@ -35,6 +41,7 @@ import {
   LockIcon,
   PaperPlaneTiltIcon,
   PlayIcon,
+  SidebarSimpleIcon,
   WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
@@ -193,6 +200,9 @@ function BalaoDoGuia({
 
 // ── Moldura ─────────────────────────────────────────────────────────────
 
+// o editor lê daqui se a coluna da esquerda está recolhida, e o botão de expandir a recolhe
+const ExpandirContexto = React.createContext<{ expandido: boolean; mudar: (v: boolean) => void } | null>(null)
+
 export interface ExerciseWorkspaceProps {
   header: React.ReactNode
   /** O que ocupa o painel da esquerda e rola por dentro: o enunciado. */
@@ -202,11 +212,31 @@ export interface ExerciseWorkspaceProps {
   editor: React.ReactNode
   /** O guia do primeiro exercício. Sem isto, nada de véu. */
   guide?: ExerciseGuide
+  /**
+   * A coluna da esquerda recolhida e o editor na largura toda (só no desktop). Controlado, se o app
+   * quiser lembrar por pessoa; sem isto, a tela abre como sempre e o botão do editor alterna.
+   */
+  expanded?: boolean
+  defaultExpanded?: boolean
+  onExpandedChange?: (expanded: boolean) => void
   className?: string
 }
 
-export function ExerciseWorkspace({ header, side, foot, editor, guide, className }: ExerciseWorkspaceProps) {
+export function ExerciseWorkspace({
+  header,
+  side,
+  foot,
+  editor,
+  guide,
+  expanded,
+  defaultExpanded = false,
+  onExpandedChange,
+  className,
+}: ExerciseWorkspaceProps) {
   const ativo = !!guide && guide.step >= 1 && guide.step <= PASSOS
+  const [expandido, mudarExpandido] = useAberta(expanded, defaultExpanded, onExpandedChange)
+  // o guia aponta para a explicação no passo 3: com ele na tela, a coluna não some
+  const recolhida = expandido && !ativo
   React.useEffect(() => {
     if (!ativo || !guide) return
     const aoTeclar = (e: KeyboardEvent) => {
@@ -217,6 +247,7 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
   }, [ativo, guide])
   return (
     <GuiaContexto.Provider value={ativo ? guide! : null}>
+      <ExpandirContexto.Provider value={{ expandido: recolhida, mudar: mudarExpandido }}>
       <div
         data-slot="exercise-workspace"
         className={cn("flex min-w-0 flex-col gap-[18px] lg:h-full lg:min-h-0", className)}
@@ -224,7 +255,11 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
         {header}
         <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
           {/* Só o corpo do enunciado rola, dentro do cartão dele: os cartões ficam parados. */}
-          <div data-slot="exercise-side" className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0">
+          <div
+            data-slot="exercise-side"
+            data-state={recolhida ? "collapsed" : "open"}
+            className={cn("flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0", recolhida && "lg:hidden")}
+          >
             {side}
             {foot}
           </div>
@@ -233,6 +268,7 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
         {/* o véu cobre a tela; só a área do passo atual sobe acima dele */}
         {ativo ? <div aria-hidden className="fixed inset-0 z-40 bg-scrim" /> : null}
       </div>
+      </ExpandirContexto.Provider>
     </GuiaContexto.Provider>
   )
 }
@@ -725,6 +761,7 @@ const TIPOS_DE_ERRO = new Set(["timeout", "build", "runtime", "unavailable"])
 
 export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, peerNote, className }: ExerciseTestsProps) {
   const t = useTranslate()
+  const console_ = React.useContext(ConsoleContexto)
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLElement>(2)
 
   let resumo: React.ReactNode
@@ -788,6 +825,16 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, peerNo
                 </span>
               ) : null}
             </button>
+            {item.status === "fail" && console_ && console_.linhasDe(item.name) > 0 ? (
+              // o atalho do teste que falhou para o que ele imprimiu
+              <button
+                type="button"
+                onClick={() => console_.mostrar(item.name)}
+                className="ml-5 mb-1 flex items-center gap-1 rounded-[4px] px-1 font-mono text-[11px] leading-4 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+              >
+                {t("exercise_workspace.console.in_console", { count: console_.linhasDe(item.name) })}
+              </button>
+            ) : null}
             {peerNote && peerNote.test === item.name ? <div className="pt-0.5 pr-1 pb-1.5 pl-6">{peerNote.node}</div> : null}
           </li>
         ))}
@@ -827,6 +874,22 @@ export interface ExerciseTab {
   readOnly?: boolean
 }
 
+/** Uma linha do que o código imprimiu. `test` é o `name` do teste em ExerciseTests; sem ele, saiu ao carregar o arquivo. */
+export interface ExerciseLog {
+  test?: string
+  level: "log" | "warn" | "error"
+  text: string
+}
+
+/** O que o código imprimiu ao rodar os testes, na ordem em que saiu. `truncated`: o runner cortou. */
+export interface ExerciseOutput {
+  logs: ExerciseLog[]
+  truncated?: boolean
+}
+
+// os Testes (no rail) e o Console (embaixo do código) conversam por aqui, dentro do ExerciseEditor
+const ConsoleContexto = React.createContext<{ linhasDe: (test: string) => number; mostrar: (test: string) => void } | null>(null)
+
 export interface ExerciseEditorProps {
   /** Os arquivos abertos, em ordem. */
   tabs: ExerciseTab[]
@@ -848,6 +911,11 @@ export interface ExerciseEditorProps {
   legend?: boolean
   /** Acima da barra de status: a fala do Peer de uma pausa, <PeerNote variant="bar" />. */
   peerBar?: React.ReactNode
+  /**
+   * O que o código imprimiu ao rodar os testes. Com isto (inclusive `null`, ainda não rodou), o
+   * Console aparece embaixo do código. Sem isto, nada de Console.
+   */
+  output?: ExerciseOutput | null
   /** O editor do app (CodeMirror, por exemplo). */
   children: React.ReactNode
   className?: string
@@ -870,10 +938,32 @@ export function ExerciseEditor({
   statusEnd,
   legend = true,
   peerBar,
+  output,
   children,
   className,
 }: ExerciseEditorProps) {
   const t = useTranslate()
+  const expandir = React.useContext(ExpandirContexto)
+  // o Console abre sozinho quando chega saída; a escolha da pessoa vale até a próxima rodada
+  const [escolha, setEscolha] = React.useState<{ para: ExerciseOutput | null | undefined; aberto: boolean } | null>(null)
+  const consoleAberto = escolha && escolha.para === output ? escolha.aberto : !!output?.logs.length
+  const [foco, setFoco] = React.useState<string | null>(null)
+  const corpoDoConsole = React.useRef<HTMLDivElement>(null)
+  const consoleCtx = output
+    ? {
+        linhasDe: (test: string) => output.logs.filter((l) => l.test === test).length,
+        mostrar: (test: string) => {
+          setEscolha({ para: output, aberto: true })
+          setFoco(test)
+          // depois de abrir, o grupo do teste sobe para a vista
+          requestAnimationFrame(() =>
+            corpoDoConsole.current
+              ?.querySelector(`[data-test="${CSS.escape(test)}"]`)
+              ?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+          )
+        },
+      }
+    : null
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLDivElement>(1, "inset", "dentro")
   const podeRodar = !!onRun && !runDisabledReason && !running
   const listaDeAbas = React.useRef<HTMLDivElement>(null)
@@ -896,6 +986,7 @@ export function ExerciseEditor({
   }
 
   return (
+    <ConsoleContexto.Provider value={consoleCtx}>
     <section
       data-slot="exercise-editor"
       aria-label={t("exercise_workspace.editor.label")}
@@ -963,6 +1054,27 @@ export function ExerciseEditor({
             })}
           </div>
           <span className="ml-auto flex shrink-0 items-center gap-2 py-1.5">
+            {expandir ? (
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-pressed={expandir.expandido}
+                      aria-label={t(expandir.expandido ? "exercise_workspace.editor.collapse" : "exercise_workspace.editor.expand")}
+                      onClick={() => expandir.mudar(!expandir.expandido)}
+                      className="max-lg:hidden"
+                    />
+                  }
+                >
+                  <SidebarSimpleIcon aria-hidden weight={expandir.expandido ? "fill" : "regular"} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  {t(expandir.expandido ? "exercise_workspace.editor.collapse" : "exercise_workspace.editor.expand")}
+                </TooltipContent>
+              </Tooltip>
+            ) : null}
             {runDisabledReason ? (
               <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
                 {runDisabledReason}
@@ -988,6 +1100,15 @@ export function ExerciseEditor({
           {children}
           {balaoDoGuia}
         </div>
+        {output !== undefined ? (
+          <ExerciseConsole
+            output={output}
+            open={consoleAberto}
+            onOpenChange={(aberto) => setEscolha({ para: output, aberto })}
+            focus={foco}
+            bodyRef={corpoDoConsole}
+          />
+        ) : null}
         {peerBar}
         <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
           {status ? <span className="truncate">{status}</span> : null}
@@ -998,6 +1119,110 @@ export function ExerciseEditor({
             <span className="ml-auto truncate max-md:hidden">{statusEnd ?? t("exercise_workspace.editor.no_autocomplete")}</span>
           )}
         </div>
+      </div>
+    </section>
+    </ConsoleContexto.Provider>
+  )
+}
+
+// ── Console ─────────────────────────────────────────────────────────────
+
+const COR_DO_NIVEL: Record<ExerciseLog["level"], string> = {
+  log: "text-foreground",
+  warn: "bg-tone-yellow/60 text-tone-yellow-foreground",
+  error: "bg-destructive-subtle text-destructive-subtle-foreground",
+}
+
+/**
+ * A faixa embaixo do código, como o terminal de uma IDE: o que saiu ao carregar o arquivo e depois o
+ * que cada teste imprimiu, na ordem. Recolhe pelo título; a altura é limitada e o corpo rola.
+ */
+function ExerciseConsole({
+  output,
+  open,
+  onOpenChange,
+  focus,
+  bodyRef,
+}: {
+  output: ExerciseOutput | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  focus: string | null
+  bodyRef: React.Ref<HTMLDivElement>
+}) {
+  const t = useTranslate()
+  const id = React.useId()
+  const Seta = open ? CaretDownIcon : CaretRightIcon
+  // os grupos na ordem em que apareceram; "ao carregar" (sem teste) primeiro
+  const grupos: Array<{ test?: string; logs: ExerciseLog[] }> = []
+  for (const log of output?.logs ?? []) {
+    const grupo = grupos.find((g) => g.test === log.test)
+    if (grupo) grupo.logs.push(log)
+    else grupos.push({ test: log.test, logs: [log] })
+  }
+  grupos.sort((a, b) => Number(a.test !== undefined) - Number(b.test !== undefined))
+  const total = output?.logs.length ?? 0
+  return (
+    <section data-slot="exercise-console" data-state={open ? "open" : "closed"} className="flex shrink-0 flex-col border-t border-muted bg-rail">
+      <div className="flex h-[34px] shrink-0 items-center gap-1.5 pr-3 pl-2.5">
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls={id}
+          onClick={() => onOpenChange(!open)}
+          className="flex h-[26px] items-center gap-1.5 rounded-md px-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+        >
+          <Seta aria-hidden className="size-3" />
+          <span className="font-mono text-[9.5px] font-medium tracking-[0.2em] uppercase">{t("exercise_workspace.console.title")}</span>
+        </button>
+        {output ? (
+          <span className="ml-auto font-mono text-[11px] text-muted-foreground">
+            {total ? t("exercise_workspace.console.lines", { count: total }) : t("exercise_workspace.console.empty_badge")}
+          </span>
+        ) : null}
+      </div>
+      <div
+        id={id}
+        ref={bodyRef}
+        hidden={!open}
+        role="log"
+        aria-label={t("exercise_workspace.console.title")}
+        className="muriki-scroll max-h-[220px] overflow-y-auto px-4 pb-3 font-mono text-[12px] leading-[18px]"
+      >
+        {!output ? (
+          <span className="font-sans text-[12.5px] text-muted-foreground">{t("exercise_workspace.console.not_run")}</span>
+        ) : !total ? (
+          <span className="font-sans text-[12.5px] text-muted-foreground">{t("exercise_workspace.console.empty")}</span>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {grupos.map((g) => (
+              <div
+                key={g.test ?? ""}
+                data-test={g.test}
+                className={cn("flex flex-col rounded-md", g.test !== undefined && g.test === focus && "ring-2 ring-primary/35 ring-offset-2 ring-offset-rail")}
+              >
+                <span className="font-sans text-[11.5px] font-medium text-muted-foreground">
+                  {g.test ?? t("exercise_workspace.console.on_load")}
+                </span>
+                {g.logs.map((log, i) => (
+                  <span
+                    key={i}
+                    className={cn("rounded-[3px] px-1.5 break-words whitespace-pre-wrap", COR_DO_NIVEL[log.level])}
+                  >
+                    {log.level !== "log" ? <span className="sr-only">{t(`exercise_workspace.console.level.${log.level}`)}: </span> : null}
+                    {log.text}
+                  </span>
+                ))}
+              </div>
+            ))}
+            {output.truncated ? (
+              <span className="flex items-center gap-1.5 font-sans text-[12px] text-muted-foreground">
+                <WarningCircleIcon aria-hidden className="size-3.5" />
+                {t("exercise_workspace.console.truncated", { count: total })}
+              </span>
+            ) : null}
+          </div>
+        )}
       </div>
     </section>
   )

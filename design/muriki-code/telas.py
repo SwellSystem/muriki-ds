@@ -150,8 +150,9 @@ def arvore(k, primeira=False):
                  borda=False)
 
 
-def painel_testes(k, primeira=False, extra='', dentro='', nota_peer=''):
+def painel_testes(k, primeira=False, extra='', dentro='', nota_peer='', no_console=None):
     # nota_peer: a fala do Peer depois de rodar os testes, embaixo do primeiro teste que falhou
+    # no_console: {nome do teste: chave do texto}, o atalho do teste que falhou para o que ele imprimiu
     linhas, nota_posta = '', False
     for ok, nome, det in TESTES:
         if primeira:
@@ -169,6 +170,9 @@ def painel_testes(k, primeira=False, extra='', dentro='', nota_peer=''):
                    f'<span style="display:flex;align-items:flex-start;gap:8px;">'
                    f'<span style="margin-top:2px;">{marca}</span>'
                    f'<span style="font-size:12.5px;line-height:17px;color:{cor_nome};">{nome}</span></span>{extra_det}</button></li>')
+        if no_console and not ok and nome in no_console:
+            linhas += (f'<li style="padding:0 0 4px 28px;"><a href="#" style="font-family:{MONO};font-size:11px;line-height:16px;">'
+                       f'{T(no_console[nome])}</a></li>')
         if nota_peer and not ok and not nota_posta and not primeira:
             linhas += f'<li style="padding:2px 4px 6px 24px;">{nota_peer}</li>'
             nota_posta = True
@@ -183,6 +187,19 @@ def painel_testes(k, primeira=False, extra='', dentro='', nota_peer=''):
     corpo = (f'<ul aria-label="{T("testes")}" style="margin:0;padding:0 6px;list-style:none;display:flex;flex-direction:column;gap:1px;">{linhas}</ul>'
              f'<span style="padding:6px 16px 10px;font-size:11.5px;color:{k["mfg"]};">{rodape}</span>')
     return secao(k, T('testes'), resumo, corpo, extra=extra, dentro=dentro)
+
+
+def botao_expandir(k, expandido=False):
+    # o painel lateral: recolhe a coluna da esquerda (preenchido quando ela está recolhida)
+    cor = k['fgs'] if expandido else k['mfg']
+    fundo = f'background:{k["muted"]};' if expandido else 'background:transparent;'
+    icone = (f'<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">'
+             f'<rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/>'
+             + (f'<path d="M2.5 3.5h3.5v9H2.5z" fill="currentColor" stroke="none"/>' if expandido else '')
+             + f'<path d="M6 2.8v10.4"/></svg>')
+    rotulo_ = T('mostrarEnunciado') if expandido else T('expandir')
+    return (f'<button type="button" aria-label="{rotulo_}" aria-pressed="{"true" if expandido else "false"}" title="{rotulo_}" '
+            f'style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border:0;border-radius:7px;{fundo}color:{cor};">{icone}</button>')
 
 
 def balao_guia(k, n, posicao):
@@ -201,7 +218,41 @@ def balao_guia(k, n, posicao):
             f'<span style="margin-left:auto;display:flex;">{seguir}</span></div></div></sc-if>')
 
 
-def tela_exercicio(k, primeira=False, peer=None):
+# o que o código imprimiu ao rodar os testes: (teste ou None para "ao carregar", nível, texto)
+SAIDA_DO_CONSOLE = [
+    (None, 'log', 'unidades carregadas: h, min, s'),
+    ('rejeita texto vazio', 'log', 'texto: ""'),
+    ('rejeita texto vazio', 'error', "TypeError: Cannot read properties of null (reading 'groups')\n    at parseDuration (parse-duration.ts:6:18)"),
+    ('arredonda segundos para o minuto', 'log', "partes: [ '90', 's' ]"),
+    ('arredonda segundos para o minuto', 'warn', 'segundos não inteiros: 1.5'),
+]
+
+
+def faixa_console(k, saida):
+    # a faixa embaixo do código, como o terminal de uma IDE: ao carregar primeiro, depois cada teste
+    grupos = []
+    for teste, nivel, texto in saida:
+        if not grupos or grupos[-1][0] != teste:
+            grupos.append((teste, []))
+        grupos[-1][1].append((nivel, texto))
+    cor = {'log': f'color:{k["fg"]};', 'warn': f'background:{k["tyellow"]};color:{k["tyellowfg"]};',
+           'error': f'background:{k["tred"]};color:{k["tredfg"]};'}
+    corpo = ''.join(
+        f'<div style="display:flex;flex-direction:column;">'
+        f'<span style="font-family:{FONTE};font-size:11.5px;font-weight:500;color:{k["mfg"]};">{teste or T("aoCarregar")}</span>'
+        + ''.join(f'<span style="padding:0 6px;border-radius:3px;white-space:pre-wrap;{cor[n]}">{t}</span>' for n, t in linhas)
+        + '</div>'
+        for teste, linhas in grupos)
+    return (f'<section style="display:flex;flex-direction:column;border-top:1px solid {k["muted"]};background:{k["rail"]};">'
+            f'<div style="display:flex;align-items:center;gap:6px;height:34px;padding:0 12px 0 14px;">{ic("baixo", 12, k["mfg"])}'
+            f'<span style="font-family:{MONO};font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:{k["mfg"]};">{T("consoleTit")}</span>'
+            f'<span style="margin-left:auto;font-family:{MONO};font-size:11px;color:{k["mfg"]};">{T("consoleLinhas")}</span></div>'
+            f'<div role="log" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding:0 16px 12px;'
+            f'font-family:{MONO};font-size:12px;line-height:18px;">{corpo}</div></section>')
+
+
+def tela_exercicio(k, primeira=False, peer=None, console=False):
+    # console: a coluna da esquerda recolhida (o editor expandido) e o Console embaixo do código
     # peer (design/muriki-code/peer_exercicio.py): dict com 'testes' (a fala no painel de testes),
     # 'faixa' (a fala acima da barra de status), 'historico' (o cartão na coluna) e 'status'
     peer = peer or {}
@@ -265,6 +316,8 @@ def tela_exercicio(k, primeira=False, peer=None):
                            k, pad='14px 20px')
     esquerda = (f'<div style="width:372px;flex:0 0 372px;display:flex;flex-direction:column;gap:12px;">'
                 f'{enunciado}{explicacao}{dicas}{peer.get("historico", "")}</div>')
+    if console:
+        esquerda = ''
 
     arquivos = ([('parse-duration.ts', True), ('parse-duration.test.ts', False)] if primeira
                 else [('parse-duration.ts', True), ('unidades.ts', False), ('parse-duration.test.ts', False)])
@@ -287,7 +340,8 @@ def tela_exercicio(k, primeira=False, peer=None):
                f'{arvore(k, primeira)}'
                + painel_testes(k, primeira, extra=(f'background:{k["rail"]};' + realce(2)) if primeira else '',
                                dentro=balao_guia(k, 2, 'top:0;left:calc(100% + 14px);') if primeira else '',
-                               nota_peer=peer.get('testes', ''))
+                               nota_peer=peer.get('testes', ''),
+                               no_console={'rejeita texto vazio': 'noConsole2', 'arredonda segundos para o minuto': 'noConsole2'} if console else None)
                + f'<div style="flex:1;"></div>'
                f'<div style="display:flex;flex-direction:column;gap:4px;padding:10px 14px 12px;border-top:1px solid {k["muted"]};font-size:11.5px;line-height:16px;color:{k["mfg"]};">'
                f'<span style="display:flex;align-items:center;gap:6px;">{ic("cadeado", 11)}{T("travado")}</span>'
@@ -303,8 +357,8 @@ def tela_exercicio(k, primeira=False, peer=None):
         f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">'
         f'<div style="display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid {k["muted"]};">'
         f'<div role="tablist" aria-label="{T("abertos")}" style="display:flex;">{abas}</div>'
-        f'<span style="margin-left:auto;">{botao(T("rodar"), k, "primary", 30, "rodar")}</span></div>'
-        f'{area}{peer.get("faixa", "")}'
+        f'<span style="margin-left:auto;display:flex;align-items:center;gap:8px;">{botao_expandir(k, console)}{botao(T("rodar"), k, "primary", 30, "rodar")}</span></div>'
+        f'{area}{faixa_console(k, SAIDA_DO_CONSOLE) if console else ""}{peer.get("faixa", "")}'
         f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
         f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;">'
         f'<span>{posicao}</span><span>{T("atalho")}</span>'
@@ -1333,6 +1387,8 @@ def _montar(tela, tema, sufixo):
         return web(juntar(EVOLUCAO_NOVA, STARTER), fazer(k))
     if tela['id'] == 'exercicio':
         return web(EXERCICIO, tela_exercicio(k), valores=VALORES_EXERCICIO)
+    if tela['id'] == 'exercicio_console':
+        return web(EXERCICIO, tela_exercicio(k, console=True), valores=VALORES_EXERCICIO)
     if tela['id'] == 'arquitetura':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k))
     if tela['id'] == 'arquitetura_nuvem':

@@ -23,6 +23,8 @@ TEXTOS = {
         rodou='rodou há 40 s', abrirTeste='Abrir o teste',
         editor='Editor', abertos='Arquivos abertos', rodar='Rodar testes',
         atalho='⌘ ↵ roda os testes', semAuto='sem autocompletar: aqui quem escreve é você',
+        expandir='Expandir o editor', mostrarEnunciado='Mostrar o enunciado', consoleTit='Console', aoCarregar='ao carregar',
+        consoleLinhas='5 linhas', noConsole2='2 linhas no console',
     ),
     'en-US': dict(
         titulo='Convert a text duration into minutes', nivel='Mid-level', andamento='in progress',
@@ -48,6 +50,8 @@ TEXTOS = {
         rodou='ran 40 s ago', abrirTeste='Open the test',
         editor='Editor', abertos='Open files', rodar='Run tests',
         atalho='⌘ ↵ runs the tests', semAuto='no autocomplete: here, you write the code',
+        expandir='Expand the editor', mostrarEnunciado='Show the statement', consoleTit='Console', aoCarregar='on load',
+        consoleLinhas='5 lines', noConsole2='2 lines in the console',
     ),
     'es-ES': dict(
         titulo='Convertir una duración en texto a minutos', nivel='nivel intermedio', andamento='en curso',
@@ -73,6 +77,8 @@ TEXTOS = {
         rodou='se ejecutó hace 40 s', abrirTeste='Abrir la prueba',
         editor='Editor', abertos='Archivos abiertos', rodar='Ejecutar pruebas',
         atalho='⌘ ↵ ejecuta las pruebas', semAuto='sin autocompletar: aquí escribes tú',
+        expandir='Expandir el editor', mostrarEnunciado='Mostrar el enunciado', consoleTit='Consola', aoCarregar='al cargar',
+        consoleLinhas='5 líneas', noConsole2='2 líneas en la consola',
     ),
 }
 
