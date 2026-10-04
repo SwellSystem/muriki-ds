@@ -112,6 +112,13 @@ TRILHAS = [
 ]
 
 
+def _numero(k, n, depois=False):
+    # o "1" e o "2" das etapas, como no LevelGate do DS: a de agora em tinta forte, a seguinte apagada
+    return (f'<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;'
+            f'border-radius:999px;flex:0 0 auto;background:{k["card"]};color:{k["mfg"] if depois else k["fgs"]};'
+            f'font-size:11px;font-weight:600;font-variant-numeric:tabular-nums;">{n}</span>')
+
+
 def _cartao_trilha(k, logo, ling, nome, publico, estado, prog, href='#'):
     marca = logo_js(14) if logo == 'js' else logo_arq(14)
     topo = (f'<div style="display:flex;align-items:center;gap:8px;">{chip_ling(k, marca, T(ling))}'
@@ -120,11 +127,16 @@ def _cartao_trilha(k, logo, ling, nome, publico, estado, prog, href='#'):
              f'<span style="font-size:17px;line-height:23px;font-weight:600;color:{k["fgs"]};">{nome}</span>'
              f'<span style="font-size:13.5px;line-height:20px;color:{k["mfg"]};">{publico}</span></div>')
     if estado == 'bloqueada':
-        # o caminho até o startTier, numa linha: o nível que libera, a escala e o que falta
+        # o caminho em duas etapas (gate.language): primeiro Pleno na linguagem, inteira; depois a trilha,
+        # numa linha só. O cartão fica uma linha mais alto que os outros
         caminho = (f'<div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:10px;background:{k["sunken"]};">'
-                   f'<span style="font-size:12.5px;font-weight:500;color:{k["fgs"]};">{T("paraLiberar")}</span>'
+                   f'<div style="display:flex;align-items:flex-start;gap:10px;">{_numero(k, 1)}'
+                   f'<div style="display:flex;flex-direction:column;gap:8px;min-width:0;">'
+                   f'<span style="font-size:12.5px;font-weight:500;color:{k["fgs"]};">{T("passo1")}</span>'
                    f'<span style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">{escala(2, k, 14)}'
-                   f'<span style="font-size:12px;color:{k["mfg"]};">{T("faltam")} · Compor funções · Event loop e ordem de execução · {T("maisDuas")}</span></span></div>')
+                   f'<span style="font-size:12px;color:{k["mfg"]};">{T("faltam")} · Compor funções · Event loop e ordem de execução · {T("maisDuas")}</span></span></div></div>'
+                   f'<div style="display:flex;align-items:flex-start;gap:10px;">{_numero(k, 2, depois=True)}'
+                   f'<span style="padding-top:1px;font-size:12px;color:{k["mfg"]};">{T("passo2")}</span></div></div>')
         pe = (f'<a href="DesbloqueioTrilha__SUF__.dc.html" style="display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:500;'
               f'color:{k["mfg"]};">{T("abrirMesmo")}{ic("seta", 14)}</a>')
         return (f'<div style="display:flex;flex-direction:column;gap:12px;padding:18px 20px;border-radius:12px;background:{k["card"]};'
@@ -196,6 +208,11 @@ def tela_trilha_acima(k):
              f'<div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">'
              f'<span style="font-size:14.5px;font-weight:600;color:{k["prisubfg"]};">{T("avisoTit")}</span>'
              f'<span style="max-width:720px;font-size:13.5px;line-height:20px;color:{k["fg"]};">{T("avisoTxt")}</span>'
+             f'<ol style="margin:0;padding:2px 0 0;list-style:none;display:flex;flex-direction:column;gap:6px;max-width:720px;">'
+             + ''.join(f'<li style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;line-height:20px;color:{k["fg"]};">'
+                       f'{_numero(k, i + 1, depois=i > 0)}<span>{T(chave)}</span></li>'
+                       for i, chave in enumerate(('avisoPasso1', 'avisoPasso2')))
+             + '</ol>'
              f'<div style="display:flex;align-items:center;gap:16px;padding-top:4px;">'
              f'<a href="Main__SUF__.dc.html" style="font-size:13.5px;font-weight:500;">{T("verCaminho")}</a>'
              f'<span style="font-size:13.5px;font-weight:500;color:{k["mfg"]};">{T("entendi")}</span></div></div></section>')
