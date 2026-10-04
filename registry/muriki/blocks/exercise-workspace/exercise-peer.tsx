@@ -12,7 +12,9 @@
  *   (ExerciseTests `peerNote`); `bar` é a faixa acima da barra de status do editor
  *   (ExerciseEditor `peerBar`), para o que veio de uma pausa.
  * - `PeerStatus`: "Peer acompanhando" no cabeçalho, ao lado do "salvo há" (ExerciseHeader
- *   `peerStatus`); "Peer em pausa" quando a cota ou o orçamento acabou.
+ *   `peerStatus`); "Peer em pausa" quando a cota ou o orçamento acabou. No Starter (`review`
+ *   "not_in_plan"), o Peer não consulta a IA nos eventos do editor, e o status ganha o complemento
+ *   fixo "· revisão da IA no Pro": discreto, desde a abertura, nunca como fala a cada evento.
  * - `PeerHistory`: o cartão "Peer neste exercício" na coluna da esquerda, embaixo das dicas, com o
  *   que ele disse, do mais recente para o mais antigo.
  * - `PeerInsight`: quando o Peer acha uma armadilha da linguagem no código (ex.: `==`), a fala dele é
@@ -27,6 +29,7 @@ import { ChatTeardropTextIcon, SparkleIcon } from "@phosphor-icons/react"
 
 import { DID_YOU_KNOW_TONE } from "@/components/blocks/did-you-know"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -128,12 +131,19 @@ export function PeerNote({ message, variant = "inline", onEscalate, escalating, 
 export interface PeerStatusProps {
   /** `paused`: a cota do mês ou o orçamento acabou; o Peer volta sozinho. */
   state?: "following" | "paused"
+  /** O `peer.review` da API: `not_in_plan` no Starter, que não tem a revisão da IA nos eventos. */
+  review?: "not_in_plan"
+  /** O complemento "revisão da IA no Pro" vira link. Sem nenhum dos dois, fica como texto. */
+  onSeePro?: () => void
+  proRender?: React.ReactElement
   className?: string
 }
 
-export function PeerStatus({ state = "following", className }: PeerStatusProps) {
+export function PeerStatus({ state = "following", review, onSeePro, proRender, className }: PeerStatusProps) {
   const t = useTranslate()
   const pausa = state === "paused"
+  const pro = t("exercise_workspace.peer.review_pro")
+  const linkPro = "rounded-[4px] underline decoration-muted-foreground/40 underline-offset-[3px] outline-none hover:text-foreground-strong focus-visible:ring-2 focus-visible:ring-ring/35"
   return (
     <span
       data-slot="peer-status"
@@ -141,6 +151,22 @@ export function PeerStatus({ state = "following", className }: PeerStatusProps) 
     >
       <span aria-hidden className={cn("size-1.5 rounded-full", pausa ? "bg-muted-foreground" : "bg-primary")} />
       {t(pausa ? "exercise_workspace.peer.paused" : "exercise_workspace.peer.following")}
+      {review === "not_in_plan" ? (
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <span aria-hidden>·</span>
+          {proRender ? (
+            <Button variant="ghost" size="xs" render={proRender} nativeButton={false} onClick={onSeePro} className={cn("h-auto px-0 text-xs font-normal text-muted-foreground hover:bg-transparent", linkPro)}>
+              {pro}
+            </Button>
+          ) : onSeePro ? (
+            <button type="button" onClick={onSeePro} className={linkPro}>
+              {pro}
+            </button>
+          ) : (
+            pro
+          )}
+        </span>
+      ) : null}
     </span>
   )
 }

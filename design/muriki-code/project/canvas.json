@@ -1201,6 +1201,54 @@
    "h": 844,
    "title": "Celular · a troca de linguagem numa folha: os cartões empilham e as setas descem · escuro",
    "is_interactive": true
+  },
+  "ExercicioStarter.dc.html": {
+   "x": 21280,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · o Peer sem a revisão da IA nos eventos: um complemento fixo no \"Peer acompanhando\"",
+   "is_interactive": true
+  },
+  "ExercicioStarterEscuro.dc.html": {
+   "x": 21280,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · o Peer sem a revisão da IA nos eventos: um complemento fixo no \"Peer acompanhando\" · escuro",
+   "is_interactive": true
+  },
+  "EvolucaoStarter.dc.html": {
+   "x": 22800,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · a Evolução nos últimos 7 dias: o aviso, a linha do tempo com a borda e a trajetória fora da janela",
+   "is_interactive": true
+  },
+  "EvolucaoStarterEscuro.dc.html": {
+   "x": 22800,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · a Evolução nos últimos 7 dias: o aviso, a linha do tempo com a borda e a trajetória fora da janela · escuro",
+   "is_interactive": true
+  },
+  "CompetenciaStarter.dc.html": {
+   "x": 24320,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · a competência nos últimos 7 dias: o histórico sem mudança na janela e a trajetória fora dela",
+   "is_interactive": true
+  },
+  "CompetenciaStarterEscuro.dc.html": {
+   "x": 24320,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Starter · a competência nos últimos 7 dias: o histórico sem mudança na janela e a trajetória fora dela · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1223,7 +1271,7 @@
   "web": {
    "kind": "title1",
    "maxW": 8000,
-   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo e o guia de sintaxe",
+   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -1491,7 +1539,13 @@
   "TrocaLinguagemPlano.dc.html",
   "TrocaLinguagemPlanoEscuro.dc.html",
   "TrocaLinguagemMovel.dc.html",
-  "TrocaLinguagemMovelEscuro.dc.html"
+  "TrocaLinguagemMovelEscuro.dc.html",
+  "ExercicioStarter.dc.html",
+  "ExercicioStarterEscuro.dc.html",
+  "EvolucaoStarter.dc.html",
+  "EvolucaoStarterEscuro.dc.html",
+  "CompetenciaStarter.dc.html",
+  "CompetenciaStarterEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

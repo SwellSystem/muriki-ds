@@ -1322,6 +1322,15 @@ def _montar(tela, tema, sufixo):
         import peer_exercicio as pe
         fazer = {'peer_testes': pe.tela_peer_testes, 'peer_faixa': pe.tela_peer_faixa, 'peer_retorno': pe.tela_peer_retorno}[tela['id']]
         return web(juntar(EXERCICIO, PEER_EXERCICIO), fazer(k), valores=VALORES_EXERCICIO)
+    if tela['id'] in ('starter_exercicio', 'starter_evolucao', 'starter_competencia'):
+        from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO
+        from textos_starter import TEXTOS as STARTER
+        import starter as st
+        if tela['id'] == 'starter_exercicio':
+            peer = {l: {kk: v for kk, v in PEER_EXERCICIO[l].items() if kk == 'peerAcompanhando'} for l in PEER_EXERCICIO}
+            return web(juntar(EXERCICIO, peer, STARTER), st.tela_exercicio_starter(k), valores=VALORES_EXERCICIO)
+        fazer = st.tela_evolucao_starter if tela['id'] == 'starter_evolucao' else st.tela_competencia_starter
+        return web(juntar(EVOLUCAO_NOVA, STARTER), fazer(k))
     if tela['id'] == 'exercicio':
         return web(EXERCICIO, tela_exercicio(k), valores=VALORES_EXERCICIO)
     if tela['id'] == 'arquitetura':

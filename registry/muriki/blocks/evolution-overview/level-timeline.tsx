@@ -16,6 +16,11 @@
  *
  * É a forma de GET /code/evolution/level-changes, agrupada por competência pelo app. Para quem
  * não enxerga o desenho, a mesma informação vai numa lista escondida.
+ *
+ * NO STARTER, A JANELA. Com `historyFrom` (a API só devolve as mudanças dos últimos dias), o trecho
+ * antes dele fica hachurado e apagado, com "desde 28 de set." na borda: fora da vista, não "nada
+ * aconteceu". A linha de quem mudou na janela entra pela borda no nível de antes da mudança (`from`).
+ * O aviso com o Pro é o HistoryWindowNote, embaixo do cabeçalho; aqui não se repete.
  */
 import * as React from "react"
 
@@ -24,6 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { formatShortDate } from "@/lib/date-format"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+
+import { formatHistoryFrom } from "./history-window"
 
 export interface LevelTimelineChange {
   from: Level | null
@@ -50,6 +57,8 @@ export interface LevelTimelineProps {
   locale?: string
   /** Troca "Evolução no tempo"; `null` tira o título e a frase. */
   title?: React.ReactNode | null
+  /** O `historyFrom` da API no Starter (ISO 8601): o antes dele fica hachurado. `null` no Pro. */
+  historyFrom?: string | null
   className?: string
 }
 
@@ -65,7 +74,7 @@ type Desenho = { h: Array<[number, number, Level]>; v: Array<[number, Level, Lev
 const tempo = (iso: string) => Date.parse(iso)
 const yDe = (nivel: Level, desloca: number) => ALTURA - (LEVELS.indexOf(nivel) + 0.5) * FAIXA + desloca
 
-function desenhar(changes: LevelTimelineChange[], ini: number, fim: number): Desenho | null {
+function desenhar(changes: LevelTimelineChange[], ini: number, fim: number, janela: number | null): Desenho | null {
   const x = (t: number) => ((t - ini) / (fim - ini)) * 100
   const ordem = [...changes].sort((a, b) => tempo(a.occurredAt) - tempo(b.occurredAt))
   const antes = ordem.filter((c) => tempo(c.occurredAt) <= ini)
@@ -76,10 +85,16 @@ function desenhar(changes: LevelTimelineChange[], ini: number, fim: number): Des
   if (nivel === null) {
     if (dentro.length === 0) return null
     const primeiro = dentro[0]
-    nivel = primeiro.to
-    atual = x(tempo(primeiro.occurredAt))
-    d.marcas.push({ x: atual, nivel, partida: primeiro.cause === "baseline" })
-    dentro = dentro.slice(1)
+    if (janela !== null && primeiro.from) {
+      // na janela do Starter, o antes não veio: a linha entra pela borda no nível de antes da mudança
+      nivel = primeiro.from
+      atual = x(Math.max(janela, ini))
+    } else {
+      nivel = primeiro.to
+      atual = x(tempo(primeiro.occurredAt))
+      d.marcas.push({ x: atual, nivel, partida: primeiro.cause === "baseline" })
+      dentro = dentro.slice(1)
+    }
   }
   for (const c of dentro) {
     const xc = x(tempo(c.occurredAt))
@@ -100,18 +115,22 @@ export function LevelTimeline({
   max = 5,
   locale = "pt-BR",
   title,
+  historyFrom,
   className,
 }: LevelTimelineProps) {
   const t = useTranslate()
+  const hachura = React.useId()
   const nome = useLevelName()
   const [hoje] = React.useState(() => Date.now())
   const fim = until ? tempo(until) : hoje
   const ini = fim - weeks * 7 * DIA
   const limite = Math.min(max, CORES.length)
+  const janela = historyFrom ? tempo(historyFrom) : null
+  const borda = janela !== null && janela > ini ? Math.min(100, ((janela - ini) / (fim - ini)) * 100) : null
 
   const desenhos = new Map<string, Desenho>()
   for (const s of series) {
-    const d = desenhar(s.changes, ini, fim)
+    const d = desenhar(s.changes, ini, fim, janela)
     if (d) desenhos.set(s.id, d)
   }
   const ultima = (s: LevelTimelineSeries) => Math.max(0, ...s.changes.map((c) => tempo(c.occurredAt)))
@@ -161,7 +180,11 @@ export function LevelTimeline({
       {title === null ? null : (
         <div className="flex flex-col gap-[3px]">
           <h2 className="m-0 text-[15px] leading-5 font-semibold text-foreground-strong">{title ?? t("level_timeline.title")}</h2>
-          <p className="m-0 text-[13px] leading-[19px] text-pretty text-muted-foreground">{t("level_timeline.subtitle")}</p>
+          <p className="m-0 text-[13px] leading-[19px] text-pretty text-muted-foreground">
+            {janela !== null
+              ? t("level_timeline.subtitle_window", { count: Math.max(1, Math.round((fim - janela) / DIA)) })
+              : t("level_timeline.subtitle")}
+          </p>
         </div>
       )}
 
@@ -228,7 +251,7 @@ export function LevelTimeline({
             </span>
           ))}
         </div>
-        <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <div className="relative flex min-w-0 flex-1 flex-col gap-2">
           <svg aria-hidden width="100%" height={ALTURA} className="block overflow-visible rounded-md">
             {LEVELS.map((n, i) => (
               <rect key={n} x="0" y={i * FAIXA} width="100%" height={FAIXA} fill={i % 2 ? "var(--sunken)" : "var(--card)"} />
@@ -236,6 +259,18 @@ export function LevelTimeline({
             {Array.from({ length: weeks }, (_, i) => (
               <line key={i} x1={`${(i / weeks) * 100}%`} x2={`${(i / weeks) * 100}%`} y1="0" y2={ALTURA} stroke="var(--muted)" />
             ))}
+            {borda !== null ? (
+              <>
+                <defs>
+                  <pattern id={hachura} width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                    <line x1="0" y1="0" x2="0" y2="7" stroke="var(--input)" strokeWidth={1.5} />
+                  </pattern>
+                </defs>
+                <rect x="0" y="0" width={`${borda}%`} height={ALTURA} fill="var(--card)" opacity={0.55} />
+                <rect x="0" y="0" width={`${borda}%`} height={ALTURA} fill={`url(#${hachura})`} opacity={0.7} />
+                <line x1={`${borda}%`} x2={`${borda}%`} y1="0" y2={ALTURA} stroke="var(--muted-foreground)" strokeDasharray="3 3" />
+              </>
+            ) : null}
             {ligadas.map((s) => {
               const d = desenhos.get(s.id)!
               const lugar = lugarDe(s.id)
@@ -263,6 +298,15 @@ export function LevelTimeline({
               )
             })}
           </svg>
+          {borda !== null && historyFrom ? (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute top-2 rounded-[4px] bg-card px-1.5 font-mono text-[10.5px] whitespace-nowrap text-muted-foreground"
+              style={{ right: `calc(${100 - borda}% + 8px)` }}
+            >
+              {t("history_window.since", { date: formatHistoryFrom(historyFrom, locale) })}
+            </span>
+          ) : null}
           <div aria-hidden className="relative h-4">
             {meses.map((m) => (
               <span key={m.x} className="absolute -translate-x-1/2 text-[11px] text-muted-foreground" style={{ left: `${m.x}%` }}>
@@ -275,6 +319,7 @@ export function LevelTimeline({
 
       {/* a mesma informação, para leitor de tela */}
       <ul className="sr-only">
+        {historyFrom ? <li>{t("history_window.since", { date: formatHistoryFrom(historyFrom, locale) })}</li> : null}
         {ligadas.map((s) => (
           <li key={s.id}>
             {s.title}:{" "}
