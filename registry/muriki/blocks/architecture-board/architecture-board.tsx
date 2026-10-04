@@ -27,20 +27,28 @@ import * as React from "react"
 import {
   Archive,
   ArrowsSplit,
+  Bell,
   Browser,
+  ChartLine,
   Check,
   Circle,
+  Clock,
+  Copy,
   Cube,
   Database,
+  Door,
   Gear,
   Globe,
+  IdentificationBadge,
   Lightning,
   LinkSimple,
+  MagnifyingGlass,
   PencilSimple,
   Plug,
   Queue,
   Square,
   Trash,
+  Tray,
   X,
 } from "@phosphor-icons/react"
 import {
@@ -144,6 +152,15 @@ const ICONES: Record<string, React.ElementType> = {
   cdn: Globe,
   "load-balancer": ArrowsSplit,
   "object-storage": Archive,
+  // as peças do pacote 2026.10.03-3
+  "api-gateway": Door,
+  "identity-provider": IdentificationBadge,
+  "search-index": MagnifyingGlass,
+  "read-replica": Copy,
+  scheduler: Clock,
+  "dead-letter-queue": Tray,
+  telemetry: ChartLine,
+  alerting: Bell,
 }
 
 function IconeDaPeca({ kind, className }: { kind: string; className?: string }) {
