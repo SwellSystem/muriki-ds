@@ -26,6 +26,7 @@ import { Toggle as TogglePrimitive } from "@base-ui/react/toggle"
 import { ToggleGroup as ToggleGroupPrimitive } from "@base-ui/react/toggle-group"
 import { CheckIcon } from "@phosphor-icons/react"
 
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 export interface ChoiceChip {
@@ -129,4 +130,28 @@ function ChoiceChips({
   )
 }
 
-export { ChoiceChips }
+/**
+ * A lista de chips carregando (as linguagens do primeiro acesso e do Aprendizado): uma linha por
+ * grupo, o rótulo à esquerda e os chips de 30px à direita, com larguras variadas.
+ */
+function ChoiceChipsSkeleton({ groups = [4, 6, 3, 5], className }: { groups?: number[]; className?: string }) {
+  const larguras = ["w-[92px]", "w-[78px]", "w-[104px]", "w-[64px]", "w-[86px]", "w-[72px]"]
+  return (
+    <div aria-hidden data-slot="choice-chips-skeleton" className={cn("flex flex-col gap-2.5", className)}>
+      {groups.map((n, g) => (
+        <div key={g} className="flex items-start gap-3.5">
+          <span className="flex h-[30px] w-24 shrink-0 items-center">
+            <Skeleton className="h-2.5 w-16" />
+          </span>
+          <span className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+            {Array.from({ length: n }, (_, i) => (
+              <Skeleton key={i} className={cn("h-[30px] rounded-full", larguras[(i + g) % larguras.length])} />
+            ))}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export { ChoiceChips, ChoiceChipsSkeleton }
