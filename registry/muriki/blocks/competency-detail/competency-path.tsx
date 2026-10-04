@@ -22,6 +22,7 @@ import { CaretRightIcon, CheckIcon } from "@phosphor-icons/react"
 
 import { LEVELS, useLevelName, type Level } from "@/components/ui/level-scale"
 import { useTranslate } from "@/lib/i18n"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 
 export interface CompetencyPathStep {
@@ -132,4 +133,54 @@ function Etapa({ etapa }: { etapa: CompetencyPathStep }) {
       }
     ),
   })
+}
+
+// ── Carregando ──────────────────────────────────────────────────────────────
+
+/** Uma linha de texto carregando: a caixa tem a altura da linha real; a barra, a da letra. */
+function LinhaDeTexto({ h, className }: { h: number; className?: string }) {
+  return (
+    <span className="flex items-center" style={{ height: h }}>
+      <Skeleton className={cn("h-[0.7em] min-h-2", className)} style={{ fontSize: h * 0.75 }} />
+    </span>
+  )
+}
+
+/** O CompetencyPath carregando: os quatro níveis, com etapas (`steps`) por nível; 0 vira a linha da frase. */
+export function CompetencyPathSkeleton({ steps = [1, 4, 2, 0], className }: { steps?: number[]; className?: string }) {
+  return (
+    <div aria-hidden data-slot="competency-path-skeleton" className={cn("@container flex min-w-0 flex-col gap-1 rounded-xl bg-card px-5 pt-4 pb-[18px] shadow-xs", className)}>
+      <LinhaDeTexto h={20} className="w-36" />
+      <div className="mb-1">
+        <LinhaDeTexto h={19} className="w-[64%]" />
+        <span className="@[30rem]:hidden">
+          <LinhaDeTexto h={19} className="w-[30%]" />
+        </span>
+      </div>
+      {steps.map((n, g) => (
+        <div key={g} className="flex flex-col">
+          <div className="pt-2.5 pb-1.5">
+            <LinhaDeTexto h={14} className="w-20" />
+          </div>
+          {n === 0 ? (
+            <div className="border-t border-muted pt-2.5 pb-0.5">
+              <LinhaDeTexto h={19} className="w-[80%]" />
+            </div>
+          ) : (
+            Array.from({ length: n }, (_, i) => (
+              <div key={i} className="flex min-h-10 items-center gap-3 border-t border-muted py-1">
+                <Skeleton className="size-5 shrink-0 rounded-full" />
+                <span className="min-w-0 flex-1">
+                  <LinhaDeTexto h={20} className={["w-[46%]", "w-[38%]", "w-[54%]", "w-[30%]"][(i + g) % 4]} />
+                </span>
+                <span>
+                  <LinhaDeTexto h={16} className="w-12" />
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      ))}
+    </div>
+  )
 }

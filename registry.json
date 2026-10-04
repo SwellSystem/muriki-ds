@@ -1832,7 +1832,8 @@
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/i18n",
         "SwellSystem/muriki-ds/badge",
-        "SwellSystem/muriki-ds/level-scale"
+        "SwellSystem/muriki-ds/level-scale",
+        "SwellSystem/muriki-ds/skeleton"
       ],
       "files": [
         {
@@ -1846,7 +1847,7 @@
           "target": "components/blocks/level-profile/index.ts"
         }
       ],
-      "docs": "<LevelProfile groups={porLinguagem(profile.competencies).map(([language, itens]) => ({ id: language, label: rotuloDa(language), items: itens.map((c) => ({ id: c.id, title: c.title, declared: c.declared, confirmed: c.confirmed, next: c.next, render: <Link to=\"/evolution/$id\" params={{ id: c.id }} /> })) }))} />. declared, confirmed e next vêm de GET /code/evolution/profile sem conversão; o app só agrupa por language (js, neutral…) e escolhe o rótulo do grupo. next null = \"no último nível\"; next com missing vazio = \"Senior: sem etapas ainda\"; senão \"Senior: faltam N etapas\". Sem render nem href, a linha não é link. title troca \"Suas competências\"; null tira. A troca de linha para cartão é por container query (44rem). Textos em level_profile.* no i18n."
+      "docs": "<LevelProfile groups={porLinguagem(profile.competencies).map(([language, itens]) => ({ id: language, label: rotuloDa(language), items: itens.map((c) => ({ id: c.id, title: c.title, declared: c.declared, confirmed: c.confirmed, next: c.next, render: <Link to=\"/evolution/$id\" params={{ id: c.id }} /> })) }))} />. declared, confirmed e next vêm de GET /code/evolution/profile sem conversão; o app só agrupa por language (js, neutral…) e escolhe o rótulo do grupo. next null = \"no último nível\"; next com missing vazio = \"Senior: sem etapas ainda\"; senão \"Senior: faltam N etapas\". Sem render nem href, a linha não é link. title troca \"Suas competências\"; null tira. A troca de linha para cartão é por container query (44rem). Textos em level_profile.* no i18n. Carregando: <LevelProfileSkeleton groups={[9, 1]} /> (linhas por grupo), com as mesmas colunas."
     },
     {
       "name": "code-trace",
@@ -1918,7 +1919,8 @@
         "SwellSystem/muriki-ds/i18n",
         "SwellSystem/muriki-ds/date-format",
         "SwellSystem/muriki-ds/badge",
-        "SwellSystem/muriki-ds/level-scale"
+        "SwellSystem/muriki-ds/level-scale",
+        "SwellSystem/muriki-ds/skeleton"
       ],
       "files": [
         {
@@ -1942,7 +1944,7 @@
           "target": "components/blocks/competency-detail/index.ts"
         }
       ],
-      "docs": "import { CompetencyPath, LevelHistory, SkillTrajectory } from \"@/components/blocks/competency-detail\". A página /evolution/$competencyId (canvas: Competencia): no topo, o BackLink \"Evolução\", o título, a LevelScale com confirmado e declarado e os selos; embaixo, à esquerda (flex-1) o CompetencyPath e à direita (520px) o LevelHistory e a SkillTrajectory; abaixo de lg, uma coluna. <CompetencyPath tiers={[{ tier: \"junior\", steps: [{ id, title, status, demonstratedBy, render: <Link … /> }] }, …]} />: as etapas do caminho da trilha (GET /code/tracks/{id}) que são da competência, agrupadas por tier, status e demonstratedBy como vêm; eletiva fora. Os quatro níveis aparecem sempre; nível sem etapa vira a frase. <LevelHistory changes={levelChanges} locale={i18n.language} />, de GET /code/evolution/level-changes?competencyId ({ from, to, cause: \"baseline\" | \"assessment\", occurredAt }); ordena do mais recente para o mais antigo. <SkillTrajectory skill=\"Closures\" first={tr.first} latest={tr.latest} locale={i18n.language} />, de GET /code/evolution/trajectories/{skillId}; latest null vira a frase de uma aprovação só, understanding null vira traço, retired leva \"saiu do catálogo\". Qual etapa mostrar é do app (ex.: a última aprovada desta competência). Na Evolução, o LevelProfile já leva à página: passe render={<Link to=\"/evolution/$competencyId\" params={{ competencyId }} />} em cada item. title troca ou tira (null) o título de cada peça. Textos em competency_path.*, level_history.* e skill_trajectory.* no i18n."
+      "docs": "import { CompetencyPath, LevelHistory, SkillTrajectory } from \"@/components/blocks/competency-detail\". A página /evolution/$competencyId (canvas: Competencia): no topo, o BackLink \"Evolução\", o título, a LevelScale com confirmado e declarado e os selos; embaixo, à esquerda (flex-1) o CompetencyPath e à direita (520px) o LevelHistory e a SkillTrajectory; abaixo de lg, uma coluna. <CompetencyPath tiers={[{ tier: \"junior\", steps: [{ id, title, status, demonstratedBy, render: <Link … /> }] }, …]} />: as etapas do caminho da trilha (GET /code/tracks/{id}) que são da competência, agrupadas por tier, status e demonstratedBy como vêm; eletiva fora. Os quatro níveis aparecem sempre; nível sem etapa vira a frase. <LevelHistory changes={levelChanges} locale={i18n.language} />, de GET /code/evolution/level-changes?competencyId ({ from, to, cause: \"baseline\" | \"assessment\", occurredAt }); ordena do mais recente para o mais antigo. <SkillTrajectory skill=\"Closures\" first={tr.first} latest={tr.latest} locale={i18n.language} />, de GET /code/evolution/trajectories/{skillId}; latest null vira a frase de uma aprovação só, understanding null vira traço, retired leva \"saiu do catálogo\". Qual etapa mostrar é do app (ex.: a última aprovada desta competência). Na Evolução, o LevelProfile já leva à página: passe render={<Link to=\"/evolution/$competencyId\" params={{ competencyId }} />} em cada item. title troca ou tira (null) o título de cada peça. Textos em competency_path.*, level_history.* e skill_trajectory.* no i18n. Carregando: <CompetencyPathSkeleton steps={[1, 4, 2, 0]} /> (etapas por nível; 0 é a frase), <LevelHistorySkeleton items={2} /> e <SkillTrajectorySkeleton /> (a trajetória chega depois)."
     },
     {
       "name": "track-progress",
@@ -1955,7 +1957,8 @@
       "registryDependencies": [
         "utils",
         "SwellSystem/muriki-ds/theme",
-        "SwellSystem/muriki-ds/i18n"
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton"
       ],
       "files": [
         {
@@ -1969,7 +1972,7 @@
           "target": "components/blocks/track-progress/index.ts"
         }
       ],
-      "docs": "<TrackProgress tracks={trilhas.map((tr) => ({ id: tr.id, title: tr.title, done: conta(p => p.status === \"done\" && p.demonstratedBy === \"exercise\"), skipped: conta(p => p.status === \"done\" && p.demonstratedBy === \"diagnostic\"), covered: conta(p => p.status === \"presumed\"), todo: conta(p => p.status === \"todo\" || p.status === \"diagnostic\"), render: <Link to=\"/tracks/$trackId\" params={{ trackId: tr.id }} /> }))} />, contando o path de GET /code/tracks/{id}; elective fica fora. title troca \"Nas trilhas\"; null tira. Textos em track_progress.* no i18n."
+      "docs": "<TrackProgress tracks={trilhas.map((tr) => ({ id: tr.id, title: tr.title, done: conta(p => p.status === \"done\" && p.demonstratedBy === \"exercise\"), skipped: conta(p => p.status === \"done\" && p.demonstratedBy === \"diagnostic\"), covered: conta(p => p.status === \"presumed\"), todo: conta(p => p.status === \"todo\" || p.status === \"diagnostic\"), render: <Link to=\"/tracks/$trackId\" params={{ trackId: tr.id }} /> }))} />, contando o path de GET /code/tracks/{id}; elective fica fora. title troca \"Nas trilhas\"; null tira. Textos em track_progress.* no i18n. Carregando: <TrackProgressSkeleton tracks={3} />."
     },
     {
       "name": "evolution-overview",
@@ -1987,7 +1990,8 @@
         "SwellSystem/muriki-ds/date-format",
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/sheet",
-        "SwellSystem/muriki-ds/level-scale"
+        "SwellSystem/muriki-ds/level-scale",
+        "SwellSystem/muriki-ds/skeleton"
       ],
       "files": [
         {
@@ -2011,7 +2015,7 @@
           "target": "components/blocks/evolution-overview/index.ts"
         }
       ],
-      "docs": "import { EvolutionHeader, EvolutionHowMeasured, EvolutionStart, LevelTimeline } from \"@/components/blocks/evolution-overview\". A página /evolution (canvas: Main, EvolucaoNoTempo, PerfilVazio): <EvolutionHeader /> no topo; embaixo, lado a lado, o LevelProfile e o TrackProgress (360px); depois o <LevelTimeline /> e a SkillTrajectory (competency-detail). EvolutionHeader traz o título com, ao lado, o botão com contorno e ícone que abre o EvolutionHowMeasured, e a frase embaixo; (painel à direita com declarado e confirmado, só sobe, as marcas do caminho, a trajetória e \"só você\"); subtitle troca a frase, howMeasured={null} tira o botão. No primeiro dia (sem exercício enviado): <EvolutionHeader subtitle={t(\"evolution_header.subtitle_empty\")} /> e, no lugar do gráfico e da trajetória, <EvolutionStart actionRender={<Link to=\"/exercises/$slug\" params={…} />} /> ao lado do TrackProgress. <LevelTimeline series={competencias.map((c) => ({ id: c.id, title: c.title, changes: mudancasDe(c.id) }))} locale={i18n.language} />, com as mudanças de GET /code/evolution/level-changes agrupadas por competência. Doze semanas até agora (until e weeks trocam); até cinco linhas ao mesmo tempo (max), começando pelas cinco com mudança mais recente; a legenda liga e desliga, e passar por ela realça a linha. Competência só com ponto de partida segue reta; partida antes da janela entra pela borda; sem nível confirmado, o botão fica desligado. Uma lista escondida diz o mesmo para leitor de tela. Textos em evolution_header.*, evolution_how.*, evolution_start.* e level_timeline.* no i18n."
+      "docs": "import { EvolutionHeader, EvolutionHowMeasured, EvolutionStart, LevelTimeline } from \"@/components/blocks/evolution-overview\". A página /evolution (canvas: Main, EvolucaoNoTempo, PerfilVazio): <EvolutionHeader /> no topo; embaixo, lado a lado, o LevelProfile e o TrackProgress (360px); depois o <LevelTimeline /> e a SkillTrajectory (competency-detail). EvolutionHeader traz o título com, ao lado, o botão com contorno e ícone que abre o EvolutionHowMeasured, e a frase embaixo; (painel à direita com declarado e confirmado, só sobe, as marcas do caminho, a trajetória e \"só você\"); subtitle troca a frase, howMeasured={null} tira o botão. No primeiro dia (sem exercício enviado): <EvolutionHeader subtitle={t(\"evolution_header.subtitle_empty\")} /> e, no lugar do gráfico e da trajetória, <EvolutionStart actionRender={<Link to=\"/exercises/$slug\" params={…} />} /> ao lado do TrackProgress. <LevelTimeline series={competencias.map((c) => ({ id: c.id, title: c.title, changes: mudancasDe(c.id) }))} locale={i18n.language} />, com as mudanças de GET /code/evolution/level-changes agrupadas por competência. Doze semanas até agora (until e weeks trocam); até cinco linhas ao mesmo tempo (max), começando pelas cinco com mudança mais recente; a legenda liga e desliga, e passar por ela realça a linha. Competência só com ponto de partida segue reta; partida antes da janela entra pela borda; sem nível confirmado, o botão fica desligado. Uma lista escondida diz o mesmo para leitor de tela. Textos em evolution_header.*, evolution_how.*, evolution_start.* e level_timeline.* no i18n. Carregando: <LevelTimelineSkeleton /> para o gráfico, que chega depois do resto (as faixas já aparecem, na altura de 200px)."
     },
     {
       "name": "metric-card",
