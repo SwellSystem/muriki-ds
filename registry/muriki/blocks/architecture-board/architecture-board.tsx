@@ -28,6 +28,7 @@ import {
   Archive,
   ArrowsSplit,
   Bell,
+  Broadcast,
   Browser,
   ChartLine,
   Check,
@@ -39,6 +40,7 @@ import {
   Door,
   Gear,
   Globe,
+  Handshake,
   IdentificationBadge,
   Lightning,
   LinkSimple,
@@ -46,9 +48,11 @@ import {
   PencilSimple,
   Plug,
   Queue,
+  ShareNetwork,
   Square,
   Trash,
   Tray,
+  Vault,
   X,
 } from "@phosphor-icons/react"
 import {
@@ -161,6 +165,11 @@ const ICONES: Record<string, React.ElementType> = {
   "dead-letter-queue": Tray,
   telemetry: ChartLine,
   alerting: Bell,
+  // as peças do pacote 2026.10.04-2
+  "event-bus": ShareNetwork,
+  "third-party": Handshake,
+  "secrets-vault": Vault,
+  "realtime-gateway": Broadcast,
 }
 
 function IconeDaPeca({ kind, className }: { kind: string; className?: string }) {
