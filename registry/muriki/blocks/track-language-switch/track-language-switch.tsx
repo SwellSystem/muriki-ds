@@ -12,22 +12,26 @@
  * Por cima do véu desfocado, como as boas-vindas: as duas trilhas lado a lado, a de agora à esquerda e a
  * clicada à direita, e no meio o logo da linguagem ativa com as setas fazendo a passagem. Três fases:
  * - confirmar: o que acontece, Trocar e Continuar na atual (e o link do Pro, se o app passar);
- * - trocando: a de agora congela (o gelo desce, a cor sai, "Guardado · 5 de 12 etapas"), o logo do meio
- *   gira e vira o da nova, e a nova se abre — o primeiro ponto acende com "comece aqui"; na volta, a que
- *   estava guardada descongela "de onde parou". Dura o tempo do `onConfirm`, e no mínimo ~2,2 s;
- * - concluído: "Começar a trilha" (ou "Continuar a trilha", na volta).
+ * - trocando: a de agora congela (o gelo desce, a cor sai, "Guardado · 5 de 12 etapas": o histórico fica,
+ *   nada é apagado), o logo do meio gira e vira o da nova, e a nova se abre do começo — o primeiro ponto
+ *   acende com "comece aqui". Dura o tempo do `onConfirm`, e no mínimo ~2,2 s;
+ * - concluído: "Começar a trilha".
+ *
+ * Regra B do Starter: voltar para uma linguagem deixada recomeça do zero (a "época" da API; nada é apagado e
+ * o Pro vê tudo). Por isso nada aqui promete voltar de onde parou: a confirmação avisa o recomeço, e a
+ * trilha clicada sempre abre do começo (o `done` de `to` não conta).
  *
  * Se `onConfirm` rejeitar, volta para a confirmação com o aviso de erro. Trocando, Esc e clique fora não
  * fecham; na confirmação e no not_in_plan são "Continuar na atual" (`onDismiss`).
  *
  * Movimento no css do item (`muriki-langswitch-*`). Com prefers-reduced-motion, nada se mexe: cada fase
  * aparece no estado final e a troca espera só o `onConfirm`. Ao abrir, o logo do meio dá uma prévia da
- * troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta). No celular (abaixo de md), a folha que sobe
- * de baixo, com os cartões empilhados e as setas descendo de um para o outro; `variant` fixa um dos dois.
+ * troca, uma vez (gira para a nova e volta; no not_in_plan, para o cadeado e volta). No celular (abaixo de
+ * md), a folha que sobe de baixo, com os cartões empilhados e as setas descendo de um para o outro; `variant` fixa um dos dois.
  */
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
-import { ArrowRightIcon, CaretRightIcon, LockSimpleIcon, SnowflakeIcon } from "@phosphor-icons/react"
+import { ArrowCounterClockwiseIcon, ArrowRightIcon, CaretRightIcon, LockSimpleIcon, SnowflakeIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { BrandLogo, brandName, type Brand } from "@/components/ui/brand-logo"
@@ -42,7 +46,7 @@ export interface TrackLanguageSwitchTrack {
   language?: string
   /** O nome da trilha, ex.: "JavaScript do zero". */
   title: string
-  /** Etapas feitas. 0 é a trilha que nunca começou: abre do começo. */
+  /** Etapas feitas. Só conta em `from`: a trilha clicada sempre abre do começo no Starter. */
   done: number
   total: number
   /** A etapa de agora, ex.: "Funções e escopo". Vai na linha de baixo do cartão. */
@@ -56,7 +60,7 @@ export interface TrackLanguageSwitchProps {
   onOpenChange?: (open: boolean) => void
   /** A trilha da linguagem de agora: é ela que congela. */
   from: TrackLanguageSwitchTrack
-  /** A trilha clicada, de outra linguagem: abre do começo (done 0) ou descongela de onde parou. */
+  /** A trilha clicada, de outra linguagem: abre do começo, mesmo na volta (regra B). */
   to: TrackLanguageSwitchTrack
   /** O `access` da trilha clicada no GET /code/tracks. */
   access: "switch" | "not_in_plan"
@@ -94,7 +98,7 @@ const FORMA = {
     grupo: "flex flex-col md:flex-row",
     giro: "rotate-90 md:rotate-0",
     titulo: "text-[21px] leading-[27px] md:text-2xl md:leading-[30px]",
-    fases: "min-h-[200px] md:min-h-[156px]",
+    fases: "md:min-h-[220px]",
     rodape: "flex flex-col-reverse items-stretch gap-1.5 md:flex-row md:items-center md:gap-2.5",
     pro: "self-center pt-1.5 md:mr-auto md:self-auto md:pt-0",
     botao: "h-12 md:h-10",
@@ -107,7 +111,7 @@ const FORMA = {
     grupo: "flex",
     giro: "",
     titulo: "text-2xl leading-[30px]",
-    fases: "min-h-[156px]",
+    fases: "min-h-[220px]",
     rodape: "flex items-center gap-2.5",
     pro: "mr-auto",
     botao: "h-10",
@@ -120,7 +124,7 @@ const FORMA = {
     grupo: "flex flex-col",
     giro: "rotate-90",
     titulo: "text-[21px] leading-[27px]",
-    fases: "min-h-[200px]",
+    fases: "",
     rodape: "flex flex-col-reverse items-stretch gap-1.5",
     pro: "self-center pt-1.5",
     botao: "h-12",
@@ -182,13 +186,14 @@ function Cartao({
   balao,
 }: {
   track: TrackLanguageSwitchTrack
-  /** from: a de agora (congela). new: a nova (abre). back: a guardada (descongela). locked: not_in_plan. */
-  papel: "from" | "new" | "back" | "locked"
+  /** from: a de agora (congela). new: a nova (abre do começo). locked: not_in_plan. */
+  papel: "from" | "new" | "locked"
   selo?: string
   balao?: string
 }) {
   const t = useTranslate()
-  const progresso = track.done > 0 ? t("track_language_switch.progress", { done: track.done, total: track.total }) : null
+  const feitas = papel === "from" ? track.done : 0
+  const progresso = feitas > 0 ? t("track_language_switch.progress", { done: track.done, total: track.total }) : null
   const meta = progresso
     ? [progresso, track.current].filter(Boolean).join(" · ")
     : t("track_language_switch.steps", { count: track.total })
@@ -215,10 +220,10 @@ function Cartao({
           ) : null}
         </div>
         <span className="text-[15px] leading-[21px] font-semibold text-foreground-strong">{track.title}</span>
-        <Caminho agora={estacao(track.done, track.total)} nova={papel === "new"} balao={balao} />
+        <Caminho agora={estacao(feitas, track.total)} nova={papel === "new"} balao={balao} />
         <span className="text-xs leading-[17px] text-muted-foreground">{meta}</span>
       </div>
-      {papel === "from" || papel === "back" ? (
+      {papel === "from" ? (
         // o gelo: azul tingido e translúcido por cima, o floco, "Guardado" e quanto ficou guardado
         <div
           aria-hidden
@@ -316,7 +321,6 @@ function TrackLanguageSwitch({
   }, [fase, open])
 
   const bloqueado = access === "not_in_plan"
-  const volta = to.done > 0
   const nomeDe = from.language ?? brandName(from.brand)
   const nomePara = to.language ?? brandName(to.brand)
   const temPro = !!(onSeePro || proRender)
@@ -342,23 +346,16 @@ function TrackLanguageSwitch({
   }
 
   const k = (chave: string) => `track_language_switch.${chave}`
-  const contagem = { from: nomeDe, to: nomePara, count: from.done, total: from.total, toDone: to.done, toTotal: to.total }
+  const nomes = { from: nomeDe, to: nomePara }
   const textos = bloqueado
-    ? { titulo: t(k("locked_title"), { to: nomePara, date: dataLonga }), texto: t(k("locked_text"), { from: nomeDe }) }
+    ? { titulo: t(k("locked_title"), { to: nomePara, date: dataLonga }), texto: t(k("locked_text"), nomes) }
     : fase === "switching"
-      ? {
-          titulo: t(k("switching_title"), { from: nomeDe }),
-          texto: t(k(volta ? "back_switching_text" : "switching_text"), { from: nomeDe, to: nomePara }),
-        }
+      ? { titulo: t(k("switching_title"), nomes), texto: t(k("switching_text"), nomes) }
       : fase === "done"
-        ? {
-            titulo: t(k(volta ? "back_done_title" : "done_title"), { to: nomePara }),
-            texto: t(k(volta ? "back_done_text" : "done_text"), contagem),
-          }
-        : {
-            titulo: t(k(volta ? "back_title" : "confirm_title"), { to: nomePara }),
-            texto: t(k(volta ? "back_text" : "confirm_text"), contagem),
-          }
+        ? { titulo: t(k("done_title"), nomes), texto: t(k("done_text"), nomes) }
+        : { titulo: t(k("confirm_title"), nomes), texto: t(k("confirm_text"), nomes) }
+  // o recomeço do zero, dito antes de trocar (e no not_in_plan, para quando trocar)
+  const aviso = bloqueado ? t(k("locked_note"), nomes) : fase === "confirm" ? t(k("note"), nomes) : null
 
   const linkPro = temPro ? (
     <Button variant="ghost" size="lg" onClick={onSeePro} render={proRender} nativeButton={!proRender} className={cn("px-0 text-primary hover:bg-transparent", f.pro)}>
@@ -402,9 +399,9 @@ function TrackLanguageSwitch({
             <Passagem de={from.brand} para={to.brand} travado={bloqueado} f={f} />
             <Cartao
               track={to}
-              papel={bloqueado ? "locked" : volta ? "back" : "new"}
+              papel={bloqueado ? "locked" : "new"}
               selo={bloqueado ? t(k("unlocks_at"), { date: dataCurta }) : undefined}
-              balao={bloqueado ? undefined : t(k(volta ? "here_resume" : "here_start"))}
+              balao={bloqueado ? undefined : t(k("here_start"))}
             />
           </div>
 
@@ -420,6 +417,12 @@ function TrackLanguageSwitch({
               <DialogPrimitive.Description className="m-0 text-[14.5px] leading-[22px] text-pretty text-foreground">
                 {textos.texto}
               </DialogPrimitive.Description>
+              {aviso ? (
+                <p className="m-0 flex items-start gap-2.5 rounded-[10px] bg-sunken px-3 py-2.5 text-[13.5px] leading-5 text-foreground">
+                  <ArrowCounterClockwiseIcon aria-hidden className="mt-0.5 size-[15px] shrink-0 text-muted-foreground" />
+                  {aviso}
+                </p>
+              ) : null}
               {bloqueado && temPro ? <p className="m-0 text-[13.5px] text-muted-foreground">{t(k("locked_pro"))}</p> : null}
               {erro ? (
                 <p role="alert" className="m-0 text-[13.5px] text-destructive">
@@ -446,7 +449,7 @@ function TrackLanguageSwitch({
                   {t(k("stay"), { from: nomeDe })}
                 </Button>
                 <Button variant="solid" size="lg" onClick={trocar} className={f.botao}>
-                  {t(k(volta ? "back" : "switch"), { to: nomePara })}
+                  {t(k("switch"), nomes)}
                   <ArrowRightIcon aria-hidden data-motion="nudge" />
                 </Button>
               </div>
@@ -463,7 +466,7 @@ function TrackLanguageSwitch({
                   nativeButton={!startRender}
                   className={cn(f.botao, "md:ml-auto")}
                 >
-                  {t(k(volta ? "resume" : "start"))}
+                  {t(k("start"))}
                   <ArrowRightIcon aria-hidden data-motion="nudge" />
                 </Button>
               </div>
