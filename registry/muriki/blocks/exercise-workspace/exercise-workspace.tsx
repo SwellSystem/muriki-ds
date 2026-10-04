@@ -26,6 +26,7 @@ import { createPortal } from "react-dom"
 import {
   CaretDownIcon,
   CaretRightIcon,
+  CheckCircleIcon,
   CheckIcon,
   CircleIcon,
   FileIcon,
@@ -34,6 +35,7 @@ import {
   LockIcon,
   PaperPlaneTiltIcon,
   PlayIcon,
+  WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
 
@@ -49,6 +51,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -236,6 +239,72 @@ export function ExerciseWorkspace({ header, side, foot, editor, guide, className
 
 // ── Cabeçalho ───────────────────────────────────────────────────────────
 
+// ── O estado do rascunho ────────────────────────────────────────────────
+
+export type ExerciseSaveState = "saving" | "saved" | "error"
+
+export interface ExerciseSaveStatusProps {
+  state: ExerciseSaveState
+  savedAt?: Date | string | number
+  locale?: string
+  className?: string
+}
+
+/**
+ * O estado do rascunho, no cabeçalho, ao lado das ações. Um estado, não um relógio: "Salvando…" em
+ * cinza enquanto a pessoa digita; "Salvo" com o check verde (só o ícone tem cor, para não brigar com
+ * "Enviar solução") quando ela para, e a hora fixa ("salvo às 21:42") só ao passar ou focar nele;
+ * "Não salvo" no tom de aviso, com a dica, quando o rascunho local falhou. O check entra de leve
+ * (muriki-saved-in, no css do item); com prefers-reduced-motion, só aparece.
+ */
+export function ExerciseSaveStatus({ state, savedAt, locale = "pt-BR", className }: ExerciseSaveStatusProps) {
+  const t = useTranslate()
+  if (state === "saving")
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("text-xs text-muted-foreground", className)}>
+        {t("exercise_workspace.save.saving")}
+      </span>
+    )
+  if (state === "error")
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("inline-flex items-center gap-1.5 text-xs", className)}>
+        <WarningCircleIcon aria-hidden weight="fill" className="size-3.5 shrink-0 text-warning" />
+        <span className="font-medium text-foreground-strong">{t("exercise_workspace.save.error")}</span>
+        <span className="text-muted-foreground max-sm:hidden">{t("exercise_workspace.save.error_hint")}</span>
+      </span>
+    )
+  const hora =
+    savedAt !== undefined
+      ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(savedAt))
+      : null
+  const salvo = (
+    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+      <CheckCircleIcon key={String(savedAt)} aria-hidden weight="fill" className="muriki-saved-in size-3.5 shrink-0 text-success" />
+      {t("exercise_workspace.save.saved")}
+    </span>
+  )
+  if (!hora)
+    return (
+      <span role="status" data-slot="exercise-save-status" data-state={state} className={className}>
+        {salvo}
+      </span>
+    )
+  return (
+    <span role="status" data-slot="exercise-save-status" data-state={state} className={cn("inline-flex", className)}>
+      <Tooltip>
+        <TooltipTrigger
+          render={<span tabIndex={0} />}
+          aria-label={t("exercise_workspace.save.saved_at", { time: hora })}
+          className="rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+        >
+          {salvo}
+        </TooltipTrigger>
+        <TooltipContent>{t("exercise_workspace.save.saved_at", { time: hora })}</TooltipContent>
+      </Tooltip>
+    </span>
+  )
+}
+
 export interface ExerciseCrumb {
   label: string
   /** O link do roteador, ex.: <Link to="/exercises" />. Ganha de `href`. */
@@ -249,7 +318,13 @@ export interface ExerciseHeaderProps {
   title: React.ReactNode
   /** Os chips: competências, nível e estado (Badge). */
   chips?: React.ReactNode
-  /** Texto pronto, ex.: "salvo há 5 s". */
+  /** O rascunho: "saving" (Salvando…), "saved" (o check e "Salvo") ou "error" (Não salvo). Sem isto, nada, como antes da primeira edição. */
+  saveState?: ExerciseSaveState
+  /** Quando salvou. Aparece fixo só ao passar ou focar no "Salvo": "salvo às 21:42". */
+  savedAt?: Date | string | number
+  /** O locale do app (i18n.language), para a hora. */
+  locale?: string
+  /** @deprecated Texto pronto, ex.: "salvo há 5 s". Use `saveState` e `savedAt`. */
   savedLabel?: React.ReactNode
   /** Ao lado do "salvo há": o <PeerStatus />. */
   peerStatus?: React.ReactNode
@@ -270,6 +345,9 @@ export function ExerciseHeader({
   breadcrumb,
   title,
   chips,
+  saveState,
+  savedAt,
+  locale,
   savedLabel,
   peerStatus,
   onContinueInIde,
@@ -324,7 +402,11 @@ export function ExerciseHeader({
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {peerStatus ? <span className="mr-2.5 flex">{peerStatus}</span> : null}
-        {savedLabel ? <span className="mr-1.5 text-xs text-muted-foreground">{savedLabel}</span> : null}
+        {saveState ? (
+          <ExerciseSaveStatus state={saveState} savedAt={savedAt} locale={locale} className="mr-1.5" />
+        ) : savedLabel ? (
+          <span className="mr-1.5 text-xs text-muted-foreground">{savedLabel}</span>
+        ) : null}
         <Button variant="ghost" size="lg" onClick={onContinueInIde} disabled={continueInIdeSoon}>
           <LaptopIcon aria-hidden />
           {t("exercise_workspace.continue_in_ide")}
