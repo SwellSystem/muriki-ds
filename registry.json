@@ -2731,6 +2731,373 @@
       "docs": "<BrandLogo brand=\"ts\" size={16} /> ao lado do nome (decorativo, aria-hidden). brand: ts | js | py | go | docker | postgres | mysql | rust | ruby | aws | architecture; architecture é a trilha e as competências de language \"architecture\" (o brandName dela é \"Architecture\": traduza o rótulo no app); BRANDS lista todos e brandName(brand) dá o nome (\"PostgreSQL\", \"AWS\"). tile: o ladrilho branco com sombra e raio (size é o lado do ladrilho; o logo ocupa ~56%), para o Rust preto e o texto escuro da AWS lerem no tema escuro. Sem o nome ao lado, passe title=\"TypeScript\" e ele vira role=\"img\". Nos chips de linguagem: <span className=\"flex size-[18px] items-center justify-center rounded-full bg-white\"><BrandLogo brand=\"py\" size={12} /></span> Python."
     },
     {
+      "name": "cloud-service-icon",
+      "type": "registry:ui",
+      "title": "Cloud Service Icon",
+      "description": "O ícone oficial de cada serviço de nuvem do catálogo (21 da AWS, 22 do GCP e 27 do Azure), pelo id <provedor>.<serviço>. Os SVGs dos pacotes oficiais, sem alteração, instalados em public/cloud-icons e mostrados por <img>, porque o pacote da AWS repete ids de gradiente entre arquivos. Só baixa o que aparece. No GCP, os produtos centrais usam o ícone colorido novo e os outros o azul, como manda o Google; o Entra ID vem do pacote de ícones do Microsoft Entra; o EventBridge Scheduler usa o ícone do EventBridge, porque não tem um próprio.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/cloud-service-icon.tsx",
+          "type": "registry:ui"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/api-gateway.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/api-gateway.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/appsync.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/appsync.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/aurora.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/aurora.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/cloudfront.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/cloudfront.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/cloudwatch.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/cloudwatch.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/cognito.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/cognito.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/dynamodb.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/dynamodb.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/ec2.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/ec2.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/ecs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/ecs.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/eks.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/eks.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/elasticache.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/elasticache.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/elb.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/elb.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/eventbridge-scheduler.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/eventbridge-scheduler.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/eventbridge.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/eventbridge.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/lambda.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/lambda.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/opensearch.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/opensearch.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/rds.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/rds.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/s3.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/s3.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/secrets-manager.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/secrets-manager.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/sns.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/sns.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/sqs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/sqs.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/alloydb.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/alloydb.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/api-gateway.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/api-gateway.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/apigee.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/apigee.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-cdn.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-cdn.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-load-balancing.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-load-balancing.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-logging.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-logging.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-monitoring.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-monitoring.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-run-functions.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-run-functions.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-run.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-run.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-scheduler.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-scheduler.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-sql.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-sql.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-storage.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-storage.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-tasks.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-tasks.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/compute-engine.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/compute-engine.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/eventarc.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/eventarc.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/firestore.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/firestore.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/gke.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/gke.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/identity-platform.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/identity-platform.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/memorystore.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/memorystore.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/pubsub.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/pubsub.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/secret-manager.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/secret-manager.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/spanner.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/spanner.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/ai-search.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/ai-search.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/aks.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/aks.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/api-management.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/api-management.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/app-service.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/app-service.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/application-gateway.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/application-gateway.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/application-insights.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/application-insights.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/blob-storage.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/blob-storage.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/container-apps.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/container-apps.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/cosmos-db.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/cosmos-db.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/database-for-postgresql.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/database-for-postgresql.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/entra-external-id.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/entra-external-id.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/entra-id.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/entra-id.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/event-grid.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/event-grid.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/event-hubs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/event-hubs.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/front-door.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/front-door.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/functions.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/functions.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/key-vault.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/key-vault.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/load-balancer.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/load-balancer.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/logic-apps.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/logic-apps.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/managed-redis.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/managed-redis.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/monitor.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/monitor.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/queue-storage.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/queue-storage.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/service-bus.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/service-bus.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/signalr.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/signalr.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/sql-database.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/sql-database.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/virtual-machines.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/virtual-machines.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/web-pubsub.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/web-pubsub.svg"
+        }
+      ],
+      "docs": "<CloudServiceIcon service=\"aws.sqs\" className=\"size-6\" /> e o name do catálogo em texto ao lado, nunca dentro do ícone (regra dos três pacotes). Id sem ícone curado não desenha nada: cloudServiceIconSrc(id) devolve null e quem usa cai no ícone genérico da peça. CLOUD_SERVICE_ICON_IDS é o conjunto dos 70 ids. Os SVGs vão para public/cloud-icons/<provedor>/<serviço>.svg; o app serve public na raiz."
+    },
+    {
       "name": "qr-code",
       "type": "registry:ui",
       "title": "QR Code",
