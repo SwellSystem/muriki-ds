@@ -1073,6 +1073,70 @@
    "h": 900,
    "title": "Peer no exercício · o retorno do envio na voz do Peer · escuro",
    "is_interactive": true
+  },
+  "LicaoPassoAPasso.dc.html": {
+   "x": 16720,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Lição · a execução passo a passo (anterior, próximo, recomeçar) e o Você sabia?",
+   "is_interactive": true
+  },
+  "LicaoPassoAPassoEscuro.dc.html": {
+   "x": 16720,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Lição · a execução passo a passo (anterior, próximo, recomeçar) e o Você sabia? · escuro",
+   "is_interactive": true
+  },
+  "GuiaVoceSabia.dc.html": {
+   "x": 18240,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Guia de sintaxe · o Você sabia? junto do recurso",
+   "is_interactive": true
+  },
+  "GuiaVoceSabiaEscuro.dc.html": {
+   "x": 18240,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Guia de sintaxe · o Você sabia? junto do recurso · escuro",
+   "is_interactive": true
+  },
+  "ExercicioPeerVoceSabia.dc.html": {
+   "x": 19760,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer no exercício · a armadilha no código vira um Você sabia?",
+   "is_interactive": true
+  },
+  "ExercicioPeerVoceSabiaEscuro.dc.html": {
+   "x": 19760,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer no exercício · a armadilha no código vira um Você sabia? · escuro",
+   "is_interactive": true
+  },
+  "LicaoMovel.dc.html": {
+   "x": 5170,
+   "y": 18480,
+   "w": 390,
+   "h": 1000,
+   "title": "Celular · a lição com o passo a passo empilhado",
+   "is_interactive": true
+  },
+  "LicaoMovelEscuro.dc.html": {
+   "x": 5170,
+   "y": 21360,
+   "w": 390,
+   "h": 1000,
+   "title": "Celular · a lição com o passo a passo empilhado · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1095,7 +1159,7 @@
   "web": {
    "kind": "title1",
    "maxW": 8000,
-   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada e o Peer no exercício (testes, faixa e retorno)",
+   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício de arquitetura, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo e o guia de sintaxe",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -1347,7 +1411,15 @@
   "ExercicioPeerFaixa.dc.html",
   "ExercicioPeerFaixaEscuro.dc.html",
   "ExercicioPeerRetorno.dc.html",
-  "ExercicioPeerRetornoEscuro.dc.html"
+  "ExercicioPeerRetornoEscuro.dc.html",
+  "LicaoPassoAPasso.dc.html",
+  "LicaoPassoAPassoEscuro.dc.html",
+  "GuiaVoceSabia.dc.html",
+  "GuiaVoceSabiaEscuro.dc.html",
+  "ExercicioPeerVoceSabia.dc.html",
+  "ExercicioPeerVoceSabiaEscuro.dc.html",
+  "LicaoMovel.dc.html",
+  "LicaoMovelEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
