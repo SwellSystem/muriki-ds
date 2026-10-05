@@ -152,7 +152,7 @@ def _diagrama_livre(k, destaque=False):
              + _peca_servico(k, 434, 120, 'aws.lambda', 'AWS Lambda', T('nPedidos'))
              + _decisao(k, 462, 196, 'nDecisao')
              + _peca_servico(k, 434, 346, 'aws.rds', 'Amazon RDS', T('nEstoque'))
-             + _peca_servico(k, 780, 226, 'aws.ses', 'Amazon SES', T('nAvisar')))
+             + _peca_servico(k, 780, 226, 'gcp.firebase-cloud-messaging', 'Firebase Cloud Messaging', T('nAvisar'), nuvem='GCP'))
     notas = _nota(k, -20, 40, 'nota1') + _nota(k, 214, 300, 'nota2')
     # o destaque da revisão no Estoque: a moldura solta e cheia, na marca, mais leve que a seleção
     if destaque:
@@ -186,7 +186,7 @@ def tela_desenho_livre(k, revisao=False):
     notas = secao(T('notasTit'), f'<ul style="margin:0;padding:0 6px 4px;list-style:none;">{item("nota", T("nota"))}</ul>'
                   f'<span style="display:block;padding:0 16px 10px;font-size:11.5px;line-height:16px;color:{k["mfg"]};">{T("notasDica")}</span>', T('notasConta'))
     lateral = (f'<div style="width:248px;flex:0 0 248px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:{k["rail"]};'
-               f'border-right:1px solid {k["muted"]};">{_provedor(k, "aws")}{pecas}{grupos}{notas}</div>')
+               f'border-right:1px solid {k["muted"]};">{_provedor(k, "aws", misto=True)}{pecas}{grupos}{notas}</div>')
     # sem regras não há Verificar: Expandir e Simular ficam
     barra = (f'<div style="display:flex;align-items:center;gap:8px;min-height:41px;padding:6px 8px 6px 12px;border-bottom:1px solid {k["muted"]};box-sizing:border-box;">'
              f'<span style="flex:1;min-width:0;font-size:12px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{T("dlDica")}</span>'
