@@ -1393,6 +1393,12 @@ def _montar(tela, tema, sufixo):
         return web(ARQUITETURA, tela_exercicio_arquitetura(k))
     if tela['id'] == 'arquitetura_simular':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, simular=True))
+    if tela['id'] in ('playground_desenhos', 'playground_limite', 'desenho_livre'):
+        from textos_playground import TEXTOS as PLAYGROUND_TEXTOS
+        import playground as pg
+        if tela['id'] == 'desenho_livre':
+            return web(PLAYGROUND_TEXTOS, pg.tela_desenho_livre(k))
+        return web(PLAYGROUND_TEXTOS, pg.tela_playground(k, limite=tela['id'] == 'playground_limite'), css=pg.CSS_PLAYGROUND)
     if tela['id'] == 'arquitetura_nuvem':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, nuvem=True))
     if tela['id'] == 'desb_trilhas':
