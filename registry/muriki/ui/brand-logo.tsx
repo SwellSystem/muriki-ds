@@ -45,12 +45,12 @@ const AWS_PATHS: { fill: string; d: string; fillRule?: "evenodd" | "nonzero" }[]
 
 // a Arquitetura (a trilha e as competências de language "architecture"): cubos empilhados, preenchimento
 // claro e traço índigo, com cor própria como o JavaScript amarelo
-const ARQUITETURA_PATHS: { d: string; fill?: string; stroke?: string; evenodd?: boolean }[] = [
-  { fill: "#d7e0ff", evenodd: true, d: "M.65 8.074v3.62l3.167 1.357l3.167-1.357l3.166 1.357l3.167-1.357v-3.62l-.008-.003l-3.159 1.353l-3.166-1.357l3.166-1.35l.002-3.621l-.002.026L6.983 4.48L3.82 3.123l-.002 3.594l3.167 1.35l-3.167 1.359z" },
-  { fill: "#fff", d: "m6.985 1.738l3.167 1.357l-.002.027l-3.167 1.357l-3.166-1.357l.002-.027zm3.165 4.979l3.158 1.354l-3.158 1.353l-3.166-1.357l-3.167 1.359L.65 8.074l3.167-1.357l3.167 1.35z" },
-  { stroke: "#4147d5", d: "m.65 8.067l3.167 1.357l3.167-1.357M3.817 3.122l3.166 1.357l3.167-1.357" },
-  { stroke: "#4147d5", d: "m6.983 8.067l3.167 1.357l3.167-1.357M.65 11.694v-3.62l3.167-1.357l3.167 1.357v3.62L3.817 13.05z" },
-  { stroke: "#4147d5", d: "M3.819 6.715v-3.62l3.166-1.357l3.167 1.357v3.62L6.985 8.072zm3.164 4.979v-3.62l3.167-1.357l3.167 1.357v3.62L10.15 13.05zM3.817 9.426v3.625m6.335-3.625v3.625M6.983 4.48v3.624" },
+const ARQUITETURA_PATHS: { d: string; fill?: string; stroke?: string; evenodd?: boolean; parte: "fundo" | "face" | "traco" }[] = [
+  { parte: "fundo", fill: "#d7e0ff", evenodd: true, d: "M.65 8.074v3.62l3.167 1.357l3.167-1.357l3.166 1.357l3.167-1.357v-3.62l-.008-.003l-3.159 1.353l-3.166-1.357l3.166-1.35l.002-3.621l-.002.026L6.983 4.48L3.82 3.123l-.002 3.594l3.167 1.35l-3.167 1.359z" },
+  { parte: "face", fill: "#fff", d: "m6.985 1.738l3.167 1.357l-.002.027l-3.167 1.357l-3.166-1.357l.002-.027zm3.165 4.979l3.158 1.354l-3.158 1.353l-3.166-1.357l-3.167 1.359L.65 8.074l3.167-1.357l3.167 1.35z" },
+  { parte: "traco", stroke: "#4147d5", d: "m.65 8.067l3.167 1.357l3.167-1.357M3.817 3.122l3.166 1.357l3.167-1.357" },
+  { parte: "traco", stroke: "#4147d5", d: "m6.983 8.067l3.167 1.357l3.167-1.357M.65 11.694v-3.62l3.167-1.357l3.167 1.357v3.62L3.817 13.05z" },
+  { parte: "traco", stroke: "#4147d5", d: "M3.819 6.715v-3.62l3.166-1.357l3.167 1.357v3.62L6.985 8.072zm3.164 4.979v-3.62l3.167-1.357l3.167 1.357v3.62L10.15 13.05zM3.817 9.426v3.625m6.335-3.625v3.625M6.983 4.48v3.624" },
 ]
 
 /** O nome da marca. Para "architecture" é o nome em inglês: no app, traduza o rótulo ("Arquitetura"). */
@@ -70,7 +70,7 @@ export interface BrandLogoProps extends Omit<React.ComponentProps<"span">, "chil
   title?: string
 }
 
-function Svg({ brand, size }: { brand: Brand; size: number }) {
+function Svg({ brand, size, tile }: { brand: Brand; size: number; tile?: boolean }) {
   if (brand === "aws") {
     return (
       <svg viewBox="0 0 128 128" width={size} height={size} aria-hidden className="block shrink-0">
@@ -82,10 +82,23 @@ function Svg({ brand, size }: { brand: Brand; size: number }) {
   }
   if (brand === "architecture") {
     return (
-      <svg viewBox="0 0 14 14" width={size} height={size} fill="none" aria-hidden className="block shrink-0">
+      <svg
+        viewBox="0 0 14 14"
+        width={size}
+        height={size}
+        fill="none"
+        aria-hidden
+        className={cn(
+          "block shrink-0",
+          // sem o ladrilho branco, no escuro o traço índigo sumia: o traço clareia e os cubos escurecem
+          !tile &&
+            "dark:[&_[data-parte=traco]]:stroke-[oklch(0.8_0.11_275)] dark:[&_[data-parte=fundo]]:fill-[oklch(0.36_0.09_275)] dark:[&_[data-parte=face]]:fill-[oklch(0.5_0.13_275)]"
+        )}
+      >
         {ARQUITETURA_PATHS.map((p, i) => (
           <path
             key={i}
+            data-parte={p.parte}
             d={p.d}
             fill={p.fill ?? "none"}
             fillRule={p.evenodd ? "evenodd" : undefined}
@@ -121,7 +134,7 @@ function BrandLogo({ brand, size = 18, tile = false, title, className, style, ..
       )}
       style={tile ? { width: size, height: size, borderRadius: Math.round(size * 0.28), ...style } : style}
     >
-      <Svg brand={brand} size={tile ? Math.round(size * 0.56) : size} />
+      <Svg brand={brand} size={tile ? Math.round(size * 0.56) : size} tile={tile} />
     </span>
   )
 }

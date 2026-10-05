@@ -1398,7 +1398,7 @@ def _montar(tela, tema, sufixo):
         import playground as pg
         if tela['id'] == 'desenho_livre':
             return web(PLAYGROUND_TEXTOS, pg.tela_desenho_livre(k))
-        return web(PLAYGROUND_TEXTOS, pg.tela_playground(k, limite=tela['id'] == 'playground_limite'))
+        return web(PLAYGROUND_TEXTOS, pg.tela_playground(k, limite=tela['id'] == 'playground_limite'), css=pg.CSS_PLAYGROUND)
     if tela['id'] == 'arquitetura_nuvem':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, nuvem=True))
     if tela['id'] == 'desb_trilhas':

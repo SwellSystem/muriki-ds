@@ -9,6 +9,37 @@ from desbloqueio import logo_arq
 
 # a nota usa o lápis da base, no traço dos ícones da bancada
 IP.setdefault('nota', I['lapis'])
+IP.setdefault('nuvem', svg('<path d="M4.6 12.6h6.8a3 3 0 00.4-6A4.2 4.2 0 003.6 7.4a2.6 2.6 0 001 5.2z"/>'))
+IP.setdefault('codigo', svg('<path d="M5.4 4.6L2 8l3.4 3.4M10.6 4.6L14 8l-3.4 3.4"/>'))
+IP.setdefault('conversa', svg('<path d="M2.4 8a5.6 5.6 0 118.6 4.7L8 13.6l-.2-1A5.6 5.6 0 012.4 8z"/>'))
+
+
+# no escuro, o traço índigo fixo sumia no ladrilho escuro: a mesma variante do BrandLogo sem tile,
+# por CSS, porque o tema do quadro troca em tempo de execução
+CSS_PLAYGROUND = (
+    '\n.escuro .logo-tema [fill="#d7e0ff"]{fill:oklch(0.36 0.09 275);}'
+    '\n.escuro .logo-tema [fill="#fff"]{fill:oklch(0.5 0.13 275);}'
+    '\n.escuro .logo-tema [stroke="#4147d5"]{stroke:oklch(0.8 0.11 275);}')
+
+
+def _logo_arq_tema(k, tam):
+    return f'<span class="logo-tema" style="display:flex;">{logo_arq(tam)}</span>'
+
+
+def _ladrilho(k, conteudo, marca=True):
+    # o ladrilho no tom da marca (e não branco: no escuro, o branco acendia no cartão)
+    fundo = f'background:{k["prisub"]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);' if marca else f'background:{k["sunken"]};color:{k["mfg"]};'
+    return (f'<span style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:11px;flex:0 0 auto;{fundo}">{conteudo}</span>')
+
+
+def _pontos(k, itens, apagado=False):
+    # o que o tipo faz: ícone num quadradinho e o texto curto
+    cor_icone = f'background:{k["sunken"]};color:{k["mfg"]};' if apagado else f'background:{k["prisub"]};color:{k["prisubfg"]};'
+    return ('<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">'
+            + ''.join(f'<li style="display:flex;align-items:center;gap:10px;font-size:13px;line-height:18px;color:{k["mfg"] if apagado else k["fg"]};">'
+                      f'<span style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:7px;flex:0 0 auto;{cor_icone}">{_ip(icone, 14)}</span>{T(chave)}</li>'
+                      for icone, chave in itens)
+            + '</ul>')
 
 
 def _cartao_tipo_desenho(k, limite=False):
@@ -16,42 +47,51 @@ def _cartao_tipo_desenho(k, limite=False):
               f'color:{k["prisubfg"]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);">'
               f'<span style="font-size:13px;line-height:19px;">{T("pgLimite")}</span>'
               f'<a href="#" style="font-size:13px;font-weight:500;">{T("pgConhecerPro")}</a></div>') if limite else ''
-    return (f'<div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:12px;background:{k["card"]};box-shadow:{k["sombra"]};">'
-            f'<div style="display:flex;align-items:flex-start;gap:12px;">'
-            f'<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:#fff;'
-            f'box-shadow:0 1px 2px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(0,0,0,0.06);flex:0 0 auto;">{logo_arq(22)}</span>'
+    usados = 3 if limite else 2
+    barra = ''.join(f'<span style="width:24px;height:6px;border-radius:999px;background:{k["pri"] if i < usados else k["sunken"]};"></span>' for i in range(3))
+    pe = (f'<div style="display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:16px;border-top:1px solid {k["muted"]};">'
+          f'<span style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:12px;color:{k["mfg"]};">{T("pgUso3") if limite else T("pgUso2")}</span>'
+          f'<span style="display:flex;gap:4px;">{barra}</span></span>'
+          f'<span style="margin-left:auto;">{botao(T("pgNovo"), k, "primary", 32, desativado=limite)}</span></div>')
+    return (f'<div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:12px;background:{k["card"]};box-shadow:{k["sombra"]};">'
+            f'<div style="display:flex;align-items:flex-start;gap:14px;">{_ladrilho(k, _logo_arq_tema(k, 24))}'
             f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
             f'<h2 style="margin:0;font-size:17px;line-height:23px;font-weight:600;color:{k["fgs"]};">{T("pgDesenho")}</h2>'
             f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("pgDesenhoTxt")}</p></div></div>'
-            f'{oferta}<div style="display:flex;justify-content:flex-end;margin-top:auto;padding-top:4px;">'
-            f'{botao(T("pgNovo"), k, "primary", 32, "mais" if "mais" in I else None, desativado=limite)}</div></div>')
+            f'{_pontos(k, [("nuvem", "pgPonto1"), ("nota", "pgPonto2"), ("pulso", "pgPonto3")])}'
+            f'{oferta}{pe}</div>')
 
 
 def _cartao_tipo_codigo(k):
-    return (f'<div aria-disabled="true" style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:12px;'
-            f'background:color-mix(in oklab, {k["card"]} 60%, transparent);box-shadow:{k["sombra"]};">'
-            f'<div style="display:flex;align-items:flex-start;gap:12px;">'
-            f'<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:10px;background:{k["sunken"]};'
-            f'color:{k["mfg"]};flex:0 0 auto;">{ic("terminal", 20)}</span>'
+    # o que ainda não existe: contorno tracejado e os pontos apagados
+    return (f'<div aria-disabled="true" style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:12px;'
+            f'border:1.5px dashed {k["input"]};background:color-mix(in oklab, {k["card"]} 50%, transparent);">'
+            f'<div style="display:flex;align-items:flex-start;gap:14px;">{_ladrilho(k, ic("terminal", 20), marca=False)}'
             f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
             f'<h2 style="margin:0;display:flex;align-items:center;gap:8px;font-size:17px;line-height:23px;font-weight:600;color:{k["fg"]};">'
             f'{T("pgCodigo")}{badge(T("pgEmBreve"), k, "gray")}</h2>'
-            f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("pgCodigoTxt")}</p></div></div></div>')
+            f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("pgCodigoTxt")}</p></div></div>'
+            f'{_pontos(k, [("codigo", "pgPonto4"), ("conversa", "pgPonto5")], apagado=True)}'
+            f'<span style="margin-top:auto;padding-top:16px;border-top:1px solid {k["muted"]};font-size:12px;color:{k["mfg"]};">{T("pgAvisamos")}</span></div>')
 
 
 def _lista(k, desenhos):
     borda = f'border-top:1px solid {k["muted"]};'
     linhas = ''.join(
-        f'<li style="display:flex;align-items:center;gap:12px;min-height:56px;padding:0 8px 0 16px;{"" if i == 0 else borda}">'
-        f'<a href="DesenhoLivre__SUF__.dc.html" style="display:flex;align-items:center;gap:16px;flex:1;min-width:0;color:inherit;">'
-        f'<span style="font-size:14px;font-weight:500;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{titulo}</span>'
-        f'<span style="margin-left:auto;font-size:12.5px;color:{k["mfg"]};white-space:nowrap;">{T(salvo)}</span></a>'
+        f'<li style="display:flex;align-items:center;gap:8px;min-height:64px;padding:0 8px 0 12px;{"" if i == 0 else borda}">'
+        f'<a href="DesenhoLivre__SUF__.dc.html" style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;color:inherit;">'
+        f'<span style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9px;background:{k["prisub"]};flex:0 0 auto;">{_logo_arq_tema(k, 18)}</span>'
+        f'<span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">'
+        f'<span style="font-size:14px;line-height:20px;font-weight:500;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{titulo}</span>'
+        f'<span style="font-size:12px;color:{k["mfg"]};">{T(criado)}</span></span>'
+        f'<span style="font-size:12.5px;color:{k["mfg"]};white-space:nowrap;">{T(salvo)}</span>'
+        f'<span style="display:flex;color:{k["mfg"]};">{ic("direita", 14)}</span></a>'
         f'<span role="img" aria-label="{T("pgApagar")}" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;color:{k["mfg"]};">{ic("lixeira", 14)}</span></li>'
-        for i, (titulo, salvo) in enumerate(desenhos))
+        for i, (titulo, salvo, criado) in enumerate(desenhos))
     return (f'<ul style="margin:0;padding:0;list-style:none;border-radius:12px;background:{k["card"]};box-shadow:{k["sombra"]};overflow:hidden;">{linhas}</ul>')
 
 
-DESENHOS = [('Farmácia fora do ar', 'pgSalvo2h'), ('Encurtador de links na AWS', 'pgSalvoOntem'), ('Fila de pedidos com DLQ', 'pgSalvo4d')]
+DESENHOS = [('Farmácia fora do ar', 'pgSalvo2h', 'pgCriado1'), ('Encurtador de links na AWS', 'pgSalvoOntem', 'pgCriado2'), ('Fila de pedidos com DLQ', 'pgSalvo4d', 'pgCriado3')]
 
 
 def tela_playground(k, limite=False):
@@ -63,8 +103,7 @@ def tela_playground(k, limite=False):
              f'{_cartao_tipo_desenho(k, limite)}{_cartao_tipo_codigo(k)}</section>')
     lista = (f'<section style="display:flex;flex-direction:column;gap:8px;">'
              f'<div style="display:flex;align-items:baseline;gap:12px;">'
-             f'<h2 style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("pgSeus")}</h2>'
-             f'<span style="font-family:{MONO};font-size:11.5px;color:{k["fgs"] if limite else k["mfg"]};">{T("pgConta3") if limite else T("pgConta2")}</span></div>'
+             f'<h2 style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("pgSeus")}</h2></div>'
              f'{_lista(k, desenhos)}</section>')
     return app(k, 'playground', cab + tipos + lista, gap=24)
 
