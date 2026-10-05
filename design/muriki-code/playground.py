@@ -4,6 +4,7 @@
 # desenho livre é a bancada sem regras e sem Verificar, com notas. Espelha os blocos playground e
 # architecture-board do registry. Contrato: swell-docs/muriki-api/features/arch-cloud/fd-desenho.md.
 from base import *
+from base import _estilo_botao
 from arquitetura import IP, _grupo, _peca, _peca_servico, _chip, _ip, _titulo_secao, _provedor
 from desbloqueio import logo_arq
 
@@ -127,7 +128,7 @@ def _decisao(k, x, y, rotulo, lado=112):
             f'<span style="font-size:11.5px;line-height:14px;font-weight:500;color:{k["fgs"]};">{T(rotulo)}</span></span></div>')
 
 
-def _diagrama_livre(k):
+def _diagrama_livre(k, destaque=False):
     # palco de 960 × 460, na AWS: o App fora; o balanceador na sub-rede pública; na privada, Pedidos chega à
     # Decisão "Estoque disponível?": sim escreve no Estoque, não chama "Avisar cliente", fora da região
     traco = 'color-mix(in oklab, var(--mfg) 70%, transparent)'
@@ -153,18 +154,26 @@ def _diagrama_livre(k):
              + _peca_servico(k, 434, 346, 'aws.rds', 'Amazon RDS', T('nEstoque'))
              + _peca_servico(k, 780, 226, 'aws.ses', 'Amazon SES', T('nAvisar')))
     notas = _nota(k, -20, 40, 'nota1') + _nota(k, 214, 300, 'nota2')
+    # o destaque da revisão no Estoque: a moldura solta e cheia, na marca, mais leve que a seleção
+    if destaque:
+        pecas += (f'<div aria-hidden="true" style="position:absolute;left:428px;top:340px;width:180px;height:64px;box-sizing:border-box;'
+                  f'border-radius:14px;border:2px solid color-mix(in oklab, {k["pri"]} 55%, transparent);pointer-events:none;"></div>')
     rotulo = lambda rel, cond: f'{T(rel)} <span style="color:{k["fg"]};">· {T(cond)}</span>'
     chips = (_chip(k, 194, 196, T('chama')) + _chip(k, 412, 146, T('chama')) + _chip(k, 518, 184, T('chama'))
              + _chip(k, 518, 326, rotulo('escreve', 'sim')) + _chip(k, 680, 252, rotulo('chama', 'nao')))
     return f'<div style="position:relative;width:960px;height:460px;zoom:0.84;">{grupos}{linhas}{pecas}{notas}{chips}</div>'
 
 
-def tela_desenho_livre(k):
+def tela_desenho_livre(k, revisao=False):
+    # com a revisão, o "Revisar" com o selo Pro entra à direita do salvo (o slot actions do cabeçalho)
+    revisar = (f'<a href="DesenhoRevisao__SUF__.dc.html" style="{_estilo_botao("", k, "outline", 32, None, None)}gap:7px;padding:0 12px;color:{k["fgs"]};">'
+               f'{ic("brilho", 15)}{T("drRevisar")}{badge("Pro", k, "blue")}</a>')
     cab = (f'<header style="display:flex;align-items:flex-end;gap:24px;">'
            f'<div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">{voltar(k, T("dlVoltar"), "PlaygroundDesenhos__SUF__.dc.html")}'
            f'<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">Farmácia fora do ar</h1></div>'
-           f'<span style="display:inline-flex;align-items:center;gap:6px;padding-bottom:6px;font-size:12px;color:{k["mfg"]};">'
-           f'<span style="width:12px;height:12px;border-radius:999px;background:{k["ok"]};display:inline-flex;"></span>{T("dlSalvo")}</span></header>')
+           f'<span style="display:inline-flex;align-items:center;gap:12px;padding-bottom:4px;">'
+           f'<span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:{k["mfg"]};">'
+           f'<span style="width:12px;height:12px;border-radius:999px;background:{k["ok"]};display:inline-flex;"></span>{T("dlSalvo")}</span>{revisar}</span></header>')
     item = lambda icone, nome: (f'<li style="display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:6px;font-size:12.5px;color:{k["fg"]};">'
                                 f'{_ip(icone, 15, k["mfg"])}{nome}</li>')
     secao = lambda titulo, conteudo, direita='': (
@@ -183,10 +192,85 @@ def tela_desenho_livre(k):
              f'<span style="flex:1;min-width:0;font-size:12px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{T("dlDica")}</span>'
              f'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;color:{k["mfg"]};">{_ip("painel", 14)}</span>'
              f'<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip("pulso", 14)}{T("simular")}</span></div>')
-    palco = (f'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:{k["card"]};'
-             f'background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);background-size:18px 18px;">{_diagrama_livre(k)}</div>')
+    # com a revisão, a visão já foi até o Estoque destacado (o fitView do highlight): o desenho encosta à esquerda
+    alinhar = 'flex-start;padding-left:24px' if revisao else 'center'
+    palco = (f'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:{alinhar};overflow:hidden;background-color:{k["card"]};'
+             f'background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);background-size:18px 18px;">{_diagrama_livre(k, destaque=revisao)}</div>')
     status = (f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
               f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;"><span>{T("status")}</span></div>')
     bancada = (f'<section style="flex:1;min-height:0;display:flex;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">'
                f'{lateral}<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{palco}{status}</div></section>')
     return app(k, 'playground', cab + bancada, compacto=True, pad='24px 28px', gap=18)
+
+
+# ── a Revisão do Pro (bloco drawing-review) ─────────────────────────────
+
+def _item_revisao(k, chave, refs=(), padrao=None, marcado=False):
+    # o achado ou a sugestão: texto puro; as peças citadas em chips; clicado, o fundo do hover fica
+    chips = ''.join(f'<span style="display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;font-size:11px;font-weight:500;'
+                    f'color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["input"]};">{T(r)}</span>' for r in refs)
+    chips = f'<span style="display:flex;flex-wrap:wrap;gap:4px;">{chips}</span>' if refs else ''
+    fundo = f'background:{k["muted"]};' if marcado else ''
+    pad = (f'<span style="display:flex;flex-direction:column;gap:2px;padding:6px 8px;border-radius:7px;background:{k["prisub"]};color:{k["prisubfg"]};font-size:12px;line-height:17px;">'
+           f'<span style="display:inline-flex;align-items:center;gap:4px;font-weight:500;">{T(padrao + "Titulo")}{ic("seta", 11)}</span>'
+           f'<span style="opacity:0.85;">{T(padrao + "Txt")}</span></span>') if padrao else ''
+    return (f'<li style="display:flex;flex-direction:column;gap:4px;">'
+            f'<span style="display:flex;flex-direction:column;gap:4px;margin:0 -6px;padding:4px 6px;border-radius:7px;{fundo}">'
+            f'<span style="font-size:13px;line-height:19px;color:{k["fg"]};white-space:pre-line;">{T(chave)}</span>{chips}</span>{pad}</li>')
+
+
+def _pilar(k, nome, status, tom, achados='', sugestoes='', tracejado=False):
+    sub = lambda titulo, itens: (f'<div style="display:flex;flex-direction:column;gap:4px;">'
+                                 f'<span style="font-family:{MONO};font-size:10px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:{k["mfg"]};">{T(titulo)}</span>'
+                                 f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;">{itens}</ul></div>') if itens else ''
+    return (f'<li style="display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:10px;box-shadow:inset 0 0 0 1px var(--divider);">'
+            f'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">'
+            f'<h3 style="margin:0;font-size:13.5px;font-weight:600;color:{k["fgs"]};">{T(nome)}</h3>{badge(T(status), k, tom, tracejado=tracejado)}</div>'
+            f'{sub("drAchados", achados)}{sub("drSugestoes", sugestoes)}</li>')
+
+
+def _painel_revisao(k):
+    secao = lambda conteudo, ultima=False: (f'<div style="display:flex;flex-direction:column;gap:12px;padding:16px 20px;'
+                                            f'{"" if ultima else "box-shadow:inset 0 -1px 0 var(--divider);"}">{conteudo}</div>')
+    cab = (f'<div style="position:relative;display:flex;flex-direction:column;gap:6px;padding:16px 52px 16px 20px;box-shadow:inset 0 -1px 0 var(--divider);">'
+           f'<h2 style="margin:0;font-size:16px;line-height:1.25;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T("drTitulo")}</h2>'
+           f'<p style="margin:0;font-size:13px;line-height:18px;color:{k["mfg"]};">{T("drDescricao")}</p>'
+           f'<a href="DesenhoLivre__SUF__.dc.html" aria-label="{T("drFechar")}" style="position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;'
+           f'width:28px;height:28px;border-radius:7px;color:{k["mfg"]};">{ic("x", 16)}</a></div>')
+    objetivo = (f'<label style="display:flex;flex-direction:column;gap:6px;">'
+                f'<span style="font-size:13px;font-weight:500;color:{k["fgs"]};">{T("drObjetivo")} <span style="font-weight:400;color:{k["mfg"]};">{T("drOpcional")}</span></span>'
+                f'<span style="display:block;min-height:56px;box-sizing:border-box;padding:8px 10px;border-radius:8px;background:{k["field"] if "field" in k else k["card"]};'
+                f'box-shadow:inset 0 0 0 1px {k["input"]};font-size:13px;line-height:19px;color:{k["fgs"]};">Farmácia que não pode cair no pico das 19 h</span>'
+                f'<span style="align-self:flex-end;font-size:11px;color:{k["mfg"]};">43/500</span></label>'
+                f'<div style="display:flex;align-items:center;gap:12px;">{botao(T("drRevisar"), k, "primary", 32, "brilho")}'
+                f'<span style="font-size:12px;color:{k["mfg"]};">{T("drCusto")}</span></div>')
+    confiabilidade = _pilar(k, 'drConfiabilidade', 'drRisco', 'red',
+                            achados=_item_revisao(k, 'drAchado1', ('nEstoque',), marcado=True),
+                            sugestoes=_item_revisao(k, 'drSugestao1', ('nEstoque',), padrao='drMultiAz'))
+    seguranca = _pilar(k, 'drSeguranca', 'drAtencao', 'yellow',
+                       achados=_item_revisao(k, 'drAchado2', ('nEntrada',)),
+                       sugestoes=_item_revisao(k, 'drSugestao2'))
+    ok = ''.join(_pilar(k, n, 'drOk', 'green') for n in ('drPilarCusto', 'drDesempenho', 'drOperacao'))
+    revisao = (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+               f'<span style="font-size:12px;color:{k["mfg"]};">{T("drQuando")} · Farmácia que não pode cair no pico das 19 h</span>'
+               f'<p style="margin:0;font-size:14px;line-height:21px;color:{k["fgs"]};white-space:pre-line;">{T("drResumo")}</p></div>'
+               f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;">{confiabilidade}{seguranca}{ok}</ul>')
+    historico = (f'<h3 style="margin:0;display:flex;align-items:center;gap:6px;font-family:{MONO};font-size:10.5px;font-weight:500;letter-spacing:0.12em;'
+                 f'text-transform:uppercase;color:{k["mfg"]};">{ic("relogio", 14)}{T("drHistorico")}</h3>'
+                 f'<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;">'
+                 f'<span style="font-size:12px;color:{k["mfg"]};">{T("drQuandoAntes")}</span>'
+                 f'<span style="flex:1;min-width:0;font-size:13px;color:{k["fg"]};">{T("drSemObjetivo")}</span>'
+                 f'{badge(T("drDesatualizada"), k, tracejado=True)}</div>')
+    return (f'<aside role="dialog" aria-modal="true" aria-label="{T("drTitulo")}" style="position:absolute;top:8px;right:8px;bottom:8px;width:500px;'
+            f'display:flex;flex-direction:column;overflow:hidden;border-radius:16px;background:{k["card"]};'
+            f'box-shadow:0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px {k["border"]};">{cab}'
+            f'<div class="muriki-scroll" style="flex:1;min-height:0;overflow-y:auto;">{secao(objetivo)}{secao(revisao)}{secao(historico, ultima=True)}</div></aside>')
+
+
+def tela_desenho_revisao(k):
+    # o editor com a Revisão aberta: o painel da direita sobre o véu leve, e o Estoque destacado no
+    # quadro (o achado da confiabilidade foi clicado)
+    tela = tela_desenho_livre(k, revisao=True)
+    assert tela.endswith('</div>')
+    veu = f'<div style="position:absolute;inset:0;z-index:20;background:color-mix(in oklch, {k["bg"]} 30%, transparent);">{_painel_revisao(k)}</div>'
+    return tela[:-len('</div>')] + veu + '</div>'

@@ -220,6 +220,12 @@ export interface ArchitectureBoardProps {
   pick?: { max: number; selected: string[]; onChange: (ids: string[]) => void; candidates?: string[] }
   /** "Abrir no desenho livre", na barra: o app cria um desenho com o grafo atual. */
   onOpenInPlayground?: () => void
+  /**
+   * Peças, grupos e notas em destaque (as `refs` de um achado da Revisão do Pro): um contorno solto,
+   * diferente da seleção, e a visão vai até elas quando a lista muda. Id desconhecido é ignorado;
+   * vazio (ou ausente) não destaca nada.
+   */
+  highlight?: string[]
   className?: string
 }
 
@@ -423,6 +429,8 @@ interface Bancada {
   escreverNota: (id: string, texto: string) => void
   /** As peças marcadas como defeito. */
   marcadas: Set<string>
+  /** As peças, grupos e notas em destaque (`highlight`). */
+  destacadas: Set<string>
   /** As peças cujo tipo ou serviço saiu do catálogo. */
   foraDoCatalogo: Set<string>
 }
@@ -495,8 +503,11 @@ const ALCAS = [
   { id: "l", position: Position.Left },
 ]
 
+/** O destaque da revisão: moldura cheia e solta da peça, no tom da marca, mais leve que a seleção. */
+const DESTAQUE = "outline-2 outline-offset-4 outline-primary/55"
+
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas } = useBancada()
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas, destacadas } = useBancada()
   const marcada = marcadas.has(id)
   const t = useTranslate()
   const servico = servicoDe(data.service)
@@ -518,7 +529,9 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
         fora && !selected && "shadow-[0_0_0_1.5px_var(--destructive),0_1px_2px_oklch(0_0_0/0.06)]",
         apagada && "opacity-35",
         // a marca do defeito: moldura tracejada por fora, que não some com a seleção
-        marcada && "outline-2 outline-offset-[3px] outline-destructive outline-dashed"
+        marcada && "outline-2 outline-offset-[3px] outline-destructive outline-dashed",
+        // o destaque da revisão: moldura solta e cheia, que convive com a seleção
+        destacadas.has(id) && !marcada && DESTAQUE
       )}
     >
       {marcada ? (
@@ -614,7 +627,7 @@ const PELE_DO_GRUPO: Record<GroupType, string> = {
 }
 
 function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
-  const { tituloDoGrupo, minimoDe, editando, setEditando, readOnly, sim } = useBancada()
+  const { tituloDoGrupo, minimoDe, editando, setEditando, readOnly, sim, destacadas } = useBancada()
   const t = useTranslate()
   const min = minimoDe(id)
   const derrubado = !!sim?.gruposDerrubados.has(id)
@@ -625,7 +638,8 @@ function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
         "relative size-full rounded-[12px] border-[1.5px]",
         PELE_DO_GRUPO[data.type],
         derrubado && "border-muted-foreground/50 bg-muted-foreground/[0.08]",
-        selected && "outline-2 outline-offset-2 outline-primary"
+        selected && "outline-2 outline-offset-2 outline-primary",
+        destacadas.has(id) && !selected && DESTAQUE
       )}
     >
       <span
@@ -686,14 +700,15 @@ const LARGURA_DA_NOTA = 200
  * cliques editam; Esc desfaz; sair do campo ou ⌘↵ grava; vazio apaga.
  */
 function Nota({ id, data, selected }: NodeProps<NotaNode>) {
-  const { editando, setEditando, readOnly } = useBancada()
+  const { editando, setEditando, readOnly, destacadas } = useBancada()
   return (
     <div
       onDoubleClick={() => !readOnly && setEditando(id)}
       className={cn(
         "flex w-[200px] flex-col gap-1 rounded-[10px] bg-tone-yellow px-3 py-2.5 text-tone-yellow-foreground",
         "shadow-[0_1px_2px_oklch(0_0_0/0.08),0_0_0_1px_color-mix(in_oklab,var(--tone-yellow-foreground)_18%,transparent)]",
-        selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.08)]"
+        selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.08)]",
+        destacadas.has(id) && DESTAQUE
       )}
     >
       <NotePencil aria-hidden className="size-3.5 shrink-0 opacity-70" />
@@ -854,7 +869,7 @@ function Ligacao(props: EdgeProps<LigacaoEdge>) {
 const LADO_DA_DECISAO = 112
 
 function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, editando, setEditando, readOnly, sim, marcadas } = useBancada()
+  const { tituloDe, editando, setEditando, readOnly, sim, marcadas, destacadas } = useBancada()
   const t = useTranslate()
   const derrubada = !!sim?.resultado.down.has(id)
   const apagada = !!sim && !derrubada && !sim.resultado.reached.has(id)
@@ -874,7 +889,8 @@ function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
           className={cn(
             derrubada ? "fill-muted" : "fill-card",
             selected ? "stroke-primary [stroke-width:2]" : "stroke-input [stroke-width:1.25]",
-            marcadas.has(id) && "stroke-destructive [stroke-dasharray:5_4] [stroke-width:2]"
+            marcadas.has(id) && "stroke-destructive [stroke-dasharray:5_4] [stroke-width:2]",
+            destacadas.has(id) && !marcadas.has(id) && "stroke-primary [stroke-width:3]"
           )}
           style={{ filter: "drop-shadow(0 1px 1px oklch(0 0 0 / 0.06))" }}
         />
@@ -960,10 +976,19 @@ function Moldura({
   onAnnotationsChange,
   onOpenInPlayground,
   pick,
+  highlight,
   className,
 }: ArchitectureBoardProps) {
   const t = useTranslate()
-  const { screenToFlowPosition } = useReactFlow()
+  const { screenToFlowPosition, fitView } = useReactFlow()
+  // o destaque muda pela lista, não pela referência: o app pode recriar o array a cada render
+  const chaveDoDestaque = (highlight ?? []).join(" ")
+  const destacadas = React.useMemo(() => new Set(chaveDoDestaque ? chaveDoDestaque.split(" ") : []), [chaveDoDestaque])
+  React.useEffect(() => {
+    if (!destacadas.size) return
+    const parado = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    void fitView({ nodes: [...destacadas].map((id) => ({ id })), padding: 0.5, maxZoom: 1, duration: parado ? 0 : 300 })
+  }, [destacadas, fitView])
   // o modo Simular: o que caiu é estado passageiro, e o desenho não se edita enquanto ele dura
   const [simulando, setSimulando] = React.useState(false)
   const [derrubados, setDerrubados] = React.useState<{ nodes: string[]; groups: string[] }>({ nodes: [], groups: [] })
@@ -1595,6 +1620,7 @@ function Moldura({
     escreverNota,
     foraDoCatalogo,
     marcadas: new Set(pick?.selected ?? []),
+    destacadas,
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined

@@ -2195,6 +2195,38 @@
       "docs": "Tela: <PlaygroundPage drawings={lista?.items ?? null} onNewDrawing={criar} creating={criando} renderOpen={(d) => <Link to=\"/playground/$id\" params={{ id: d.id }} />} onDelete={apagar} locale={i18n.language} />. drawings null = carregando (esqueleto); [] = estado vazio. O Novo fica sempre ativo; quando criar volta 409 DRAWING_LIMIT_REACHED, abra <PlanLimitDialog> (bloco plan-limit-dialog) com title=t(\"playground.limit.reached_title\", { limit }), description=t(\"playground.limit.reached_description\"), benefit=t(\"playground.limit.benefit\"), usage={{ used: count, limit, icon: <BrandLogo brand=\"architecture\" size={24} /> }} e upgradeRender={<Link to=\"/plans\" />}; com count > limit (quem desceu do Pro), over_title e over_description no lugar. 409 DRAWING_CEILING_REACHED usa ceiling_title/ceiling_description e o 503 do billing usa unavailable_title/unavailable_description, os dois sem upgradeRender (só \"Entendi\"). Apagar pede confirmação (AlertDialog) e chama onDelete. formatSavedAgo(savedAt, locale) é exportado. Editor: <PlaygroundDrawingHeader backRender={<Link to=\"/playground\" />} title={d.title} onTitleChange={renomear} saveState={estado} savedAt={d.savedAt} /> em cima do <ArchitectureBoard> sem rules, com annotations e onAnnotationsChange. O título muda com um clique; chega a onTitleChange já limpo (sem controle, sem espaços nas pontas, 1 a 80); vazio volta ao anterior. No 409 DRAWING_CONFLICT, <PlaygroundConflict onReload={recarregar} onKeepMine={manter} /> entre o cabeçalho e o board. Textos em playground.* no i18n."
     },
     {
+      "name": "drawing-review",
+      "type": "registry:block",
+      "title": "Drawing Review",
+      "description": "A Revisão do Pro no desenho livre: o \"Revisar\" com o selo Pro para o cabeçalho do editor e o painel da direita com o objetivo opcional, o pedido, o resumo e os cinco pilares do Well-Architected (status em badge de tom, achados e sugestões com as peças citadas e o padrão do catálogo) e o histórico das revisões anteriores, com o aviso de revisão desatualizada. Texto da IA sempre como texto puro.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/textarea",
+        "SwellSystem/muriki-ds/sheet"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blocks/drawing-review/drawing-review.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/drawing-review/drawing-review.tsx"
+        },
+        {
+          "path": "registry/muriki/blocks/drawing-review/index.ts",
+          "type": "registry:component",
+          "target": "components/blocks/drawing-review/index.ts"
+        }
+      ],
+      "docs": "No editor do desenho livre: <PlaygroundDrawingHeader ... actions={<DrawingReviewTrigger onClick={() => setAberto(true)} />} /> e <DrawingReviewSheet open={aberto} onOpenChange={setAberto} reviews={lista} patterns={catalogo.patterns} refLabels={rotulos} onHighlight={setDestaque} goal={objetivo} onGoalChange={setObjetivo} onRequest={revisar} requesting={revisando} requestDisabledReason={salvando ? \"Salvando…\" : undefined} error={mensagem} locale={i18n.language} />, com <ArchitectureBoard highlight={destaque} /> (limpe o destaque ao fechar). reviews undefined = esqueleto; [] = vazio; mais nova primeiro, e uma nova no topo volta a ser a escolhida. refLabels mapeia id → rótulo das peças, grupos e notas de hoje: ref e padrão desconhecidos são ignorados. 403 REVIEW_NOT_IN_PLAN abre o <PlanLimitDialog> do app, não este painel; cota, 429 e 503 chegam em error. Texto da revisão é texto puro (whitespace-pre-line), nunca link, markdown ou HTML; o único link é o source do padrão. Textos em drawing_review.* no i18n."
+    },
+    {
       "name": "trail-map",
       "type": "registry:block",
       "title": "Trail Map",
