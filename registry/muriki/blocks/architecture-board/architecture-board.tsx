@@ -31,6 +31,10 @@
  * e a ponta de uma ligação se arrasta para outra peça. ⌘C/⌘V (Ctrl fora do Mac) copia e cola a peça
  * ou o grupo selecionado, com o que está dentro.
  *
+ * DESENHO LIVRE. Sem `rules`, somem as Regras e o Verificar: é o Playground. Com `annotations`, o
+ * palco aceita notas (bilhetes amarelos de texto, que não ligam a nada e não contam em regra). A
+ * peça cujo tipo ou serviço saiu do catálogo ganha um aviso, porque a API recusa salvar até a troca.
+ *
  * TUDO TEM CAMINHO DE TECLADO. Selecionada uma peça, a barra de cima mostra "Serviço",
  * "Ligar a…", "Mover para…", "Renomear" e "Apagar"; um grupo, "Mover para…", "Renomear" e
  * "Apagar"; uma ligação, os cinco tipos. Arrastar é atalho, não o único jeito. ⌘↵ (Ctrl↵) em
@@ -64,6 +68,9 @@ import {
   IdentificationBadge,
   Lightning,
   LinkSimple,
+  NotePencil,
+  ArrowSquareOut,
+  Warning,
   MagnifyingGlass,
   PencilSimple,
   Plug,
@@ -110,8 +117,10 @@ import { ViewToggle } from "@/components/ui/view-toggle"
 import { ExerciseExpandButton, ExerciseSection } from "@/components/blocks/exercise-workspace/exercise-workspace"
 
 import {
+  ANNOTATION_LIMITS,
   GRAPH_LIMITS,
   PROVIDERS,
+  cleanAnnotationText,
   RELATIONS,
   absoluteOf,
   canNest,
@@ -123,6 +132,7 @@ import {
   subtreeOf,
   type ArchitectureGraphV2,
   type FlowSimulation,
+  type GraphAnnotation,
   type CloudProvider,
   type GraphEdge,
   type GraphGroup,
@@ -174,16 +184,24 @@ export interface ArchitectureBoardProps {
   palette: PaletteItem[]
   /** Os grupos que o exercício deixa usar. Vazio (ou ausente) esconde a seção de Grupos. */
   groups?: GroupPaletteItem[]
-  /** As regras visíveis do exercício, com o status da última verificação. */
-  rules: BoardRule[]
+  /**
+   * As regras visíveis do exercício, com o status da última verificação. Sem isto (o desenho livre
+   * do Playground), somem a seção de Regras e o Verificar.
+   */
+  rules?: BoardRule[]
   /** `null` = ainda não verificou. */
-  summary: { passing: number; total: number } | null
+  summary?: { passing: number; total: number } | null
   onCheck?: () => void
   checking?: boolean
   /** Texto curto no lugar do "Verificar" ativo, ex.: "em breve". */
   checkDisabledReason?: string
   checkError?: { kind: "invalid" | "rate_limit" | "network"; message?: string; retryIn?: number } | null
   readOnly?: boolean
+  /** As notas do desenho livre. Com isto, o palco aceita notas e a paleta ganha "Nota". */
+  annotations?: GraphAnnotation[]
+  onAnnotationsChange?: (annotations: GraphAnnotation[]) => void
+  /** "Abrir no desenho livre", na barra: o app cria um desenho com o grafo atual. */
+  onOpenInPlayground?: () => void
   className?: string
 }
 
@@ -374,6 +392,10 @@ interface Bancada {
   readOnly: boolean
   /** A simulação em curso, ou `null` fora do modo Simular. */
   sim: Simulacao | null
+  /** Grava o texto da nota; `undefined` (vazio) apaga a nota. */
+  escreverNota: (id: string, texto: string) => void
+  /** As peças cujo tipo ou serviço saiu do catálogo. */
+  foraDoCatalogo: Set<string>
 }
 
 interface Simulacao {
@@ -445,10 +467,11 @@ const ALCAS = [
 ]
 
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim } = useBancada()
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo } = useBancada()
   const t = useTranslate()
   const servico = servicoDe(data.service)
   const derrubada = !!sim?.resultado.down.has(id)
+  const fora = foraDoCatalogo.has(id)
   // na simulação: fora do ar, cinza com o X; sem caminho a partir do Cliente, apagada
   const apagada = !!sim && !derrubada && !sim.resultado.reached.has(id)
   return (
@@ -462,9 +485,16 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
         selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.06)]",
         // o cinza vale para o conteúdo; o X continua vermelho
         derrubada && "bg-muted [&>:not([data-x]):not([data-alca])]:opacity-60 [&>:not([data-x]):not([data-alca])]:grayscale",
+        fora && !selected && "shadow-[0_0_0_1.5px_var(--destructive),0_1px_2px_oklch(0_0_0/0.06)]",
         apagada && "opacity-35"
       )}
     >
+      {fora ? (
+        <span data-x className="absolute -top-2 -left-2 flex size-5 items-center justify-center rounded-full bg-card text-destructive shadow-[0_0_0_1px_var(--input)]">
+          <Warning aria-hidden weight="fill" className="size-3.5" />
+          <span className="sr-only">{t("architecture_board.catalog.badge")}</span>
+        </span>
+      ) : null}
       {derrubada ? (
         <span data-x className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-card text-destructive shadow-[0_0_0_1px_var(--input)]">
           <XCircle aria-hidden weight="fill" className="size-4" />
@@ -605,6 +635,85 @@ function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
   )
 }
 
+// ── a nota ──────────────────────────────────────────────────────────────
+
+type NotaNode = Node<{ text: string }, "nota">
+
+const LARGURA_DA_NOTA = 200
+
+/**
+ * O bilhete do desenho livre: texto solto no tom amarelo, sem alça, que não liga a nada. Dois
+ * cliques editam; Esc desfaz; sair do campo ou ⌘↵ grava; vazio apaga.
+ */
+function Nota({ id, data, selected }: NodeProps<NotaNode>) {
+  const { editando, setEditando, readOnly } = useBancada()
+  return (
+    <div
+      onDoubleClick={() => !readOnly && setEditando(id)}
+      className={cn(
+        "flex w-[200px] flex-col gap-1 rounded-[10px] bg-tone-yellow px-3 py-2.5 text-tone-yellow-foreground",
+        "shadow-[0_1px_2px_oklch(0_0_0/0.08),0_0_0_1px_color-mix(in_oklab,var(--tone-yellow-foreground)_18%,transparent)]",
+        selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.08)]"
+      )}
+    >
+      <NotePencil aria-hidden className="size-3.5 shrink-0 opacity-70" />
+      {editando === id ? (
+        <CampoDaNota id={id} texto={data.text} />
+      ) : (
+        <p className="m-0 text-[12.5px] leading-[18px] break-words whitespace-pre-wrap">{data.text}</p>
+      )}
+    </div>
+  )
+}
+
+/** O campo da nota: monta ao começar a editar, então parte sempre do texto atual. */
+function CampoDaNota({ id, texto }: { id: string; texto: string }) {
+  const { setEditando, escreverNota } = useBancada()
+  const t = useTranslate()
+  const [rascunho, setRascunho] = React.useState(texto)
+  const campo = React.useRef<HTMLTextAreaElement>(null)
+  // autoFocus não basta: o React Flow monta o nó escondido até medir, e escondido não recebe foco.
+  // Tenta a cada quadro, por pouco tempo, até o campo aparecer.
+  React.useEffect(() => {
+    let tentativas = 0
+    let quadro = 0
+    const focar = () => {
+      const el = campo.current
+      if (!el) return
+      el.focus()
+      if (document.activeElement !== el && tentativas++ < 20) quadro = requestAnimationFrame(focar)
+    }
+    quadro = requestAnimationFrame(focar)
+    return () => cancelAnimationFrame(quadro)
+  }, [])
+  return (
+        <>
+          <textarea
+            ref={campo}
+            value={rascunho}
+            maxLength={ANNOTATION_LIMITS.text}
+            rows={Math.min(8, Math.max(3, rascunho.split("\n").length))}
+            aria-label={t("architecture_board.note")}
+            placeholder={t("architecture_board.note_placeholder")}
+            onChange={(e) => setRascunho(e.target.value)}
+            onKeyDown={(e) => {
+              e.stopPropagation()
+              if (e.key === "Escape") {
+                setEditando(null)
+                if (!texto) escreverNota(id, "")
+              }
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) escreverNota(id, rascunho)
+            }}
+            onBlur={() => escreverNota(id, rascunho)}
+            className="nodrag nowheel w-full resize-none rounded-[5px] bg-card/70 px-1.5 py-1 text-[12.5px] leading-[18px] text-foreground-strong outline-none ring-1 ring-primary"
+          />
+          <span className="text-right font-mono text-[10px] opacity-70">
+            {rascunho.length}/{ANNOTATION_LIMITS.text}
+          </span>
+        </>
+  )
+}
+
 // ── a ligação ───────────────────────────────────────────────────────────
 
 type LigacaoEdge = Edge<{ relation: Relation; label?: string }, "ligacao">
@@ -695,19 +804,20 @@ function Ligacao(props: EdgeProps<LigacaoEdge>) {
 }
 
 // fora do componente: o React Flow pede o mesmo objeto em todo render
-const TIPOS_DE_NO = { peca: Peca, grupo: Grupo }
+const TIPOS_DE_NO = { peca: Peca, grupo: Grupo, nota: Nota }
 const TIPOS_DE_LIGACAO = { ligacao: Ligacao }
 
 // ── a bancada ───────────────────────────────────────────────────────────
 
-type Selecao = { tipo: "peca" | "grupo" | "ligacao"; id: string } | null
+type Selecao = { tipo: "peca" | "grupo" | "ligacao" | "nota"; id: string } | null
 
 /** O que ⌘C guardou: a peça, ou o grupo com o que está dentro e as ligações entre essas peças. */
 interface Copia {
-  raiz: { kind: "node" | "group"; id: string }
+  raiz: { kind: "node" | "group" | "note"; id: string }
   nodes: GraphNode[]
   groups: GraphGroup[]
   edges: GraphEdge[]
+  notas: GraphAnnotation[]
 }
 
 export function ArchitectureBoard(props: ArchitectureBoardProps) {
@@ -730,6 +840,9 @@ function Moldura({
   checkDisabledReason,
   checkError,
   readOnly: soLeitura = false,
+  annotations,
+  onAnnotationsChange,
+  onOpenInPlayground,
   className,
 }: ArchitectureBoardProps) {
   const t = useTranslate()
@@ -761,12 +874,63 @@ function Moldura({
   const cheioDeGrupos = graph.groups.length >= GRAPH_LIMITS.groups
 
   const mudar = (g: ArchitectureGraphV2) => onGraphChange(g)
+
+  // ── as notas (desenho livre) ──
+  const comNotas = annotations !== undefined && !!onAnnotationsChange
+  const notas = annotations ?? []
+  // a nota recém-criada fica aqui até ganhar texto: a API recusa nota vazia
+  const [notaNova, setNotaNova] = React.useState<GraphAnnotation | null>(null)
+  const notasNaTela = notaNova ? [...notas, notaNova] : notas
+  const mudarNotas = (lista: GraphAnnotation[]) => onAnnotationsChange?.(lista)
+  const ehNota = (id: string) => notasNaTela.some((a) => a.id === id)
+  const cheioDeNotas = notas.length >= ANNOTATION_LIMITS.count
+  const idDeNota = () => {
+    let maior = 0
+    for (const { id } of notasNaTela) {
+      const m = /^a-(\d+)$/.exec(id)
+      if (m) maior = Math.max(maior, Number(m[1]))
+    }
+    return `a-${maior + 1}`
+  }
+  const escreverNota = (id: string, texto: string) => {
+    const limpo = cleanAnnotationText(texto)
+    setEditando(null)
+    if (notaNova?.id === id) {
+      if (limpo) mudarNotas([...notas, { ...notaNova, text: limpo }])
+      setNotaNova(null)
+      if (!limpo) setSelecao(null)
+      return
+    }
+    if (!limpo) {
+      mudarNotas(notas.filter((a) => a.id !== id))
+      setSelecao(null)
+    } else if (notas.find((a) => a.id === id)?.text !== limpo) {
+      mudarNotas(notas.map((a) => (a.id === id ? { ...a, text: limpo } : a)))
+    }
+  }
+  /** Depois de apagar grupos: a nota cujo pai sumiu sobe para o ancestral que restou, no mesmo lugar. */
+  const notasDepoisDe = (antes: ArchitectureGraphV2, depois: ArchitectureGraphV2) =>
+    notas.map((a) => {
+      if (!a.parent || depois.groups.some((g) => g.id === a.parent)) return a
+      let pai = antes.groups.find((g) => g.id === a.parent)?.parent
+      while (pai && !depois.groups.some((g) => g.id === pai)) pai = antes.groups.find((g) => g.id === pai)?.parent
+      const de = absoluteOf(antes.groups, a.parent)
+      const para = absoluteOf(depois.groups, pai)
+      const nova = { ...a, x: a.x + de.x - para.x, y: a.y + de.y - para.y, parent: pai }
+      if (!pai) delete nova.parent
+      return nova
+    })
+
+  // ── o catálogo: a peça cujo tipo ou serviço não está mais na paleta ──
+  const foraDoCatalogo = new Set(
+    graph.nodes.filter((n) => !itens.has(n.kind) || (n.service && !servicos.has(n.service))).map((n) => n.id)
+  )
   const tituloDoGrupo = (type: GroupType) => titulosDeGrupo.get(type) ?? t(`architecture_board.group_types.${type}`)
 
   // os grupos vêm antes, do topo para dentro: o React Flow pede o pai antes do filho
   const profundidade = new Map(graph.groups.map((g) => [g.id, chainOf(graph.groups, g.id).length]))
   const gruposEmOrdem = [...graph.groups].sort((a, b) => (profundidade.get(a.id) ?? 0) - (profundidade.get(b.id) ?? 0))
-  const nodes: Array<PecaNode | GrupoNode> = [
+  const nodes: Array<PecaNode | GrupoNode | NotaNode> = [
     ...gruposEmOrdem.map(
       (g): GrupoNode => ({
         id: g.id,
@@ -789,6 +953,18 @@ function Moldura({
         data: { kind: n.kind, label: n.label, service: n.service },
         selected: selecao?.tipo === "peca" && selecao.id === n.id,
         measured: medidas.get(n.id),
+      })
+    ),
+    ...notasNaTela.map(
+      (a): NotaNode => ({
+        id: a.id,
+        type: "nota",
+        position: { x: a.x, y: a.y },
+        parentId: a.parent,
+        data: { text: a.text },
+        selected: selecao?.tipo === "nota" && selecao.id === a.id,
+        measured: medidas.get(a.id),
+        connectable: false,
       })
     ),
   ]
@@ -933,9 +1109,62 @@ function Moldura({
         nodes: graph.nodes.filter((n) => n.id !== sel.id),
         edges: graph.edges.filter((e) => e.from !== sel.id && e.to !== sel.id),
       })
-    else if (sel.tipo === "grupo") mudar(deleteGroup(graph, sel.id))
-    else mudar({ ...graph, edges: graph.edges.filter((e) => e.id !== sel.id) })
+    else if (sel.tipo === "grupo") {
+      const depois = deleteGroup(graph, sel.id)
+      mudar(depois)
+      // as notas de dentro sobem como as peças: nunca somem
+      if (notas.some((a) => a.parent)) mudarNotas(notasDepoisDe(graph, depois))
+    } else if (sel.tipo === "nota") {
+      if (notaNova?.id === sel.id) setNotaNova(null)
+      else mudarNotas(notas.filter((a) => a.id !== sel.id))
+    } else mudar({ ...graph, edges: graph.edges.filter((e) => e.id !== sel.id) })
     setSelecao(null)
+  }
+
+  /** "Nota": nasce no meio da vista (no grupo sob o centro, se houver) e já em edição. */
+  const porNota = () => {
+    if (readOnly || !comNotas || cheioDeNotas || notaNova) return
+    // como a peça: no meio da vista, e se o lugar está ocupado (peça ou nota), desce e depois anda
+    const c = centroDaVista()
+    const caixas = [
+      ...graph.nodes.map((n) => ({ ...naTela(n), w: LARGURA_DA_PECA, h: alturas.get(n.id) ?? ALTURA_DA_PECA })),
+      ...notas.map((a) => {
+        const b = absoluteOf(graph.groups, a.parent)
+        return { x: b.x + a.x, y: b.y + a.y, w: LARGURA_DA_NOTA, h: medidas.get(a.id)?.height ?? 80 }
+      }),
+    ]
+    const ocupado = (x: number, y: number) =>
+      caixas.some((k) => x < k.x + k.w + 12 && k.x < x + LARGURA_DA_NOTA + 12 && y < k.y + k.h + 12 && k.y < y + 80 + 12)
+    let canto = { x: c.x - LARGURA_DA_NOTA / 2, y: c.y - 40 }
+    for (let i = 0; ocupado(canto.x, canto.y) && i < 24; i++)
+      canto = { x: c.x - LARGURA_DA_NOTA / 2 + Math.floor((i + 1) / 4) * (LARGURA_DA_NOTA + 40), y: c.y - 40 + ((i + 1) % 4) * 100 }
+    const pai = grupoNoPonto(graph, { x: canto.x + LARGURA_DA_NOTA / 2, y: canto.y + 40 }, new Set())
+    const base = absoluteOf(graph.groups, pai?.id)
+    const nota: GraphAnnotation = { id: idDeNota(), text: "", x: Math.round(canto.x - base.x), y: Math.round(canto.y - base.y) }
+    if (pai) nota.parent = pai.id
+    setNotaNova(nota)
+    setSelecao({ tipo: "nota", id: nota.id })
+    setEditando(nota.id)
+  }
+
+  /** A nota entra no grupo mais fundo sob o centro dela, mantendo o lugar na tela. */
+  const soltarNota = (id: string) => {
+    const nota = notas.find((a) => a.id === id)
+    if (!nota) return
+    const base = absoluteOf(graph.groups, nota.parent)
+    const altura = medidas.get(id)?.height ?? 80
+    const centro = { x: base.x + nota.x + LARGURA_DA_NOTA / 2, y: base.y + nota.y + altura / 2 }
+    const alvo = grupoNoPonto(graph, centro, new Set())
+    if (alvo?.id === nota.parent) return
+    const para = absoluteOf(graph.groups, alvo?.id)
+    const nova = { ...nota, x: Math.round(nota.x + base.x - para.x), y: Math.round(nota.y + base.y - para.y), parent: alvo?.id }
+    if (!alvo) delete nova.parent
+    else {
+      // como a peça: entra inteira na caixa, abaixo do chip
+      nova.x = Math.max(MARGEM, Math.min(nova.x, alvo.w - LARGURA_DA_NOTA - MARGEM))
+      nova.y = Math.max(TOPO, Math.min(nova.y, alvo.h - altura - MARGEM))
+    }
+    mudarNotas(notas.map((a) => (a.id === id ? nova : a)))
   }
 
   /** Move uma peça ou um grupo para dentro de `parent` (ou para o topo), se a tabela deixa. */
@@ -984,7 +1213,12 @@ function Moldura({
     if (!selecao || selecao.tipo === "ligacao") return
     if (selecao.tipo === "peca") {
       const no = porId.get(selecao.id)
-      if (no) setCopia({ raiz: { kind: "node", id: no.id }, nodes: [no], groups: [], edges: [] })
+      if (no) setCopia({ raiz: { kind: "node", id: no.id }, nodes: [no], groups: [], edges: [], notas: [] })
+      return
+    }
+    if (selecao.tipo === "nota") {
+      const nota = notas.find((a) => a.id === selecao.id)
+      if (nota) setCopia({ raiz: { kind: "note", id: nota.id }, nodes: [], groups: [], edges: [], notas: [nota] })
       return
     }
     // o grupo leva o que está dentro, em qualquer nível, e as ligações entre essas peças
@@ -996,11 +1230,23 @@ function Moldura({
       groups: graph.groups.filter((g) => dentro.has(g.id)),
       nodes,
       edges: graph.edges.filter((e) => ids.has(e.from) && ids.has(e.to)),
+      notas: notas.filter((a) => a.parent && dentro.has(a.parent)),
     })
   }
 
   const colar = () => {
     if (readOnly || !copia) return
+    if (copia.notas.length && (!comNotas || notas.length + copia.notas.length > ANNOTATION_LIMITS.count)) return
+    if (copia.raiz.kind === "note") {
+      const nota = copia.notas[0]
+      const pai = nota.parent && graph.groups.some((g) => g.id === nota.parent) ? nota.parent : undefined
+      const nova: GraphAnnotation = { ...nota, id: idDeNota(), x: nota.x + 24, y: nota.y + 24, parent: pai }
+      if (!pai) delete nova.parent
+      mudarNotas([...notas, nova])
+      setSelecao({ tipo: "nota", id: nova.id })
+      setCopia({ ...copia, notas: [{ ...nota, x: nota.x + 24, y: nota.y + 24 }] })
+      return
+    }
     if (
       graph.nodes.length + copia.nodes.length > GRAPH_LIMITS.nodes ||
       graph.groups.length + copia.groups.length > GRAPH_LIMITS.groups ||
@@ -1041,6 +1287,14 @@ function Moldura({
     }
     g = { ...g, groups: g.groups.map(reparentar), nodes: g.nodes.map(reparentar) }
     mudar(acomodar(g, { kind: copia.raiz.kind, id: raiz }, alturas))
+    if (copia.notas.length) {
+      // as notas do grupo vêm junto, nos grupos novos
+      let maior = Math.max(0, ...notasNaTela.map((a) => Number(/^a-(\d+)$/.exec(a.id)?.[1] ?? 0)))
+      mudarNotas([
+        ...notas,
+        ...copia.notas.map((a) => ({ ...a, id: `a-${++maior}`, parent: a.parent ? novo.get(a.parent) : undefined })),
+      ])
+    }
     setSelecao({ tipo: copia.raiz.kind === "node" ? "peca" : "grupo", id: raiz })
     // a próxima colagem cai 24px adiante, e não em cima desta
     setCopia({
@@ -1088,9 +1342,11 @@ function Moldura({
 
   const ehGrupo = (id: string) => graph.groups.some((g) => g.id === id)
 
-  const aoMudarNos = (changes: NodeChange<PecaNode | GrupoNode>[]) => {
+  const aoMudarNos = (changes: NodeChange<PecaNode | GrupoNode | NotaNode>[]) => {
     let g = graph
     let mudou = false
+    let ns = notas
+    let mudaramNotas = false
     const medidasNovas: [string, { width: number; height: number }][] = []
     for (const c of changes) {
       if (c.type === "dimensions" && c.dimensions) {
@@ -1111,10 +1367,18 @@ function Moldura({
         const { x, y } = c.position
         const mover = <T extends { id: string; x: number; y: number }>(n: T): T =>
           n.id === c.id ? { ...n, x: Math.round(x), y: Math.round(y) } : n
-        g = ehGrupo(c.id) ? { ...g, groups: g.groups.map(mover) } : { ...g, nodes: g.nodes.map(mover) }
-        mudou = true
+        if (ehNota(c.id)) {
+          if (notaNova?.id === c.id) setNotaNova(mover(notaNova))
+          else {
+            ns = ns.map(mover)
+            mudaramNotas = true
+          }
+        } else {
+          g = ehGrupo(c.id) ? { ...g, groups: g.groups.map(mover) } : { ...g, nodes: g.nodes.map(mover) }
+          mudou = true
+        }
       } else if (c.type === "select") {
-        const tipo = ehGrupo(c.id) ? "grupo" : "peca"
+        const tipo = ehGrupo(c.id) ? "grupo" : ehNota(c.id) ? "nota" : "peca"
         if (c.selected) setSelecao({ tipo, id: c.id })
         else setSelecao((s) => (s?.tipo === tipo && s.id === c.id ? null : s))
       }
@@ -1122,6 +1386,7 @@ function Moldura({
     }
     if (medidasNovas.length) setMedidas((antes) => new Map([...antes, ...medidasNovas]))
     if (mudou) mudar(g)
+    if (mudaramNotas) mudarNotas(ns)
   }
 
   // ao soltar, a peça ou o grupo entra no grupo mais fundo sob o centro dele; o grupo só entra onde
@@ -1184,13 +1449,24 @@ function Moldura({
     tituloDe: (kind) => itens.get(kind)?.title ?? kind,
     tituloDoGrupo,
     servicoDe: (id) => (id ? servicos.get(id) : undefined),
-    minimoDe: (groupId) => minimoDoGrupo(graph, groupId, alturas),
+    minimoDe: (groupId) => {
+      // as notas de dentro também seguram o tamanho do grupo
+      const min = minimoDoGrupo(graph, groupId, alturas)
+      for (const a of notasNaTela)
+        if (a.parent === groupId) {
+          min.w = Math.max(min.w, a.x + LARGURA_DA_NOTA + MARGEM)
+          min.h = Math.max(min.h, a.y + (medidas.get(a.id)?.height ?? 80) + MARGEM)
+        }
+      return min
+    },
     editando,
     setEditando,
     renomear,
     selecionarLigacao: (id) => setSelecao({ tipo: "ligacao", id }),
     readOnly,
     sim,
+    escreverNota,
+    foraDoCatalogo,
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined
@@ -1213,7 +1489,7 @@ function Moldura({
           const noCampo = !!alvo.closest("input, textarea, [contenteditable]")
           if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && !noCampo && !editando) {
             const tecla = e.key.toLowerCase()
-            if (tecla === "c" && selecao && selecao.tipo !== "ligacao") {
+            if (tecla === "c" && selecao && selecao.tipo !== "ligacao" && notaNova?.id !== selecao.id) {
               e.preventDefault()
               copiar()
               return
@@ -1305,7 +1581,34 @@ function Moldura({
               </span>
             </ExerciseSection>
           ) : null}
-          <Regras rules={rules} summary={summary} checkError={checkError} />
+          {comNotas ? (
+            <ExerciseSection
+              title={t("architecture_board.notes")}
+              end={
+                <span className="font-mono text-[11px] text-muted-foreground">
+                  {t("architecture_board.notes_count", { count: notas.length, max: ANNOTATION_LIMITS.count })}
+                </span>
+              }
+            >
+              <div className="px-1.5 pb-2">
+                <button
+                  type="button"
+                  onClick={porNota}
+                  disabled={readOnly || cheioDeNotas || !!notaNova}
+                  className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[12.5px] text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 disabled:cursor-default disabled:opacity-50 disabled:hover:bg-transparent"
+                >
+                  <NotePencil aria-hidden className="size-[15px] text-muted-foreground" />
+                  {t("architecture_board.add_note")}
+                </button>
+              </div>
+              <span className="block px-4 pb-2.5 text-[11.5px] leading-4 text-muted-foreground">
+                {cheioDeNotas
+                  ? t("architecture_board.limit_notes", { max: ANNOTATION_LIMITS.count })
+                  : t("architecture_board.notes_hint")}
+              </span>
+            </ExerciseSection>
+          ) : null}
+          {rules ? <Regras rules={rules} summary={summary ?? null} checkError={checkError} /> : null}
         </div>
 
         <div className="flex min-h-[420px] min-w-0 flex-1 flex-col">
@@ -1327,6 +1630,7 @@ function Moldura({
               />
             ) : (
             <Acoes
+              nota={selecao?.tipo === "nota" ? notasNaTela.find((a) => a.id === selecao.id) : undefined}
               peca={pecaSelecionada}
               grupo={grupoSelecionado}
               ligacao={ligacaoSelecionada}
@@ -1346,6 +1650,17 @@ function Moldura({
             </div>
             <span className="flex shrink-0 items-center gap-1.5">
               <ExerciseExpandButton />
+              {onOpenInPlayground ? (
+                <Button
+                  variant="ghost"
+                  onClick={onOpenInPlayground}
+                  title={t("architecture_board.open_in_playground")}
+                  aria-label={t("architecture_board.open_in_playground")}
+                >
+                  <ArrowSquareOut aria-hidden />
+                  {t("architecture_board.open_in_playground_short")}
+                </Button>
+              ) : null}
               {/* sempre com o nome: só o ícone, o modo passava despercebido */}
               <Button
                 variant={simulando ? "secondary" : "ghost"}
@@ -1356,23 +1671,34 @@ function Moldura({
                 <Pulse aria-hidden weight={simulando ? "bold" : "regular"} />
                 {t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
               </Button>
-              {checkDisabledReason ? (
+              {/* o desenho livre não tem regras, e então não tem Verificar */}
+              {rules && checkDisabledReason ? (
                 <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
                   {checkDisabledReason}
                 </span>
               ) : null}
-              <Button
-                variant="primary"
-                onClick={onCheck}
-                disabled={!onCheck || !!checkDisabledReason}
-                loading={checking}
-              >
-                <Check aria-hidden weight="bold" />
-                {t("architecture_board.check")}
-              </Button>
+              {rules ? (
+                <Button
+                  variant="primary"
+                  onClick={onCheck}
+                  disabled={!onCheck || !!checkDisabledReason}
+                  loading={checking}
+                >
+                  <Check aria-hidden weight="bold" />
+                  {t("architecture_board.check")}
+                </Button>
+              ) : null}
             </span>
           </div>
 
+          {foraDoCatalogo.size && !resultado ? (
+            <ForaDoCatalogo
+              pecas={graph.nodes.filter((n) => foraDoCatalogo.has(n.id))}
+              itens={itens}
+              tituloDe={bancada.tituloDe}
+              onMostrar={(id) => setSelecao({ tipo: "peca", id })}
+            />
+          ) : null}
           {resultado ? (
             <ResumoDaSimulacao
               graph={graph}
@@ -1406,7 +1732,7 @@ function Moldura({
               }
             }}
           >
-            <ReactFlow<PecaNode | GrupoNode, LigacaoEdge>
+            <ReactFlow<PecaNode | GrupoNode | NotaNode, LigacaoEdge>
               nodes={nodes}
               edges={edges}
               nodeTypes={TIPOS_DE_NO}
@@ -1417,7 +1743,7 @@ function Moldura({
                 const atual = graph.groups.find((x) => x.id === n.id) ?? graph.nodes.find((x) => x.id === n.id)
                 if (atual) setArrasto({ id: n.id, x: atual.x, y: atual.y })
               }}
-              onNodeDragStop={(_, n) => aoSoltar(n.id)}
+              onNodeDragStop={(_, n) => (ehNota(n.id) ? soltarNota(n.id) : aoSoltar(n.id))}
               onConnect={(c: Connection) => ligar(c.source, c.target)}
               onConnectEnd={(e, estado) => {
                 if (estado.isValid || !estado.fromNode) return
@@ -1480,8 +1806,9 @@ function Moldura({
                     groups: graph.groups.length,
                   })
                 : t("architecture_board.status", { nodes: graph.nodes.length, edges: graph.edges.length })}
+              {notas.length ? ` · ${t("architecture_board.status_notes", { count: notas.length })}` : null}
             </span>
-            <span className="max-sm:hidden">{t("architecture_board.shortcut")}</span>
+            {rules ? <span className="max-sm:hidden">{t("architecture_board.shortcut")}</span> : null}
           </div>
         </div>
       </section>
@@ -1600,6 +1927,53 @@ function ResumoDaSimulacao({
   )
 }
 
+/**
+ * O aviso da peça que saiu do catálogo: o desenho abre, mas a API recusa salvar até a troca. Diz
+ * qual é, o que fazer (trocar o serviço, ou apagar a peça cujo tipo não existe mais) e leva até ela.
+ */
+function ForaDoCatalogo({
+  pecas,
+  itens,
+  tituloDe,
+  onMostrar,
+}: {
+  pecas: GraphNode[]
+  itens: Map<string, PaletteItem>
+  tituloDe: (kind: string) => string
+  onMostrar: (id: string) => void
+}) {
+  const t = useTranslate()
+  return (
+    <div
+      role="alert"
+      data-slot="architecture-board-catalog"
+      className="flex shrink-0 flex-col gap-1 border-b border-destructive-subtle-border bg-destructive-subtle px-4 py-2 text-[12.5px] leading-[18px] text-destructive-subtle-foreground"
+    >
+      <span className="flex items-center gap-1.5 font-semibold">
+        <Warning aria-hidden weight="bold" className="size-3.5 shrink-0" />
+        {t("architecture_board.catalog.title", { count: pecas.length })}
+      </span>
+      <ul className="m-0 flex list-none flex-col gap-0.5 p-0 pl-5">
+        {pecas.map((n) => (
+          <li key={n.id} className="flex flex-wrap items-baseline gap-x-2">
+            <span>
+              <span className="font-medium">{n.label ?? tituloDe(n.kind)}</span> ·{" "}
+              {t(itens.has(n.kind) ? "architecture_board.catalog.change_service" : "architecture_board.catalog.remove_piece")}
+            </span>
+            <button
+              type="button"
+              onClick={() => onMostrar(n.id)}
+              className="rounded-[4px] font-medium underline-offset-[3px] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+            >
+              {t("architecture_board.catalog.show")}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 // ── o provedor ──────────────────────────────────────────────────────────
 
 function Provedores({
@@ -1640,6 +2014,7 @@ function Provedores({
 // ── a barra de ações da seleção ─────────────────────────────────────────
 
 function Acoes({
+  nota,
   peca,
   grupo,
   ligacao,
@@ -1655,6 +2030,7 @@ function Acoes({
   onRenomear,
   onApagar,
 }: {
+  nota?: GraphAnnotation
   peca?: GraphNode
   grupo?: GraphGroup
   ligacao?: GraphEdge
@@ -1671,6 +2047,19 @@ function Acoes({
   onApagar: () => void
 }) {
   const t = useTranslate()
+  if (!readOnly && nota)
+    return (
+      <span className="flex min-w-0 flex-wrap items-center gap-1">
+        <Button variant="ghost" size="sm" onClick={() => onRenomear(nota.id)}>
+          <PencilSimple aria-hidden />
+          {t("architecture_board.edit_note")}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onApagar}>
+          <Trash aria-hidden />
+          {t("architecture_board.delete")}
+        </Button>
+      </span>
+    )
   if (readOnly || (!peca && !grupo && !ligacao))
     return <span className="truncate text-[12px] text-muted-foreground">{t("architecture_board.hint")}</span>
 
@@ -1922,7 +2311,7 @@ function Regras({
   rules,
   summary,
   checkError,
-}: Pick<ArchitectureBoardProps, "rules" | "summary" | "checkError">) {
+}: { rules: BoardRule[]; summary: ArchitectureBoardProps["summary"]; checkError: ArchitectureBoardProps["checkError"] }) {
   const t = useTranslate()
   let resumo: React.ReactNode
   if (checkError) resumo = <Badge tone="red" dot>{t("architecture_board.error_badge")}</Badge>

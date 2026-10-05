@@ -297,3 +297,31 @@ function descendantsOf(groups: GraphGroup[], id: string): Set<string> {
   }
   return ids
 }
+
+// ── as notas do desenho livre ───────────────────────────────────────────
+
+/**
+ * Uma nota solta no palco do desenho livre (muriki-api features/arch-cloud/fd-desenho.md, §2).
+ * Não liga a nada e não conta em regra. `parent` é só grupo; a posição nunca define o pai.
+ */
+export interface GraphAnnotation {
+  id: string
+  /** De 1 a 500 caracteres depois do trim; aceita quebra de linha. */
+  text: string
+  /** Relativos ao pai, se houver. */
+  x: number
+  y: number
+  parent?: string
+}
+
+export const ANNOTATION_LIMITS = { count: 20, text: 500 } as const
+
+/** O texto como a API guarda: sem espaços nas pontas, sem controle além da quebra de linha. Vazio = `undefined`. */
+export function cleanAnnotationText(text: string): string | undefined {
+  const limpo = text
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\p{Cc}\p{Cf}\u2028\u2029]/gu, (c) => (c === "\n" ? c : ""))
+    .trim()
+    .slice(0, ANNOTATION_LIMITS.text)
+  return limpo || undefined
+}
