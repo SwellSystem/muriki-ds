@@ -35,6 +35,10 @@
  * palco aceita notas (bilhetes amarelos de texto, que não ligam a nada e não contam em regra). A
  * peça cujo tipo ou serviço saiu do catálogo ganha um aviso, porque a API recusa salvar até a troca.
  *
+ * ACHAR O DEFEITO. Com `pick`, a pessoa marca até `max` peças como a causa do defeito, separado
+ * da seleção e da edição: "Marcar como defeito" na barra da peça selecionada (também com o desenho
+ * só leitura), a moldura vermelha tracejada com a bandeira na peça e a seção "Defeito" no rail.
+ *
  * TUDO TEM CAMINHO DE TECLADO. Selecionada uma peça, a barra de cima mostra "Serviço",
  * "Ligar a…", "Mover para…", "Renomear" e "Apagar"; um grupo, "Mover para…", "Renomear" e
  * "Apagar"; uma ligação, os cinco tipos. Arrastar é atalho, não o único jeito. ⌘↵ (Ctrl↵) em
@@ -66,6 +70,7 @@ import {
   Globe,
   Handshake,
   IdentificationBadge,
+  Flag,
   Lightning,
   LinkSimple,
   NotePencil,
@@ -200,6 +205,11 @@ export interface ArchitectureBoardProps {
   /** As notas do desenho livre. Com isto, o palco aceita notas e a paleta ganha "Nota". */
   annotations?: GraphAnnotation[]
   onAnnotationsChange?: (annotations: GraphAnnotation[]) => void
+  /**
+   * "Achar o defeito" (`answerSpec.pick`): as peças marcadas como causa, até `max`. `candidates`
+   * (os ids do grafo inicial) limita o que pode ser marcado; sem isto, qualquer peça.
+   */
+  pick?: { max: number; selected: string[]; onChange: (ids: string[]) => void; candidates?: string[] }
   /** "Abrir no desenho livre", na barra: o app cria um desenho com o grafo atual. */
   onOpenInPlayground?: () => void
   className?: string
@@ -394,6 +404,8 @@ interface Bancada {
   sim: Simulacao | null
   /** Grava o texto da nota; `undefined` (vazio) apaga a nota. */
   escreverNota: (id: string, texto: string) => void
+  /** As peças marcadas como defeito. */
+  marcadas: Set<string>
   /** As peças cujo tipo ou serviço saiu do catálogo. */
   foraDoCatalogo: Set<string>
 }
@@ -467,7 +479,8 @@ const ALCAS = [
 ]
 
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo } = useBancada()
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas } = useBancada()
+  const marcada = marcadas.has(id)
   const t = useTranslate()
   const servico = servicoDe(data.service)
   const derrubada = !!sim?.resultado.down.has(id)
@@ -486,9 +499,17 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
         // o cinza vale para o conteúdo; o X continua vermelho
         derrubada && "bg-muted [&>:not([data-x]):not([data-alca])]:opacity-60 [&>:not([data-x]):not([data-alca])]:grayscale",
         fora && !selected && "shadow-[0_0_0_1.5px_var(--destructive),0_1px_2px_oklch(0_0_0/0.06)]",
-        apagada && "opacity-35"
+        apagada && "opacity-35",
+        // a marca do defeito: moldura tracejada por fora, que não some com a seleção
+        marcada && "outline-2 outline-offset-[3px] outline-destructive outline-dashed"
       )}
     >
+      {marcada ? (
+        <span data-x className="absolute -top-2.5 left-2 flex h-5 items-center gap-1 rounded-full bg-destructive px-1.5 text-[10.5px] font-semibold text-destructive-foreground shadow-[0_0_0_2px_var(--card)]">
+          <Flag aria-hidden weight="fill" className="size-3" />
+          {t("architecture_board.pick.badge")}
+        </span>
+      ) : null}
       {fora ? (
         <span data-x className="absolute -top-2 -left-2 flex size-5 items-center justify-center rounded-full bg-card text-destructive shadow-[0_0_0_1px_var(--input)]">
           <Warning aria-hidden weight="fill" className="size-3.5" />
@@ -550,7 +571,9 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
           className={cn(
             "!size-2.5 !rounded-full !border-2 !border-card !bg-primary opacity-0 transition-opacity",
             "group-hover:opacity-100",
-            selected && "opacity-100"
+            selected && "opacity-100",
+            // só leitura (ou simulando), não dá para ligar: a alça não aparece
+            readOnly && "!invisible"
           )}
         />
       ))}
@@ -843,6 +866,7 @@ function Moldura({
   annotations,
   onAnnotationsChange,
   onOpenInPlayground,
+  pick,
   className,
 }: ArchitectureBoardProps) {
   const t = useTranslate()
@@ -1103,6 +1127,8 @@ function Moldura({
 
   const apagar = (sel: NonNullable<Selecao>) => {
     if (readOnly) return
+    // a peça apagada sai também das marcadas
+    if (sel.tipo === "peca" && pick?.selected.includes(sel.id)) pick.onChange(pick.selected.filter((x) => x !== sel.id))
     if (sel.tipo === "peca")
       mudar({
         ...graph,
@@ -1467,6 +1493,7 @@ function Moldura({
     sim,
     escreverNota,
     foraDoCatalogo,
+    marcadas: new Set(pick?.selected ?? []),
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined
@@ -1608,6 +1635,16 @@ function Moldura({
               </span>
             </ExerciseSection>
           ) : null}
+          {pick ? (
+            <Defeito
+              pick={pick}
+              nome={(id) => {
+                const n = porId.get(id)
+                return n ? (n.label ? `${bancada.tituloDe(n.kind)} · ${n.label}` : bancada.tituloDe(n.kind)) : id
+              }}
+              onMostrar={(id) => setSelecao({ tipo: "peca", id })}
+            />
+          ) : null}
           {rules ? <Regras rules={rules} summary={summary ?? null} checkError={checkError} /> : null}
         </div>
 
@@ -1631,6 +1668,23 @@ function Moldura({
             ) : (
             <Acoes
               nota={selecao?.tipo === "nota" ? notasNaTela.find((a) => a.id === selecao.id) : undefined}
+              dicaDoDefeito={!!pick && readOnly}
+              marcar={
+                pick && pecaSelecionada && (!pick.candidates || pick.candidates.includes(pecaSelecionada.id))
+                  ? {
+                      marcada: pick.selected.includes(pecaSelecionada.id),
+                      cheio: pick.selected.length >= pick.max,
+                      onToggle: () =>
+                        pick.onChange(
+                          pick.selected.includes(pecaSelecionada.id)
+                            ? pick.selected.filter((x) => x !== pecaSelecionada.id)
+                            : pick.selected.length < pick.max
+                              ? [...pick.selected, pecaSelecionada.id]
+                              : pick.selected
+                        ),
+                    }
+                  : undefined
+              }
               peca={pecaSelecionada}
               grupo={grupoSelecionado}
               ligacao={ligacaoSelecionada}
@@ -1927,6 +1981,58 @@ function ResumoDaSimulacao({
   )
 }
 
+/** A seção "Defeito" do rail: o que está marcado, quantas faltam, e o desmarcar. */
+function Defeito({
+  pick,
+  nome,
+  onMostrar,
+}: {
+  pick: NonNullable<ArchitectureBoardProps["pick"]>
+  nome: (id: string) => string
+  onMostrar: (id: string) => void
+}) {
+  const t = useTranslate()
+  const cheio = pick.selected.length >= pick.max
+  return (
+    <ExerciseSection
+      title={t("architecture_board.pick.title")}
+      end={
+        <span className={cn("font-mono text-[11px]", pick.selected.length ? "text-destructive" : "text-muted-foreground")}>
+          {t("architecture_board.pick.count", { count: pick.selected.length, max: pick.max })}
+        </span>
+      }
+    >
+      {pick.selected.length ? (
+        <ul className="m-0 flex list-none flex-col gap-px px-1.5 pb-1">
+          {pick.selected.map((id) => (
+            <li key={id} className="flex items-center gap-1 rounded-md pr-1 pl-2 hover:bg-muted">
+              <button
+                type="button"
+                onClick={() => onMostrar(id)}
+                className="flex h-8 min-w-0 flex-1 items-center gap-2 text-left text-[12.5px] text-foreground-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+              >
+                <Flag aria-hidden weight="fill" className="size-[13px] shrink-0 text-destructive" />
+                <span className="truncate">{nome(id)}</span>
+              </button>
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                aria-label={t("architecture_board.pick.remove", { name: nome(id) })}
+                onClick={() => pick.onChange(pick.selected.filter((x) => x !== id))}
+              >
+                <X aria-hidden />
+              </Button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      <span className="block px-4 pb-2.5 text-[11.5px] leading-4 text-muted-foreground">
+        {cheio ? t("architecture_board.pick.full", { max: pick.max }) : t("architecture_board.pick.hint")}
+      </span>
+    </ExerciseSection>
+  )
+}
+
 /**
  * O aviso da peça que saiu do catálogo: o desenho abre, mas a API recusa salvar até a troca. Diz
  * qual é, o que fazer (trocar o serviço, ou apagar a peça cujo tipo não existe mais) e leva até ela.
@@ -2014,6 +2120,8 @@ function Provedores({
 // ── a barra de ações da seleção ─────────────────────────────────────────
 
 function Acoes({
+  dicaDoDefeito,
+  marcar,
   nota,
   peca,
   grupo,
@@ -2030,6 +2138,9 @@ function Acoes({
   onRenomear,
   onApagar,
 }: {
+  /** Só leitura com o marcar: a dica é marcar, não desenhar. */
+  dicaDoDefeito?: boolean
+  marcar?: { marcada: boolean; cheio: boolean; onToggle: () => void }
   nota?: GraphAnnotation
   peca?: GraphNode
   grupo?: GraphGroup
@@ -2047,6 +2158,22 @@ function Acoes({
   onApagar: () => void
 }) {
   const t = useTranslate()
+  // marcar como defeito vale mesmo com o desenho só leitura: é a resposta, não a edição
+  const botaoMarcar = marcar ? (
+    <Button
+      variant={marcar.marcada ? "secondary" : "ghost"}
+      size="sm"
+      aria-pressed={marcar.marcada}
+      onClick={marcar.onToggle}
+      disabled={!marcar.marcada && marcar.cheio}
+      title={!marcar.marcada && marcar.cheio ? t("architecture_board.pick.full_hint") : undefined}
+      className={cn(marcar.marcada && "text-destructive")}
+    >
+      <Flag aria-hidden weight={marcar.marcada ? "fill" : "regular"} />
+      {t(marcar.marcada ? "architecture_board.pick.unmark" : "architecture_board.pick.mark")}
+    </Button>
+  ) : null
+  if (readOnly && peca && botaoMarcar) return <span className="flex min-w-0 flex-wrap items-center gap-1">{botaoMarcar}</span>
   if (!readOnly && nota)
     return (
       <span className="flex min-w-0 flex-wrap items-center gap-1">
@@ -2061,7 +2188,11 @@ function Acoes({
       </span>
     )
   if (readOnly || (!peca && !grupo && !ligacao))
-    return <span className="truncate text-[12px] text-muted-foreground">{t("architecture_board.hint")}</span>
+    return (
+      <span className="truncate text-[12px] text-muted-foreground">
+        {t(dicaDoDefeito ? "architecture_board.pick.bar_hint" : "architecture_board.hint")}
+      </span>
+    )
 
   const comuns = (id: string) => (
     <>
@@ -2095,6 +2226,7 @@ function Acoes({
 
   return (
     <span className="flex min-w-0 flex-wrap items-center gap-1">
+      {botaoMarcar}
       {servicos.length ? <Servico peca={peca!} servicos={servicos} onServico={onServico} /> : null}
       <LigarA peca={peca!} graph={graph} tituloDe={tituloDe} onLigar={onLigar} />
       {graph.groups.length ? (

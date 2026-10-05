@@ -1399,6 +1399,9 @@ def _montar(tela, tema, sufixo):
         if tela['id'] == 'desenho_livre':
             return web(PLAYGROUND_TEXTOS, pg.tela_desenho_livre(k))
         return web(PLAYGROUND_TEXTOS, pg.tela_playground(k, limite=tela['id'] == 'playground_limite'))
+    if tela['id'] == 'arquitetura_defeito':
+        from arquitetura import tela_exercicio_defeito
+        return web(ARQUITETURA, tela_exercicio_defeito(k))
     if tela['id'] == 'arquitetura_nuvem':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, nuvem=True))
     if tela['id'] == 'desb_trilhas':

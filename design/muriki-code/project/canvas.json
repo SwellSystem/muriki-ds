@@ -1345,6 +1345,22 @@
    "h": 900,
    "title": "Desenho livre · a bancada sem regras e sem Verificar, com notas, título e salvo · escuro",
    "is_interactive": true
+  },
+  "ExercicioArquiteturaDefeito.dc.html": {
+   "x": 34960,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Achar o defeito · marcar a peça que derruba o sistema, os números no Responda e a bancada só leitura",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaDefeitoEscuro.dc.html": {
+   "x": 34960,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Achar o defeito · marcar a peça que derruba o sistema, os números no Responda e a bancada só leitura · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1367,7 +1383,7 @@
   "web": {
    "kind": "title1",
    "maxW": 8000,
-   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico, na nuvem com grupos e Simular), o Playground com tipos e o desenho livre, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)",
+   "text": "Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico, na nuvem com grupos e Simular), o Playground com tipos e o desenho livre, o achar o defeito, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)",
    "w": 240,
    "x": 0,
    "y": 2340
@@ -1653,7 +1669,9 @@
   "PlaygroundLimite.dc.html",
   "PlaygroundLimiteEscuro.dc.html",
   "DesenhoLivre.dc.html",
-  "DesenhoLivreEscuro.dc.html"
+  "DesenhoLivreEscuro.dc.html",
+  "ExercicioArquiteturaDefeito.dc.html",
+  "ExercicioArquiteturaDefeitoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"
