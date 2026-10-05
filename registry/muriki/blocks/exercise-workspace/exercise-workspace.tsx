@@ -943,7 +943,6 @@ export function ExerciseEditor({
   className,
 }: ExerciseEditorProps) {
   const t = useTranslate()
-  const expandir = React.useContext(ExpandirContexto)
   // o Console abre sozinho quando chega saída; a escolha da pessoa vale até a próxima rodada
   const [escolha, setEscolha] = React.useState<{ para: ExerciseOutput | null | undefined; aberto: boolean } | null>(null)
   const consoleAberto = escolha && escolha.para === output ? escolha.aberto : !!output?.logs.length
@@ -1054,27 +1053,7 @@ export function ExerciseEditor({
             })}
           </div>
           <span className="ml-auto flex shrink-0 items-center gap-2 py-1.5">
-            {expandir ? (
-              <Tooltip>
-                <TooltipTrigger
-                  render={
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-pressed={expandir.expandido}
-                      aria-label={t(expandir.expandido ? "exercise_workspace.editor.collapse" : "exercise_workspace.editor.expand")}
-                      onClick={() => expandir.mudar(!expandir.expandido)}
-                      className="max-lg:hidden"
-                    />
-                  }
-                >
-                  <SidebarSimpleIcon aria-hidden weight={expandir.expandido ? "fill" : "regular"} />
-                </TooltipTrigger>
-                <TooltipContent>
-                  {t(expandir.expandido ? "exercise_workspace.editor.collapse" : "exercise_workspace.editor.expand")}
-                </TooltipContent>
-              </Tooltip>
-            ) : null}
+            <ExerciseExpandButton />
             {runDisabledReason ? (
               <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
                 {runDisabledReason}
@@ -1122,6 +1101,39 @@ export function ExerciseEditor({
       </div>
     </section>
     </ConsoleContexto.Provider>
+  )
+}
+
+// ── Expandir ────────────────────────────────────────────────────────────
+
+/**
+ * O botão que recolhe a coluna da esquerda do ExerciseWorkspace e devolve: o ExerciseEditor já traz,
+ * e qualquer outro editor no slot `editor` (o ArchitectureBoard) põe na barra dele. Fora de um
+ * ExerciseWorkspace, e abaixo de lg, não aparece.
+ */
+export function ExerciseExpandButton({ className }: { className?: string }) {
+  const t = useTranslate()
+  const expandir = React.useContext(ExpandirContexto)
+  if (!expandir) return null
+  const rotulo = t(expandir.expandido ? "exercise_workspace.editor.collapse" : "exercise_workspace.editor.expand")
+  return (
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-pressed={expandir.expandido}
+            aria-label={rotulo}
+            onClick={() => expandir.mudar(!expandir.expandido)}
+            className={cn("max-lg:hidden", className)}
+          />
+        }
+      >
+        <SidebarSimpleIcon aria-hidden weight={expandir.expandido ? "fill" : "regular"} />
+      </TooltipTrigger>
+      <TooltipContent>{rotulo}</TooltipContent>
+    </Tooltip>
   )
 }
 

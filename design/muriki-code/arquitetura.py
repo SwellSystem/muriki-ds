@@ -48,6 +48,7 @@ IP = dict(
     mover=svg('<path d="M8 1.8v12.4M1.8 8h12.4"/><path d="M6.2 3.6L8 1.8l1.8 1.8M6.2 12.4L8 14.2l1.8-1.8M3.6 6.2L1.8 8l1.8 1.8M12.4 6.2L14.2 8l-1.8 1.8"/>'),
     caret=svg('<path d="M4.5 6.5L8 10l3.5-3.5"/>'),
     pulso=svg('<path d="M1.6 8h3l1.8-4.4 3.2 8.8L11.4 8h3"/>'),
+    painel=svg('<rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/><path d="M6 2.8v10.4"/>'),
     levantar=svg('<path d="M3.2 6.2A5 5 0 1 1 3 9.6"/><path d="M3.2 2.8v3.4h3.4"/>'),
 )
 
@@ -212,16 +213,18 @@ def _diagrama_nuvem(k):
 
 
 def _provedor(k, atual):
-    # o seletor segmentado no topo do rail; "Genérico" ganha mais espaço que as siglas
+    # o ViewToggle do DS no topo do rail: trilho afundado e a pílula (no bloco, ela desliza);
+    # "Genérico" ganha mais espaço que as siglas
     opcao = lambda chave, marcada: (
-        f'<span style="display:flex;align-items:center;justify-content:center;height:28px;border-radius:7px;font-size:11.5px;'
-        + (f'background:{k["card"]};color:{k["fgs"]};font-weight:500;box-shadow:0 0 0 1px {k["input"]}, 0 1px 2px rgba(0,0,0,0.06);'
+        f'<span style="display:flex;align-items:center;justify-content:center;height:30px;border-radius:999px;font-size:12px;font-weight:500;'
+        + (f'background:{k["card"]};color:{k["pri"]};box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px {k["input"]};'
            if marcada else f'color:{k["mfg"]};')
         + f'">{T(chave)}</span>')
     dica = T('provedorDica') if atual != 'generico' else T('provedorDicaGenerico')
     return (f'<div style="display:flex;align-items:center;height:38px;padding:0 6px 0 14px;">{_titulo_secao(T("provedor"), k, forte=False)}</div>'
             f'<div style="display:flex;flex-direction:column;gap:6px;padding:0 12px 12px;">'
-            f'<div role="radiogroup" aria-label="{T("provedor")}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2px;padding:2px;border-radius:9px;background:{k["sunken"]};">'
+            f'<div role="tablist" aria-label="{T("provedor")}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:2px;border-radius:999px;background:{k["sunken"]};'
+            f'box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">'
             + ''.join(opcao(c, c == atual) for c in ('generico', 'aws', 'gcp', 'azure'))
             + f'</div><span style="padding:0 4px;font-size:11.5px;line-height:16px;color:{k["mfg"]};">{dica}</span></div>')
 
@@ -308,10 +311,14 @@ def tela_exercicio_arquitetura(k, nuvem=False, simular=False):
     lateral = (f'<div style="width:248px;flex:0 0 248px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:{k["rail"]};'
                f'border-right:1px solid {k["muted"]};">{provedor}{pecas}{grupos}{regras}</div>')
 
+    # os tipos de ligação no ViewToggle do DS, como o provedor
     rel = lambda chave, at=False: (
-        f'<span style="display:inline-flex;align-items:center;height:28px;padding:0 8px;border-radius:7px;font-size:12px;'
-        + (f'background:{k["prisub"]};color:{k["prisubfg"]};font-weight:500;' if at else f'color:{k["mfg"]};')
+        f'<span style="display:inline-flex;align-items:center;height:30px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:500;'
+        + (f'background:{k["card"]};color:{k["pri"]};box-shadow:0 1px 2px rgba(0,0,0,0.14), 0 2px 6px rgba(0,0,0,0.07), inset 0 0 0 1px {k["input"]};'
+           if at else f'color:{k["mfg"]};')
         + f'">{T(chave)}</span>')
+    trilho = lambda conteudo: (f'<span role="tablist" style="display:inline-flex;align-items:center;padding:2px;border-radius:999px;background:{k["sunken"]};'
+                               f'box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">{conteudo}</span>')
     acao = lambda icone, texto: (f'<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px;border-radius:7px;'
                                  f'font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip(icone, 14)}{texto}</span>')
     if simular:
@@ -324,31 +331,37 @@ def tela_exercicio_arquitetura(k, nuvem=False, simular=False):
                    f'{acao("ligar", T("ligarA"))}{acao("mover", T("moverPara"))}'
                    f'{botao(T("renomear"), k, "ghost", 28, "lapis")}{botao(T("apagar"), k, "ghost", 28, "lixeira")}')
     else:
-        selecao = (f'{rel("chama")}{rel("le")}{rel("escreve", True)}{rel("publica")}{rel("consome")}'
-                   f'<span style="width:1px;height:16px;margin:0 4px;background:{k["input"]};"></span>'
+        selecao = (trilho(f'{rel("chama")}{rel("le")}{rel("escreve", True)}{rel("publica")}{rel("consome")}')
+                   + f'<span style="width:1px;height:16px;margin:0 4px;background:{k["input"]};"></span>'
                    f'{botao(T("renomear"), k, "ghost", 28, "lapis")}{botao(T("apagar"), k, "ghost", 28, "lixeira")}')
-    barra = (f'<div style="position:relative;display:flex;align-items:center;gap:4px;min-height:41px;padding:6px 8px 6px 12px;border-bottom:1px solid {k["muted"]};box-sizing:border-box;">'
-             f'{selecao}'
-             f'<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'
-             + (f'<span aria-pressed="true" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;'
-                f'background:{k["muted"]};font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip("pulso", 14)}{T("sairSim")}</span>' if simular
-                # estreita, a barra mostra só o ícone; o nome fica no aria-label
-                else f'<span role="img" aria-label="{T("simular")}" title="{T("simular")}" style="display:inline-flex;align-items:center;justify-content:center;'
-                     f'width:30px;height:30px;border-radius:8px;color:{k["fgs"]};">{_ip("pulso", 14)}</span>')
+    # dois lados que não disputam espaço: à esquerda a seleção, que quebra a linha por dentro; à
+    # direita Expandir, Simular (sempre com o nome) e Verificar, na primeira linha
+    expandir = (f'<span role="img" aria-label="{T("expandir")}" title="{T("expandir")}" style="display:inline-flex;align-items:center;justify-content:center;'
+                f'width:28px;height:28px;border-radius:7px;color:{k["mfg"]};">{_ip("painel", 14)}</span>')
+    barra = (f'<div style="position:relative;display:flex;align-items:flex-start;gap:8px;min-height:41px;padding:6px 8px 6px 12px;border-bottom:1px solid {k["muted"]};box-sizing:border-box;">'
+             f'<div style="flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px;">{selecao}</div>'
+             f'<span style="flex:0 0 auto;display:flex;align-items:center;gap:6px;">{expandir}'
+             + f'<span aria-pressed="{"true" if simular else "false"}" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;'
+             + (f'background:{k["muted"]};' if simular else '')
+             + f'font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip("pulso", 14)}{T("sairSim") if simular else T("simular")}</span>'
              + f'{botao(T("verificar"), k, "primary", 30, "check")}</span>'
              + (_popover_servico(k) if nuvem else '') + '</div>')
+    # na simulação o palco ganha o tom da marca e uma moldura: não é o desenho em edição
+    fundo_palco = (f'background-color:color-mix(in oklab, {k["prisub"]} 50%, {k["card"]});box-shadow:inset 0 0 0 2px color-mix(in oklab, {k["pri"]} 40%, transparent);'
+                   if simular else f'background-color:{k["card"]};')
     canvas_ = (f'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;'
-               f'background-color:{k["card"]};background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);'
+               f'{fundo_palco}background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);'
                f'background-size:18px 18px;">{_diagrama_nuvem(k) if nuvem else _diagrama(k, simular)}</div>')
-    resumo = (f'<div role="status" style="display:flex;align-items:center;gap:8px;min-height:34px;padding:6px 16px;box-sizing:border-box;'
-              f'border-top:1px solid {k["muted"]};background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;line-height:18px;">'
-              f'{_ip("pulso", 14)}<span>{T("simResumo")}</span></div>') if simular else ''
+    # a faixa no topo do palco diz o que é o modo antes do resultado
+    resumo = (f'<div role="status" style="display:flex;align-items:flex-start;gap:8px;min-height:34px;padding:7px 16px;box-sizing:border-box;'
+              f'border-bottom:1px solid color-mix(in oklab, {k["pri"]} 22%, transparent);background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;line-height:18px;">'
+              f'<span style="margin-top:2px;display:flex;">{_ip("pulso", 14)}</span><span>{T("simResumo")}</span></div>') if simular else ''
     status = (f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
               f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;">'
               f'<span>{T("statusNuvem") if nuvem else T("status")}</span><span>{T("atalho")}</span></div>')
     bancada = (f'<section aria-label="{T("bancada")}" style="flex:1;min-width:0;display:flex;background:{k["card"]};'
                f'border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">{lateral}'
-               f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{canvas_}{resumo}{status}</div></section>')
+               f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{resumo}{canvas_}{status}</div></section>')
 
     return app(k, 'exercicios', cab + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{esquerda}{bancada}</div>',
                compacto=True, pad='24px 28px', gap=18)
