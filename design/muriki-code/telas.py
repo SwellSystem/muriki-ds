@@ -1432,11 +1432,13 @@ def _montar(tela, tema, sufixo):
         return web(ARQUITETURA, tela_exercicio_arquitetura(k))
     if tela['id'] == 'arquitetura_simular':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, simular=True))
-    if tela['id'] in ('playground_desenhos', 'playground_limite', 'desenho_livre'):
+    if tela['id'] in ('playground_desenhos', 'playground_limite', 'desenho_livre', 'desenho_revisao'):
         from textos_playground import TEXTOS as PLAYGROUND_TEXTOS
         import playground as pg
         if tela['id'] == 'desenho_livre':
             return web(PLAYGROUND_TEXTOS, pg.tela_desenho_livre(k))
+        if tela['id'] == 'desenho_revisao':
+            return web(PLAYGROUND_TEXTOS, pg.tela_desenho_revisao(k))
         return web(PLAYGROUND_TEXTOS, pg.tela_playground(k, limite=tela['id'] == 'playground_limite'), css=pg.CSS_PLAYGROUND)
     if tela['id'] == 'arquitetura_defeito':
         from arquitetura import tela_exercicio_defeito
