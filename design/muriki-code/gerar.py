@@ -41,6 +41,7 @@ TELAS = [
     ('playground_desenhos', 'PlaygroundDesenhos', 'Playground', 'Playground · os tipos e Seus desenhos, no Starter (2 de 3)', 20, 2, 3),
     ('playground_limite', 'PlaygroundLimite', 'Playground', 'Playground · o limite do Starter (3 de 3): o Novo trava e o Pro aparece', 21, 2, 3),
     ('desenho_livre', 'DesenhoLivre', 'Farmácia fora do ar', 'Desenho livre · a bancada sem regras e sem Verificar, com notas, título e salvo', 22, 2, 3),
+    ('arquitetura_defeito', 'ExercicioArquiteturaDefeito', 'Exercício de arquitetura', 'Achar o defeito · marcar a peça que derruba o sistema, os números no Responda e a bancada só leitura', 23, 2, 3),
     ('arquitetura_nuvem', 'ExercicioArquiteturaNuvem', 'Exercício de arquitetura', 'Exercício de arquitetura na nuvem · AWS: região, VPC e sub-redes, os ícones oficiais e o serviço da peça', 17, 2, 3),
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
@@ -144,7 +145,7 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
-    ('web', 2, 23, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico, na nuvem com grupos e Simular), o Playground com tipos e o desenho livre, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)'),
+    ('web', 2, 24, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico, na nuvem com grupos e Simular), o Playground com tipos e o desenho livre, o achar o defeito, a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)'),
     ('webEscuro', 3, 8, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),

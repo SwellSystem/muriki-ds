@@ -4,6 +4,12 @@
 TEXTOS = {
     'pt-BR': dict(
         simular='Simular', sairSim='Sair da simulação', levantarApi='Levantar API de links', levantarTudo='Levantar tudo',
+        chipDefeito='Achar o defeito', defTitulo='A venda relâmpago',
+        defEnunciado='Na abertura da venda, o checkout caiu em 40 segundos. Ache a peça que derrubou o sistema e responda às duas perguntas.',
+        responda='Responda', respondaConta='1 de 2', q1='Quantas requisições por segundo o banco aguentava?', q2='Em quantos segundos a fila encheu?',
+        numero='número', respondaNota='Vai junto com o envio, com as peças marcadas.',
+        defeitoTit='Defeito', defeitoConta='1 de 2 marcadas', defeitoDica='Selecione a peça que causa o defeito e marque como defeito.',
+        desmarcar='Desmarcar', defeitoSelo='defeito', defBarDica='O desenho aqui não muda.',
         simTit='Simulação', simNaoSalvo='Nada aqui é salvo.', simCaidas='1 peça fora do ar',
         simSemCaminho='Redis e Postgres ficaram sem caminho a partir de Navegador.',
         expandir='Expandir o editor',
@@ -40,6 +46,12 @@ TEXTOS = {
     ),
     'en-US': dict(
         simular='Simulate', sairSim='Leave simulation', levantarApi='Restore Links API', levantarTudo='Restore all',
+        chipDefeito='Spot the defect', defTitulo='The flash sale',
+        defEnunciado='When the sale opened, checkout went down in 40 seconds. Find the piece that brought the system down and answer both questions.',
+        responda='Answer', respondaConta='1 of 2', q1='How many requests per second could the database take?', q2='In how many seconds did the queue fill up?',
+        numero='number', respondaNota='Sent with your submission, with the marked pieces.',
+        defeitoTit='Defect', defeitoConta='1 of 2 marked', defeitoDica='Select the piece that causes the defect and mark it as the defect.',
+        desmarcar='Unmark', defeitoSelo='defect', defBarDica='The drawing does not change here.',
         simTit='Simulation', simNaoSalvo='Nothing here is saved.', simCaidas='1 piece down',
         simSemCaminho='Redis and Postgres have no path from Browser.',
         expandir='Expand the editor',
@@ -76,6 +88,12 @@ TEXTOS = {
     ),
     'es-ES': dict(
         simular='Simular', sairSim='Salir de la simulación', levantarApi='Levantar API de enlaces', levantarTudo='Levantar todo',
+        chipDefeito='Encontrar el defecto', defTitulo='La venta relámpago',
+        defEnunciado='Al abrir la venta, el checkout cayó en 40 segundos. Encuentra la pieza que tumbó el sistema y responde las dos preguntas.',
+        responda='Responde', respondaConta='1 de 2', q1='¿Cuántas solicitudes por segundo aguantaba la base de datos?', q2='¿En cuántos segundos se llenó la cola?',
+        numero='número', respondaNota='Va junto con el envío, con las piezas marcadas.',
+        defeitoTit='Defecto', defeitoConta='1 de 2 marcadas', defeitoDica='Selecciona la pieza que causa el defecto y márcala como defecto.',
+        desmarcar='Desmarcar', defeitoSelo='defecto', defBarDica='El diseño aquí no cambia.',
         simTit='Simulación', simNaoSalvo='Nada aquí se guarda.', simCaidas='1 pieza caída',
         simSemCaminho='Redis y Postgres quedaron sin camino desde Navegador.',
         expandir='Expandir el editor',

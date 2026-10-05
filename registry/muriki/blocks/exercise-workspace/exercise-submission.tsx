@@ -40,6 +40,11 @@ export interface ExerciseSubmissionResult {
   items?: { name: string; status: "pass" | "fail" }[]
   /** No exercício de arquitetura (unit "rules"): as regras, só com o título e o status. */
   rules?: { title: string; status: "pass" | "fail"; visibility: "visible" | "hidden" }[]
+  /**
+   * As partes da resposta (`parts` do envio), além das regras: as peças marcadas e cada número, com
+   * a pergunta. Só o status: nunca a resposta certa.
+   */
+  parts?: Array<{ kind: "pick"; status: "pass" | "fail" } | { kind: "number"; prompt: React.ReactNode; status: "pass" | "fail" }>
   /** A nota da explicação: 0, 1 ou 2; null quando não houve explicação. */
   understanding: 0 | 1 | 2 | null
   /** Um parágrafo de texto, nunca o gabarito. */
@@ -157,6 +162,8 @@ export function ExerciseSubmission({
                 </ul>
               ) : null}
 
+              {!result.passed && result.parts?.length ? <ListaDePartes partes={result.parts} /> : null}
+
               {unit === "rules" && !result.passed && result.rules?.length ? (
                 <ListaDeRegras regras={result.rules} />
               ) : null}
@@ -214,6 +221,38 @@ export function ExerciseSubmission({
         ) : null}
       </ModalContent>
     </Modal>
+  )
+}
+
+/** "Sua resposta": cada parte com o status, sem dizer qual era a certa. */
+function ListaDePartes({ partes }: { partes: NonNullable<ExerciseSubmissionResult["parts"]> }) {
+  const t = useTranslate()
+  return (
+    <section className="flex flex-col gap-2">
+      <Rotulo>{t("exercise_workspace.submission.parts")}</Rotulo>
+      <ul className="m-0 flex list-none flex-col gap-1.5 p-0">
+        {partes.map((parte, i) => (
+          <li key={i} className="flex items-start gap-2 text-[13px] leading-[18px]">
+            {parte.status === "pass" ? (
+              <CheckIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-success" />
+            ) : (
+              <XIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+            )}
+            <span className={parte.status === "fail" ? "text-foreground-strong" : "text-foreground"}>
+              <span className="sr-only">
+                {parte.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
+              </span>
+              {parte.kind === "pick" ? t("exercise_workspace.submission.part_pick") : parte.prompt}
+              <span className="text-muted-foreground">
+                {" · "}
+                {t(parte.status === "pass" ? "exercise_workspace.submission.part_right" : "exercise_workspace.submission.part_wrong")}
+              </span>
+            </span>
+          </li>
+        ))}
+      </ul>
+      <span className="text-xs text-muted-foreground">{t("exercise_workspace.submission.parts_note")}</span>
+    </section>
   )
 }
 

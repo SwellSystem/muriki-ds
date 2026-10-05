@@ -49,6 +49,7 @@ IP = dict(
     caret=svg('<path d="M4.5 6.5L8 10l3.5-3.5"/>'),
     pulso=svg('<path d="M1.6 8h3l1.8-4.4 3.2 8.8L11.4 8h3"/>'),
     painel=svg('<rect x="1.8" y="2.8" width="12.4" height="10.4" rx="1.6"/><path d="M6 2.8v10.4"/>'),
+    bandeira=svg('<path d="M3.5 14.2V2.2"/><path d="M3.5 2.6h8.2l-1.8 3 1.8 3H3.5" fill="currentColor"/>'),
     levantar=svg('<path d="M3.2 6.2A5 5 0 1 1 3 9.6"/><path d="M3.2 2.8v3.4h3.4"/>'),
 )
 
@@ -363,5 +364,88 @@ def tela_exercicio_arquitetura(k, nuvem=False, simular=False):
                f'border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">{lateral}'
                f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{resumo}{canvas_}{status}</div></section>')
 
+    return app(k, 'exercicios', cab + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{esquerda}{bancada}</div>',
+               compacto=True, pad='24px 28px', gap=18)
+
+
+# ── achar o defeito (task: spot) ──
+# O mesmo esqueleto do exercício, com o selo da tarefa, o cartão "Responda" (as perguntas numéricas)
+# entre o enunciado e a explicação, e a bancada só leitura (answerSpec.graph = false): sem Verificar,
+# com o marcar como defeito. A peça marcada tem a moldura vermelha tracejada e o selo; o rail lista
+# as marcadas com o contador.
+def _peca_marcada(k, x, y, icone, tipo, nome, selecionada=False):
+    peca = _peca(k, x, y, icone, tipo, nome)
+    if selecionada:
+        peca = peca.replace(f'box-shadow:0 0 0 1px {k["input"]}', f'box-shadow:0 0 0 2px {k["pri"]}', 1)
+    moldura = (f'<div style="position:absolute;left:{x - 4}px;top:{y - 4}px;width:176px;height:60px;box-sizing:border-box;border-radius:13px;'
+               f'border:2px dashed {k["bad"]};pointer-events:none;"></div>')
+    selo = (f'<span style="position:absolute;left:{x + 8}px;top:{y - 11}px;display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;'
+            f'border-radius:999px;background:{k["bad"]};color:#fff;font-size:10.5px;font-weight:600;box-shadow:0 0 0 2px {k["card"]};">'
+            f'{_ip("bandeira", 11)}{T("defeitoSelo")}</span>')
+    return peca + moldura + selo
+
+
+def _diagrama_defeito(k):
+    traco = 'color-mix(in oklab, var(--mfg) 70%, transparent)'
+    linhas = (
+        f'<svg viewBox="0 0 640 400" width="640" height="400" style="position:absolute;inset:0;overflow:visible;" aria-hidden="true">'
+        f'<defs><marker id="seta-def" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">'
+        f'<path d="M0 0L10 5L0 10z" fill="var(--mfg)"/></marker></defs>'
+        f'<path d="M188 200H232" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-def)"/>'
+        f'<path d="M400 200H418Q426 200 426 192V94Q426 86 434 86H444" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-def)"/>'
+        f'<path d="M400 200H418Q426 200 426 208V306Q426 314 434 314H444" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-def)"/>'
+        f'</svg>')
+    pecas = (_peca(k, 20, 174, 'cliente', T('pCliente'), T('nNavegador'))
+             + _peca(k, 232, 174, 'api', T('pApi'), 'Checkout')
+             + _peca(k, 444, 60, 'cache', T('pCache'), T('nRedis'))
+             + _peca_marcada(k, 444, 288, 'banco', T('pBanco'), T('nPostgres'), selecionada=True))
+    chips = (_chip(k, 210, 200, T('chama')) + _chip(k, 426, 140, T('le')) + _chip(k, 426, 262, T('escreve')))
+    return f'<div style="position:relative;width:640px;height:400px;">{linhas}{pecas}{chips}</div>'
+
+
+def tela_exercicio_defeito(k):
+    chips = (badge(T('chipDefeito'), k, 'red', ponto=True) + badge(T('chipSD'), k, 'blue') + badge(T('nivel'), k, 'gray'))
+    trilha = topo_detalhe(k, [(T('trilhaArq'), '#'), (T('defTitulo'), '')])
+    cab = (f'<header style="display:flex;align-items:flex-end;gap:24px;">'
+           f'<div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;">{trilha}'
+           f'<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;color:{k["fgs"]};letter-spacing:-0.01em;">{T("defTitulo")}</h1>'
+           f'<div style="display:flex;gap:6px;flex-wrap:wrap;">{chips}</div></div>'
+           f'<div style="display:flex;align-items:center;gap:8px;">{botao(T("continuarIde"), k, "ghost", 36, "laptop")}{botao(T("enviar"), k, "solid", 36, "enviar")}</div></header>')
+    enunciado = _cartao_secao(k, T('enunciado'), (
+        f'<div style="padding:0 16px 16px;font-size:14px;line-height:22px;color:{k["fg"]};"><p style="margin:0;">{T("defEnunciado")}</p></div>'), extra='flex:1;min-height:0;')
+    campo = lambda valor='': (f'<span style="display:flex;align-items:center;width:200px;height:36px;padding:0 10px;box-sizing:border-box;border-radius:8px;'
+                              f'background:{k["field"] if "field" in k else k["card"]};box-shadow:inset 0 0 0 1px {k["input"]};font-family:{MONO};font-size:13px;'
+                              f'color:{k["fgs"] if valor else k["mfg"]};">{valor or T("numero")}</span>')
+    pergunta = lambda chave, valor='': (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+                                       f'<span style="font-size:13.5px;line-height:20px;font-weight:500;color:{k["fgs"]};">{T(chave)}</span>{campo(valor)}</div>')
+    responda = _cartao_secao(k, T('responda'), (
+        f'<div style="display:flex;flex-direction:column;gap:14px;padding:0 16px 16px;">{pergunta("q1", "1200")}{pergunta("q2")}'
+        f'<span style="font-size:12px;color:{k["mfg"]};">{T("respondaNota")}</span></div>'),
+        direita=f'<span style="font-family:{MONO};font-size:11px;color:{k["mfg"]};">{T("respondaConta")}</span>')
+    esquerda = f'<div style="width:372px;flex:0 0 372px;display:flex;flex-direction:column;gap:12px;min-height:0;">{enunciado}{responda}</div>'
+
+    item = lambda icone, nome: (f'<li style="display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:6px;font-size:12.5px;color:{k["fg"]};opacity:0.5;">'
+                                f'{_ip(icone, 15, k["mfg"])}{nome}</li>')
+    pecas = (f'<div style="border-top:1px solid {k["muted"]};"><div style="display:flex;align-items:center;height:38px;padding:0 6px 0 14px;">{_titulo_secao(T("pecas"), k, forte=False)}</div>'
+             f'<ul style="margin:0;padding:0 6px 8px;list-style:none;">{item("cliente", T("pCliente"))}{item("api", T("pApi"))}{item("banco", T("pBanco"))}{item("cache", T("pCache"))}</ul></div>')
+    defeito = (f'<div style="border-top:1px solid {k["muted"]};"><div style="display:flex;align-items:center;height:38px;padding:0 12px 0 14px;">{_titulo_secao(T("defeitoTit"), k, forte=False)}'
+               f'<span style="margin-left:auto;font-family:{MONO};font-size:11px;color:{k["bad"]};">{T("defeitoConta")}</span></div>'
+               f'<ul style="margin:0;padding:0 6px 4px;list-style:none;"><li style="display:flex;align-items:center;gap:8px;height:32px;padding:0 6px 0 8px;font-size:12.5px;color:{k["fgs"]};">'
+               f'<span style="display:flex;color:{k["bad"]};">{_ip("bandeira", 13)}</span><span style="flex:1;">{T("pBanco")} · {T("nPostgres")}</span>{ic("x", 12, k["mfg"])}</li></ul>'
+               f'<span style="display:block;padding:0 16px 10px;font-size:11.5px;line-height:16px;color:{k["mfg"]};">{T("defeitoDica")}</span></div>')
+    lateral = (f'<div style="width:248px;flex:0 0 248px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:{k["rail"]};'
+               f'border-right:1px solid {k["muted"]};"><div style="opacity:0.5;">{_provedor(k, "generico")}</div>{pecas}{defeito}</div>')
+    barra = (f'<div style="display:flex;align-items:center;gap:8px;min-height:41px;padding:6px 8px 6px 12px;border-bottom:1px solid {k["muted"]};box-sizing:border-box;">'
+             f'<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px;border-radius:7px;background:{k["muted"]};font-size:13px;font-weight:500;color:{k["bad"]};">'
+             f'{_ip("bandeira", 14)}{T("desmarcar")}</span>'
+             f'<span style="flex:1;min-width:0;font-size:12px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{T("defBarDica")}</span>'
+             f'<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;color:{k["mfg"]};">{_ip("painel", 14)}</span>'
+             f'<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip("pulso", 14)}{T("simular")}</span></div>')
+    canvas_ = (f'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:{k["card"]};'
+               f'background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);background-size:18px 18px;">{_diagrama_defeito(k)}</div>')
+    status = (f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
+              f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;"><span>{T("status")}</span></div>')
+    bancada = (f'<section aria-label="{T("bancada")}" style="flex:1;min-width:0;display:flex;background:{k["card"]};border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">'
+               f'{lateral}<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{canvas_}{status}</div></section>')
     return app(k, 'exercicios', cab + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{esquerda}{bancada}</div>',
                compacto=True, pad='24px 28px', gap=18)

@@ -57,6 +57,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslate } from "@/lib/i18n"
@@ -613,6 +614,99 @@ export function ExerciseExplanation({
       />
       <span className="text-xs text-muted-foreground">{note ?? t("exercise_workspace.explain_note")}</span>
       {balaoDoGuia}
+    </ExerciseSection>
+  )
+}
+
+// ── Responda (as perguntas numéricas) ─────────────────────────────────────
+
+/** Uma pergunta numérica de `answerSpec.numbers`, com o texto já traduzido e o que a pessoa digitou. */
+export interface ExerciseAnswerNumber {
+  id: string
+  prompt: React.ReactNode
+  /** Como está no campo; `parseAnswerNumber` converte (vírgula ou ponto). */
+  value: string
+}
+
+/** "1,5", "1.5" e "-2" viram número; vazio ou outra coisa, `null`. */
+export function parseAnswerNumber(value: string): number | null {
+  const limpo = value.trim().replace(/\s/g, "").replace(",", ".")
+  if (!/^-?\d+(\.\d+)?$/.test(limpo)) return null
+  return Number(limpo)
+}
+
+export interface ExerciseAnswerNumbersProps extends ExerciseCollapsibleProps {
+  questions: ExerciseAnswerNumber[]
+  onChange: (id: string, value: string) => void
+  /** A nota embaixo. Sem isto, "Vai junto com o envio". */
+  note?: React.ReactNode
+  readOnly?: boolean
+  className?: string
+}
+
+/**
+ * O cartão "Responda", na coluna da esquerda entre o enunciado e a explicação: cada pergunta com o
+ * campo dela. Aceita vírgula ou ponto; o que não é número fica marcado, sem bloquear a digitação.
+ */
+export function ExerciseAnswerNumbers({
+  questions,
+  onChange,
+  note,
+  readOnly,
+  open,
+  defaultOpen = true,
+  onOpenChange,
+  className,
+}: ExerciseAnswerNumbersProps) {
+  const t = useTranslate()
+  const base = React.useId()
+  const [aberta, mudar] = useAberta(open, defaultOpen, onOpenChange)
+  const faltam = questions.filter((q) => parseAnswerNumber(q.value) === null).length
+  return (
+    <ExerciseSection
+      data-slot="exercise-answer-numbers"
+      title={t("exercise_workspace.answer.title")}
+      end={
+        <span className="pr-1 font-mono text-[11px] text-muted-foreground">
+          {t("exercise_workspace.answer.count", { count: questions.length - faltam, total: questions.length })}
+        </span>
+      }
+      divider={false}
+      titleClassName={TITULO_DO_CARTAO}
+      open={aberta}
+      onOpenChange={mudar}
+      className={cn(CARTAO, className)}
+      bodyClassName="flex flex-col gap-3.5 px-4 pb-4"
+    >
+      {questions.map((q) => {
+        const id = `${base}-${q.id}`
+        const invalido = q.value.trim() !== "" && parseAnswerNumber(q.value) === null
+        return (
+          <div key={q.id} className="flex flex-col gap-1.5">
+            <label htmlFor={id} className="text-[13.5px] leading-5 font-medium text-foreground-strong">
+              {q.prompt}
+            </label>
+            <Input
+              id={id}
+              inputMode="decimal"
+              autoComplete="off"
+              value={q.value}
+              readOnly={readOnly}
+              aria-invalid={invalido || undefined}
+              aria-describedby={invalido ? `${id}-erro` : undefined}
+              onChange={(e) => onChange(q.id, e.target.value)}
+              placeholder={t("exercise_workspace.answer.placeholder")}
+              className="max-w-[200px] font-mono tabular-nums"
+            />
+            {invalido ? (
+              <span id={`${id}-erro`} className="text-xs text-destructive">
+                {t("exercise_workspace.answer.invalid")}
+              </span>
+            ) : null}
+          </div>
+        )
+      })}
+      <span className="text-xs text-muted-foreground">{note ?? t("exercise_workspace.answer.note")}</span>
     </ExerciseSection>
   )
 }
