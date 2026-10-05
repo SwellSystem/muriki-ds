@@ -2002,6 +2002,7 @@
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/cloud-service-icon",
         "SwellSystem/muriki-ds/popover",
+        "SwellSystem/muriki-ds/view-toggle",
         "SwellSystem/muriki-ds/exercise-workspace"
       ],
       "files": [

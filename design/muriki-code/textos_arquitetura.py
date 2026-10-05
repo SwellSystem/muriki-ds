@@ -4,7 +4,8 @@
 TEXTOS = {
     'pt-BR': dict(
         simular='Simular', sairSim='Sair da simulação', levantarApi='Levantar API de links', levantarTudo='Levantar tudo',
-        simResumo='<b>1 peça fora do ar</b> · Redis e Postgres ficaram sem caminho a partir de Navegador.',
+        simResumo='<b>Simulação</b> · Nada aqui é salvo. <b>1 peça fora do ar</b> · Redis e Postgres ficaram sem caminho a partir de Navegador.',
+        expandir='Expandir o editor',
         provedor='Provedor', generico='Genérico', aws='AWS', gcp='GCP', azure='Azure',
         provedorDica='Cada peça ganha o primeiro serviço do tipo. Troque na peça selecionada.',
         provedorDicaGenerico='As peças ficam genéricas. Escolha um provedor para ver os serviços.',
@@ -38,7 +39,8 @@ TEXTOS = {
     ),
     'en-US': dict(
         simular='Simulate', sairSim='Leave simulation', levantarApi='Restore Links API', levantarTudo='Restore all',
-        simResumo='<b>1 piece down</b> · Redis and Postgres have no path from Browser.',
+        simResumo='<b>Simulation</b> · Nothing here is saved. <b>1 piece down</b> · Redis and Postgres have no path from Browser.',
+        expandir='Expand the editor',
         provedor='Provider', generico='Generic', aws='AWS', gcp='GCP', azure='Azure',
         provedorDica='Each piece gets the first service of its type. Change it on the selected piece.',
         provedorDicaGenerico='Pieces stay generic. Pick a provider to see the services.',
@@ -72,7 +74,8 @@ TEXTOS = {
     ),
     'es-ES': dict(
         simular='Simular', sairSim='Salir de la simulación', levantarApi='Levantar API de enlaces', levantarTudo='Levantar todo',
-        simResumo='<b>1 pieza caída</b> · Redis y Postgres quedaron sin camino desde Navegador.',
+        simResumo='<b>Simulación</b> · Nada aquí se guarda. <b>1 pieza caída</b> · Redis y Postgres quedaron sin camino desde Navegador.',
+        expandir='Expandir el editor',
         provedor='Proveedor', generico='Genérico', aws='AWS', gcp='GCP', azure='Azure',
         provedorDica='Cada pieza recibe el primer servicio del tipo. Cámbialo en la pieza seleccionada.',
         provedorDicaGenerico='Las piezas quedan genéricas. Elige un proveedor para ver los servicios.',

@@ -102,7 +102,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { CloudServiceIcon } from "@/components/ui/cloud-service-icon"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { ExerciseSection } from "@/components/blocks/exercise-workspace/exercise-workspace"
+import { ViewToggle } from "@/components/ui/view-toggle"
+import { ExerciseExpandButton, ExerciseSection } from "@/components/blocks/exercise-workspace/exercise-workspace"
 
 import {
   GRAPH_LIMITS,
@@ -1193,8 +1194,11 @@ function Moldura({
         </div>
 
         <div className="flex min-h-[420px] min-w-0 flex-1 flex-col">
-          {/* estreita, a barra quebra a linha em vez de sobrepor: Verificar desce para a direita */}
-          <div className="@container/barra flex min-h-[41px] flex-wrap items-center gap-1.5 border-b border-muted py-1.5 pr-2 pl-3">
+          {/* dois lados que não disputam espaço: à esquerda a dica ou as ações da seleção, que encolhem
+              (a dica trunca, as ações quebram a linha por dentro); à direita Expandir, Simular e
+              Verificar, sempre na primeira linha */}
+          <div className="flex min-h-[41px] items-start gap-2 border-b border-muted py-1.5 pr-2 pl-3">
+            <div className="flex min-h-7 min-w-0 flex-1 items-center">
             {sim ? (
               <AcoesDaSimulacao
                 peca={pecaSelecionada}
@@ -1224,19 +1228,18 @@ function Moldura({
               onApagar={() => selecao && apagar(selecao)}
             />
             )}
-            <span className="ml-auto flex shrink-0 items-center gap-2">
+            </div>
+            <span className="flex shrink-0 items-center gap-1.5">
+              <ExerciseExpandButton />
+              {/* sempre com o nome: só o ícone, o modo passava despercebido */}
               <Button
                 variant={simulando ? "secondary" : "ghost"}
                 aria-pressed={simulando}
                 onClick={alternarSimulacao}
                 disabled={graph.nodes.length === 0}
-                title={t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
               >
                 <Pulse aria-hidden weight={simulando ? "bold" : "regular"} />
-                {/* com a seleção de uma ligação, a barra enche: estreita, fica o ícone e o nome vai para o leitor */}
-                <span className="@max-[760px]/barra:sr-only">
-                  {t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
-                </span>
+                {t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
               </Button>
               {checkDisabledReason ? (
                 <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
@@ -1255,8 +1258,16 @@ function Moldura({
             </span>
           </div>
 
+          {resultado ? (
+            <ResumoDaSimulacao
+              graph={graph}
+              resultado={resultado}
+              tituloDe={bancada.tituloDe}
+            />
+          ) : null}
           <div
             ref={palco}
+            data-sim={simulando ? "" : undefined}
             className="relative min-h-0 flex-1"
             onDragOver={(e) => {
               const tipos = e.dataTransfer.types
@@ -1313,10 +1324,14 @@ function Moldura({
               maxZoom={1.6}
               proOptions={{ hideAttribution: true }}
               aria-label={t("architecture_board.canvas")}
-              className="bg-card"
+              // na simulação, o palco ganha o tom da marca: não é o desenho em edição
+              className={simulando ? "bg-primary-subtle/50" : "bg-card"}
             >
               <Background gap={18} size={1} color="var(--input)" />
             </ReactFlow>
+            {simulando ? (
+              <div aria-hidden className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--primary)_40%,transparent)]" />
+            ) : null}
             {graph.nodes.length === 0 && graph.groups.length === 0 ? (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-6">
                 <span className="max-w-[260px] text-center text-[13px] leading-5 text-muted-foreground">
@@ -1326,13 +1341,6 @@ function Moldura({
             ) : null}
           </div>
 
-          {resultado ? (
-            <ResumoDaSimulacao
-              graph={graph}
-              resultado={resultado}
-              tituloDe={bancada.tituloDe}
-            />
-          ) : null}
           <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
             <span className="truncate">
               {graph.groups.length
@@ -1395,7 +1403,7 @@ function AcoesDaSimulacao({
         }
       : null
   return (
-    <span className="flex min-w-0 items-center gap-1">
+    <span className="flex min-w-0 flex-wrap items-center gap-1">
       {alvo ? (
         <Button variant="ghost" size="sm" onClick={() => onDerrubar(alvo)}>
           {alvo.caido ? <ArrowCounterClockwise aria-hidden /> : <XCircle aria-hidden />}
@@ -1449,10 +1457,12 @@ function ResumoDaSimulacao({
     <div
       role="status"
       data-slot="architecture-board-simulation"
-      className="flex min-h-[34px] shrink-0 items-center gap-2 border-t border-muted bg-primary-subtle px-4 py-1.5 text-[12.5px] leading-[18px] text-primary-subtle-foreground"
+      className="flex min-h-[34px] shrink-0 items-start gap-2 border-b border-primary-subtle-border bg-primary-subtle px-4 py-1.5 text-[12.5px] leading-[18px] text-primary-subtle-foreground"
     >
-      <Pulse aria-hidden weight="bold" className="size-3.5 shrink-0" />
+      <Pulse aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0" />
       <span className="min-w-0">
+        {/* o modo diz o que é antes do resultado: nada aqui vai para o desenho */}
+        <span className="font-semibold">{t("architecture_board.sim.title")}</span> · {t("architecture_board.sim.not_saved")}{" "}
         {resultado.down.size ? <span className="font-medium">{t("architecture_board.sim.down_count", { count: resultado.down.size })} · </span> : null}
         {texto}
       </span>
@@ -1472,34 +1482,24 @@ function Provedores({
   onTrocar: (provider: CloudProvider | undefined) => void
 }) {
   const t = useTranslate()
-  const opcoes: Array<CloudProvider | undefined> = [undefined, ...PROVIDERS]
+  // o segmentado do DS: o cursor desliza entre as opções (e só pula, com reduzir movimento)
   return (
     <div className="flex flex-col gap-1.5 px-3 pb-3">
-      <span
-        role="radiogroup"
-        aria-label={t("architecture_board.provider")}
-        // "Genérico" é a palavra mais longa: ganha mais espaço que as siglas
-        className="grid grid-cols-[1.5fr_1fr_1fr_1fr] gap-0.5 rounded-[9px] bg-sunken p-0.5"
-      >
-        {opcoes.map((p) => (
-          <button
-            key={p ?? "generic"}
-            type="button"
-            role="radio"
-            aria-checked={atual === p}
-            disabled={readOnly}
-            onClick={() => onTrocar(p)}
-            className={cn(
-              "h-7 min-w-0 truncate rounded-[7px] px-1 text-[11.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35 disabled:cursor-default",
-              atual === p
-                ? "bg-card font-medium text-foreground-strong shadow-[0_0_0_1px_var(--input),0_1px_2px_oklch(0_0_0/0.06)]"
-                : "text-muted-foreground hover:text-foreground"
-            )}
-          >
-            {t(`architecture_board.providers.${p ?? "generic"}`)}
-          </button>
-        ))}
-      </span>
+      <ViewToggle
+        ariaLabel={t("architecture_board.provider")}
+        size="sm"
+        value={atual ?? "generic"}
+        onChange={readOnly ? undefined : (v) => onTrocar(v === "generic" ? undefined : v)}
+        options={(["generic", ...PROVIDERS] as const).map((p) => ({
+          value: p,
+          label: t(`architecture_board.providers.${p}`),
+        }))}
+        // as quatro dividem o rail; "Genérico" é a mais longa e ganha mais espaço
+        className={cn(
+          "flex w-full [&>button]:min-w-0 [&>button]:flex-1 [&>button]:px-1.5 [&>button:nth-of-type(1)]:flex-[1.5]",
+          readOnly && "pointer-events-none opacity-60"
+        )}
+      />
       <span className="px-1 text-[11.5px] leading-4 text-muted-foreground">
         {t(atual ? "architecture_board.provider_hint" : "architecture_board.provider_hint_generic")}
       </span>
@@ -1559,26 +1559,8 @@ function Acoes({
 
   if (ligacao)
     return (
-      <span className="flex min-w-0 items-center gap-1">
-        <span role="radiogroup" aria-label={t("architecture_board.relation")} className="flex items-center gap-0.5">
-          {RELATIONS.map((r) => (
-            <button
-              key={r}
-              type="button"
-              role="radio"
-              aria-checked={ligacao.relation === r}
-              onClick={() => onRelacao(ligacao.id, r)}
-              className={cn(
-                "h-7 rounded-[7px] px-2 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
-                ligacao.relation === r
-                  ? "bg-primary-subtle font-medium text-primary-subtle-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {t(`architecture_board.relations.${r}`)}
-            </button>
-          ))}
-        </span>
+      <span className="flex min-w-0 flex-wrap items-center gap-1">
+        <TiposDeLigacao valor={ligacao.relation} onTrocar={(r) => onRelacao(ligacao.id, r)} />
         <span aria-hidden className="mx-1 h-4 w-px bg-input" />
         {comuns(ligacao.id)}
       </span>
@@ -1586,14 +1568,14 @@ function Acoes({
 
   if (grupo)
     return (
-      <span className="flex min-w-0 items-center gap-1">
+      <span className="flex min-w-0 flex-wrap items-center gap-1">
         <MoverPara item={{ kind: "group", id: grupo.id }} graph={graph} tituloDoGrupo={tituloDoGrupo} onMover={onMover} />
         {comuns(grupo.id)}
       </span>
     )
 
   return (
-    <span className="flex min-w-0 items-center gap-1">
+    <span className="flex min-w-0 flex-wrap items-center gap-1">
       {servicos.length ? <Servico peca={peca!} servicos={servicos} onServico={onServico} /> : null}
       <LigarA peca={peca!} graph={graph} tituloDe={tituloDe} onLigar={onLigar} />
       {graph.groups.length ? (
@@ -1731,6 +1713,21 @@ function MoverPara({
   )
 }
 
+/** Os cinco tipos de ligação no segmentado do DS. `cheio`: dividem a largura (no popover do Ligar a…). */
+function TiposDeLigacao({ valor, onTrocar, cheio }: { valor: Relation; onTrocar: (r: Relation) => void; cheio?: boolean }) {
+  const t = useTranslate()
+  return (
+    <ViewToggle
+      ariaLabel={t("architecture_board.relation")}
+      size="sm"
+      value={valor}
+      onChange={onTrocar}
+      options={RELATIONS.map((r) => ({ value: r, label: t(`architecture_board.relations.${r}`) }))}
+      className={cn("[&>button]:px-2.5", cheio && "flex w-full [&>button]:min-w-0 [&>button]:flex-1 [&>button]:px-1")}
+    />
+  )
+}
+
 function LigarA({
   peca,
   graph,
@@ -1752,29 +1749,13 @@ function LigarA({
         <LinkSimple aria-hidden />
         {t("architecture_board.connect_to")}
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-72 p-2">
+      <PopoverContent align="start" className="w-80 p-2">
         <span className="block px-1.5 pt-0.5 pb-1.5 font-mono text-[9.5px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
           {t("architecture_board.relation")}
         </span>
-        <span role="radiogroup" aria-label={t("architecture_board.relation")} className="flex flex-wrap gap-1 px-1 pb-2">
-          {RELATIONS.map((r) => (
-            <button
-              key={r}
-              type="button"
-              role="radio"
-              aria-checked={relacao === r}
-              onClick={() => setRelacao(r)}
-              className={cn(
-                "h-7 rounded-[7px] px-2 text-[12px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
-                relacao === r
-                  ? "bg-primary-subtle font-medium text-primary-subtle-foreground"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {t(`architecture_board.relations.${r}`)}
-            </button>
-          ))}
-        </span>
+        <div className="px-1 pb-2">
+          <TiposDeLigacao valor={relacao} onTrocar={setRelacao} cheio />
+        </div>
         <span className="block border-t border-muted px-1.5 pt-2 pb-1 font-mono text-[9.5px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
           {t("architecture_board.target")}
         </span>
