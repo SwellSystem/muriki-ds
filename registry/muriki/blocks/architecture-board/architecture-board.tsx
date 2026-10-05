@@ -22,6 +22,14 @@
  * pessoa reconhece. Escolher um provedor dá a cada peça o primeiro serviço do tipo; a pessoa troca
  * no inspetor. Genérico tira todos.
  *
+ * NUVENS MISTURADAS NO DESENHO LIVRE (`providerMode="mixed"`, FD-C). O seletor vira "Nuvem
+ * principal": só diz em que nuvem as peças NOVAS nascem, e trocar não reescreve as que já estão lá.
+ * "Aplicar a todas" é a troca de antes, explícita: cada peça vira o primeiro serviço do tipo na
+ * principal, ou fica sem serviço se a nuvem não tiver um. O inspetor lista os serviços do tipo nas
+ * três nuvens, agrupados, a principal primeiro; a nuvem da peça é sempre o prefixo do `service`, e a
+ * peça de outra nuvem ganha o selo dela. Grupos não têm nuvem: uma peça GCP numa VPC da AWS entra (a
+ * revisão da IA aponta). O exercício fica em "single", como sempre.
+ *
  * SIMULAR É PASSAGEIRO. O modo Simular executa o desenho (`simulateFlow`): um pulso parte das peças
  * Cliente e anda pelas ligações no sentido do trabalho; derrubar uma peça, uma zona ou uma região
  * mostra até onde ele ainda chega. Nada disso vai para o grafo, e sair do modo volta tudo. Durante a
@@ -202,6 +210,12 @@ export interface ArchitectureBoardProps {
   graph: ArchitectureGraphV2
   onGraphChange: (graph: ArchitectureGraphV2) => void
   palette: PaletteItem[]
+  /**
+   * `"single"` (padrão, o exercício): um provedor para o desenho todo, e trocar troca o serviço de
+   * todas as peças. `"mixed"` (o desenho livre, FD-C): `provider` é a nuvem principal, só das peças
+   * novas; cada peça pode ser de qualquer nuvem, e "Aplicar a todas" faz a troca em massa.
+   */
+  providerMode?: "single" | "mixed"
   /** Os grupos que o exercício deixa usar. Vazio (ou ausente) esconde a seção de Grupos. */
   groups?: GroupPaletteItem[]
   /**
@@ -298,6 +312,20 @@ function IconeDaPeca({ kind, className }: { kind: string; className?: string }) 
 function servicosDe(item: PaletteItem | undefined, provider: CloudProvider | undefined) {
   if (!item?.services || !provider) return []
   return item.services.filter((s) => s.id.startsWith(`${provider}.`))
+}
+
+/** A nuvem de um serviço: o prefixo do id, nunca guardado à parte. */
+const nuvemDe = (service: string | undefined) => service?.split(".")[0] as CloudProvider | undefined
+
+/**
+ * Os serviços de um tipo nas três nuvens, sem filtro, agrupados por provedor: a principal primeiro,
+ * depois a ordem de PROVIDERS. Só os provedores que têm serviço para o tipo.
+ */
+function servicosPorNuvem(item: PaletteItem | undefined, principal: CloudProvider | undefined) {
+  const ordem = principal ? [principal, ...PROVIDERS.filter((p) => p !== principal)] : [...PROVIDERS]
+  return ordem
+    .map((provider) => ({ provider, servicos: servicosDe(item, provider) }))
+    .filter((g) => g.servicos.length > 0)
 }
 
 // A ligação sai do lado da peça que dá para a outra, e entra pelo lado oposto. É só desenho: o
@@ -458,6 +486,9 @@ interface Bancada {
   foraDoCatalogo: Set<string>
   /** As peças do enunciado, que não se apagam (`locked`). */
   trancadas: Set<string>
+  /** No desenho livre misto, a nuvem principal: a peça de outra nuvem ganha o selo dela. */
+  principal?: CloudProvider
+  misto: boolean
 }
 
 interface Simulacao {
@@ -532,12 +563,15 @@ const ALCAS = [
 const DESTAQUE = "outline-2 outline-offset-4 outline-primary/55"
 
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas, destacadas, trancadas } =
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas, destacadas, trancadas, principal, misto } =
     useBancada()
   const marcada = marcadas.has(id)
   const trancada = trancadas.has(id)
   const t = useTranslate()
   const servico = servicoDe(data.service)
+  // no desenho misto, a peça de uma nuvem que não é a principal diz qual é
+  const outraNuvem = misto && servico ? nuvemDe(servico.id) : undefined
+  const seloDaNuvem = outraNuvem && outraNuvem !== principal ? outraNuvem : undefined
   const derrubada = !!sim?.resultado.down.has(id)
   const fora = foraDoCatalogo.has(id)
   // na simulação: fora do ar, cinza com o X; sem caminho a partir do Cliente, apagada
@@ -599,6 +633,11 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
             </span>
             {servico.approximate ? <MarcaAproximado /> : null}
             {trancada ? <Cadeado /> : null}
+            {seloDaNuvem ? (
+              <span className="shrink-0 rounded-[3px] bg-sunken px-1 font-mono text-[9px] leading-[13px] font-medium tracking-[0.06em] text-muted-foreground uppercase">
+                {t(`architecture_board.providers.${seloDaNuvem}`)}
+              </span>
+            ) : null}
           </span>
         ) : (
           <span className="flex min-w-0 items-center gap-1">
@@ -995,6 +1034,7 @@ function Moldura({
   graph,
   onGraphChange,
   palette,
+  providerMode = "single",
   groups: paletaDeGrupos = [],
   rules,
   summary,
@@ -1494,9 +1534,10 @@ function Moldura({
   const trocarServico = (id: string, service: string) =>
     mudar({ ...graph, nodes: graph.nodes.map((n) => (n.id === id ? { ...n, service } : n)) })
 
-  // D6: ao escolher um provedor, cada peça vira o primeiro serviço do tipo; Genérico tira todos
-  const trocarProvedor = (provider: CloudProvider | undefined) => {
-    if (readOnly || provider === graph.provider) return
+  // D6: cada peça vira o primeiro serviço do tipo no provedor (ou fica sem, se ele não tiver);
+  // Genérico tira todos. No exercício é o que o seletor faz; no desenho livre, o "Aplicar a todas"
+  const aplicarATodas = (provider: CloudProvider | undefined) => {
+    if (readOnly) return
     const nodes = graph.nodes.map((n) => {
       const novo = { ...n }
       delete novo.service
@@ -1505,6 +1546,17 @@ function Moldura({
       return novo
     })
     const novo: ArchitectureGraphV2 = { ...graph, nodes }
+    if (provider) novo.provider = provider
+    else delete novo.provider
+    mudar(novo)
+  }
+
+  const misto = providerMode === "mixed"
+  const trocarProvedor = (provider: CloudProvider | undefined) => {
+    if (readOnly || provider === graph.provider) return
+    if (!misto) return aplicarATodas(provider)
+    // a nuvem principal só vale para as peças novas: as que já estão no desenho ficam como estão
+    const novo: ArchitectureGraphV2 = { ...graph }
     if (provider) novo.provider = provider
     else delete novo.provider
     mudar(novo)
@@ -1657,6 +1709,8 @@ function Moldura({
     marcadas: new Set(pick?.selected ?? []),
     destacadas,
     trancadas,
+    principal: graph.provider,
+    misto,
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined
@@ -1701,8 +1755,20 @@ function Moldura({
         )}
       >
         <div className="muriki-scroll flex shrink-0 flex-col border-muted bg-rail max-lg:border-b lg:w-[248px] lg:overflow-y-auto lg:border-r">
-          <ExerciseSection title={t("architecture_board.provider")} divider={false}>
-            <Provedores atual={graph.provider} readOnly={readOnly} onTrocar={trocarProvedor} />
+          <ExerciseSection title={t(misto ? "architecture_board.main_provider" : "architecture_board.provider")} divider={false}>
+            <Provedores
+              atual={graph.provider}
+              readOnly={readOnly}
+              onTrocar={trocarProvedor}
+              misto={misto}
+              // "Aplicar a todas" só quando há peça que mudaria
+              onAplicar={
+                misto &&
+                graph.nodes.some((n) => n.service !== servicosDe(itens.get(n.kind), graph.provider)[0]?.id)
+                  ? () => aplicarATodas(graph.provider)
+                  : undefined
+              }
+            />
           </ExerciseSection>
           <ExerciseSection title={t("architecture_board.pieces")}>
             <ul className="m-0 flex list-none flex-col gap-px px-1.5 pb-2">
@@ -1855,7 +1921,13 @@ function Moldura({
               readOnly={readOnly}
               tituloDe={bancada.tituloDe}
               tituloDoGrupo={tituloDoGrupo}
-              servicos={pecaSelecionada ? servicosDe(itens.get(pecaSelecionada.kind), graph.provider) : []}
+              servicos={
+                !pecaSelecionada
+                  ? []
+                  : misto
+                    ? servicosPorNuvem(itens.get(pecaSelecionada.kind), graph.provider)
+                    : [{ provider: graph.provider, servicos: servicosDe(itens.get(pecaSelecionada.kind), graph.provider) }]
+              }
               onServico={trocarServico}
               onLigar={ligar}
               onMover={(item, parent) => moverPara(item, parent, true)}
@@ -2251,10 +2323,16 @@ function Provedores({
   atual,
   readOnly,
   onTrocar,
+  misto = false,
+  onAplicar,
 }: {
   atual?: CloudProvider
   readOnly: boolean
   onTrocar: (provider: CloudProvider | undefined) => void
+  /** O desenho livre: a nuvem principal, só das peças novas. */
+  misto?: boolean
+  /** "Aplicar a todas": a troca em massa, explícita. */
+  onAplicar?: () => void
 }) {
   const t = useTranslate()
   // o segmentado do DS: o cursor desliza entre as opções (e só pula, com reduzir movimento)
@@ -2276,8 +2354,15 @@ function Provedores({
         )}
       />
       <span className="px-1 text-[11.5px] leading-4 text-muted-foreground">
-        {t(atual ? "architecture_board.provider_hint" : "architecture_board.provider_hint_generic")}
+        {misto
+          ? t(atual ? "architecture_board.main_provider_hint" : "architecture_board.main_provider_hint_generic")
+          : t(atual ? "architecture_board.provider_hint" : "architecture_board.provider_hint_generic")}
       </span>
+      {misto && onAplicar && !readOnly ? (
+        <Button variant="outline" size="sm" onClick={onAplicar} className="mt-0.5 self-start">
+          {t("architecture_board.apply_to_all")}
+        </Button>
+      ) : null}
     </div>
   )
 }
@@ -2318,7 +2403,7 @@ function Acoes({
   readOnly: boolean
   tituloDe: (kind: string) => string
   tituloDoGrupo: (type: GroupType) => string
-  servicos: PaletteService[]
+  servicos: GrupoDeServicos[]
   onServico: (id: string, service: string) => void
   onLigar: (from: string, to: string, relation: Relation) => void
   onMover: (item: { kind: "node" | "group"; id: string }, parent: string | undefined) => boolean
@@ -2431,7 +2516,7 @@ function Acoes({
   return (
     <span className="flex min-w-0 flex-wrap items-center gap-1">
       {botaoMarcar}
-      {servicos.length ? <Servico peca={peca!} servicos={servicos} onServico={onServico} /> : null}
+      {servicos.some((g) => g.servicos.length) ? <Servico peca={peca!} servicos={servicos} onServico={onServico} /> : null}
       <LigarA peca={peca!} graph={graph} tituloDe={tituloDe} onLigar={onLigar} />
       {graph.groups.length ? (
         <MoverPara item={{ kind: "node", id: peca!.id }} graph={graph} tituloDoGrupo={tituloDoGrupo} onMover={onMover} />
@@ -2441,19 +2526,31 @@ function Acoes({
   )
 }
 
-/** O inspetor do serviço: o atual, com ícone e nome, e os outros do mesmo tipo no provedor. */
+/** Os serviços de um tipo numa nuvem; `provider` vazio no exercício genérico. */
+interface GrupoDeServicos {
+  provider?: CloudProvider
+  servicos: PaletteService[]
+}
+
+/**
+ * O inspetor do serviço: o atual, com ícone e nome, e os outros do mesmo tipo. No exercício, um
+ * grupo só (o provedor). No desenho livre misto, um grupo por nuvem, com o nome dela em cima, a
+ * principal primeiro.
+ */
 function Servico({
   peca,
   servicos,
   onServico,
 }: {
   peca: GraphNode
-  servicos: PaletteService[]
+  servicos: GrupoDeServicos[]
   onServico: (id: string, service: string) => void
 }) {
   const t = useTranslate()
   const [aberto, setAberto] = React.useState(false)
-  const atual = servicos.find((s) => s.id === peca.service)
+  const todos = servicos.flatMap((g) => g.servicos)
+  const atual = todos.find((s) => s.id === peca.service)
+  const comTitulo = servicos.length > 1
   return (
     <Popover open={aberto} onOpenChange={setAberto}>
       <PopoverTrigger
@@ -2468,32 +2565,43 @@ function Servico({
         <span className="block px-1.5 pt-0.5 pb-1.5 font-mono text-[9.5px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
           {t("architecture_board.service")}
         </span>
-        <ul role="listbox" aria-label={t("architecture_board.service")} className="m-0 flex list-none flex-col gap-px p-0">
-          {servicos.map((s) => (
-            <li key={s.id}>
-              <button
-                type="button"
-                role="option"
-                aria-selected={s.id === peca.service}
-                onClick={() => {
-                  onServico(peca.id, s.id)
-                  setAberto(false)
-                }}
-                className={cn(
-                  "flex h-9 w-full items-center gap-2.5 rounded-md px-1.5 text-left text-[12.5px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
-                  s.id === peca.service && "bg-muted"
-                )}
-              >
-                <CloudServiceIcon service={s.id} className="size-6" />
-                <span className="min-w-0 flex-1 truncate text-foreground">{s.name}</span>
-                {s.approximate ? (
-                  <span className="shrink-0 text-[11px] text-muted-foreground">{t("architecture_board.approximate")}</span>
-                ) : null}
-                {s.id === peca.service ? <Check aria-hidden weight="bold" className="size-3.5 shrink-0 text-primary" /> : null}
-              </button>
-            </li>
+        <div role="listbox" aria-label={t("architecture_board.service")} className="muriki-scroll flex max-h-[360px] flex-col gap-2 overflow-y-auto">
+          {servicos.map((g) => (
+            <div key={g.provider ?? "generic"} role="group" aria-label={g.provider ? t(`architecture_board.providers.${g.provider}`) : undefined}>
+              {comTitulo && g.provider ? (
+                <span className="block px-1.5 pb-1 text-[11px] font-semibold text-muted-foreground">
+                  {t(`architecture_board.providers.${g.provider}`)}
+                </span>
+              ) : null}
+              <ul className="m-0 flex list-none flex-col gap-px p-0">
+                {g.servicos.map((s) => (
+                  <li key={s.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={s.id === peca.service}
+                      onClick={() => {
+                        onServico(peca.id, s.id)
+                        setAberto(false)
+                      }}
+                      className={cn(
+                        "flex h-9 w-full items-center gap-2.5 rounded-md px-1.5 text-left text-[12.5px] hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
+                        s.id === peca.service && "bg-muted"
+                      )}
+                    >
+                      <CloudServiceIcon service={s.id} className="size-6" />
+                      <span className="min-w-0 flex-1 truncate text-foreground">{s.name}</span>
+                      {s.approximate ? (
+                        <span className="shrink-0 text-[11px] text-muted-foreground">{t("architecture_board.approximate")}</span>
+                      ) : null}
+                      {s.id === peca.service ? <Check aria-hidden weight="bold" className="size-3.5 shrink-0 text-primary" /> : null}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </PopoverContent>
     </Popover>
   )

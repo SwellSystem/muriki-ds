@@ -98,12 +98,16 @@ def _peca(k, x, y, icone, tipo, nome, estado='', trancada=False):
             f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["fgs"]};white-space:nowrap;">{nome}</span></span>{marca}</div>')
 
 
-def _peca_servico(k, x, y, servico, nome_servico, nome, marcado=False, aprox=False):
+def _peca_servico(k, x, y, servico, nome_servico, nome, marcado=False, aprox=False, nuvem=None):
     # a peça com serviço: o ícone oficial como veio, o nome oficial ao lado (até duas linhas, nunca
     # dentro do ícone) e o rótulo da pessoa
     sombra = f'0 0 0 2px {k["pri"]}' if marcado else f'0 0 0 1px {k["input"]}'
     marca = (f'<span title="{T("aproximadoDica")}" style="flex:0 0 auto;padding:0 4px;border-radius:4px;background:{k["tyellow"]};'
              f'color:{k["tyellowfg"]};font-size:10px;line-height:14px;font-weight:500;">≈</span>') if aprox else ''
+    # no desenho livre misto, a peça de uma nuvem que não é a principal ganha o selo dela
+    if nuvem:
+        marca += (f'<span style="flex:0 0 auto;padding:0 4px;border-radius:3px;background:{k["sunken"]};color:{k["mfg"]};font-family:{MONO};'
+                  f'font-size:9px;line-height:13px;font-weight:500;letter-spacing:0.06em;">{nuvem}</span>')
     return (f'<div style="position:absolute;left:{x}px;top:{y}px;width:168px;min-height:52px;box-sizing:border-box;'
             f'display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:10px;background:{k["card"]};'
             f'box-shadow:{sombra}, 0 1px 2px rgba(0,0,0,0.06);">'
@@ -217,7 +221,7 @@ def _diagrama_nuvem(k):
     return (f'<div style="position:relative;width:720px;height:420px;zoom:0.86;">{grupos}{linhas}{pecas}{chips}</div>')
 
 
-def _provedor(k, atual):
+def _provedor(k, atual, misto=False):
     # o ViewToggle do DS no topo do rail: trilho afundado e a pílula (no bloco, ela desliza);
     # "Genérico" ganha mais espaço que as siglas
     opcao = lambda chave, marcada: (
@@ -226,12 +230,18 @@ def _provedor(k, atual):
            if marcada else f'color:{k["mfg"]};')
         + f'">{T(chave)}</span>')
     dica = T('provedorDica') if atual != 'generico' else T('provedorDicaGenerico')
-    return (f'<div style="display:flex;align-items:center;height:38px;padding:0 6px 0 14px;">{_titulo_secao(T("provedor"), k, forte=False)}</div>'
+    titulo = T('provedor')
+    aplicar = ''
+    if misto:
+        # o desenho livre (FD-C): a nuvem principal só vale para as peças novas; a troca em massa é o botão
+        dica, titulo = T('nuvemDica'), T('nuvemPrincipal')
+        aplicar = f'<span style="align-self:flex-start;margin-top:2px;">{botao(T("aplicarTodas"), k, "outline", 28)}</span>'
+    return (f'<div style="display:flex;align-items:center;height:38px;padding:0 6px 0 14px;">{_titulo_secao(titulo, k, forte=False)}</div>'
             f'<div style="display:flex;flex-direction:column;gap:6px;padding:0 12px 12px;">'
             f'<div role="tablist" aria-label="{T("provedor")}" style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;padding:2px;border-radius:999px;background:{k["sunken"]};'
             f'box-shadow:inset 0 1px 2px rgba(0,0,0,0.07), inset 0 0 0 1px {k["border"]};">'
             + ''.join(opcao(c, c == atual) for c in ('generico', 'aws', 'gcp', 'azure'))
-            + f'</div><span style="padding:0 4px;font-size:11.5px;line-height:16px;color:{k["mfg"]};">{dica}</span></div>')
+            + f'</div><span style="padding:0 4px;font-size:11.5px;line-height:16px;color:{k["mfg"]};">{dica}</span>{aplicar}</div>')
 
 
 def _popover_servico(k):

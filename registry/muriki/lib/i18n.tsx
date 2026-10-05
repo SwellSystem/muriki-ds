@@ -708,6 +708,10 @@ const STRINGS: Record<string, unknown> = {
     locked_hint: "Esta peça veio no desenho de partida: dá para renomear, mover e trocar o serviço, mas não apagar.",
     provider_hint_generic: "As peças ficam genéricas. Escolha um provedor para ver os serviços.",
     provider_hint: "Cada peça ganha o primeiro serviço do tipo. Troque na peça selecionada.",
+    main_provider: "Nuvem principal",
+    main_provider_hint: "As peças novas nascem nesta nuvem. Cada peça pode ser de outra: troque na peça selecionada.",
+    main_provider_hint_generic: "As peças novas nascem genéricas. Cada peça pode ganhar o serviço de qualquer nuvem.",
+    apply_to_all: "Aplicar a todas",
     providers: {
       generic: "Genérico",
       aws: "AWS",

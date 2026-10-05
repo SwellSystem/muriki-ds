@@ -29,7 +29,11 @@ export interface GraphNode {
   /** Relativo ao pai, se houver. */
   x: number
   y: number
-  /** `<provedor>.<serviço>`; só com `provider` no grafo, e com o mesmo prefixo. */
+  /**
+   * `<provedor>.<serviço>`. No exercício, só com `provider` no grafo e com o mesmo prefixo. No desenho
+   * livre (FD-C), de qualquer nuvem: `provider` é só a nuvem principal, das peças novas, e a nuvem da
+   * peça é sempre o prefixo daqui.
+   */
   service?: string
   /** O id de um grupo. */
   parent?: string
@@ -63,7 +67,11 @@ export interface ArchitectureGraphV1 {
 
 export interface ArchitectureGraphV2 {
   v: 2
-  /** Ausente = genérico, e nenhuma peça tem `service`. */
+  /**
+   * No exercício, o provedor do desenho: ausente = genérico, e nenhuma peça tem `service`. No desenho
+   * livre (FD-C), a nuvem principal, só das peças novas: ausente, as peças nascem genéricas, e mesmo
+   * assim uma peça pode ter serviço de qualquer nuvem.
+   */
   provider?: CloudProvider
   nodes: GraphNode[]
   edges: GraphEdge[]
