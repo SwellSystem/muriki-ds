@@ -880,6 +880,54 @@ const STRINGS: Record<string, unknown> = {
   coming_soon: {
     label: "em breve",
   },
+  playground: {
+    title: "Playground",
+    subtitle: "Crie fora dos exercícios. Nada aqui vira nota nem muda o seu nível.",
+    types: "Tipos",
+    soon: "em breve",
+    drawing: {
+      title: "Desenho de arquitetura",
+      description: "Desenhe livre, com provedores, grupos e notas, e simule onde ele quebra.",
+      new: "Novo desenho",
+    },
+    code: {
+      title: "Código livre",
+      description: "Escreva e rode código fora de um exercício, com o Peer junto.",
+    },
+    limit: {
+      reached: "Você usou os {{limit}} desenhos do Starter. No Pro, desenhe sem limite.",
+      over: "Você tem {{count}} desenhos e o Starter cria até {{limit}}. Todos continuam abertos; para criar outro, apague alguns ou assine o Pro.",
+      upgrade: "Conhecer o Pro",
+      ceiling: "Você chegou a {{count}} desenhos, o máximo da conta. Apague um para criar outro.",
+      unavailable: "Não deu para conferir o seu plano agora.",
+      retry: "Tentar de novo",
+    },
+    list: {
+      title: "Seus desenhos",
+      count: "{{count}} de {{limit}}",
+      saved: "salvo {{ago}}",
+      empty_title: "Nenhum desenho ainda",
+      empty: "Comece um desenho livre no cartão acima. Ele fica aqui, salvo enquanto você desenha.",
+      delete: "Apagar {{title}}",
+      delete_short: "Apagar",
+    },
+    confirm: {
+      title: "Apagar “{{title}}”?",
+      description: "O desenho e as notas somem. Não dá para desfazer.",
+      cancel: "Cancelar",
+      delete: "Apagar desenho",
+    },
+    editor: {
+      rename: "Renomear o desenho",
+      title_label: "Título do desenho",
+    },
+    conflict: {
+      title: "Este desenho mudou em outro aparelho.",
+      description: "O que está aqui não foi salvo.",
+      reload: "Carregar o mais novo",
+      keep: "Manter o meu",
+    },
+  },
   level_gate: {
     unlocks_at: "libera em {{level}}",
     reach: "Para liberar, chegue a {{level}}",

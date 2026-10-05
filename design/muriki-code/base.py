@@ -320,7 +320,7 @@ PRODUTO_ITENS = [
 ]
 
 # para onde cada item do menu leva no Play; __SUF__ vira '' ou 'Escuro' na montagem, e o tema segue junto
-DESTINOS = dict(inicio='Inicio', evolucao='Main', trilhas='Trilhas', exercicios='Exercicios', avaliacoes='Avaliacao', playground='Playground',
+DESTINOS = dict(inicio='Inicio', evolucao='Main', trilhas='Trilhas', exercicios='Exercicios', avaliacoes='Avaliacao', playground='PlaygroundDesenhos',
                 peer='Conectar', plano='Planos')
 
 
