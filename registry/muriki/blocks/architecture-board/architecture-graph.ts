@@ -219,3 +219,81 @@ export function nextId(prefix: string, graph: Pick<ArchitectureGraphV2, "nodes" 
   }
   return `${prefix}-${maior + 1}`
 }
+
+// ── a simulação ─────────────────────────────────────────────────────────
+
+/** O resultado de `simulateFlow`. `depth` é a quantos passos do Cliente cada peça alcançada está. */
+export interface FlowSimulation {
+  reached: Set<string>
+  /** As ligações que o pulso percorre, inclusive a que chega numa peça derrubada (ele para ali). */
+  edges: Set<string>
+  /** As peças fora do ar e sem caminho a partir de um Cliente (as derrubadas não entram). */
+  unreachable: string[]
+  /** As peças derrubadas, direto ou por estarem dentro de um grupo derrubado, em qualquer nível. */
+  down: Set<string>
+  depth: Map<string, number>
+}
+
+/**
+ * Executa o desenho: um pulso parte de toda peça `client` e anda pelas ligações no sentido do
+ * trabalho, o mesmo do `flow` da API (muriki-api graph-rules.ts, `workArcs`): a seta conta, e
+ * `consumes` anda ao contrário, de quem publica para quem consome. A peça derrubada sai do caminho,
+ * e o grupo derrubado derruba tudo o que está dentro dele pelo `parent`, nunca pela posição.
+ * Estado passageiro: nada disto vai para o grafo.
+ */
+export function simulateFlow(
+  graph: Pick<ArchitectureGraphV2, "nodes" | "edges" | "groups">,
+  down: { nodes: string[]; groups: string[] }
+): FlowSimulation {
+  const gruposFora = new Set<string>()
+  for (const id of down.groups) for (const g of descendantsOf(graph.groups, id)) gruposFora.add(g)
+  const fora = new Set(down.nodes)
+  for (const n of graph.nodes) if (n.parent && gruposFora.has(n.parent)) fora.add(n.id)
+
+  const arcos = new Map<string, Array<{ to: string; edge: string }>>()
+  for (const e of graph.edges) {
+    const [de, para] = e.relation === "consumes" ? [e.to, e.from] : [e.from, e.to]
+    // o pulso não sai de quem caiu; chega até quem caiu, e para ali
+    if (fora.has(de)) continue
+    arcos.set(de, [...(arcos.get(de) ?? []), { to: para, edge: e.id }])
+  }
+  const depth = new Map<string, number>()
+  const edges = new Set<string>()
+  let fronteira = graph.nodes.filter((n) => n.kind === "client" && !fora.has(n.id)).map((n) => n.id)
+  for (const id of fronteira) depth.set(id, 0)
+  for (let passo = 1; fronteira.length; passo++) {
+    const proxima: string[] = []
+    for (const at of fronteira)
+      for (const { to, edge } of arcos.get(at) ?? []) {
+        edges.add(edge)
+        if (fora.has(to)) continue
+        if (!depth.has(to)) {
+          depth.set(to, passo)
+          proxima.push(to)
+        }
+      }
+    fronteira = proxima
+  }
+  const reached = new Set(depth.keys())
+  return {
+    reached,
+    edges,
+    unreachable: graph.nodes.filter((n) => !reached.has(n.id) && !fora.has(n.id)).map((n) => n.id),
+    down: fora,
+    depth,
+  }
+}
+
+/** O grupo e todos os de dentro, em qualquer nível. */
+function descendantsOf(groups: GraphGroup[], id: string): Set<string> {
+  const ids = new Set([id])
+  for (let cresceu = true; cresceu; ) {
+    cresceu = false
+    for (const g of groups)
+      if (g.parent && ids.has(g.parent) && !ids.has(g.id)) {
+        ids.add(g.id)
+        cresceu = true
+      }
+  }
+  return ids
+}
