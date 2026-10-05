@@ -525,3 +525,67 @@ CSS_DIVIDER_SKELETON = (
     'background-attachment:fixed;animation:muriki-shimmer 1.5s ease-in-out infinite;}'
     '\n.mc.escuro .muriki-skeleton{background-image:linear-gradient(100deg, transparent 35%, color-mix(in oklab, var(--card) 70%, transparent) 50%, transparent 65%);}'
     '\n@media (prefers-reduced-motion: reduce){.mc .muriki-skeleton{animation:none;background-image:none;}}')
+
+
+# o diamante do Pro (SketchLogo do Phosphor, preenchido): o brilho é da IA, o diamante é do Pro
+def diamante(tam):
+    return (f'<svg width="{tam}" height="{tam}" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">'
+            '<path d="M246,98.73l-56-64A8,8,0,0,0,184,32H72a8,8,0,0,0-6,2.73l-56,64a8,8,0,0,0,.17,10.73l112,120a8,8,0,0,0,11.7,0l112-120A8,8,0,0,0,246,98.73ZM222.37,96H180L144,48h36.37ZM74.58,112l30.13,75.33L34.41,112Zm106.84,0h40.17l-70.3,75.33ZM75.63,48H112L76,96H33.63Z"/></svg>')
+
+
+def selo_pro(k, lado=56):
+    # o selo do Pro do PlanLimitDialog: o ladrilho no degradê da marca, o diamante e "PRO" em mono
+    return (f'<span style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:{lado}px;height:{lado}px;'
+            f'border-radius:15px;color:{k["prifg"]};flex:0 0 auto;'
+            f'background:linear-gradient(145deg, color-mix(in oklch, {k["pri"]} 78%, white) 0%, {k["pri"]} 55%, color-mix(in oklch, {k["pri"]} 70%, black) 100%);'
+            f'box-shadow:0 12px 26px -10px color-mix(in oklch, {k["pri"]} 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.28);">'
+            f'{diamante(22)}<span style="font-family:{MONO};font-size:10px;line-height:1;font-weight:600;letter-spacing:0.16em;">PRO</span></span>')
+
+
+def beneficio_pro(k, texto, classe=''):
+    # o quadro do Pro: o diamante num quadradinho da marca e o texto, no degradê tingido
+    return (f'<div class="{classe}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;'
+            f'background:linear-gradient(100deg, {k["prisub"]} 0%, color-mix(in oklch, {k["prisub"]} 40%, {k["card"]}) 100%);'
+            f'box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);font-size:14px;line-height:20px;font-weight:500;color:{k["fgs"]};">'
+            f'<span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;flex:0 0 auto;'
+            f'background:{k["pri"]};color:{k["prifg"]};">{diamante(18)}</span>{texto}</div>')
+
+
+def modal_limite_plano(k, rotulo_mono, titulo, descricao, beneficio=None, vagas=None, uso=None):
+    # o PlanLimitDialog do registry, da família das boas-vindas: o palco no degradê da marca com as
+    # vagas do plano (as ocupadas em ladrilhos, a próxima tracejada com o cadeado e o selo do Pro), o
+    # rótulo mono, o título, o quadro do Pro e "Agora não" com "Conhecer o Pro"
+    icone, usadas = vagas
+    ladrilho = lambda conteudo, extra: (f'<span style="display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:14px;{extra}">{conteudo}</span>')
+    cheias = ''.join(ladrilho(icone, f'background:{k["card"]};box-shadow:0 8px 20px -10px rgba(0,0,0,0.35), 0 0 0 1px {k["border"]};') for _ in range(usadas))
+    proxima = ladrilho(ic('cadeado', 20), f'color:{k["mfg"]};background:color-mix(in oklch, {k["card"]} 55%, transparent);box-shadow:inset 0 0 0 1.5px {k["input"]};')
+    seta = f'<span style="display:flex;margin:0 4px;color:color-mix(in oklch, {k["pri"]} 60%, transparent);">{ic("seta", 14)}</span>'
+    palco = (f'<div aria-hidden="true" style="position:relative;display:flex;align-items:center;justify-content:center;height:176px;overflow:hidden;'
+             f'background:linear-gradient(135deg, color-mix(in oklch, {k["pri"]} 16%, {k["card"]}) 0%, {k["card"]} 55%, color-mix(in oklch, {k["accent"]} 30%, {k["card"]}) 100%);">'
+             f'<span style="position:absolute;top:50%;left:50%;width:280px;height:280px;transform:translate(-50%,-50%);border-radius:999px;'
+             f'background:radial-gradient(circle, color-mix(in oklch, {k["pri"]} 14%, transparent), transparent 70%);"></span>'
+             f'<div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:12px;">'
+             f'<div style="display:flex;align-items:center;gap:12px;">{cheias}{proxima}{seta}{selo_pro(k)}</div>'
+             f'<span style="padding:2px 10px;border-radius:999px;background:color-mix(in oklch, {k["card"]} 80%, transparent);box-shadow:0 0 0 1px {k["border"]};'
+             f'font-family:{MONO};font-size:11px;letter-spacing:0.04em;color:{k["mfg"]};">{uso}</span></div></div>')
+    fechar = (f'<span aria-hidden="true" style="position:absolute;top:14px;right:14px;z-index:1;display:flex;align-items:center;justify-content:center;width:32px;height:32px;'
+              f'border-radius:8px;background:color-mix(in oklch, {k["card"]} 70%, transparent);color:{k["mfg"]};">{ic("x", 16)}</span>')
+    principal = botao(T('plConhecerPro'), k, 'solid', 40)
+    principal = principal[:-len('</button>')] + ic('seta', 15) + '</button>'
+    corpo = (f'<div style="display:flex;flex-direction:column;gap:18px;padding:22px 28px 24px;">'
+             f'<div style="display:flex;flex-direction:column;gap:8px;">{rotulo(rotulo_mono, k["mfg"])}'
+             f'<h2 style="margin:0;font-size:24px;line-height:30px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};text-wrap:balance;">{titulo}</h2>'
+             f'<p style="margin:0;font-size:14.5px;line-height:22px;color:{k["fg"]};text-wrap:pretty;">{descricao}</p></div>'
+             f'{beneficio_pro(k, beneficio)}'
+             f'<div style="display:flex;justify-content:flex-end;align-items:center;gap:8px;">{botao(T("plAgoraNao"), k, "ghost", 40)}{principal}</div></div>')
+    return (f'<section role="dialog" aria-modal="true" aria-label="{titulo}" style="position:relative;width:520px;max-width:calc(100% - 32px);'
+            f'display:flex;flex-direction:column;overflow:hidden;border-radius:18px;background:{k["card"]};'
+            f'box-shadow:0 30px 80px -20px rgba(0,0,0,0.45), 0 0 0 1px {k["border"]};">{fechar}{palco}{corpo}</section>')
+
+
+def com_modal(k, tela, modal):
+    # o véu das boas-vindas por cima da tela inteira, o rail junto: desfoca, e o modal fica no centro
+    assert tela.endswith('</div>')
+    return tela[:-len('</div>')] + (f'<div style="position:absolute;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;'
+                                     f'background:color-mix(in oklch, {k["bg"]} 45%, transparent);backdrop-filter:blur(14px) saturate(115%);'
+                                     f'-webkit-backdrop-filter:blur(14px) saturate(115%);">{modal}</div></div>')

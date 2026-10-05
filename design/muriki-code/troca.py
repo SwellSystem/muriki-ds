@@ -251,10 +251,13 @@ def _fases(k, cenario, movel=False):
     alt2 = 44 if movel else 40
     larg = '100%' if movel else None
     if cenario == 'plano':
-        return (_texto(k, 'tlPlanoTit', 'tlPlanoTxt', movel) + _aviso(k, 'tlPlanoAviso')
-                + f'<p style="margin:-6px 0 0;font-size:13.5px;color:{k["mfg"]};">{T("tlPlanoPro")}</p>'
-                + _rodape(k, botao(T('tlFicarJs'), k, 'solid', alt, largura=larg),
-                          botao_link(T('tlVerPro'), 'Planos__SUF__.dc.html', k, 'outline', alt2, largura=larg), movel=movel))
+        # as peças do PlanLimitDialog: o quadro do Pro e "Agora não" com "Conhecer o Pro". A linha de cima
+        # é o `reason` de quem chegou por um link direto que a API recusou (403 LANGUAGE_NOT_IN_PLAN)
+        razao = f'<p class="tl-texto" style="margin:0 0 -10px;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("tlRazao")}</p>'
+        quadro = beneficio_pro(k, T('tlPlanoPro'), 'tl-texto')
+        pro = botao_link(T('plConhecerPro'), 'Planos__SUF__.dc.html', k, 'solid', alt, 'seta', larg)
+        return (razao + _texto(k, 'tlPlanoTit', 'tlPlanoTxt', movel) + _aviso(k, 'tlPlanoAviso') + quadro
+                + _rodape(k, pro, botao(T('plAgoraNao'), k, 'ghost', alt2, largura=larg), movel=movel))
     c = 'Ida' if cenario == 'ida' else 'Volta'
     ida = cenario == 'ida'
     confirmar = (_texto(k, f'tl{c}Tit', f'tl{c}Txt', movel) + _aviso(k, f'tl{c}Aviso')

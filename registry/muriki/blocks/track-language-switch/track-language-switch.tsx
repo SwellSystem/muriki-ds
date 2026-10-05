@@ -7,7 +7,9 @@
  * No Starter a pessoa estuda uma família de linguagem por vez. Em "Começar a trilha" numa trilha de outra
  * linguagem (`access: "switch"` no GET /code/tracks), o app abre este modal; na confirmação o componente
  * chama `onConfirm` (o PUT /code/language-choice do app). Com `access: "not_in_plan"`, a troca só libera
- * em `changeAllowedAt`, e o modal mostra a data, "Continuar em JavaScript" e "Ver o Pro". O Pro nunca vê.
+ * em `changeAllowedAt`: o modal só diz a data quando a pessoa clica (o cartão da trilha não antecipa o
+ * limite) e usa as peças do PlanLimitDialog, o quadro do Pro e "Agora não" com "Conhecer o Pro". O Pro
+ * nunca vê. `reason` é a linha de cima de quem chegou por redirecionamento (403 LANGUAGE_NOT_IN_PLAN).
  *
  * Por cima do véu desfocado, como as boas-vindas: as duas trilhas lado a lado, a de agora à esquerda e a
  * clicada à direita, e no meio o logo da linguagem ativa com as setas fazendo a passagem. Três fases:
@@ -38,6 +40,7 @@ import { BrandLogo, brandName, type Brand } from "@/components/ui/brand-logo"
 import { Button } from "@/components/ui/button"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { PlanLimitActions, PlanLimitBenefit } from "@/components/blocks/plan-limit-dialog/plan-limit-dialog"
 
 export interface TrackLanguageSwitchTrack {
   /** A linguagem da trilha, para o logo e o chip ("js", "py"…). */
@@ -66,6 +69,12 @@ export interface TrackLanguageSwitchProps {
   access: "switch" | "not_in_plan"
   /** Com not_in_plan: quando a troca libera (`changeAllowedAt`). */
   changeAllowedAt?: string | Date
+  /**
+   * Por que o modal abriu sem a pessoa clicar numa trilha: a linha de cima, antes do título. Ex.: o
+   * link direto que a API recusou (403 LANGUAGE_NOT_IN_PLAN) e o app trouxe para Trilhas:
+   * "Esse conteúdo é de Python, e o seu plano estuda uma linguagem por vez."
+   */
+  reason?: string
   /** O idioma do app (i18n.language), para a data. */
   locale?: string
   /** A troca (PUT /code/language-choice). A animação dura o tempo da promessa; se rejeitar, volta. */
@@ -75,7 +84,10 @@ export interface TrackLanguageSwitchProps {
   startRender?: React.ReactElement
   /** "Continuar em JavaScript", Esc e clique fora (na confirmação e no not_in_plan). */
   onDismiss?: () => void
-  /** "Ver o Pro" e o link "No Pro as duas ficam abertas". Sem nenhum dos dois, o link e o botão somem. */
+  /**
+   * O link "No Pro as duas ficam abertas" na confirmação e, no not_in_plan, o quadro do Pro com
+   * "Conhecer o Pro" (as peças do PlanLimitDialog). Sem nenhum dos dois, o Pro some.
+   */
   onSeePro?: () => void
   proRender?: React.ReactElement
   /** A fase em que abre (prévias e testes). */
@@ -290,6 +302,7 @@ function TrackLanguageSwitch({
   to,
   access,
   changeAllowedAt,
+  reason,
   locale = "pt-BR",
   onConfirm,
   onStart,
@@ -407,6 +420,11 @@ function TrackLanguageSwitch({
 
           <div className={cn("flex flex-col gap-4 md:gap-[18px]", f.fases)}>
             <div key={bloqueado ? "locked" : fase} className="muriki-langswitch-copy flex flex-col gap-2">
+              {reason && (bloqueado || fase === "confirm") ? (
+                <p data-slot="track-language-switch-reason" className="m-0 text-[13px] leading-[19px] text-muted-foreground">
+                  {reason}
+                </p>
+              ) : null}
               <DialogPrimitive.Title
                 ref={tituloRef}
                 tabIndex={-1}
@@ -423,7 +441,7 @@ function TrackLanguageSwitch({
                   {aviso}
                 </p>
               ) : null}
-              {bloqueado && temPro ? <p className="m-0 text-[13.5px] text-muted-foreground">{t(k("locked_pro"))}</p> : null}
+              {bloqueado && temPro ? <PlanLimitBenefit>{t(k("locked_pro"))}</PlanLimitBenefit> : null}
               {erro ? (
                 <p role="alert" className="m-0 text-[13.5px] text-destructive">
                   {t(k("error"))}
@@ -432,16 +450,21 @@ function TrackLanguageSwitch({
             </div>
 
             {bloqueado ? (
-              <div className={f.rodape}>
-                {temPro ? (
-                  <Button variant="outline" size="lg" onClick={onSeePro} render={proRender} nativeButton={!proRender} className={cn(f.botao, "md:ml-auto")}>
-                    {t(k("see_pro"))}
+              temPro ? (
+                // o mesmo rodapé do limite do plano: "Agora não" e "Conhecer o Pro"
+                <PlanLimitActions
+                  onUpgrade={onSeePro}
+                  upgradeRender={proRender}
+                  onDismiss={ficar}
+                  buttonClassName={f.botao}
+                />
+              ) : (
+                <div className={f.rodape}>
+                  <Button variant="solid" size="lg" onClick={ficar} className={cn(f.botao, "md:ml-auto")}>
+                    {t(k("stay"), { from: nomeDe })}
                   </Button>
-                ) : null}
-                <Button variant="solid" size="lg" onClick={ficar} className={cn(f.botao, !temPro && "md:ml-auto")}>
-                  {t(k("stay"), { from: nomeDe })}
-                </Button>
-              </div>
+                </div>
+              )
             ) : fase === "confirm" ? (
               <div className={f.rodape}>
                 {linkPro}

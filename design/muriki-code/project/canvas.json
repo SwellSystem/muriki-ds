@@ -1175,7 +1175,7 @@
    "y": 15840,
    "w": 1440,
    "h": 900,
-   "title": "Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt",
+   "title": "Troca de linguagem · not_in_plan: a data só ao clicar, o quadro do Pro e a linha de quem chegou por link direto",
    "is_interactive": true
   },
   "TrocaLinguagemPlanoEscuro.dc.html": {
@@ -1183,7 +1183,7 @@
    "y": 17160,
    "w": 1440,
    "h": 900,
-   "title": "Troca de linguagem · not_in_plan: a troca só libera em changeAllowedAt · escuro",
+   "title": "Troca de linguagem · not_in_plan: a data só ao clicar, o quadro do Pro e a linha de quem chegou por link direto · escuro",
    "is_interactive": true
   },
   "TrocaLinguagemMovel.dc.html": {
@@ -1303,7 +1303,7 @@
    "y": 2640,
    "w": 1440,
    "h": 900,
-   "title": "Playground · os tipos e Seus desenhos, no Starter (2 de 3)",
+   "title": "Playground · os tipos e Seus desenhos, o Novo sempre ativo",
    "is_interactive": true
   },
   "PlaygroundDesenhosEscuro.dc.html": {
@@ -1311,7 +1311,7 @@
    "y": 3960,
    "w": 1440,
    "h": 900,
-   "title": "Playground · os tipos e Seus desenhos, no Starter (2 de 3) · escuro",
+   "title": "Playground · os tipos e Seus desenhos, o Novo sempre ativo · escuro",
    "is_interactive": true
   },
   "PlaygroundLimite.dc.html": {
@@ -1319,7 +1319,7 @@
    "y": 2640,
    "w": 1440,
    "h": 900,
-   "title": "Playground · o limite do Starter (3 de 3): o Novo trava e o Pro aparece",
+   "title": "Playground · o limite do plano: o Novo com 3 desenhos no Starter abre o modal com o Pro",
    "is_interactive": true
   },
   "PlaygroundLimiteEscuro.dc.html": {
@@ -1327,7 +1327,7 @@
    "y": 3960,
    "w": 1440,
    "h": 900,
-   "title": "Playground · o limite do Starter (3 de 3): o Novo trava e o Pro aparece · escuro",
+   "title": "Playground · o limite do plano: o Novo com 3 desenhos no Starter abre o modal com o Pro · escuro",
    "is_interactive": true
   },
   "DesenhoLivre.dc.html": {

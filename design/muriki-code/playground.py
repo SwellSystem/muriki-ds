@@ -1,6 +1,6 @@
 # ── Playground com tipos e o desenho livre ──────────────────────────────
 # O Playground deixa de ser "em breve" e vira o lugar de criar livre: os tipos no topo (Desenho de
-# arquitetura, e Código livre em breve) e "Seus desenhos" embaixo, com o limite do Starter. O
+# arquitetura, e Código livre em breve) e "Seus desenhos" embaixo; o limite do Starter só no modal. O
 # desenho livre é a bancada sem regras e sem Verificar, com notas. Espelha os blocos playground e
 # architecture-board do registry. Contrato: swell-docs/muriki-api/features/arch-cloud/fd-desenho.md.
 from base import *
@@ -43,24 +43,17 @@ def _pontos(k, itens, apagado=False):
             + '</ul>')
 
 
-def _cartao_tipo_desenho(k, limite=False):
-    oferta = (f'<div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-radius:10px;background:{k["prisub"]};'
-              f'color:{k["prisubfg"]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);">'
-              f'<span style="font-size:13px;line-height:19px;">{T("pgLimite")}</span>'
-              f'<a href="#" style="font-size:13px;font-weight:500;">{T("pgConhecerPro")}</a></div>') if limite else ''
-    usados = 3 if limite else 2
-    barra = ''.join(f'<span style="width:24px;height:6px;border-radius:999px;background:{k["pri"] if i < usados else k["sunken"]};"></span>' for i in range(3))
+def _cartao_tipo_desenho(k):
+    # sem contador nem barrinha: o Novo fica sempre ativo, e o limite só aparece se bloquear (o modal)
     pe = (f'<div style="display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:16px;border-top:1px solid {k["muted"]};">'
-          f'<span style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:12px;color:{k["mfg"]};">{T("pgUso3") if limite else T("pgUso2")}</span>'
-          f'<span style="display:flex;gap:4px;">{barra}</span></span>'
-          f'<span style="margin-left:auto;">{botao(T("pgNovo"), k, "primary", 32, desativado=limite)}</span></div>')
+          f'<span style="margin-left:auto;">{botao(T("pgNovo"), k, "primary", 32)}</span></div>')
     return (f'<div style="display:flex;flex-direction:column;gap:16px;padding:20px;border-radius:12px;background:{k["card"]};box-shadow:{k["sombra"]};">'
             f'<div style="display:flex;align-items:flex-start;gap:14px;">{_ladrilho(k, _logo_arq_tema(k, 24))}'
             f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
             f'<h2 style="margin:0;font-size:17px;line-height:23px;font-weight:600;color:{k["fgs"]};">{T("pgDesenho")}</h2>'
             f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["mfg"]};">{T("pgDesenhoTxt")}</p></div></div>'
             f'{_pontos(k, [("nuvem", "pgPonto1"), ("nota", "pgPonto2"), ("pulso", "pgPonto3")])}'
-            f'{oferta}{pe}</div>')
+            f'{pe}</div>')
 
 
 def _cartao_tipo_codigo(k):
@@ -101,12 +94,17 @@ def tela_playground(k, limite=False):
            f'<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{T("pgTitulo")}</h1>'
            f'<p style="margin:0;max-width:640px;font-size:14px;line-height:21px;color:{k["mfg"]};">{T("pgSub")}</p></header>')
     tipos = (f'<section style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">'
-             f'{_cartao_tipo_desenho(k, limite)}{_cartao_tipo_codigo(k)}</section>')
+             f'{_cartao_tipo_desenho(k)}{_cartao_tipo_codigo(k)}</section>')
     lista = (f'<section style="display:flex;flex-direction:column;gap:8px;">'
              f'<div style="display:flex;align-items:baseline;gap:12px;">'
              f'<h2 style="margin:0;font-size:15px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("pgSeus")}</h2></div>'
              f'{_lista(k, desenhos)}</section>')
-    return app(k, 'playground', cab + tipos + lista, gap=24)
+    tela = app(k, 'playground', cab + tipos + lista, gap=24)
+    if not limite:
+        return tela
+    # o Novo foi clicado com 3 desenhos no Starter: a API recusa (409 DRAWING_LIMIT_REACHED) e o modal abre
+    vagas = (f'<span class="logo-tema" style="display:flex;">{logo_arq(24)}</span>', 3)
+    return com_modal(k, tela, modal_limite_plano(k, T('plRotulo'), T('pgLimiteTitulo'), T('pgLimiteTxt'), T('pgLimitePro'), vagas, T('plUso')))
 
 
 def _nota(k, x, y, chave):
