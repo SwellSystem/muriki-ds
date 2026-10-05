@@ -27,6 +27,10 @@
  * mostra até onde ele ainda chega. Nada disso vai para o grafo, e sair do modo volta tudo. Durante a
  * simulação, o desenho não se edita.
  *
+ * LIGAR É PELA PEÇA, NÃO SÓ PELA ALÇA. Puxar da alça e soltar em qualquer parte de outra peça liga,
+ * e a ponta de uma ligação se arrasta para outra peça. ⌘C/⌘V (Ctrl fora do Mac) copia e cola a peça
+ * ou o grupo selecionado, com o que está dentro.
+ *
  * TUDO TEM CAMINHO DE TECLADO. Selecionada uma peça, a barra de cima mostra "Serviço",
  * "Ligar a…", "Mover para…", "Renomear" e "Apagar"; um grupo, "Mover para…", "Renomear" e
  * "Apagar"; uma ligação, os cinco tipos. Arrastar é atalho, não o único jeito. ⌘↵ (Ctrl↵) em
@@ -698,6 +702,14 @@ const TIPOS_DE_LIGACAO = { ligacao: Ligacao }
 
 type Selecao = { tipo: "peca" | "grupo" | "ligacao"; id: string } | null
 
+/** O que ⌘C guardou: a peça, ou o grupo com o que está dentro e as ligações entre essas peças. */
+interface Copia {
+  raiz: { kind: "node" | "group"; id: string }
+  nodes: GraphNode[]
+  groups: GraphGroup[]
+  edges: GraphEdge[]
+}
+
 export function ArchitectureBoard(props: ArchitectureBoardProps) {
   return (
     <ReactFlowProvider>
@@ -726,6 +738,8 @@ function Moldura({
   const [simulando, setSimulando] = React.useState(false)
   const [derrubados, setDerrubados] = React.useState<{ nodes: string[]; groups: string[] }>({ nodes: [], groups: [] })
   const readOnly = soLeitura || simulando
+  // o que ⌘C guardou: estado do board, não a área de transferência do sistema (é desenho, não texto)
+  const [copia, setCopia] = React.useState<Copia | null>(null)
   const palco = React.useRef<HTMLDivElement>(null)
   const [selecao, setSelecao] = React.useState<Selecao>(null)
   const [editando, setEditando] = React.useState<string | null>(null)
@@ -949,6 +963,93 @@ function Moldura({
     mudar({ ...graph, edges: graph.edges.map((e) => (e.id === id ? { ...e, relation } : e)) })
   }
 
+  /** Move uma ponta da ligação, com as regras de criar: sem repetida, sem ela mesma, só entre peças. */
+  const religar = (id: string, from: string, to: string) => {
+    const atual = graph.edges.find((e) => e.id === id)
+    if (readOnly || !atual || from === to || !porId.has(from) || !porId.has(to)) return
+    if (atual.from === from && atual.to === to) return
+    if (graph.edges.some((e) => e.id !== id && e.from === from && e.to === to && e.relation === atual.relation)) return
+    mudar({ ...graph, edges: graph.edges.map((e) => (e.id === id ? { ...e, from, to } : e)) })
+    setSelecao({ tipo: "ligacao", id })
+  }
+
+  // soltar fora de uma alça: vale a peça sob o ponteiro, se houver uma
+  const pecaNoPonto = (e: MouseEvent | TouchEvent) => {
+    const ponto = "changedTouches" in e ? e.changedTouches[0] : e
+    const id = document.elementFromPoint(ponto.clientX, ponto.clientY)?.closest<HTMLElement>(".react-flow__node")?.dataset.id
+    return id && porId.has(id) ? id : undefined
+  }
+
+  const copiar = () => {
+    if (!selecao || selecao.tipo === "ligacao") return
+    if (selecao.tipo === "peca") {
+      const no = porId.get(selecao.id)
+      if (no) setCopia({ raiz: { kind: "node", id: no.id }, nodes: [no], groups: [], edges: [] })
+      return
+    }
+    // o grupo leva o que está dentro, em qualquer nível, e as ligações entre essas peças
+    const dentro = descendentes(graph.groups, selecao.id)
+    const nodes = graph.nodes.filter((n) => n.parent && dentro.has(n.parent))
+    const ids = new Set(nodes.map((n) => n.id))
+    setCopia({
+      raiz: { kind: "group", id: selecao.id },
+      groups: graph.groups.filter((g) => dentro.has(g.id)),
+      nodes,
+      edges: graph.edges.filter((e) => ids.has(e.from) && ids.has(e.to)),
+    })
+  }
+
+  const colar = () => {
+    if (readOnly || !copia) return
+    if (
+      graph.nodes.length + copia.nodes.length > GRAPH_LIMITS.nodes ||
+      graph.groups.length + copia.groups.length > GRAPH_LIMITS.groups ||
+      graph.edges.length + copia.edges.length > GRAPH_LIMITS.edges
+    )
+      return
+    const original = (copia.raiz.kind === "node" ? copia.nodes : copia.groups).find((x) => x.id === copia.raiz.id)
+    if (!original) return
+    // no mesmo pai do original, se ele ainda existe; senão no topo, se a tabela deixar
+    const pai = original.parent && graph.groups.some((g) => g.id === original.parent) ? original.parent : undefined
+    if (copia.raiz.kind === "group" && !canNest(chainOf(graph.groups, pai), subtreeOf(copia.groups, copia.raiz.id))) return
+    let g = graph
+    const novo = new Map<string, string>()
+    for (const x of copia.groups) {
+      const id = nextId("g", g)
+      novo.set(x.id, id)
+      g = { ...g, groups: [...g.groups, { ...x, id }] }
+    }
+    for (const x of copia.nodes) {
+      const id = nextId("n", g)
+      novo.set(x.id, id)
+      g = { ...g, nodes: [...g.nodes, { ...x, id }] }
+    }
+    for (const x of copia.edges) {
+      const id = nextId("e", g)
+      g = { ...g, edges: [...g.edges, { ...x, id, from: novo.get(x.from)!, to: novo.get(x.to)! }] }
+    }
+    // os de dentro apontam para os pais novos; a raiz vai 24px para o lado e para baixo, no pai certo
+    const raiz = novo.get(copia.raiz.id)!
+    const reparentar = <T extends { id: string; parent?: string; x: number; y: number }>(x: T): T => {
+      if (!novo.has(x.id) && ![...novo.values()].includes(x.id)) return x
+      if (x.id === raiz) {
+        const r = { ...x, x: x.x + 24, y: x.y + 24, parent: pai }
+        if (pai === undefined) delete r.parent
+        return r
+      }
+      return x.parent && novo.has(x.parent) ? { ...x, parent: novo.get(x.parent) } : x
+    }
+    g = { ...g, groups: g.groups.map(reparentar), nodes: g.nodes.map(reparentar) }
+    mudar(acomodar(g, { kind: copia.raiz.kind, id: raiz }, alturas))
+    setSelecao({ tipo: copia.raiz.kind === "node" ? "peca" : "grupo", id: raiz })
+    // a próxima colagem cai 24px adiante, e não em cima desta
+    setCopia({
+      ...copia,
+      nodes: copia.nodes.map((n) => (n.id === copia.raiz.id ? { ...n, x: n.x + 24, y: n.y + 24 } : n)),
+      groups: copia.groups.map((x) => (x.id === copia.raiz.id ? { ...x, x: x.x + 24, y: x.y + 24 } : x)),
+    })
+  }
+
   const trocarServico = (id: string, service: string) =>
     mudar({ ...graph, nodes: graph.nodes.map((n) => (n.id === id ? { ...n, service } : n)) })
 
@@ -1109,6 +1210,20 @@ function Moldura({
           }
           // o Delete apaga a seleção pela regra da bancada; dentro de um campo, é do campo
           const alvo = e.target as HTMLElement
+          const noCampo = !!alvo.closest("input, textarea, [contenteditable]")
+          if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey && !noCampo && !editando) {
+            const tecla = e.key.toLowerCase()
+            if (tecla === "c" && selecao && selecao.tipo !== "ligacao") {
+              e.preventDefault()
+              copiar()
+              return
+            }
+            if (tecla === "v" && copia && !readOnly) {
+              e.preventDefault()
+              colar()
+              return
+            }
+          }
           if ((e.key === "Backspace" || e.key === "Delete") && selecao && !editando && !alvo.closest("input, textarea, [contenteditable]")) {
             e.preventDefault()
             apagar(selecao)
@@ -1304,6 +1419,21 @@ function Moldura({
               }}
               onNodeDragStop={(_, n) => aoSoltar(n.id)}
               onConnect={(c: Connection) => ligar(c.source, c.target)}
+              onConnectEnd={(e, estado) => {
+                if (estado.isValid || !estado.fromNode) return
+                const alvo = pecaNoPonto(e)
+                if (alvo) ligar(estado.fromNode.id, alvo)
+              }}
+              edgesReconnectable={!readOnly}
+              onReconnect={(velha, nova) => religar(velha.id, nova.source, nova.target)}
+              onReconnectEnd={(e, ligacao, ponta, estado) => {
+                if (estado.isValid) return
+                const alvo = pecaNoPonto(e)
+                if (!alvo) return
+                // `ponta` é a que fica parada: a outra é a que foi arrastada
+                if (ponta === "source") religar(ligacao.id, ligacao.source, alvo)
+                else religar(ligacao.id, alvo, ligacao.target)
+              }}
               onPaneClick={() => {
                 setSelecao(null)
                 setEditando(null)

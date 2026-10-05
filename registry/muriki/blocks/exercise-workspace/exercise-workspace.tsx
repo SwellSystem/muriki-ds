@@ -253,15 +253,25 @@ export function ExerciseWorkspace({
         className={cn("flex min-w-0 flex-col gap-[18px] lg:h-full lg:min-h-0", className)}
       >
         {header}
-        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
-          {/* Só o corpo do enunciado rola, dentro do cartão dele: os cartões ficam parados. */}
+        <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row lg:gap-0">
+          {/* Só o corpo do enunciado rola, dentro do cartão dele: os cartões ficam parados.
+              Recolhida, a coluna desliza: a largura e a margem vão a zero e o conteúdo some aos poucos;
+              por dentro ele fica na largura de sempre, para não refluir no caminho. `invisible` (só no
+              desktop, onde ela recolhe) tira o que sumiu do Tab e do leitor no fim da transição. Com
+              reduzir movimento, só troca. */}
           <div
             data-slot="exercise-side"
             data-state={recolhida ? "collapsed" : "open"}
-            className={cn("flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0", recolhida && "lg:hidden")}
+            className={cn(
+              "flex min-w-0 flex-col lg:min-h-0 lg:shrink-0 lg:overflow-hidden",
+              "lg:transition-[width,margin,opacity,visibility] lg:duration-300 lg:ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:motion-reduce:transition-none",
+              recolhida ? "lg:invisible lg:mr-0 lg:w-0 lg:opacity-0" : "lg:mr-4 lg:w-[372px] lg:opacity-100"
+            )}
           >
-            {side}
-            {foot}
+            <div className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:flex-1">
+              {side}
+              {foot}
+            </div>
           </div>
           {editor}
         </div>
