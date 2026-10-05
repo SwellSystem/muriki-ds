@@ -143,6 +143,12 @@ CONECTAR = {
 
 PLANOS = {
     'pt-BR': dict(
+        descStarter='Para começar: uma linguagem por vez, com o Peer junto.', descPro='Para estudar sem teto, com a revisão da IA no código.',
+        precoPro='R$ 20', teste7='7 dias grátis', cancele='cancele quando quiser', assinarPro='Assinar o Pro', recomendadoAba='Recomendado',
+        oQueVem='O que vem no plano', semLimite='sem limite',
+        fIa='Interações com a IA', fIaS='50 por mês', fIaP='1.000 por mês', fDesenhos='Desenhos livres',
+        fHistorico='Histórico guardado', fHistS='7 dias', fFamilias='Linguagens ao mesmo tempo', fFamS='1 família', fFamP='todas',
+        fLinguagens='Linguagens analisadas', fLingV='JavaScript e Python', fRevisao='Revisão de código pela IA',
         periodo='Período de cobrança', mensal='Mensal', anual='Anual',
         titulo='Planos do Muriki Code',
         sub='A assinatura do Code é separada da do Platform. A conta Muriki é a mesma nos dois, e assinar um não muda nada no outro.',
@@ -158,6 +164,12 @@ PLANOS = {
         r3='O Peer e a conversa usam IA, por isso têm limite mensal por pessoa.',
     ),
     'en-US': dict(
+        descStarter='To get started: one language at a time, with the Peer along.', descPro='To study with no ceiling, with AI review on your code.',
+        precoPro='R$20', teste7='7 days free', cancele='cancel anytime', assinarPro='Subscribe to Pro', recomendadoAba='Recommended',
+        oQueVem='What the plan includes', semLimite='no limit',
+        fIa='AI interactions', fIaS='50 a month', fIaP='1,000 a month', fDesenhos='Free drawings',
+        fHistorico='History kept', fHistS='7 days', fFamilias='Languages at once', fFamS='1 family', fFamP='all',
+        fLinguagens='Languages analyzed', fLingV='JavaScript and Python', fRevisao='AI code review',
         periodo='Billing period', mensal='Monthly', anual='Yearly',
         titulo='Muriki Code plans',
         sub='The Code subscription is separate from Platform’s. Your Muriki account is the same for both, and subscribing to one changes nothing in the other.',
@@ -173,6 +185,12 @@ PLANOS = {
         r3='The Peer and chat use AI, so they have a monthly limit per person.',
     ),
     'es-ES': dict(
+        descStarter='Para empezar: un lenguaje a la vez, con el Peer al lado.', descPro='Para estudiar sin techo, con la revisión de la IA en tu código.',
+        precoPro='R$ 20', teste7='7 días gratis', cancele='cancela cuando quieras', assinarPro='Suscribirme a Pro', recomendadoAba='Recomendado',
+        oQueVem='Qué incluye el plan', semLimite='sin límite',
+        fIa='Interacciones con la IA', fIaS='50 al mes', fIaP='1.000 al mes', fDesenhos='Diseños libres',
+        fHistorico='Historial guardado', fHistS='7 días', fFamilias='Lenguajes a la vez', fFamS='1 familia', fFamP='todos',
+        fLinguagens='Lenguajes analizados', fLingV='JavaScript y Python', fRevisao='Revisión de código por la IA',
         periodo='Periodo de facturación', mensal='Mensual', anual='Anual',
         titulo='Planes de Muriki Code',
         sub='La suscripción de Code es independiente de la de Platform. La cuenta Muriki es la misma en los dos, y suscribirte a uno no cambia nada en el otro.',

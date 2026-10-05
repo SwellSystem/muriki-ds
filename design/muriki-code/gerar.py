@@ -46,6 +46,7 @@ TELAS = [
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
     ('planos', 'Planos', 'Planos', 'Planos · Starter e Pro', 2, 4, 5),
+    ('planos_carregando', 'PlanosCarregando', 'Planos', 'Planos · carregando: a silhueta dos cartões, o Pro já tingido', 4, 4, 5),
     ('planos_escolha', 'PlanosEscolha', 'Escolha seu plano', 'Planos · escolha obrigatória: Starter, o teste do Pro e o Pro pago', 3, 4, 5),
     ('codigo', 'SegundoFator', 'Segundo fator', 'Entrar · segundo fator (app ou código de backup)', 0, 6, 7),
     ('esqueci', 'EsqueciSenha', 'Esqueci a senha', 'Conta · esqueci a senha', 1, 6, 7),
