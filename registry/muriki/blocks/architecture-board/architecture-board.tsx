@@ -87,6 +87,14 @@ import {
   Trash,
   Tray,
   Vault,
+  Diamond,
+  Package,
+  PaperPlaneTilt,
+  ShieldCheck,
+  Signpost,
+  Stack,
+  Warehouse,
+  Waves,
   X,
   XCircle,
 } from "@phosphor-icons/react"
@@ -241,6 +249,15 @@ const ICONES: Record<string, React.ElementType> = {
   "third-party": Handshake,
   "secrets-vault": Vault,
   "realtime-gateway": Broadcast,
+  // as peças do pacote 2026.10.05-1
+  dns: Signpost,
+  waf: ShieldCheck,
+  stream: Waves,
+  "data-warehouse": Warehouse,
+  notification: PaperPlaneTilt,
+  "container-registry": Package,
+  "batch-job": Stack,
+  decision: Diamond,
 }
 
 function IconeDaPeca({ kind, className }: { kind: string; className?: string }) {
@@ -469,7 +486,7 @@ function MarcaAproximado({ className }: { className?: string }) {
 
 // ── a peça ──────────────────────────────────────────────────────────────
 
-type PecaNode = Node<{ kind: string; label?: string; service?: string }, "peca">
+type PecaNode = Node<{ kind: string; label?: string; service?: string }, "peca" | "decisao">
 
 const ALCAS = [
   { id: "t", position: Position.Top },
@@ -827,7 +844,83 @@ function Ligacao(props: EdgeProps<LigacaoEdge>) {
 }
 
 // fora do componente: o React Flow pede o mesmo objeto em todo render
-const TIPOS_DE_NO = { peca: Peca, grupo: Grupo, nota: Nota }
+// ── a decisão ───────────────────────────────────────────────────────────
+
+/**
+ * A Decisão (kind `decision`, só no desenho livre): o losango do fluxograma. O caminho se divide
+ * aqui, e a condição de cada caminho vai no rótulo da ligação que sai (a barra sugere "sim", "não",
+ * "erro"). As alças ficam nos quatro vértices.
+ */
+const LADO_DA_DECISAO = 112
+
+function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
+  const { tituloDe, editando, setEditando, readOnly, sim, marcadas } = useBancada()
+  const t = useTranslate()
+  const derrubada = !!sim?.resultado.down.has(id)
+  const apagada = !!sim && !derrubada && !sim.resultado.reached.has(id)
+  const L = LADO_DA_DECISAO
+  return (
+    <div
+      onDoubleClick={() => !readOnly && setEditando(id)}
+      data-sim={derrubada ? "down" : apagada ? "unreached" : sim ? "reached" : undefined}
+      title={tituloDe(data.kind)}
+      className={cn("group relative flex items-center justify-center transition-opacity", apagada && "opacity-35")}
+      style={{ width: L, height: L }}
+    >
+      <svg aria-hidden viewBox={`0 0 ${L} ${L}`} width={L} height={L} className="absolute inset-0 overflow-visible">
+        <polygon
+          points={`${L / 2},2 ${L - 2},${L / 2} ${L / 2},${L - 2} 2,${L / 2}`}
+          strokeLinejoin="round"
+          className={cn(
+            derrubada ? "fill-muted" : "fill-card",
+            selected ? "stroke-primary [stroke-width:2]" : "stroke-input [stroke-width:1.25]",
+            marcadas.has(id) && "stroke-destructive [stroke-dasharray:5_4] [stroke-width:2]"
+          )}
+          style={{ filter: "drop-shadow(0 1px 1px oklch(0 0 0 / 0.06))" }}
+        />
+      </svg>
+      <span className={cn("relative flex max-w-[64px] flex-col items-center gap-0.5 text-center", derrubada && "opacity-60 grayscale")}>
+        <Diamond aria-hidden weight="fill" className="size-3.5 text-primary" />
+        {editando === id ? (
+          <CampoDeRotulo id={id} valor={data.label} className="w-24 text-center text-[11.5px]" />
+        ) : (
+          <span
+            className={cn(
+              "line-clamp-2 text-[11.5px] leading-[14px] break-words",
+              data.label ? "font-medium text-foreground-strong" : "text-muted-foreground"
+            )}
+          >
+            {data.label ?? tituloDe(data.kind)}
+          </span>
+        )}
+      </span>
+      {derrubada ? (
+        <span className="absolute top-3 right-3 flex size-5 items-center justify-center rounded-full bg-card text-destructive shadow-[0_0_0_1px_var(--input)]">
+          <XCircle aria-hidden weight="fill" className="size-4" />
+          <span className="sr-only">{t("architecture_board.sim.down")}</span>
+        </span>
+      ) : null}
+      {ALCAS.map((a) => (
+        <Handle
+          key={a.id}
+          data-alca
+          id={a.id}
+          type="source"
+          position={a.position}
+          isConnectable={!readOnly}
+          className={cn(
+            "!size-2.5 !rounded-full !border-2 !border-card !bg-primary opacity-0 transition-opacity",
+            "group-hover:opacity-100",
+            selected && "opacity-100",
+            readOnly && "!invisible"
+          )}
+        />
+      ))}
+    </div>
+  )
+}
+
+const TIPOS_DE_NO = { peca: Peca, grupo: Grupo, nota: Nota, decisao: Decisao }
 const TIPOS_DE_LIGACAO = { ligacao: Ligacao }
 
 // ── a bancada ───────────────────────────────────────────────────────────
@@ -971,7 +1064,8 @@ function Moldura({
     ...graph.nodes.map(
       (n): PecaNode => ({
         id: n.id,
-        type: "peca",
+        // a Decisão tem o nó próprio, o losango; o resto da peça é igual
+        type: n.kind === "decision" ? "decisao" : "peca",
         position: { x: n.x, y: n.y },
         parentId: n.parent,
         data: { kind: n.kind, label: n.label, service: n.service },
@@ -1001,7 +1095,14 @@ function Moldura({
     const marcada = selecao?.tipo === "ligacao" && selecao.id === e.id
     const de = porId.get(e.from)
     const para = porId.get(e.to)
-    const lado = de && para ? lados(naTela(de), naTela(para)) : undefined
+    // pelo centro de cada nó (a Decisão é quadrada, a peça é larga)
+    const centro = (n: GraphNode) => {
+      const p = naTela(n)
+      return n.kind === "decision"
+        ? { x: p.x + LADO_DA_DECISAO / 2, y: p.y + LADO_DA_DECISAO / 2 }
+        : { x: p.x + LARGURA_DA_PECA / 2, y: p.y + ALTURA_DA_PECA / 2 }
+    }
+    const lado = de && para ? lados(centro(de), centro(para)) : undefined
     return {
       id: e.id,
       type: "ligacao",
@@ -1697,6 +1798,7 @@ function Moldura({
               onLigar={ligar}
               onMover={(item, parent) => moverPara(item, parent, true)}
               onRelacao={trocarRelacao}
+              onRotular={renomear}
               onRenomear={(id) => setEditando(id)}
               onApagar={() => selecao && apagar(selecao)}
             />
@@ -2120,6 +2222,7 @@ function Provedores({
 // ── a barra de ações da seleção ─────────────────────────────────────────
 
 function Acoes({
+  onRotular,
   dicaDoDefeito,
   marcar,
   nota,
@@ -2138,6 +2241,8 @@ function Acoes({
   onRenomear,
   onApagar,
 }: {
+  /** Dá o rótulo a uma ligação (a condição sugerida na saída de uma Decisão); vazio tira. */
+  onRotular?: (id: string, label: string) => void
   /** Só leitura com o marcar: a dica é marcar, não desenhar. */
   dicaDoDefeito?: boolean
   marcar?: { marcada: boolean; cheio: boolean; onToggle: () => void }
@@ -2207,14 +2312,39 @@ function Acoes({
     </>
   )
 
-  if (ligacao)
+  if (ligacao) {
+    // a ligação que sai de uma Decisão leva a condição no rótulo: a barra sugere as comuns
+    const daDecisao = graph.nodes.find((n) => n.id === ligacao.from)?.kind === "decision"
     return (
       <span className="flex min-w-0 flex-wrap items-center gap-1">
         <TiposDeLigacao valor={ligacao.relation} onTrocar={(r) => onRelacao(ligacao.id, r)} />
         <span aria-hidden className="mx-1 h-4 w-px bg-input" />
+        {daDecisao && onRotular ? (
+          <span role="group" aria-label={t("architecture_board.condition")} className="flex items-center gap-1">
+            <span className="font-mono text-[9.5px] tracking-[0.12em] text-muted-foreground uppercase">
+              {t("architecture_board.condition")}
+            </span>
+            {(["yes", "no", "error"] as const).map((c) => {
+              const rotulo = t(`architecture_board.conditions.${c}`)
+              return (
+                <Button
+                  key={c}
+                  variant={ligacao.label === rotulo ? "secondary" : "ghost"}
+                  size="sm"
+                  aria-pressed={ligacao.label === rotulo}
+                  onClick={() => onRotular(ligacao.id, ligacao.label === rotulo ? "" : rotulo)}
+                >
+                  {rotulo}
+                </Button>
+              )
+            })}
+            <span aria-hidden className="mx-1 h-4 w-px bg-input" />
+          </span>
+        ) : null}
         {comuns(ligacao.id)}
       </span>
     )
+  }
 
   if (grupo)
     return (

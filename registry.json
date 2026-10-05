@@ -2023,7 +2023,7 @@
           "target": "components/blocks/architecture-board/index.ts"
         }
       ],
-      "docs": "<ExerciseWorkspace … editor={<ArchitectureBoard graph={graph} onGraphChange={setGraph} palette={exercise.palette} groups={exercise.groups} rules={exercise.visibleRules.map((r) => ({ ...r, status: statusDe(r.id) }))} summary={check ? { passing, total } : null} onCheck={verificar} checking={verificando} checkError={erro} />} />. graph é controlado e sempre ArchitectureGraph v2 ({ v: 2, provider?, nodes: [{ id, kind, label?, x, y, service?, parent? }], edges, groups: [{ id, type, label?, parent?, x, y, w, h }] }); rascunho v1 passa por toV2(graph). x e y são relativos ao pai; quem está dentro de quem é só o parent, que o bloco decide ao soltar (o grupo mais fundo sob o centro). onGraphChange chega a cada mudança, inclusive no arrasto: salve o rascunho com espera. Exportados de architecture-graph.ts (funções puras, sem React): GRAPH_LIMITS (40 peças, 80 ligações, 20 grupos, rótulo 60, 24.000 caracteres), RELATIONS, PROVIDERS, GROUP_TYPES, toV2, canNest(parentChain, subtree) (a tabela única de aninhamento: região no topo ou em VPC; VPC no topo ou em região; zona no topo, em região ou em VPC; sub-redes em VPC, região ou zona, sempre com uma VPC acima; nenhum tipo repetido na cadeia), deleteGroup(graph, id) (os grupos de dentro sobem até um lugar válido ou são apagados; peças nunca somem, sobem para o ancestral que restar), reparent, chainOf, subtreeOf, absoluteOf e nextId. palette: [{ id, title, description?, services?: [{ id, name, approximate? }] }], os serviços dos três provedores de palette[].services; os ids da paleta neutra têm ícone próprio e id desconhecido cai num quadrado. groups: [{ id, title, description? }] do exercício; vazio esconde a seção. Provedor: escolher AWS, GCP ou Azure dá a cada peça o primeiro serviço do tipo (D6), e a peça nova nasce com ele; Genérico tira provider e todos os service. O serviço troca no inspetor (\"Serviço\" na barra, com a peça selecionada). A peça com serviço mostra o ícone oficial (CloudServiceIcon, sem alteração) e o nome oficial ao lado; approximate ganha a marca ≈. Grupos: clique põe no meio da vista, ou dentro do grupo selecionado se a tabela deixa (a sub-rede só entra num grupo com VPC acima); arrastar da paleta põe sob o ponto. Soltar peça ou grupo dentro de outro grupo troca o parent; grupo que não cabe ali volta para onde estava. O grupo cresce para caber o que entra, e o redimensionar (direita, baixo e canto) para na caixa do que está dentro. Grupo nunca recebe ligação. Apagar grupo segue deleteGroup. rules: as visíveis, com status \"pass\" | \"fail\" ou sem status (não verificou). checkError: { kind: invalid | rate_limit | network, message?, retryIn? }; os motivos do 422 (unknown_provider, invalid_nesting…) vão em message, com o texto do app. checkDisabledReason troca o Verificar ativo por um texto curto. readOnly trava tudo. A ligação nasce \"chama\"; o bloco não deixa ligação repetida (mesmas peças e mesmo tipo), nem de uma peça para ela mesma, nem passar dos limites. O lado por onde a ligação sai é só desenho. Seleção de um elemento por vez; Delete apaga pela regra da bancada. Textos em architecture_board.* no i18n. Importa @xyflow/react/dist/base.css. Simular: o botão na barra executa o desenho, estado passageiro que nunca vai para o grafo. Um pulso parte das peças client e anda pelas ligações no sentido do trabalho, o mesmo do flow da API: a seta conta, e consumes anda ao contrário. Peça que ele não alcança fica apagada. Selecionada uma peça, zona ou região (pelo clique ou pelo teclado, Tab e Enter), a barra mostra Derrubar/Levantar: a peça fica cinza com o X, o grupo derruba tudo o que está dentro pelo parent, e o pulso chega até a queda e para. Um resumo acima da barra de status diz o que ficou sem caminho. Levantar tudo e Sair da simulação voltam tudo. Durante a simulação o desenho não se edita, e o Verificar e as regras não mudam. Com prefers-reduced-motion, sem pulso: só o estado final. simulateFlow(graph, { nodes, groups }) → { reached, edges, unreachable, down, depth } é exportada de architecture-graph.ts para o app testar sem divergir. Desenho livre (Playground): sem rules, somem a seção de Regras, o Verificar e o atalho; Simular e Expandir continuam. annotations + onAnnotationsChange ligam as notas: GraphAnnotation { id, text, x, y, parent? } (até 20 por desenho, texto de 1 a 500 com quebra de linha, parent só grupo). A paleta ganha \"Nota\" com o contador; a nota nasce em edição num lugar livre e só vai para onAnnotationsChange quando ganha texto (vazia, some), porque a API recusa nota vazia. Dois cliques ou Editar editam; ⌘↵ ou sair do campo grava. Ela entra num grupo ao soltar, sobe quando o grupo é apagado, segura o tamanho mínimo do grupo e copia e cola como as peças. cleanAnnotationText limpa o texto como a API guarda. Catálogo: peça cujo tipo não está na palette ou cujo serviço não está em palette[].services ganha a marca e um aviso acima do palco (\"escolha outro serviço\" ou \"apague a peça\", com Mostrar), porque a API recusa salvar com 422 até a troca. onOpenInPlayground põe \"Desenho livre\" na barra do exercício: o app cria o desenho com o grafo atual. Achar o defeito (task: spot): pick={{ max, selected, onChange, candidates }} com candidates = os ids do grafo inicial. Selecionada uma peça marcável, a barra mostra \"Marcar como defeito\"/\"Desmarcar\" (também com readOnly, quando answerSpec.graph é false: aí passe readOnly e não passe rules, e o board fica sem Verificar); ao chegar em max, marcar trava. A peça marcada ganha a moldura vermelha tracejada e o selo \"defeito\"; a seção Defeito do rail lista as marcadas pelo tipo e rótulo (os ids são opacos), com o contador \"1 de 2 marcadas\" e o desmarcar. Apagar uma peça marcada a desmarca."
+      "docs": "<ExerciseWorkspace … editor={<ArchitectureBoard graph={graph} onGraphChange={setGraph} palette={exercise.palette} groups={exercise.groups} rules={exercise.visibleRules.map((r) => ({ ...r, status: statusDe(r.id) }))} summary={check ? { passing, total } : null} onCheck={verificar} checking={verificando} checkError={erro} />} />. graph é controlado e sempre ArchitectureGraph v2 ({ v: 2, provider?, nodes: [{ id, kind, label?, x, y, service?, parent? }], edges, groups: [{ id, type, label?, parent?, x, y, w, h }] }); rascunho v1 passa por toV2(graph). x e y são relativos ao pai; quem está dentro de quem é só o parent, que o bloco decide ao soltar (o grupo mais fundo sob o centro). onGraphChange chega a cada mudança, inclusive no arrasto: salve o rascunho com espera. Exportados de architecture-graph.ts (funções puras, sem React): GRAPH_LIMITS (40 peças, 80 ligações, 20 grupos, rótulo 60, 24.000 caracteres), RELATIONS, PROVIDERS, GROUP_TYPES, toV2, canNest(parentChain, subtree) (a tabela única de aninhamento: região no topo ou em VPC; VPC no topo ou em região; zona no topo, em região ou em VPC; sub-redes em VPC, região ou zona, sempre com uma VPC acima; nenhum tipo repetido na cadeia), deleteGroup(graph, id) (os grupos de dentro sobem até um lugar válido ou são apagados; peças nunca somem, sobem para o ancestral que restar), reparent, chainOf, subtreeOf, absoluteOf e nextId. palette: [{ id, title, description?, services?: [{ id, name, approximate? }] }], os serviços dos três provedores de palette[].services; os ids da paleta neutra têm ícone próprio e id desconhecido cai num quadrado. groups: [{ id, title, description? }] do exercício; vazio esconde a seção. Provedor: escolher AWS, GCP ou Azure dá a cada peça o primeiro serviço do tipo (D6), e a peça nova nasce com ele; Genérico tira provider e todos os service. O serviço troca no inspetor (\"Serviço\" na barra, com a peça selecionada). A peça com serviço mostra o ícone oficial (CloudServiceIcon, sem alteração) e o nome oficial ao lado; approximate ganha a marca ≈. Grupos: clique põe no meio da vista, ou dentro do grupo selecionado se a tabela deixa (a sub-rede só entra num grupo com VPC acima); arrastar da paleta põe sob o ponto. Soltar peça ou grupo dentro de outro grupo troca o parent; grupo que não cabe ali volta para onde estava. O grupo cresce para caber o que entra, e o redimensionar (direita, baixo e canto) para na caixa do que está dentro. Grupo nunca recebe ligação. Apagar grupo segue deleteGroup. rules: as visíveis, com status \"pass\" | \"fail\" ou sem status (não verificou). checkError: { kind: invalid | rate_limit | network, message?, retryIn? }; os motivos do 422 (unknown_provider, invalid_nesting…) vão em message, com o texto do app. checkDisabledReason troca o Verificar ativo por um texto curto. readOnly trava tudo. A ligação nasce \"chama\"; o bloco não deixa ligação repetida (mesmas peças e mesmo tipo), nem de uma peça para ela mesma, nem passar dos limites. O lado por onde a ligação sai é só desenho. Seleção de um elemento por vez; Delete apaga pela regra da bancada. Textos em architecture_board.* no i18n. Importa @xyflow/react/dist/base.css. Simular: o botão na barra executa o desenho, estado passageiro que nunca vai para o grafo. Um pulso parte das peças client e anda pelas ligações no sentido do trabalho, o mesmo do flow da API: a seta conta, e consumes anda ao contrário. Peça que ele não alcança fica apagada. Selecionada uma peça, zona ou região (pelo clique ou pelo teclado, Tab e Enter), a barra mostra Derrubar/Levantar: a peça fica cinza com o X, o grupo derruba tudo o que está dentro pelo parent, e o pulso chega até a queda e para. Um resumo acima da barra de status diz o que ficou sem caminho. Levantar tudo e Sair da simulação voltam tudo. Durante a simulação o desenho não se edita, e o Verificar e as regras não mudam. Com prefers-reduced-motion, sem pulso: só o estado final. simulateFlow(graph, { nodes, groups }) → { reached, edges, unreachable, down, depth } é exportada de architecture-graph.ts para o app testar sem divergir. Desenho livre (Playground): sem rules, somem a seção de Regras, o Verificar e o atalho; Simular e Expandir continuam. annotations + onAnnotationsChange ligam as notas: GraphAnnotation { id, text, x, y, parent? } (até 20 por desenho, texto de 1 a 500 com quebra de linha, parent só grupo). A paleta ganha \"Nota\" com o contador; a nota nasce em edição num lugar livre e só vai para onAnnotationsChange quando ganha texto (vazia, some), porque a API recusa nota vazia. Dois cliques ou Editar editam; ⌘↵ ou sair do campo grava. Ela entra num grupo ao soltar, sobe quando o grupo é apagado, segura o tamanho mínimo do grupo e copia e cola como as peças. cleanAnnotationText limpa o texto como a API guarda. Catálogo: peça cujo tipo não está na palette ou cujo serviço não está em palette[].services ganha a marca e um aviso acima do palco (\"escolha outro serviço\" ou \"apague a peça\", com Mostrar), porque a API recusa salvar com 422 até a troca. onOpenInPlayground põe \"Desenho livre\" na barra do exercício: o app cria o desenho com o grafo atual. Achar o defeito (task: spot): pick={{ max, selected, onChange, candidates }} com candidates = os ids do grafo inicial. Selecionada uma peça marcável, a barra mostra \"Marcar como defeito\"/\"Desmarcar\" (também com readOnly, quando answerSpec.graph é false: aí passe readOnly e não passe rules, e o board fica sem Verificar); ao chegar em max, marcar trava. A peça marcada ganha a moldura vermelha tracejada e o selo \"defeito\"; a seção Defeito do rail lista as marcadas pelo tipo e rótulo (os ids são opacos), com o contador \"1 de 2 marcadas\" e o desmarcar. Apagar uma peça marcada a desmarca. Decisão (kind decision, freeDrawingOnly: só no desenho livre; o app filtra a palette): o nó é o losango do fluxograma, com o rótulo no meio e as alças nos vértices. Selecionada uma ligação que sai de uma Decisão, a barra sugere a condição (\"sim\", \"não\", \"erro\", textos em architecture_board.conditions.*) e o clique põe ou tira o rótulo; qualquer outra condição vai pelo Renomear."
     },
     {
       "name": "playground",
@@ -2779,7 +2779,7 @@
       "name": "cloud-service-icon",
       "type": "registry:ui",
       "title": "Cloud Service Icon",
-      "description": "O ícone oficial de cada serviço de nuvem do catálogo (21 da AWS, 22 do GCP e 27 do Azure), pelo id <provedor>.<serviço>. Os SVGs dos pacotes oficiais, sem alteração, instalados em public/cloud-icons e mostrados por <img>, porque o pacote da AWS repete ids de gradiente entre arquivos. Só baixa o que aparece. No GCP, os produtos centrais usam o ícone colorido novo e os outros o azul, como manda o Google; o Entra ID vem do pacote de ícones do Microsoft Entra; o EventBridge Scheduler usa o ícone do EventBridge, porque não tem um próprio.",
+      "description": "O ícone oficial de cada serviço de nuvem do catálogo (29 da AWS, 30 do GCP e 35 do Azure), pelo id <provedor>.<serviço>. Os SVGs dos pacotes oficiais, sem alteração, instalados em public/cloud-icons e mostrados por <img>, porque o pacote da AWS repete ids de gradiente entre arquivos. Só baixa o que aparece. No GCP, os produtos centrais usam o ícone colorido novo e os outros o azul, como manda o Google; o Entra ID vem do pacote de ícones do Microsoft Entra; o EventBridge Scheduler usa o ícone do EventBridge, porque não tem um próprio. Managed Kafka (GCP) usa o ícone da categoria Data Analytics, como o Google orienta para produto sem ícone; Firebase Cloud Messaging vem do pacote de marca do Firebase; os jobs do Cloud Run e do Container Apps usam o ícone do serviço.",
       "dependencies": [],
       "registryDependencies": [
         "utils"
@@ -2805,6 +2805,11 @@
           "target": "~/public/cloud-icons/aws/aurora.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/aws/batch.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/batch.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/aws/cloudfront.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/cloudfront.svg"
@@ -2828,6 +2833,11 @@
           "path": "registry/muriki/cloud-service-icons/aws/ec2.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/ec2.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/ecr.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/ecr.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/aws/ecs.svg",
@@ -2860,9 +2870,19 @@
           "target": "~/public/cloud-icons/aws/eventbridge.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/aws/kinesis-data-streams.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/kinesis-data-streams.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/aws/lambda.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/lambda.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/msk.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/msk.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/aws/opensearch.svg",
@@ -2875,6 +2895,16 @@
           "target": "~/public/cloud-icons/aws/rds.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/aws/redshift.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/redshift.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/route-53.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/route-53.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/aws/s3.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/s3.svg"
@@ -2885,6 +2915,11 @@
           "target": "~/public/cloud-icons/aws/secrets-manager.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/aws/ses.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/ses.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/aws/sns.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/sns.svg"
@@ -2893,6 +2928,11 @@
           "path": "registry/muriki/cloud-service-icons/aws/sqs.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/aws/sqs.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/aws/waf.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/aws/waf.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/gcp/alloydb.svg",
@@ -2910,9 +2950,34 @@
           "target": "~/public/cloud-icons/gcp/apigee.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/gcp/artifact-registry.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/artifact-registry.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/batch.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/batch.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/bigquery.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/bigquery.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-armor.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-armor.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/gcp/cloud-cdn.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/gcp/cloud-cdn.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-dns.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-dns.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/gcp/cloud-load-balancing.svg",
@@ -2933,6 +2998,11 @@
           "path": "registry/muriki/cloud-service-icons/gcp/cloud-run-functions.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/gcp/cloud-run-functions.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/cloud-run-jobs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/cloud-run-jobs.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/gcp/cloud-run.svg",
@@ -2970,6 +3040,11 @@
           "target": "~/public/cloud-icons/gcp/eventarc.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/gcp/firebase-cloud-messaging.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/firebase-cloud-messaging.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/gcp/firestore.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/gcp/firestore.svg"
@@ -2983,6 +3058,11 @@
           "path": "registry/muriki/cloud-service-icons/gcp/identity-platform.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/gcp/identity-platform.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/gcp/managed-kafka.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/gcp/managed-kafka.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/gcp/memorystore.svg",
@@ -3035,14 +3115,34 @@
           "target": "~/public/cloud-icons/azure/application-insights.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/azure/batch.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/batch.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/azure/blob-storage.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/azure/blob-storage.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/azure/communication-services.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/communication-services.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/container-apps-jobs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/container-apps-jobs.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/azure/container-apps.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/azure/container-apps.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/container-registry.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/container-registry.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/azure/cosmos-db.svg",
@@ -3053,6 +3153,11 @@
           "path": "registry/muriki/cloud-service-icons/azure/database-for-postgresql.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/azure/database-for-postgresql.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/dns.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/dns.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/azure/entra-external-id.svg",
@@ -3110,6 +3215,11 @@
           "target": "~/public/cloud-icons/azure/monitor.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/azure/notification-hubs.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/notification-hubs.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/azure/queue-storage.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/azure/queue-storage.svg"
@@ -3130,9 +3240,19 @@
           "target": "~/public/cloud-icons/azure/sql-database.svg"
         },
         {
+          "path": "registry/muriki/cloud-service-icons/azure/synapse-analytics.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/synapse-analytics.svg"
+        },
+        {
           "path": "registry/muriki/cloud-service-icons/azure/virtual-machines.svg",
           "type": "registry:file",
           "target": "~/public/cloud-icons/azure/virtual-machines.svg"
+        },
+        {
+          "path": "registry/muriki/cloud-service-icons/azure/web-application-firewall.svg",
+          "type": "registry:file",
+          "target": "~/public/cloud-icons/azure/web-application-firewall.svg"
         },
         {
           "path": "registry/muriki/cloud-service-icons/azure/web-pubsub.svg",
