@@ -704,6 +704,8 @@ const STRINGS: Record<string, unknown> = {
     relation: "Tipo da ligação",
     target: "Destino",
     provider: "Provedor",
+    locked: "Do enunciado",
+    locked_hint: "Esta peça veio no desenho de partida: dá para renomear, mover e trocar o serviço, mas não apagar.",
     provider_hint_generic: "As peças ficam genéricas. Escolha um provedor para ver os serviços.",
     provider_hint: "Cada peça ganha o primeiro serviço do tipo. Troque na peça selecionada.",
     main_provider: "Nuvem principal",
