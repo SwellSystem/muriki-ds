@@ -19,7 +19,18 @@
  * Só apresentação: nada chama API.
  */
 import * as React from "react"
-import { ArrowClockwiseIcon, CodeIcon, PlusIcon, TrashIcon, WarningCircleIcon } from "@phosphor-icons/react"
+import {
+  ArrowClockwiseIcon,
+  CaretRightIcon,
+  ChatCircleTextIcon,
+  CloudIcon,
+  CodeIcon,
+  NotePencilIcon,
+  PlusIcon,
+  PulseIcon,
+  TrashIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
@@ -64,6 +75,34 @@ export interface PlaygroundDrawing {
   id: string
   title: string
   savedAt: Date | string | number
+  /** Quando foi criado: a segunda linha do desenho na lista. */
+  createdAt?: Date | string | number
+}
+
+/** "2 de out.": o dia em que o desenho nasceu, na língua do app. */
+export function formatCreatedOn(createdAt: Date | string | number, locale = "pt-BR") {
+  return new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(new Date(createdAt))
+}
+
+/** Os pontos do que o tipo faz: ícone e texto curto, um por linha. */
+function Pontos({ itens, apagado }: { itens: Array<{ icone: React.ElementType; texto: string }>; apagado?: boolean }) {
+  return (
+    <ul className="m-0 flex list-none flex-col gap-2 p-0">
+      {itens.map(({ icone: Icone, texto }) => (
+        <li key={texto} className={cn("flex items-center gap-2.5 text-[13px] leading-[18px]", apagado ? "text-muted-foreground" : "text-foreground")}>
+          <span
+            className={cn(
+              "flex size-6 shrink-0 items-center justify-center rounded-[7px]",
+              apagado ? "bg-sunken text-muted-foreground" : "bg-primary-subtle text-primary-subtle-foreground"
+            )}
+          >
+            <Icone aria-hidden className="size-3.5" />
+          </span>
+          {texto}
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 /** Por que o "Novo" não cria agora, se não cria. */
@@ -126,14 +165,24 @@ export function PlaygroundPage({
 
       <section aria-label={t("playground.types")} className="grid gap-4 md:grid-cols-2">
         {/* o tipo que existe: o desenho livre */}
-        <div className="flex flex-col gap-3 rounded-xl bg-card p-5 shadow-xs">
-          <div className="flex items-start gap-3">
-            <BrandLogo brand="architecture" size={40} tile />
+        <article className="flex flex-col gap-4 rounded-xl bg-card p-5 shadow-xs">
+          <div className="flex items-start gap-3.5">
+            {/* o ladrilho no tom da marca, e não branco: no escuro, o branco acendia no cartão */}
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-[11px] bg-primary-subtle shadow-[inset_0_0_0_1px_var(--primary-subtle-border)]">
+              <BrandLogo brand="architecture" size={24} />
+            </span>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
               <h2 className="m-0 text-[17px] leading-[23px] font-semibold text-foreground-strong">{t("playground.drawing.title")}</h2>
               <p className="m-0 text-[13.5px] leading-5 text-muted-foreground">{t("playground.drawing.description")}</p>
             </div>
           </div>
+          <Pontos
+            itens={[
+              { icone: CloudIcon, texto: t("playground.drawing.point_providers") },
+              { icone: NotePencilIcon, texto: t("playground.drawing.point_groups") },
+              { icone: PulseIcon, texto: t("playground.drawing.point_simulate") },
+            ]}
+          />
           {noLimite && !blocked ? (
             <div className="flex flex-col gap-2 rounded-[10px] bg-primary-subtle px-3.5 py-3 text-primary-subtle-foreground shadow-[inset_0_0_0_1px_var(--primary-subtle-border)]">
               <span className="text-[13px] leading-[19px]">
@@ -169,29 +218,57 @@ export function PlaygroundPage({
               ) : null}
             </div>
           ) : null}
-          <div className="mt-auto flex items-center justify-end gap-3 pt-1">
-            <Button variant="primary" onClick={onNewDrawing} disabled={!onNewDrawing || travado} loading={creating}>
+          {/* o pé: quanto do plano já foi (só no Starter) e o Novo */}
+          <div className="mt-auto flex items-center gap-3 border-t border-muted pt-4">
+            {limit !== null && drawings && !blocked ? (
+              <span className="flex min-w-0 flex-col gap-1">
+                <span className="text-[12px] text-muted-foreground">{t("playground.drawing.usage", { count: total, limit })}</span>
+                <span aria-hidden className="flex gap-1">
+                  {Array.from({ length: limit }, (_, i) => (
+                    <span key={i} className={cn("h-1.5 w-6 rounded-full", i < total ? "bg-primary" : "bg-sunken")} />
+                  ))}
+                </span>
+              </span>
+            ) : null}
+            <Button
+              variant="primary"
+              onClick={onNewDrawing}
+              disabled={!onNewDrawing || travado}
+              loading={creating}
+              className="ml-auto"
+            >
               <PlusIcon aria-hidden weight="bold" />
               {t("playground.drawing.new")}
             </Button>
           </div>
-        </div>
+        </article>
 
-        {/* o tipo que vem: o código livre */}
-        <div aria-disabled className="flex flex-col gap-3 rounded-xl bg-card/60 p-5 shadow-xs">
-          <div className="flex items-start gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-[10px] bg-sunken text-muted-foreground">
+        {/* o tipo que vem: o código livre, com o contorno tracejado do que ainda não existe */}
+        <article
+          aria-disabled
+          className="flex flex-col gap-4 rounded-xl border-[1.5px] border-dashed border-input bg-card/50 p-5"
+        >
+          <div className="flex items-start gap-3.5">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-[11px] bg-sunken text-muted-foreground">
               <CodeIcon aria-hidden className="size-5" />
             </span>
             <div className="flex min-w-0 flex-1 flex-col gap-1">
-              <h2 className="m-0 flex items-center gap-2 text-[17px] leading-[23px] font-semibold text-foreground">
+              <h2 className="m-0 flex flex-wrap items-center gap-2 text-[17px] leading-[23px] font-semibold text-foreground">
                 {t("playground.code.title")}
                 <Badge tone="gray">{t("playground.soon")}</Badge>
               </h2>
               <p className="m-0 text-[13.5px] leading-5 text-muted-foreground">{t("playground.code.description")}</p>
             </div>
           </div>
-        </div>
+          <Pontos
+            apagado
+            itens={[
+              { icone: CodeIcon, texto: t("playground.code.point_languages") },
+              { icone: ChatCircleTextIcon, texto: t("playground.code.point_peer") },
+            ]}
+          />
+          <span className="mt-auto border-t border-muted pt-4 text-[12px] text-muted-foreground">{t("playground.code.notify")}</span>
+        </article>
       </section>
 
       <section aria-labelledby="playground-lista" className="flex flex-col gap-2">
@@ -199,11 +276,6 @@ export function PlaygroundPage({
           <h2 id="playground-lista" className="m-0 text-[15px] leading-5 font-semibold text-foreground-strong">
             {t("playground.list.title")}
           </h2>
-          {limit !== null && drawings ? (
-            <span className={cn("font-mono text-[11.5px]", noLimite ? "text-foreground-strong" : "text-muted-foreground")}>
-              {t("playground.list.count", { count: total, limit })}
-            </span>
-          ) : null}
         </div>
         <ListaDeDesenhos
           drawings={drawings}
@@ -248,12 +320,26 @@ function ListaDeDesenhos({
     <>
       <ul className="m-0 flex list-none flex-col overflow-hidden rounded-xl bg-card p-0 shadow-xs">
         {drawings.map((d) => (
-          <li key={d.id} className="group/linha flex min-h-14 items-center gap-3 border-t border-muted pr-2 pl-4 first:border-t-0 hover:bg-muted/50">
+          <li key={d.id} className="group/linha flex min-h-16 items-center gap-2 border-t border-muted pr-2 pl-3 first:border-t-0 hover:bg-muted/50">
             <Abrir drawing={d} renderOpen={renderOpen} onOpen={onOpen}>
-              <span className="truncate text-[14px] font-medium text-foreground-strong">{d.title}</span>
-              <span className="ml-auto shrink-0 text-[12.5px] text-muted-foreground">
+              <span className="flex size-9 shrink-0 items-center justify-center rounded-[9px] bg-primary-subtle">
+                <BrandLogo brand="architecture" size={18} />
+              </span>
+              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <span className="truncate text-[14px] leading-5 font-medium text-foreground-strong">{d.title}</span>
+                {d.createdAt !== undefined ? (
+                  <span className="truncate text-[12px] text-muted-foreground">
+                    {t("playground.list.created", { date: formatCreatedOn(d.createdAt, locale) })}
+                  </span>
+                ) : null}
+              </span>
+              <span className="shrink-0 text-[12.5px] text-muted-foreground max-sm:hidden">
                 {t("playground.list.saved", { ago: formatSavedAgo(d.savedAt, locale) })}
               </span>
+              <CaretRightIcon
+                aria-hidden
+                className="size-4 shrink-0 text-muted-foreground transition-transform group-hover/linha:translate-x-0.5"
+              />
             </Abrir>
             {onDelete ? (
               <Tooltip>

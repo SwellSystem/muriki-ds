@@ -914,10 +914,18 @@ const STRINGS: Record<string, unknown> = {
       title: "Desenho de arquitetura",
       description: "Desenhe livre, com provedores, grupos e notas, e simule onde ele quebra.",
       new: "Novo desenho",
+      point_providers: "AWS, GCP e Azure, ou genérico",
+      point_groups: "Grupos de rede e notas soltas",
+      point_simulate: "Simule e veja onde ele quebra",
+      usage_one: "{{count}} de {{limit}} desenhos do Starter",
+      usage_other: "{{count}} de {{limit}} desenhos do Starter",
     },
     code: {
       title: "Código livre",
       description: "Escreva e rode código fora de um exercício, com o Peer junto.",
+      point_languages: "JavaScript e Python",
+      point_peer: "O Peer junto, sem nota nem nível",
+      notify: "Avisamos quando chegar.",
     },
     limit: {
       reached: "Você usou os {{limit}} desenhos do Starter. No Pro, desenhe sem limite.",
@@ -929,8 +937,8 @@ const STRINGS: Record<string, unknown> = {
     },
     list: {
       title: "Seus desenhos",
-      count: "{{count}} de {{limit}}",
       saved: "salvo {{ago}}",
+      created: "criado em {{date}}",
       empty_title: "Nenhum desenho ainda",
       empty: "Comece um desenho livre no cartão acima. Ele fica aqui, salvo enquanto você desenha.",
       delete: "Apagar {{title}}",

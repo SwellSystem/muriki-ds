@@ -4,6 +4,9 @@
 
 TEXTOS = {
     'pt-BR': dict(
+        pgPonto1='AWS, GCP e Azure, ou genérico', pgPonto2='Grupos de rede e notas soltas', pgPonto3='Simule e veja onde ele quebra',
+        pgPonto4='JavaScript e Python', pgPonto5='O Peer junto, sem nota nem nível', pgAvisamos='Avisamos quando chegar.',
+        pgUso2='2 de 3 desenhos do Starter', pgUso3='3 de 3 desenhos do Starter', pgCriado1='criado em 2 de out.', pgCriado2='criado em 26 de set.', pgCriado3='criado em 15 de set.',
         pgTitulo='Playground', pgSub='Crie fora dos exercícios. Nada aqui vira nota nem muda o seu nível.',
         pgDesenho='Desenho de arquitetura', pgDesenhoTxt='Desenhe livre, com provedores, grupos e notas, e simule onde ele quebra.',
         pgNovo='Novo desenho', pgCodigo='Código livre', pgCodigoTxt='Escreva e rode código fora de um exercício, com o Peer junto.',
@@ -22,6 +25,9 @@ TEXTOS = {
         nota1='Pico às 19 h: 3x o normal.', nota2='Réplica de leitura\ndepois do lançamento',
     ),
     'en-US': dict(
+        pgPonto1='AWS, GCP and Azure, or generic', pgPonto2='Network groups and loose notes', pgPonto3='Simulate and see where it breaks',
+        pgPonto4='JavaScript and Python', pgPonto5='Peer along, no grade or level', pgAvisamos='We will let you know when it arrives.',
+        pgUso2='2 of 3 Starter drawings', pgUso3='3 of 3 Starter drawings', pgCriado1='created Oct 2', pgCriado2='created Sep 26', pgCriado3='created Sep 15',
         pgTitulo='Playground', pgSub='Create outside the exercises. Nothing here becomes a grade or changes your level.',
         pgDesenho='Architecture drawing', pgDesenhoTxt='Draw freely, with providers, groups and notes, and simulate where it breaks.',
         pgNovo='New drawing', pgCodigo='Free code', pgCodigoTxt='Write and run code outside an exercise, with Peer along.',
@@ -40,6 +46,9 @@ TEXTOS = {
         nota1='Peak at 7 pm: 3x normal.', nota2='Read replica\nafter launch',
     ),
     'es-ES': dict(
+        pgPonto1='AWS, GCP y Azure, o genérico', pgPonto2='Grupos de red y notas sueltas', pgPonto3='Simula y ve dónde se rompe',
+        pgPonto4='JavaScript y Python', pgPonto5='El Peer al lado, sin nota ni nivel', pgAvisamos='Te avisamos cuando llegue.',
+        pgUso2='2 de 3 diseños del Starter', pgUso3='3 de 3 diseños del Starter', pgCriado1='creado el 2 de oct.', pgCriado2='creado el 26 de sept.', pgCriado3='creado el 15 de sept.',
         pgTitulo='Playground', pgSub='Crea fuera de los ejercicios. Nada aquí se vuelve nota ni cambia tu nivel.',
         pgDesenho='Diseño de arquitectura', pgDesenhoTxt='Diseña libre, con proveedores, grupos y notas, y simula dónde se rompe.',
         pgNovo='Nuevo diseño', pgCodigo='Código libre', pgCodigoTxt='Escribe y ejecuta código fuera de un ejercicio, con el Peer al lado.',
