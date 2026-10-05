@@ -355,7 +355,7 @@ def tela_exercicio_arquitetura(k, nuvem=False, simular=False):
     # a faixa no topo do palco diz o que é o modo antes do resultado
     resumo = (f'<div role="status" style="display:flex;align-items:flex-start;gap:8px;min-height:34px;padding:7px 16px;box-sizing:border-box;'
               f'border-bottom:1px solid color-mix(in oklab, {k["pri"]} 22%, transparent);background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;line-height:18px;">'
-              f'<span style="margin-top:2px;display:flex;">{_ip("pulso", 14)}</span><span>{T("simResumo")}</span></div>') if simular else ''
+              f'<span style="margin-top:2px;display:flex;">{_ip("pulso", 14)}</span><span><b>{T("simTit")}</b> · {T("simNaoSalvo")} <b>{T("simCaidas")}</b> · {T("simSemCaminho")}</span></div>') if simular else ''
     status = (f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
               f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;">'
               f'<span>{T("statusNuvem") if nuvem else T("status")}</span><span>{T("atalho")}</span></div>')
