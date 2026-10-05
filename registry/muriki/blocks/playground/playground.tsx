@@ -6,15 +6,15 @@
  * O Playground tem tipos. O primeiro é o Desenho de arquitetura (o desenho livre, no
  * ArchitectureBoard sem regras); o Código livre aparece "em breve". Três peças:
  *
- * - `PlaygroundPage`, a tela: os tipos no topo, "Seus desenhos" embaixo, com o limite do plano;
+ * - `PlaygroundPage`, a tela: os tipos no topo, "Seus desenhos" embaixo;
  * - `PlaygroundDrawingHeader`, o cabeçalho do editor: voltar, título editável e o estado de salvo;
  * - `PlaygroundConflict`, o aviso de que o desenho mudou em outro aparelho (409 DRAWING_CONFLICT).
  *
- * O PLANO DIZ O QUE O "NOVO" PODE. No Starter, `limit` desenhos (3) e o contador "2 de 3"; ao bater,
- * a oferta do Pro. No Pro, `limit` é `null` e não há contador. O teto técnico (200,
- * DRAWING_CEILING_REACHED) avisa sem oferecer upgrade a quem já é Pro, e o billing fora do ar (503)
- * pede "tente de novo", nunca o upgrade. Quem desceu do Pro e tem mais que o limite vê e edita
- * todos; só o "Novo" trava.
+ * O LIMITE DO PLANO SÓ APARECE QUANDO BLOQUEIA. O "Novo desenho" fica sempre ativo, sem contador:
+ * quando a API recusa (409 DRAWING_LIMIT_REACHED, DRAWING_CEILING_REACHED ou o billing fora do ar),
+ * o app abre o `PlanLimitDialog` com os textos de `playground.limit`. Só o Starter recebe a oferta do
+ * Pro; o teto técnico e o billing fora do ar avisam sem ela. Quem desceu do Pro e tem mais que o
+ * limite vê e edita todos; só criar bate no modal.
  *
  * Só apresentação: nada chama API.
  */
@@ -105,21 +105,9 @@ function Pontos({ itens, apagado }: { itens: Array<{ icone: React.ElementType; t
   )
 }
 
-/** Por que o "Novo" não cria agora, se não cria. */
-export type PlaygroundBlock = "ceiling" | "unavailable"
-
 export interface PlaygroundPageProps {
   /** Os desenhos da pessoa (`GET /code/drawings`); `null` enquanto carrega. */
   drawings: PlaygroundDrawing[] | null
-  /** `count` da lista: o total, mesmo com a página cortada. */
-  count?: number
-  /** O limite do plano (`limit` da lista): 3 no Starter, `null` no Pro (sem contador). */
-  limit?: number | null
-  /**
-   * `ceiling`: o teto técnico (DRAWING_CEILING_REACHED), sem upgrade. `unavailable`: o billing fora
-   * do ar (503), com "tente de novo". O limite do Starter sai de `count` e `limit`.
-   */
-  blocked?: PlaygroundBlock | null
   onNewDrawing?: () => void
   creating?: boolean
   /** O link para abrir um desenho (o <Link> do roteador), ou `onOpen`. */
@@ -127,33 +115,21 @@ export interface PlaygroundPageProps {
   onOpen?: (drawing: PlaygroundDrawing) => void
   /** Apagar, depois da confirmação. */
   onDelete?: (drawing: PlaygroundDrawing) => void
-  /** O link para os planos, na oferta do Pro do Starter. */
-  upgradeRender?: React.ReactElement
-  /** "Tentar de novo" do billing fora do ar. */
-  onRetry?: () => void
   locale?: string
   className?: string
 }
 
 export function PlaygroundPage({
   drawings,
-  count,
-  limit = null,
-  blocked = null,
   onNewDrawing,
   creating,
   renderOpen,
   onOpen,
   onDelete,
-  upgradeRender,
-  onRetry,
   locale = "pt-BR",
   className,
 }: PlaygroundPageProps) {
   const t = useTranslate()
-  const total = count ?? drawings?.length ?? 0
-  const noLimite = limit !== null && total >= limit
-  const travado = noLimite || !!blocked
   return (
     <div data-slot="playground" className={cn("flex min-w-0 flex-col gap-6", className)}>
       <header className="flex flex-col gap-2">
@@ -183,57 +159,12 @@ export function PlaygroundPage({
               { icone: PulseIcon, texto: t("playground.drawing.point_simulate") },
             ]}
           />
-          {noLimite && !blocked ? (
-            <div className="flex flex-col gap-2 rounded-[10px] bg-primary-subtle px-3.5 py-3 text-primary-subtle-foreground shadow-[inset_0_0_0_1px_var(--primary-subtle-border)]">
-              <span className="text-[13px] leading-[19px]">
-                {total > (limit ?? 0)
-                  ? t("playground.limit.over", { count: total, limit })
-                  : t("playground.limit.reached", { limit })}
-              </span>
-              {upgradeRender
-                ? React.cloneElement(upgradeRender, {
-                    className: "self-start text-[13px] font-medium text-primary underline-offset-[3px] hover:underline",
-                    children: t("playground.limit.upgrade"),
-                  } as React.HTMLAttributes<HTMLElement>)
-                : null}
-            </div>
-          ) : null}
-          {blocked === "ceiling" ? (
-            <p role="status" className="m-0 flex items-start gap-2 text-[13px] leading-[19px] text-foreground">
-              <WarningCircleIcon aria-hidden weight="fill" className="mt-0.5 size-4 shrink-0 text-warning" />
-              {t("playground.limit.ceiling", { count: total })}
-            </p>
-          ) : null}
-          {blocked === "unavailable" ? (
-            <div role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] leading-[19px] text-foreground">
-              <span className="flex items-start gap-2">
-                <WarningCircleIcon aria-hidden weight="fill" className="mt-0.5 size-4 shrink-0 text-warning" />
-                {t("playground.limit.unavailable")}
-              </span>
-              {onRetry ? (
-                <Button variant="ghost" size="sm" onClick={onRetry}>
-                  <ArrowClockwiseIcon aria-hidden />
-                  {t("playground.limit.retry")}
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
-          {/* o pé: quanto do plano já foi (só no Starter) e o Novo */}
+          {/* o pé: o Novo, sempre ativo; o limite do plano só aparece se bloquear (PlanLimitDialog) */}
           <div className="mt-auto flex items-center gap-3 border-t border-muted pt-4">
-            {limit !== null && drawings && !blocked ? (
-              <span className="flex min-w-0 flex-col gap-1">
-                <span className="text-[12px] text-muted-foreground">{t("playground.drawing.usage", { count: total, limit })}</span>
-                <span aria-hidden className="flex gap-1">
-                  {Array.from({ length: limit }, (_, i) => (
-                    <span key={i} className={cn("h-1.5 w-6 rounded-full", i < total ? "bg-primary" : "bg-sunken")} />
-                  ))}
-                </span>
-              </span>
-            ) : null}
             <Button
               variant="primary"
               onClick={onNewDrawing}
-              disabled={!onNewDrawing || travado}
+              disabled={!onNewDrawing}
               loading={creating}
               className="ml-auto"
             >
