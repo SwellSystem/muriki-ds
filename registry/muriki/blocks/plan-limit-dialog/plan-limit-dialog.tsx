@@ -10,7 +10,7 @@
  * É da família das boas-vindas e da troca de linguagem: o véu desfoca a janela inteira, o modal sobe
  * e, no topo, o palco no degradê da marca mostra o que bateu. Com `usage`, as vagas do plano: as
  * ocupadas em ladrilhos (o ícone do app, ex.: o logo de arquitetura), a próxima tracejada com o
- * cadeado, que balança uma vez, e o selo do Pro brilhando ao lado. Sem `usage`, o mascote com o selo.
+ * cadeado, que balança uma vez, e o selo do Pro (o diamante) brilhando ao lado. Sem `usage`, o mascote com o selo.
  * Depois o rótulo mono, o título, o texto, o quadro do Pro (`benefit`) e o rodapé: "Agora não" à
  * esquerda e "Conhecer o Pro" (`upgradeRender` ou `onUpgrade`) à direita.
  *
@@ -27,7 +27,7 @@
  */
 import * as React from "react"
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
-import { ArrowRightIcon, LockSimpleIcon, SparkleIcon, XIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon, LockSimpleIcon, SketchLogoIcon, XIcon } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { MurikiLogo } from "@/components/ui/muriki-logo"
@@ -63,7 +63,10 @@ export interface PlanLimitDialogProps {
   className?: string
 }
 
-/** O selo do Pro: o ladrilho no degradê da marca, com o brilho e "PRO" em mono. */
+/**
+ * O selo do Pro: o ladrilho no degradê da marca, com o diamante e "PRO" em mono. O diamante é do Pro;
+ * o brilho (Sparkle) é da IA no DS (o Peer, o "Você sabia?"), e os dois não se misturam.
+ */
 function SeloPro({ grande = false }: { grande?: boolean }) {
   return (
     <span
@@ -76,7 +79,7 @@ function SeloPro({ grande = false }: { grande?: boolean }) {
         boxShadow: "0 12px 26px -10px color-mix(in oklch, var(--primary) 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.28)",
       }}
     >
-      <SparkleIcon aria-hidden weight="fill" className={grande ? "size-6" : "size-5"} />
+      <SketchLogoIcon aria-hidden weight="fill" className={grande ? "size-6" : "size-[22px]"} />
       <span className="font-mono text-[10px] leading-none font-semibold tracking-[0.16em]">PRO</span>
     </span>
   )
@@ -147,7 +150,7 @@ function Palco({ usage, oferta }: { usage?: PlanLimitUsage; oferta: boolean }) {
   )
 }
 
-/** O que o Pro dá: o quadro tingido com o brilho e o texto. */
+/** O que o Pro dá: o quadro tingido com o diamante e o texto. */
 export function PlanLimitBenefit({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
@@ -161,7 +164,7 @@ export function PlanLimitBenefit({ children, className }: { children: React.Reac
       }}
     >
       <span className="flex size-8 shrink-0 items-center justify-center rounded-[9px] bg-primary text-primary-foreground">
-        <SparkleIcon aria-hidden weight="fill" className="size-4" />
+        <SketchLogoIcon aria-hidden weight="fill" className="size-[18px]" />
       </span>
       <span className="min-w-0 flex-1 text-pretty">{children}</span>
     </div>

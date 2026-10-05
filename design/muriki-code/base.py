@@ -527,22 +527,28 @@ CSS_DIVIDER_SKELETON = (
     '\n@media (prefers-reduced-motion: reduce){.mc .muriki-skeleton{animation:none;background-image:none;}}')
 
 
+# o diamante do Pro (SketchLogo do Phosphor, preenchido): o brilho é da IA, o diamante é do Pro
+def diamante(tam):
+    return (f'<svg width="{tam}" height="{tam}" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">'
+            '<path d="M246,98.73l-56-64A8,8,0,0,0,184,32H72a8,8,0,0,0-6,2.73l-56,64a8,8,0,0,0,.17,10.73l112,120a8,8,0,0,0,11.7,0l112-120A8,8,0,0,0,246,98.73ZM222.37,96H180L144,48h36.37ZM74.58,112l30.13,75.33L34.41,112Zm106.84,0h40.17l-70.3,75.33ZM75.63,48H112L76,96H33.63Z"/></svg>')
+
+
 def selo_pro(k, lado=56):
-    # o selo do Pro do PlanLimitDialog: o ladrilho no degradê da marca, o brilho e "PRO" em mono
+    # o selo do Pro do PlanLimitDialog: o ladrilho no degradê da marca, o diamante e "PRO" em mono
     return (f'<span style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;width:{lado}px;height:{lado}px;'
             f'border-radius:15px;color:{k["prifg"]};flex:0 0 auto;'
             f'background:linear-gradient(145deg, color-mix(in oklch, {k["pri"]} 78%, white) 0%, {k["pri"]} 55%, color-mix(in oklch, {k["pri"]} 70%, black) 100%);'
             f'box-shadow:0 12px 26px -10px color-mix(in oklch, {k["pri"]} 70%, transparent), inset 0 1px 0 rgba(255,255,255,0.28);">'
-            f'{ic("brilho", 20)}<span style="font-family:{MONO};font-size:10px;line-height:1;font-weight:600;letter-spacing:0.16em;">PRO</span></span>')
+            f'{diamante(22)}<span style="font-family:{MONO};font-size:10px;line-height:1;font-weight:600;letter-spacing:0.16em;">PRO</span></span>')
 
 
 def beneficio_pro(k, texto, classe=''):
-    # o quadro do Pro: o brilho num quadradinho da marca e o texto, no degradê tingido
+    # o quadro do Pro: o diamante num quadradinho da marca e o texto, no degradê tingido
     return (f'<div class="{classe}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;'
             f'background:linear-gradient(100deg, {k["prisub"]} 0%, color-mix(in oklch, {k["prisub"]} 40%, {k["card"]}) 100%);'
             f'box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);font-size:14px;line-height:20px;font-weight:500;color:{k["fgs"]};">'
             f'<span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:9px;flex:0 0 auto;'
-            f'background:{k["pri"]};color:{k["prifg"]};">{ic("brilho", 16)}</span>{texto}</div>')
+            f'background:{k["pri"]};color:{k["prifg"]};">{diamante(18)}</span>{texto}</div>')
 
 
 def modal_limite_plano(k, rotulo_mono, titulo, descricao, beneficio=None, vagas=None, uso=None):
