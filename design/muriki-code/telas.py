@@ -1391,6 +1391,8 @@ def _montar(tela, tema, sufixo):
         return web(EXERCICIO, tela_exercicio(k, console=True), valores=VALORES_EXERCICIO)
     if tela['id'] == 'arquitetura':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k))
+    if tela['id'] == 'arquitetura_simular':
+        return web(ARQUITETURA, tela_exercicio_arquitetura(k, simular=True))
     if tela['id'] == 'arquitetura_nuvem':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, nuvem=True))
     if tela['id'] == 'desb_trilhas':

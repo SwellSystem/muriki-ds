@@ -47,6 +47,8 @@ IP = dict(
     ligar=svg('<path d="M6.6 9.4l2.8-2.8"/><path d="M7.4 4.6l1.2-1.2a2.6 2.6 0 013.7 3.7l-1.2 1.2M8.6 11.4l-1.2 1.2a2.6 2.6 0 01-3.7-3.7l1.2-1.2"/>'),
     mover=svg('<path d="M8 1.8v12.4M1.8 8h12.4"/><path d="M6.2 3.6L8 1.8l1.8 1.8M6.2 12.4L8 14.2l1.8-1.8M3.6 6.2L1.8 8l1.8 1.8M12.4 6.2L14.2 8l-1.8 1.8"/>'),
     caret=svg('<path d="M4.5 6.5L8 10l3.5-3.5"/>'),
+    pulso=svg('<path d="M1.6 8h3l1.8-4.4 3.2 8.8L11.4 8h3"/>'),
+    levantar=svg('<path d="M3.2 6.2A5 5 0 1 1 3 9.6"/><path d="M3.2 2.8v3.4h3.4"/>'),
 )
 
 
@@ -73,16 +75,22 @@ def _cartao_secao(k, titulo, corpo, direita='', extra=''):
             f'display:flex;flex-direction:column;overflow:hidden;{extra}">{topo}{corpo}</section>')
 
 
-def _peca(k, x, y, icone, tipo, nome):
-    # a peça do diagrama: o ícone num quadrado tingido, o tipo em mono e o rótulo da pessoa
+def _peca(k, x, y, icone, tipo, nome, estado=''):
+    # a peça do diagrama: o ícone num quadrado tingido, o tipo em mono e o rótulo da pessoa.
+    # estado (Simular): 'caida' fica cinza com o X vermelho; 'apagada' o pulso não alcança
+    fundo = k['muted'] if estado == 'caida' else k['card']
+    conteudo = 'opacity:0.6;filter:grayscale(1);' if estado == 'caida' else ''
+    marca = (f'<span style="position:absolute;top:-8px;right:-8px;display:flex;align-items:center;justify-content:center;width:20px;height:20px;'
+             f'border-radius:999px;background:{k["card"]};box-shadow:0 0 0 1px {k["input"]};color:{k["bad"]};">{ic("x", 12)}</span>') if estado == 'caida' else ''
     return (f'<div style="position:absolute;left:{x}px;top:{y}px;width:168px;min-height:52px;box-sizing:border-box;'
-            f'display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:10px;background:{k["card"]};'
-            f'box-shadow:0 0 0 1px {k["input"]}, 0 1px 2px rgba(0,0,0,0.06);">'
+            f'display:flex;align-items:center;gap:10px;padding:8px 10px 8px 8px;border-radius:10px;background:{fundo};'
+            f'box-shadow:0 0 0 {"2px " + k["pri"] if estado == "caida" else "1px " + k["input"]}, 0 1px 2px rgba(0,0,0,0.06);'
+            f'{"opacity:0.35;" if estado == "apagada" else ""}">'
             f'<span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;'
-            f'background:{k["prisub"]};color:{k["prisubfg"]};flex:0 0 auto;">{_ip(icone, 16)}</span>'
-            f'<span style="display:flex;flex-direction:column;gap:2px;min-width:0;">'
+            f'background:{k["prisub"]};color:{k["prisubfg"]};flex:0 0 auto;{conteudo}">{_ip(icone, 16)}</span>'
+            f'<span style="display:flex;flex-direction:column;gap:2px;min-width:0;{conteudo}">'
             f'<span style="font-family:{MONO};font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:{k["mfg"]};">{tipo}</span>'
-            f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["fgs"]};white-space:nowrap;">{nome}</span></span></div>')
+            f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["fgs"]};white-space:nowrap;">{nome}</span></span>{marca}</div>')
 
 
 def _peca_servico(k, x, y, servico, nome_servico, nome, marcado=False, aprox=False):
@@ -126,9 +134,30 @@ def _chip(k, x, y, texto, marcado=False):
             f'font-size:11px;color:{cor};white-space:nowrap;">{texto}</span>')
 
 
-def _diagrama(k):
-    # palco de 640 × 400: Navegador → API, a API lê o Redis e escreve no Postgres (selecionada)
+def _diagrama(k, simular=False):
+    # palco de 640 × 400: Navegador → API, a API lê o Redis e escreve no Postgres (selecionada).
+    # Simular: a API caiu; o pulso sai do Navegador e para nela; Redis e Postgres ficam apagados
     traco = 'color-mix(in oklab, var(--mfg) 70%, transparent)'
+    if simular:
+        apagado = 'color-mix(in oklab, var(--mfg) 70%, transparent)'
+        linhas = (
+            f'<svg viewBox="0 0 640 400" width="640" height="400" style="position:absolute;inset:0;overflow:visible;" aria-hidden="true">'
+            f'<defs><marker id="seta-sim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">'
+            f'<path d="M0 0L10 5L0 10z" fill="var(--pri)"/></marker>'
+            f'<marker id="seta-sim-apagada" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">'
+            f'<path d="M0 0L10 5L0 10z" fill="var(--mfg)"/></marker></defs>'
+            f'<path d="M188 200H232" fill="none" stroke="var(--pri)" stroke-width="1.5" marker-end="url(#seta-sim)"/>'
+            f'<circle cx="214" cy="200" r="4" fill="var(--pri)"/>'
+            f'<g opacity="0.25"><path d="M400 200H418Q426 200 426 192V94Q426 86 434 86H444" fill="none" stroke="{apagado}" stroke-width="1.25" marker-end="url(#seta-sim-apagada)"/>'
+            f'<path d="M400 200H418Q426 200 426 208V306Q426 314 434 314H444" fill="none" stroke="{apagado}" stroke-width="1.25" marker-end="url(#seta-sim-apagada)"/></g>'
+            f'</svg>')
+        pecas = (_peca(k, 20, 174, 'cliente', T('pCliente'), T('nNavegador'))
+                 + _peca(k, 232, 174, 'api', T('pApi'), T('nApi'), 'caida')
+                 + _peca(k, 444, 60, 'cache', T('pCache'), T('nRedis'), 'apagada')
+                 + _peca(k, 444, 288, 'banco', T('pBanco'), T('nPostgres'), 'apagada'))
+        chips = (_chip(k, 210, 200, T('chama'))
+                 + '<span style="opacity:0.4;">' + _chip(k, 426, 140, f'{T("le")} · {T("rotuloCache")}') + _chip(k, 426, 262, T('escreve')) + '</span>')
+        return f'<div style="position:relative;width:640px;height:400px;">{linhas}{pecas}{chips}</div>'
     linhas = (
         f'<svg viewBox="0 0 640 400" width="640" height="400" style="position:absolute;inset:0;overflow:visible;" aria-hidden="true">'
         f'<defs>'
@@ -212,7 +241,7 @@ def _popover_servico(k):
             f'</ul></div>')
 
 
-def tela_exercicio_arquitetura(k, nuvem=False):
+def tela_exercicio_arquitetura(k, nuvem=False, simular=False):
     chips = (badge(T('chipSD'), k, 'blue') + badge(T('nivel'), k, 'gray') + badge(T('andamento'), k, 'yellow', ponto=True))
     trilha = topo_detalhe(k, [(T('trilhaArq'), '#'), (T('titulo'), '')])
     cab = (f'<header style="display:flex;align-items:flex-end;gap:24px;">'
@@ -272,6 +301,9 @@ def tela_exercicio_arquitetura(k, nuvem=False):
               f'<span style="display:block;padding:6px 16px 10px;font-size:11.5px;color:{k["mfg"]};">{T("dicaVerificar")}</span></div>')
     provedor = _provedor(k, 'aws' if nuvem else 'generico')
     pecas = f'<div style="border-top:1px solid {k["muted"]};">{pecas}</div>'
+    if simular:
+        # durante a simulação o desenho não se edita: a paleta fica apagada
+        provedor, pecas, grupos = (f'<div style="opacity:0.5;">{x}</div>' for x in (provedor, pecas, grupos))
     # o rail rola, como no bloco: as seções não se espremem para caber
     lateral = (f'<div style="width:248px;flex:0 0 248px;display:flex;flex-direction:column;min-height:0;overflow-y:auto;background:{k["rail"]};'
                f'border-right:1px solid {k["muted"]};">{provedor}{pecas}{grupos}{regras}</div>')
@@ -282,7 +314,10 @@ def tela_exercicio_arquitetura(k, nuvem=False):
         + f'">{T(chave)}</span>')
     acao = lambda icone, texto: (f'<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px;border-radius:7px;'
                                  f'font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip(icone, 14)}{texto}</span>')
-    if nuvem:
+    if simular:
+        # o modo Simular com a API derrubada e selecionada: Levantar, Levantar tudo, e o botão aceso
+        selecao = (f'{acao("levantar", T("levantarApi"))}{acao("levantar", T("levantarTudo"))}')
+    elif nuvem:
         # a peça API selecionada: o serviço (com o inspetor aberto), Ligar a…, Mover para…, Renomear e Apagar
         selecao = (f'<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px;border-radius:7px;'
                    f'background:{k["muted"]};font-size:13px;font-weight:500;color:{k["fgs"]};">{_icone_servico("aws.lambda", 16)}AWS Lambda{_ip("caret", 12, k["mfg"])}</span>'
@@ -294,17 +329,26 @@ def tela_exercicio_arquitetura(k, nuvem=False):
                    f'{botao(T("renomear"), k, "ghost", 28, "lapis")}{botao(T("apagar"), k, "ghost", 28, "lixeira")}')
     barra = (f'<div style="position:relative;display:flex;align-items:center;gap:4px;min-height:41px;padding:6px 8px 6px 12px;border-bottom:1px solid {k["muted"]};box-sizing:border-box;">'
              f'{selecao}'
-             f'<span style="margin-left:auto;">{botao(T("verificar"), k, "primary", 30, "check")}</span>'
+             f'<span style="margin-left:auto;display:flex;align-items:center;gap:6px;">'
+             + (f'<span aria-pressed="true" style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 10px;border-radius:8px;'
+                f'background:{k["muted"]};font-size:13px;font-weight:500;color:{k["fgs"]};">{_ip("pulso", 14)}{T("sairSim")}</span>' if simular
+                # estreita, a barra mostra só o ícone; o nome fica no aria-label
+                else f'<span role="img" aria-label="{T("simular")}" title="{T("simular")}" style="display:inline-flex;align-items:center;justify-content:center;'
+                     f'width:30px;height:30px;border-radius:8px;color:{k["fgs"]};">{_ip("pulso", 14)}</span>')
+             + f'{botao(T("verificar"), k, "primary", 30, "check")}</span>'
              + (_popover_servico(k) if nuvem else '') + '</div>')
     canvas_ = (f'<div style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;'
                f'background-color:{k["card"]};background-image:radial-gradient(circle, {k["input"]} 1px, transparent 1.2px);'
-               f'background-size:18px 18px;">{_diagrama_nuvem(k) if nuvem else _diagrama(k)}</div>')
+               f'background-size:18px 18px;">{_diagrama_nuvem(k) if nuvem else _diagrama(k, simular)}</div>')
+    resumo = (f'<div role="status" style="display:flex;align-items:center;gap:8px;min-height:34px;padding:6px 16px;box-sizing:border-box;'
+              f'border-top:1px solid {k["muted"]};background:{k["prisub"]};color:{k["prisubfg"]};font-size:12.5px;line-height:18px;">'
+              f'{_ip("pulso", 14)}<span>{T("simResumo")}</span></div>') if simular else ''
     status = (f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
               f'font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;overflow:hidden;">'
               f'<span>{T("statusNuvem") if nuvem else T("status")}</span><span>{T("atalho")}</span></div>')
     bancada = (f'<section aria-label="{T("bancada")}" style="flex:1;min-width:0;display:flex;background:{k["card"]};'
                f'border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">{lateral}'
-               f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{canvas_}{status}</div></section>')
+               f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">{barra}{canvas_}{resumo}{status}</div></section>')
 
     return app(k, 'exercicios', cab + f'<div style="display:flex;gap:16px;flex:1;min-height:0;">{esquerda}{bancada}</div>',
                compacto=True, pad='24px 28px', gap=18)

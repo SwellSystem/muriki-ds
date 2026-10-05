@@ -37,6 +37,7 @@ TELAS = [
     ('starter_evolucao', 'EvolucaoStarter', 'Evolução', 'Starter · a Evolução nos últimos 7 dias: o aviso, a linha do tempo com a borda e a trajetória fora da janela', 15, 2, 3),
     ('starter_competencia', 'CompetenciaStarter', 'Funções e escopo', 'Starter · a competência nos últimos 7 dias: o histórico sem mudança na janela e a trajetória fora dela', 16, 2, 3),
     ('exercicio_console', 'ExercicioConsole', 'Exercício', 'Exercício · o editor expandido e o Console: o que o código imprimiu, por teste', 18, 2, 3),
+    ('arquitetura_simular', 'ExercicioArquiteturaSimular', 'Exercício de arquitetura', 'Exercício de arquitetura · Simular: a API derrubada, o pulso para nela e o resumo do que ficou sem caminho', 19, 2, 3),
     ('arquitetura_nuvem', 'ExercicioArquiteturaNuvem', 'Exercício de arquitetura', 'Exercício de arquitetura na nuvem · AWS: região, VPC e sub-redes, os ícones oficiais e o serviço da peça', 17, 2, 3),
     ('peer', 'Peer', 'Peer na IDE', 'Peer na IDE', 0, 4, 5),
     ('conectar', 'Conectar', 'Conectar IDE', 'Conectar IDE · código no navegador', 1, 4, 5),
@@ -140,7 +141,7 @@ notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('jornada', 0, 10, 'Entrada e primeiro acesso: código por email, perfil, plano, pagamento, perfil de aprendizado e o primeiro exercício'),
     ('jornadaEscuro', 1, 10, 'Entrada e primeiro acesso no tema escuro'),
-    ('web', 2, 19, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico e na nuvem, com grupos), a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)'),
+    ('web', 2, 20, 'Code web: evolução, competência, exercício, avaliação, playground, o início do primeiro dia, o exercício com o editor expandido e o Console, o exercício de arquitetura (genérico, na nuvem com grupos e Simular), a evolução rolada, o Peer no exercício (testes, faixa, retorno e Você sabia?), a lição passo a passo, o guia de sintaxe e os limites do Starter (Peer sem revisão da IA, Evolução de 7 dias)'),
     ('webEscuro', 3, 8, 'Code web no tema escuro'),
     ('ide', 4, 3, 'Peer na IDE, conta e plano'),
     ('ideEscuro', 5, 3, 'Peer na IDE, conta e plano no tema escuro'),

@@ -22,6 +22,11 @@
  * pessoa reconhece. Escolher um provedor dá a cada peça o primeiro serviço do tipo; a pessoa troca
  * no inspetor. Genérico tira todos.
  *
+ * SIMULAR É PASSAGEIRO. O modo Simular executa o desenho (`simulateFlow`): um pulso parte das peças
+ * Cliente e anda pelas ligações no sentido do trabalho; derrubar uma peça, uma zona ou uma região
+ * mostra até onde ele ainda chega. Nada disso vai para o grafo, e sair do modo volta tudo. Durante a
+ * simulação, o desenho não se edita.
+ *
  * TUDO TEM CAMINHO DE TECLADO. Selecionada uma peça, a barra de cima mostra "Serviço",
  * "Ligar a…", "Mover para…", "Renomear" e "Apagar"; um grupo, "Mover para…", "Renomear" e
  * "Apagar"; uma ligação, os cinco tipos. Arrastar é atalho, não o único jeito. ⌘↵ (Ctrl↵) em
@@ -36,6 +41,7 @@ import {
   Archive,
   ArrowsOutCardinal,
   ArrowsSplit,
+  ArrowCounterClockwise,
   Bell,
   Broadcast,
   Browser,
@@ -57,6 +63,7 @@ import {
   MagnifyingGlass,
   PencilSimple,
   Plug,
+  Pulse,
   Queue,
   ShareNetwork,
   Square,
@@ -65,6 +72,7 @@ import {
   Tray,
   Vault,
   X,
+  XCircle,
 } from "@phosphor-icons/react"
 import {
   Background,
@@ -106,8 +114,10 @@ import {
   deleteGroup,
   nextId,
   reparent,
+  simulateFlow,
   subtreeOf,
   type ArchitectureGraphV2,
+  type FlowSimulation,
   type CloudProvider,
   type GraphEdge,
   type GraphGroup,
@@ -357,7 +367,21 @@ interface Bancada {
   renomear: (id: string, texto: string) => void
   selecionarLigacao: (id: string) => void
   readOnly: boolean
+  /** A simulação em curso, ou `null` fora do modo Simular. */
+  sim: Simulacao | null
 }
+
+interface Simulacao {
+  resultado: FlowSimulation
+  gruposDerrubados: Set<string>
+  /** Quanto dura uma volta do pulso, em segundos, e quanto leva cada passo. */
+  ciclo: number
+  passo: number
+}
+
+// cada passo do pulso leva isto; no fim da volta, uma pausa antes de recomeçar
+const PASSO_DO_PULSO = 0.7
+const PAUSA_DO_PULSO = 0.9
 
 const BancadaContexto = React.createContext<Bancada | null>(null)
 
@@ -416,19 +440,32 @@ const ALCAS = [
 ]
 
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly } = useBancada()
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim } = useBancada()
   const t = useTranslate()
   const servico = servicoDe(data.service)
+  const derrubada = !!sim?.resultado.down.has(id)
+  // na simulação: fora do ar, cinza com o X; sem caminho a partir do Cliente, apagada
+  const apagada = !!sim && !derrubada && !sim.resultado.reached.has(id)
   return (
     <div
       onDoubleClick={() => !readOnly && setEditando(id)}
       title={servico ? tituloDe(data.kind) : undefined}
+      data-sim={derrubada ? "down" : apagada ? "unreached" : sim ? "reached" : undefined}
       className={cn(
-        "group flex w-[168px] min-h-[52px] items-center gap-2.5 rounded-[10px] bg-card py-2 pr-2.5 pl-2 text-left",
+        "group relative flex w-[168px] min-h-[52px] items-center gap-2.5 rounded-[10px] bg-card py-2 pr-2.5 pl-2 text-left transition-opacity",
         "shadow-[0_0_0_1px_var(--input),0_1px_2px_oklch(0_0_0/0.06)]",
-        selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.06)]"
+        selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.06)]",
+        // o cinza vale para o conteúdo; o X continua vermelho
+        derrubada && "bg-muted [&>:not([data-x]):not([data-alca])]:opacity-60 [&>:not([data-x]):not([data-alca])]:grayscale",
+        apagada && "opacity-35"
       )}
     >
+      {derrubada ? (
+        <span data-x className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-card text-destructive shadow-[0_0_0_1px_var(--input)]">
+          <XCircle aria-hidden weight="fill" className="size-4" />
+          <span className="sr-only">{t("architecture_board.sim.down")}</span>
+        </span>
+      ) : null}
       {servico ? (
         // o ícone oficial como veio do pacote, sem fundo nem cor por cima
         <span className="flex size-8 shrink-0 items-center justify-center">
@@ -470,6 +507,7 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
       {ALCAS.map((a) => (
         <Handle
           key={a.id}
+          data-alca
           id={a.id}
           type="source"
           position={a.position}
@@ -501,13 +539,17 @@ const PELE_DO_GRUPO: Record<GroupType, string> = {
 }
 
 function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
-  const { tituloDoGrupo, minimoDe, editando, setEditando, readOnly } = useBancada()
+  const { tituloDoGrupo, minimoDe, editando, setEditando, readOnly, sim } = useBancada()
+  const t = useTranslate()
   const min = minimoDe(id)
+  const derrubado = !!sim?.gruposDerrubados.has(id)
   return (
     <div
+      data-sim={derrubado ? "down" : undefined}
       className={cn(
         "relative size-full rounded-[12px] border-[1.5px]",
         PELE_DO_GRUPO[data.type],
+        derrubado && "border-muted-foreground/50 bg-muted-foreground/[0.08]",
         selected && "outline-2 outline-offset-2 outline-primary"
       )}
     >
@@ -515,6 +557,12 @@ function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
         onDoubleClick={() => !readOnly && setEditando(id)}
         className="absolute top-2 left-2.5 flex max-w-[calc(100%-20px)] items-center gap-1.5 rounded-[6px] bg-card/90 px-1.5 py-0.5 shadow-[0_0_0_1px_var(--input)]"
       >
+        {derrubado ? (
+          <>
+            <XCircle aria-hidden weight="fill" className="size-3.5 shrink-0 text-destructive" />
+            <span className="sr-only">{t("architecture_board.sim.down")}</span>
+          </>
+        ) : null}
         <span className="shrink-0 font-mono text-[9.5px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
           {tituloDoGrupo(data.type)}
         </span>
@@ -556,12 +604,48 @@ function Grupo({ id, data, selected }: NodeProps<GrupoNode>) {
 
 type LigacaoEdge = Edge<{ relation: Relation; label?: string }, "ligacao">
 
+/**
+ * O pulso numa ligação percorrida: um ponto que anda no sentido do trabalho (em `consumes`, contra a
+ * seta) no passo dele da volta, e some fora dele. Com prefers-reduced-motion, nada se mexe: fica o
+ * estado final, a ligação acesa.
+ */
+function Pulso({ caminho, inverso, inicio, sim }: { caminho: string; inverso: boolean; inicio: number; sim: Simulacao }) {
+  const a = (inicio * sim.passo) / sim.ciclo
+  const b = ((inicio + 1) * sim.passo) / sim.ciclo
+  const pontos = inverso ? "1;1;0;0" : "0;0;1;1"
+  return (
+    <g className="motion-reduce:hidden">
+      <circle r={4} fill="var(--primary)" opacity={0}>
+        <animateMotion
+          dur={`${sim.ciclo}s`}
+          repeatCount="indefinite"
+          path={caminho}
+          keyPoints={pontos}
+          keyTimes={`0;${a};${b};1`}
+          calcMode="linear"
+        />
+        <animate
+          attributeName="opacity"
+          dur={`${sim.ciclo}s`}
+          repeatCount="indefinite"
+          values={a > 0 ? "0;1;0" : "1;0"}
+          keyTimes={a > 0 ? `0;${a};${b}` : `0;${b}`}
+          calcMode="discrete"
+        />
+      </circle>
+    </g>
+  )
+}
+
 function Ligacao(props: EdgeProps<LigacaoEdge>) {
-  const { id, data, selected, markerEnd } = props
-  const { editando, setEditando, selecionarLigacao, readOnly } = useBancada()
+  const { id, data, selected, markerEnd, source, target } = props
+  const { editando, setEditando, selecionarLigacao, readOnly, sim } = useBancada()
   const t = useTranslate()
   const [caminho, x, y] = getSmoothStepPath({ ...props, borderRadius: 10 })
   const relation = data?.relation ?? "calls"
+  const percorrida = !!sim?.resultado.edges.has(id)
+  // o pulso parte de quem faz o trabalho: em `consumes`, de quem publica (o destino da seta)
+  const origem = relation === "consumes" ? target : source
   return (
     <>
       <BaseEdge
@@ -569,13 +653,17 @@ function Ligacao(props: EdgeProps<LigacaoEdge>) {
         path={caminho}
         markerEnd={markerEnd}
         style={{
-          stroke: selected ? "var(--primary)" : "color-mix(in oklab, var(--muted-foreground) 70%, transparent)",
-          strokeWidth: selected ? 1.75 : 1.25,
+          stroke: selected || percorrida ? "var(--primary)" : "color-mix(in oklab, var(--muted-foreground) 70%, transparent)",
+          strokeWidth: selected ? 1.75 : percorrida ? 1.5 : 1.25,
+          opacity: sim && !percorrida ? 0.25 : 1,
         }}
       />
+      {sim && percorrida ? (
+        <Pulso caminho={caminho} inverso={relation === "consumes"} inicio={sim.resultado.depth.get(origem) ?? 0} sim={sim} />
+      ) : null}
       <EdgeLabelRenderer>
         <div
-          className="nodrag nopan pointer-events-auto absolute"
+          className={cn("nodrag nopan pointer-events-auto absolute", sim && !percorrida && "opacity-40")}
           style={{ transform: `translate(-50%, -50%) translate(${x}px, ${y}px)` }}
         >
           {editando === id ? (
@@ -628,11 +716,15 @@ function Moldura({
   checking,
   checkDisabledReason,
   checkError,
-  readOnly = false,
+  readOnly: soLeitura = false,
   className,
 }: ArchitectureBoardProps) {
   const t = useTranslate()
   const { screenToFlowPosition } = useReactFlow()
+  // o modo Simular: o que caiu é estado passageiro, e o desenho não se edita enquanto ele dura
+  const [simulando, setSimulando] = React.useState(false)
+  const [derrubados, setDerrubados] = React.useState<{ nodes: string[]; groups: string[] }>({ nodes: [], groups: [] })
+  const readOnly = soLeitura || simulando
   const palco = React.useRef<HTMLDivElement>(null)
   const [selecao, setSelecao] = React.useState<Selecao>(null)
   const [editando, setEditando] = React.useState<string | null>(null)
@@ -963,6 +1055,29 @@ function Moldura({
     }
   }
 
+  const resultado = simulando ? simulateFlow(graph, derrubados) : null
+  const sim: Simulacao | null = resultado
+    ? {
+        resultado,
+        gruposDerrubados: new Set(
+          graph.groups.filter((g) => derrubados.groups.some((d) => g.id === d || chainOfIds(graph.groups, g.id).includes(d))).map((g) => g.id)
+        ),
+        passo: PASSO_DO_PULSO,
+        ciclo: (Math.max(0, ...resultado.depth.values()) + 1) * PASSO_DO_PULSO + PAUSA_DO_PULSO,
+      }
+    : null
+  const alternarSimulacao = () => {
+    setSimulando((v) => !v)
+    setDerrubados({ nodes: [], groups: [] })
+    setEditando(null)
+  }
+  const derrubar = (item: { tipo: "peca" | "grupo"; id: string }) =>
+    setDerrubados((d) => {
+      const lista = item.tipo === "peca" ? d.nodes : d.groups
+      const nova = lista.includes(item.id) ? lista.filter((x) => x !== item.id) : [...lista, item.id]
+      return item.tipo === "peca" ? { ...d, nodes: nova } : { ...d, groups: nova }
+    })
+
   const bancada: Bancada = {
     tituloDe: (kind) => itens.get(kind)?.title ?? kind,
     tituloDoGrupo,
@@ -973,6 +1088,7 @@ function Moldura({
     renomear,
     selecionarLigacao: (id) => setSelecao({ tipo: "ligacao", id }),
     readOnly,
+    sim,
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined
@@ -1077,7 +1193,20 @@ function Moldura({
         </div>
 
         <div className="flex min-h-[420px] min-w-0 flex-1 flex-col">
-          <div className="flex min-h-[41px] items-center gap-1.5 border-b border-muted py-1.5 pr-2 pl-3">
+          {/* estreita, a barra quebra a linha em vez de sobrepor: Verificar desce para a direita */}
+          <div className="@container/barra flex min-h-[41px] flex-wrap items-center gap-1.5 border-b border-muted py-1.5 pr-2 pl-3">
+            {sim ? (
+              <AcoesDaSimulacao
+                peca={pecaSelecionada}
+                grupo={grupoSelecionado}
+                derrubados={derrubados}
+                temQuedas={derrubados.nodes.length + derrubados.groups.length > 0}
+                tituloDe={bancada.tituloDe}
+                tituloDoGrupo={tituloDoGrupo}
+                onDerrubar={derrubar}
+                onLevantarTudo={() => setDerrubados({ nodes: [], groups: [] })}
+              />
+            ) : (
             <Acoes
               peca={pecaSelecionada}
               grupo={grupoSelecionado}
@@ -1094,7 +1223,21 @@ function Moldura({
               onRenomear={(id) => setEditando(id)}
               onApagar={() => selecao && apagar(selecao)}
             />
+            )}
             <span className="ml-auto flex shrink-0 items-center gap-2">
+              <Button
+                variant={simulando ? "secondary" : "ghost"}
+                aria-pressed={simulando}
+                onClick={alternarSimulacao}
+                disabled={graph.nodes.length === 0}
+                title={t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
+              >
+                <Pulse aria-hidden weight={simulando ? "bold" : "regular"} />
+                {/* com a seleção de uma ligação, a barra enche: estreita, fica o ícone e o nome vai para o leitor */}
+                <span className="@max-[760px]/barra:sr-only">
+                  {t(simulando ? "architecture_board.sim.exit" : "architecture_board.sim.start")}
+                </span>
+              </Button>
               {checkDisabledReason ? (
                 <span className="font-mono text-[9.5px] tracking-[0.08em] text-muted-foreground uppercase">
                   {checkDisabledReason}
@@ -1183,6 +1326,13 @@ function Moldura({
             ) : null}
           </div>
 
+          {resultado ? (
+            <ResumoDaSimulacao
+              graph={graph}
+              resultado={resultado}
+              tituloDe={bancada.tituloDe}
+            />
+          ) : null}
           <div className="flex h-[30px] shrink-0 items-center gap-3.5 overflow-hidden border-t border-muted px-4 font-mono text-[11px] whitespace-nowrap text-muted-foreground">
             <span className="truncate">
               {graph.groups.length
@@ -1198,6 +1348,115 @@ function Moldura({
         </div>
       </section>
     </BancadaContexto.Provider>
+  )
+}
+
+/** Os ids dos ancestrais de um grupo, do pai ao topo. */
+function chainOfIds(groups: GraphGroup[], id: string): string[] {
+  const porId = new Map(groups.map((g) => [g.id, g]))
+  const ids: string[] = []
+  for (let g = porId.get(id)?.parent; g && !ids.includes(g); g = porId.get(g)?.parent) ids.push(g)
+  return ids
+}
+
+// ── a simulação ─────────────────────────────────────────────────────────
+
+/** Só zona e região caem inteiras: são lugar. VPC e sub-rede são rede, e não caem sozinhas. */
+const GRUPOS_QUE_CAEM: GroupType[] = ["zone", "region"]
+
+function AcoesDaSimulacao({
+  peca,
+  grupo,
+  derrubados,
+  temQuedas,
+  tituloDe,
+  tituloDoGrupo,
+  onDerrubar,
+  onLevantarTudo,
+}: {
+  peca?: GraphNode
+  grupo?: GraphGroup
+  derrubados: { nodes: string[]; groups: string[] }
+  temQuedas: boolean
+  tituloDe: (kind: string) => string
+  tituloDoGrupo: (type: GroupType) => string
+  onDerrubar: (item: { tipo: "peca" | "grupo"; id: string }) => void
+  onLevantarTudo: () => void
+}) {
+  const t = useTranslate()
+  const alvo = peca
+    ? { tipo: "peca" as const, id: peca.id, nome: peca.label ?? tituloDe(peca.kind), caido: derrubados.nodes.includes(peca.id) }
+    : grupo && GRUPOS_QUE_CAEM.includes(grupo.type)
+      ? {
+          tipo: "grupo" as const,
+          id: grupo.id,
+          nome: grupo.label ? `${tituloDoGrupo(grupo.type)} ${grupo.label}` : tituloDoGrupo(grupo.type),
+          caido: derrubados.groups.includes(grupo.id),
+        }
+      : null
+  return (
+    <span className="flex min-w-0 items-center gap-1">
+      {alvo ? (
+        <Button variant="ghost" size="sm" onClick={() => onDerrubar(alvo)}>
+          {alvo.caido ? <ArrowCounterClockwise aria-hidden /> : <XCircle aria-hidden />}
+          <span className="max-w-[220px] truncate">
+            {t(alvo.caido ? "architecture_board.sim.restore" : "architecture_board.sim.take_down", { name: alvo.nome })}
+          </span>
+        </Button>
+      ) : (
+        <span className="truncate text-[12px] text-muted-foreground">{t("architecture_board.sim.hint")}</span>
+      )}
+      {temQuedas ? (
+        <Button variant="ghost" size="sm" onClick={onLevantarTudo}>
+          <ArrowCounterClockwise aria-hidden />
+          {t("architecture_board.sim.restore_all")}
+        </Button>
+      ) : null}
+    </span>
+  )
+}
+
+/** O resumo da simulação, acima da barra de status: o que ficou de fora, em palavras. */
+function ResumoDaSimulacao({
+  graph,
+  resultado,
+  tituloDe,
+}: {
+  graph: ArchitectureGraphV2
+  resultado: FlowSimulation
+  tituloDe: (kind: string) => string
+}) {
+  const t = useTranslate()
+  const nome = (id: string) => {
+    const n = graph.nodes.find((x) => x.id === id)
+    return n ? (n.label ?? tituloDe(n.kind)) : id
+  }
+  const clientes = graph.nodes.filter((n) => n.kind === "client")
+  const de = clientes.length === 1 ? nome(clientes[0].id) : tituloDe("client")
+  const fora = resultado.unreachable
+  let texto: string
+  if (!clientes.length) texto = t("architecture_board.sim.no_client", { client: tituloDe("client") })
+  else if (!fora.length) texto = t("architecture_board.sim.all_reached", { from: de })
+  else if (fora.length <= 2)
+    texto = t("architecture_board.sim.unreachable", { count: fora.length, names: fora.map(nome).join(t("architecture_board.sim.and")), from: de })
+  else
+    texto = t("architecture_board.sim.unreachable_many", {
+      names: fora.slice(0, 2).map(nome).join(", "),
+      rest: fora.length - 2,
+      from: de,
+    })
+  return (
+    <div
+      role="status"
+      data-slot="architecture-board-simulation"
+      className="flex min-h-[34px] shrink-0 items-center gap-2 border-t border-muted bg-primary-subtle px-4 py-1.5 text-[12.5px] leading-[18px] text-primary-subtle-foreground"
+    >
+      <Pulse aria-hidden weight="bold" className="size-3.5 shrink-0" />
+      <span className="min-w-0">
+        {resultado.down.size ? <span className="font-medium">{t("architecture_board.sim.down_count", { count: resultado.down.size })} · </span> : null}
+        {texto}
+      </span>
+    </div>
   )
 }
 
