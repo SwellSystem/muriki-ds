@@ -35,6 +35,12 @@
  * palco aceita notas (bilhetes amarelos de texto, que não ligam a nada e não contam em regra). A
  * peça cujo tipo ou serviço saiu do catálogo ganha um aviso, porque a API recusa salvar até a troca.
  *
+ * PEÇAS TRANCADAS (EX-C). `locked` são as peças do desenho de partida que a pessoa não pode apagar
+ * nem trocar de tipo (o tipo já não se troca na bancada). Rótulo, posição, grupo e serviço seguem
+ * livres, e as ligações também. A peça trancada mostra o cadeado, e na barra o "Apagar" dá lugar a
+ * "Do enunciado"; o Delete do teclado também não apaga. Se mesmo assim o grafo chegar quebrado, a
+ * API responde 422 GRAPH_INVALID com `locked_node_missing` ou `locked_node_changed`.
+ *
  * ACHAR O DEFEITO. Com `pick`, a pessoa marca até `max` peças como a causa do defeito, separado
  * da seleção e da edição: "Marcar como defeito" na barra da peça selecionada (também com o desenho
  * só leitura), a moldura vermelha tracejada com a bandeira na peça e a seção "Defeito" no rail.
@@ -86,6 +92,7 @@ import {
   SquareHalf,
   Trash,
   Tray,
+  LockSimple,
   Vault,
   Diamond,
   Package,
@@ -218,6 +225,11 @@ export interface ArchitectureBoardProps {
    * (os ids do grafo inicial) limita o que pode ser marcado; sem isto, qualquer peça.
    */
   pick?: { max: number; selected: string[]; onChange: (ids: string[]) => void; candidates?: string[] }
+  /**
+   * As peças do desenho de partida que não se apagam (`locked` do exercício): o cadeado na peça e o
+   * "Apagar" desligado. Rótulo, posição, grupo, serviço e ligações seguem livres.
+   */
+  locked?: string[]
   /** "Abrir no desenho livre", na barra: o app cria um desenho com o grafo atual. */
   onOpenInPlayground?: () => void
   /**
@@ -264,6 +276,17 @@ const ICONES: Record<string, React.ElementType> = {
   "container-registry": Package,
   "batch-job": Stack,
   decision: Diamond,
+}
+
+/** O cadeado da peça do enunciado (`locked`): pequeno, ao lado do tipo, com o porquê no title. */
+function Cadeado() {
+  const t = useTranslate()
+  return (
+    <span title={t("architecture_board.locked_hint")} className="flex shrink-0 text-muted-foreground">
+      <LockSimple aria-hidden weight="fill" className="size-[11px]" />
+      <span className="sr-only">{t("architecture_board.locked")}</span>
+    </span>
+  )
 }
 
 function IconeDaPeca({ kind, className }: { kind: string; className?: string }) {
@@ -433,6 +456,8 @@ interface Bancada {
   destacadas: Set<string>
   /** As peças cujo tipo ou serviço saiu do catálogo. */
   foraDoCatalogo: Set<string>
+  /** As peças do enunciado, que não se apagam (`locked`). */
+  trancadas: Set<string>
 }
 
 interface Simulacao {
@@ -507,8 +532,10 @@ const ALCAS = [
 const DESTAQUE = "outline-2 outline-offset-4 outline-primary/55"
 
 function Peca({ id, data, selected }: NodeProps<PecaNode>) {
-  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas, destacadas } = useBancada()
+  const { tituloDe, servicoDe, editando, setEditando, readOnly, sim, foraDoCatalogo, marcadas, destacadas, trancadas } =
+    useBancada()
   const marcada = marcadas.has(id)
+  const trancada = trancadas.has(id)
   const t = useTranslate()
   const servico = servicoDe(data.service)
   const derrubada = !!sim?.resultado.down.has(id)
@@ -571,10 +598,14 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
               {servico.name}
             </span>
             {servico.approximate ? <MarcaAproximado /> : null}
+            {trancada ? <Cadeado /> : null}
           </span>
         ) : (
-          <span className="truncate font-mono text-[9.5px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
-            {tituloDe(data.kind)}
+          <span className="flex min-w-0 items-center gap-1">
+            <span className="truncate font-mono text-[9.5px] font-medium tracking-[0.12em] text-muted-foreground uppercase">
+              {tituloDe(data.kind)}
+            </span>
+            {trancada ? <Cadeado /> : null}
           </span>
         )}
         {editando === id ? (
@@ -976,6 +1007,7 @@ function Moldura({
   onAnnotationsChange,
   onOpenInPlayground,
   pick,
+  locked,
   highlight,
   className,
 }: ArchitectureBoardProps) {
@@ -1251,8 +1283,11 @@ function Moldura({
     setSelecao({ tipo: "ligacao", id })
   }
 
+  const trancadas = new Set(locked ?? [])
   const apagar = (sel: NonNullable<Selecao>) => {
     if (readOnly) return
+    // a peça do enunciado não sai, nem pela barra nem pelo teclado
+    if (sel.tipo === "peca" && trancadas.has(sel.id)) return
     // a peça apagada sai também das marcadas
     if (sel.tipo === "peca" && pick?.selected.includes(sel.id)) pick.onChange(pick.selected.filter((x) => x !== sel.id))
     if (sel.tipo === "peca")
@@ -1621,6 +1656,7 @@ function Moldura({
     foraDoCatalogo,
     marcadas: new Set(pick?.selected ?? []),
     destacadas,
+    trancadas,
   }
 
   const pecaSelecionada = selecao?.tipo === "peca" ? graph.nodes.find((n) => n.id === selecao.id) : undefined
@@ -1827,6 +1863,7 @@ function Moldura({
               onRotular={renomear}
               onRenomear={(id) => setEditando(id)}
               onApagar={() => selecao && apagar(selecao)}
+              trancada={!!pecaSelecionada && trancadas.has(pecaSelecionada.id)}
             />
             )}
             </div>
@@ -2266,6 +2303,7 @@ function Acoes({
   onRelacao,
   onRenomear,
   onApagar,
+  trancada = false,
 }: {
   /** Dá o rótulo a uma ligação (a condição sugerida na saída de uma Decisão); vazio tira. */
   onRotular?: (id: string, label: string) => void
@@ -2287,6 +2325,8 @@ function Acoes({
   onRelacao: (id: string, relation: Relation) => void
   onRenomear: (id: string) => void
   onApagar: () => void
+  /** A peça selecionada é do enunciado (`locked`): sem o Apagar. */
+  trancada?: boolean
 }) {
   const t = useTranslate()
   // marcar como defeito vale mesmo com o desenho só leitura: é a resposta, não a edição
@@ -2331,10 +2371,18 @@ function Acoes({
         <PencilSimple aria-hidden />
         {t("architecture_board.rename")}
       </Button>
-      <Button variant="ghost" size="sm" onClick={onApagar}>
-        <Trash aria-hidden />
-        {t("architecture_board.delete")}
-      </Button>
+      {trancada && id === peca?.id ? (
+        // a peça do enunciado não se apaga: no lugar do botão, o porquê
+        <span title={t("architecture_board.locked_hint")} className="flex h-7 items-center gap-1.5 px-2 text-[12.5px] text-muted-foreground">
+          <LockSimple aria-hidden weight="fill" className="size-3.5" />
+          {t("architecture_board.locked")}
+        </span>
+      ) : (
+        <Button variant="ghost" size="sm" onClick={onApagar}>
+          <Trash aria-hidden />
+          {t("architecture_board.delete")}
+        </Button>
+      )}
     </>
   )
 

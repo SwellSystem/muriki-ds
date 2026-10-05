@@ -77,7 +77,7 @@ def _cartao_secao(k, titulo, corpo, direita='', extra=''):
             f'display:flex;flex-direction:column;overflow:hidden;{extra}">{topo}{corpo}</section>')
 
 
-def _peca(k, x, y, icone, tipo, nome, estado=''):
+def _peca(k, x, y, icone, tipo, nome, estado='', trancada=False):
     # a peça do diagrama: o ícone num quadrado tingido, o tipo em mono e o rótulo da pessoa.
     # estado (Simular): 'caida' fica cinza com o X vermelho; 'apagada' o pulso não alcança
     fundo = k['muted'] if estado == 'caida' else k['card']
@@ -91,7 +91,10 @@ def _peca(k, x, y, icone, tipo, nome, estado=''):
             f'<span style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;'
             f'background:{k["prisub"]};color:{k["prisubfg"]};flex:0 0 auto;{conteudo}">{_ip(icone, 16)}</span>'
             f'<span style="display:flex;flex-direction:column;gap:2px;min-width:0;{conteudo}">'
-            f'<span style="font-family:{MONO};font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:{k["mfg"]};">{tipo}</span>'
+            f'<span style="display:flex;align-items:center;gap:4px;"><span style="font-family:{MONO};font-size:9.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:{k["mfg"]};">{tipo}</span>'
+            # a peça do enunciado (`locked`, EX-C): o cadeado ao lado do tipo; não se apaga
+            + (f'<span title="{T("trancadaDica")}" style="display:flex;color:{k["mfg"]};">{ic("cadeado", 11)}</span>' if trancada else '')
+            + f'</span>'
             f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["fgs"]};white-space:nowrap;">{nome}</span></span>{marca}</div>')
 
 
@@ -171,8 +174,9 @@ def _diagrama(k, simular=False):
         f'<path d="M400 200H418Q426 200 426 192V94Q426 86 434 86H444" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-arq)"/>'
         f'<path d="M400 200H418Q426 200 426 208V306Q426 314 434 314H444" fill="none" stroke="var(--pri)" stroke-width="1.75" marker-end="url(#seta-arq-sel)"/>'
         f'</svg>')
-    pecas = (_peca(k, 20, 174, 'cliente', T('pCliente'), T('nNavegador'))
-             + _peca(k, 232, 174, 'api', T('pApi'), T('nApi'))
+    # o Navegador e a API vieram no desenho de partida (locked): não se apagam
+    pecas = (_peca(k, 20, 174, 'cliente', T('pCliente'), T('nNavegador'), trancada=True)
+             + _peca(k, 232, 174, 'api', T('pApi'), T('nApi'), trancada=True)
              + _peca(k, 444, 60, 'cache', T('pCache'), T('nRedis'))
              + _peca(k, 444, 288, 'banco', T('pBanco'), T('nPostgres')))
     # a peça selecionada (a ligação "escreve") tem as alças à mostra nas duas pontas
