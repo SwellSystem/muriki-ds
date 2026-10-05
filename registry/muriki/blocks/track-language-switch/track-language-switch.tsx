@@ -456,8 +456,6 @@ function TrackLanguageSwitch({
                   onUpgrade={onSeePro}
                   upgradeRender={proRender}
                   onDismiss={ficar}
-                  size="lg"
-                  className={cn(f.rodape, "justify-end")}
                   buttonClassName={f.botao}
                 />
               ) : (

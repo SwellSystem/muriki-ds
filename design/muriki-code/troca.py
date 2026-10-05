@@ -254,12 +254,8 @@ def _fases(k, cenario, movel=False):
         # as peças do PlanLimitDialog: o quadro do Pro e "Agora não" com "Conhecer o Pro". A linha de cima
         # é o `reason` de quem chegou por um link direto que a API recusou (403 LANGUAGE_NOT_IN_PLAN)
         razao = f'<p class="tl-texto" style="margin:0 0 -10px;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("tlRazao")}</p>'
-        quadro = (f'<div class="tl-texto" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;background:{k["prisub"]};'
-                  f'color:{k["prisubfg"]};font-size:13.5px;line-height:20px;box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 22%, transparent);">'
-                  f'<span style="display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;background:{k["tblue"]};color:{k["tbluefg"]};'
-                  f'font-family:{MONO};font-size:11px;letter-spacing:0.08em;font-weight:500;">PRO</span>{T("tlPlanoPro")}</div>')
-        pro = botao_link(T('plConhecerPro'), 'Planos__SUF__.dc.html', k, 'primary', alt, largura=larg)
-        pro = pro.replace('">', '">' + ic('brilho', 15), 1)
+        quadro = beneficio_pro(k, T('tlPlanoPro'), 'tl-texto')
+        pro = botao_link(T('plConhecerPro'), 'Planos__SUF__.dc.html', k, 'solid', alt, 'seta', larg)
         return (razao + _texto(k, 'tlPlanoTit', 'tlPlanoTxt', movel) + _aviso(k, 'tlPlanoAviso') + quadro
                 + _rodape(k, pro, botao(T('plAgoraNao'), k, 'ghost', alt2, largura=larg), movel=movel))
     c = 'Ida' if cenario == 'ida' else 'Volta'

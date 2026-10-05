@@ -969,6 +969,9 @@ const STRINGS: Record<string, unknown> = {
     },
   },
   plan_limit: {
+    eyebrow: "Limite do plano",
+    usage: "{{used}} de {{limit}} no seu plano",
+    usage_over: "{{used}} · o seu plano guarda {{limit}}",
     upgrade: "Conhecer o Pro",
     dismiss: "Agora não",
     ok: "Entendi",

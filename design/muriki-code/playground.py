@@ -103,7 +103,8 @@ def tela_playground(k, limite=False):
     if not limite:
         return tela
     # o Novo foi clicado com 3 desenhos no Starter: a API recusa (409 DRAWING_LIMIT_REACHED) e o modal abre
-    return com_modal(k, tela, modal_limite_plano(k, T('pgLimiteTitulo'), T('pgLimiteTxt'), T('pgLimitePro')))
+    vagas = (f'<span class="logo-tema" style="display:flex;">{logo_arq(24)}</span>', 3)
+    return com_modal(k, tela, modal_limite_plano(k, T('plRotulo'), T('pgLimiteTitulo'), T('pgLimiteTxt'), T('pgLimitePro'), vagas, T('plUso')))
 
 
 def _nota(k, x, y, chave):

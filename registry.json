@@ -2030,7 +2030,7 @@
       "name": "plan-limit-dialog",
       "type": "registry:block",
       "title": "Plan Limit Dialog",
-      "description": "O modal da ação que o plano não deixa fazer agora: abre só quando a ação é bloqueada (nada de contador antes da hora). Diz o que bateu, o que o Pro dá num quadro com o selo PRO e oferece \"Conhecer o Pro\" ao lado de \"Agora não\". Sem upgradeRender vira só o aviso, com \"Entendi\", para o teto técnico e o billing fora do ar. Textos do app, caso a caso.",
+      "description": "O modal da ação que o plano não deixa fazer agora, da família das boas-vindas e da troca de linguagem: o véu desfocando a janela, o palco no degradê da marca com as vagas do plano (as ocupadas em ladrilhos, a próxima tracejada com o cadeado e o selo do Pro brilhando) ou o mascote com o selo, o rótulo mono, o título, o quadro do Pro e \"Agora não\" com \"Conhecer o Pro\". Sem upgrade vira só o aviso, com \"Entendi\". Folha que sobe de baixo no celular; movimento desligado com prefers-reduced-motion.",
       "dependencies": [
         "@base-ui/react",
         "@phosphor-icons/react"
@@ -2039,9 +2039,8 @@
         "utils",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/i18n",
-        "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/button",
-        "SwellSystem/muriki-ds/dialog"
+        "SwellSystem/muriki-ds/muriki-logo"
       ],
       "files": [
         {
@@ -2050,7 +2049,106 @@
           "target": "components/blocks/plan-limit-dialog/plan-limit-dialog.tsx"
         }
       ],
-      "docs": "No Playground, ao criar e receber 409 DRAWING_LIMIT_REACHED: <PlanLimitDialog open={limite} onOpenChange={setLimite} title={t(\"playground.limit.reached_title\", { limit: 3 })} description={t(\"playground.limit.reached_description\")} benefit={t(\"playground.limit.benefit\")} upgradeRender={<Link to=\"/plans\" />} />. Sem upgradeRender (teto técnico, billing fora do ar) o benefit não aparece e o rodapé é só \"Entendi\". Rótulos em plan_limit.* no i18n, ou por labels. Não use para avisos que não bloqueiam nada."
+      "docs": "No Playground, ao criar e receber 409 DRAWING_LIMIT_REACHED: <PlanLimitDialog open={limite} onOpenChange={setLimite} eyebrow=\"Playground · Starter\" title={t(\"playground.limit.reached_title\", { limit })} description={t(\"playground.limit.reached_description\")} benefit={t(\"playground.limit.benefit\")} usage={{ used: count, limit, icon: <BrandLogo brand=\"architecture\" size={24} /> }} upgradeRender={<Link to=\"/plans\" />} />. usage desenha as vagas no palco (com used > limit, o rótulo diz quanto passou); sem usage, o mascote com o selo do Pro. Sem upgradeRender nem onUpgrade (teto técnico, billing fora do ar) o selo e o quadro do Pro somem e o rodapé é só \"Entendi\". Rótulos em plan_limit.* no i18n, ou por labels. PlanLimitBenefit e PlanLimitActions saem soltos para quem já tem o próprio modal (o not_in_plan do TrackLanguageSwitch). Não use para avisos que não bloqueiam nada.",
+      "css": {
+        "@keyframes muriki-planlimit-veil": {
+          "from": {
+            "opacity": "0"
+          },
+          "to": {
+            "opacity": "1"
+          }
+        },
+        "@keyframes muriki-planlimit-in": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(14px) scale(0.96)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-planlimit-up": {
+          "from": {
+            "transform": "translateY(100%)"
+          },
+          "to": {
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-planlimit-pop": {
+          "from": {
+            "opacity": "0",
+            "transform": "translateY(8px) scale(0.9)"
+          },
+          "to": {
+            "opacity": "1",
+            "transform": "none"
+          }
+        },
+        "@keyframes muriki-planlimit-deny": {
+          "0%, 100%": {
+            "transform": "none"
+          },
+          "20%": {
+            "transform": "translateX(-4px) rotate(-3deg)"
+          },
+          "40%": {
+            "transform": "translateX(4px) rotate(3deg)"
+          },
+          "60%": {
+            "transform": "translateX(-2px)"
+          },
+          "80%": {
+            "transform": "translateX(2px)"
+          }
+        },
+        "@keyframes muriki-planlimit-glow": {
+          "0%, 100%": {
+            "filter": "brightness(1)"
+          },
+          "50%": {
+            "filter": "brightness(1.12)"
+          }
+        },
+        "@keyframes muriki-planlimit-float": {
+          "0%, 100%": {
+            "transform": "translateY(0) rotate(-4deg)"
+          },
+          "50%": {
+            "transform": "translateY(-6px) rotate(-4deg)"
+          }
+        },
+        ".muriki-planlimit-veil": {
+          "animation": "muriki-planlimit-veil 0.35s ease-out both"
+        },
+        ".muriki-planlimit-modal": {
+          "animation": "muriki-planlimit-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.08s both"
+        },
+        ".muriki-planlimit-slot": {
+          "animation": "muriki-planlimit-pop 0.4s ease-out both"
+        },
+        ".muriki-planlimit-next": {
+          "animation": "muriki-planlimit-pop 0.4s ease-out both, muriki-planlimit-deny 0.5s ease-in-out 0.9s"
+        },
+        ".muriki-planlimit-pro": {
+          "animation": "muriki-planlimit-pop 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 0.7s both, muriki-planlimit-glow 2.8s ease-in-out 1.4s infinite"
+        },
+        ".muriki-planlimit-mascot": {
+          "animation": "muriki-planlimit-float 3.2s ease-in-out 0.6s infinite"
+        },
+        "@media (max-width: 767.98px) and (prefers-reduced-motion: no-preference)": {
+          ".muriki-planlimit-modal": {
+            "animation": "muriki-planlimit-up 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both"
+          }
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-planlimit-veil, .muriki-planlimit-modal, .muriki-planlimit-slot, .muriki-planlimit-next, .muriki-planlimit-pro, .muriki-planlimit-mascot": {
+            "animation": "none"
+          }
+        }
+      }
     },
     {
       "name": "playground",
@@ -2087,7 +2185,7 @@
           "target": "components/blocks/playground/index.ts"
         }
       ],
-      "docs": "Tela: <PlaygroundPage drawings={lista?.items ?? null} onNewDrawing={criar} creating={criando} renderOpen={(d) => <Link to=\"/playground/$id\" params={{ id: d.id }} />} onDelete={apagar} locale={i18n.language} />. drawings null = carregando (esqueleto); [] = estado vazio. O Novo fica sempre ativo; quando criar volta 409 DRAWING_LIMIT_REACHED, abra <PlanLimitDialog> (bloco plan-limit-dialog) com title=t(\"playground.limit.reached_title\", { limit }), description=t(\"playground.limit.reached_description\"), benefit=t(\"playground.limit.benefit\") e upgradeRender={<Link to=\"/plans\" />}; com count > limit (quem desceu do Pro), over_title e over_description no lugar. 409 DRAWING_CEILING_REACHED usa ceiling_title/ceiling_description e o 503 do billing usa unavailable_title/unavailable_description, os dois sem upgradeRender (só \"Entendi\"). Apagar pede confirmação (AlertDialog) e chama onDelete. formatSavedAgo(savedAt, locale) é exportado. Editor: <PlaygroundDrawingHeader backRender={<Link to=\"/playground\" />} title={d.title} onTitleChange={renomear} saveState={estado} savedAt={d.savedAt} /> em cima do <ArchitectureBoard> sem rules, com annotations e onAnnotationsChange. O título muda com um clique; chega a onTitleChange já limpo (sem controle, sem espaços nas pontas, 1 a 80); vazio volta ao anterior. No 409 DRAWING_CONFLICT, <PlaygroundConflict onReload={recarregar} onKeepMine={manter} /> entre o cabeçalho e o board. Textos em playground.* no i18n."
+      "docs": "Tela: <PlaygroundPage drawings={lista?.items ?? null} onNewDrawing={criar} creating={criando} renderOpen={(d) => <Link to=\"/playground/$id\" params={{ id: d.id }} />} onDelete={apagar} locale={i18n.language} />. drawings null = carregando (esqueleto); [] = estado vazio. O Novo fica sempre ativo; quando criar volta 409 DRAWING_LIMIT_REACHED, abra <PlanLimitDialog> (bloco plan-limit-dialog) com title=t(\"playground.limit.reached_title\", { limit }), description=t(\"playground.limit.reached_description\"), benefit=t(\"playground.limit.benefit\"), usage={{ used: count, limit, icon: <BrandLogo brand=\"architecture\" size={24} /> }} e upgradeRender={<Link to=\"/plans\" />}; com count > limit (quem desceu do Pro), over_title e over_description no lugar. 409 DRAWING_CEILING_REACHED usa ceiling_title/ceiling_description e o 503 do billing usa unavailable_title/unavailable_description, os dois sem upgradeRender (só \"Entendi\"). Apagar pede confirmação (AlertDialog) e chama onDelete. formatSavedAgo(savedAt, locale) é exportado. Editor: <PlaygroundDrawingHeader backRender={<Link to=\"/playground\" />} title={d.title} onTitleChange={renomear} saveState={estado} savedAt={d.savedAt} /> em cima do <ArchitectureBoard> sem rules, com annotations e onAnnotationsChange. O título muda com um clique; chega a onTitleChange já limpo (sem controle, sem espaços nas pontas, 1 a 80); vazio volta ao anterior. No 409 DRAWING_CONFLICT, <PlaygroundConflict onReload={recarregar} onKeepMine={manter} /> entre o cabeçalho e o board. Textos em playground.* no i18n."
     },
     {
       "name": "trail-map",
