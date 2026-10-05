@@ -9,6 +9,7 @@ from desbloqueio import logo_arq
 
 # a nota usa o lápis da base, no traço dos ícones da bancada
 IP.setdefault('nota', I['lapis'])
+IP.setdefault('decisao', svg('<path d="M8 1.6L14.4 8L8 14.4L1.6 8z"/>'))
 IP.setdefault('nuvem', svg('<path d="M4.6 12.6h6.8a3 3 0 00.4-6A4.2 4.2 0 003.6 7.4a2.6 2.6 0 001 5.2z"/>'))
 IP.setdefault('codigo', svg('<path d="M5.4 4.6L2 8l3.4 3.4M10.6 4.6L14 8l-3.4 3.4"/>'))
 IP.setdefault('conversa', svg('<path d="M2.4 8a5.6 5.6 0 118.6 4.7L8 13.6l-.2-1A5.6 5.6 0 012.4 8z"/>'))
@@ -117,27 +118,47 @@ def _nota(k, x, y, chave):
             f'<p style="margin:0;font-size:12.5px;line-height:18px;white-space:pre-wrap;">{T(chave)}</p></div>')
 
 
+def _decisao(k, x, y, rotulo, lado=112):
+    # a Decisão: o losango do fluxograma, como o nó do bloco; o rótulo no meio, as saídas nos vértices
+    m = lado / 2
+    return (f'<div style="position:absolute;left:{x}px;top:{y}px;width:{lado}px;height:{lado}px;display:flex;align-items:center;justify-content:center;">'
+            f'<svg viewBox="0 0 {lado} {lado}" width="{lado}" height="{lado}" aria-hidden="true" style="position:absolute;inset:0;overflow:visible;">'
+            f'<polygon points="{m},2 {lado - 2},{m} {m},{lado - 2} 2,{m}" stroke-linejoin="round" fill="var(--card)" stroke="var(--input)" stroke-width="1.25"/></svg>'
+            f'<span style="position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;max-width:64px;text-align:center;">'
+            f'<span style="display:flex;color:{k["pri"]};">{_ip("decisao", 13)}</span>'
+            f'<span style="font-size:11.5px;line-height:14px;font-weight:500;color:{k["fgs"]};">{T(rotulo)}</span></span></div>')
+
+
 def _diagrama_livre(k):
-    # palco de 760 × 440, na AWS: o App fora; o balanceador na sub-rede pública; Pedidos e o Estoque na privada; duas notas
+    # palco de 960 × 460, na AWS: o App fora; o balanceador na sub-rede pública; na privada, Pedidos chega à
+    # Decisão "Estoque disponível?": sim escreve no Estoque, não chama "Avisar cliente", fora da região
     traco = 'color-mix(in oklab, var(--mfg) 70%, transparent)'
+    seta = 'marker-end="url(#seta-livre)"'
+    linha = lambda d: f'<path d="{d}" fill="none" stroke="{traco}" stroke-width="1.25" {seta}/>'
     linhas = (
-        f'<svg viewBox="0 0 760 440" width="760" height="440" style="position:absolute;inset:0;overflow:visible;z-index:1;pointer-events:none;" aria-hidden="true">'
+        f'<svg viewBox="0 0 960 460" width="960" height="460" style="position:absolute;inset:0;overflow:visible;z-index:1;pointer-events:none;" aria-hidden="true">'
         f'<defs><marker id="seta-livre" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">'
         f'<path d="M0 0L10 5L0 10z" fill="var(--mfg)"/></marker></defs>'
-        f'<path d="M168 246H186Q194 246 194 238V200Q194 192 202 192H222" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-livre)"/>'
-        f'<path d="M390 192H434" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-livre)"/>'
-        f'<path d="M518 218V280" fill="none" stroke="{traco}" stroke-width="1.25" marker-end="url(#seta-livre)"/>'
-        f'</svg>')
-    grupos = (_grupo(k, 190, 60, 520, 360, 'regiao', 'us-east-1')
-              + _grupo(k, 206, 96, 196, 150, 'publica')
-              + _grupo(k, 420, 96, 274, 300, 'privada'))
-    pecas = (_peca(k, 0, 220, 'cliente', T('pCliente'), T('nApp'))
-             + _peca_servico(k, 222, 166, 'aws.elb', 'Elastic Load Balancing', T('nEntrada'))
-             + _peca_servico(k, 434, 166, 'aws.lambda', 'AWS Lambda', T('nPedidos'))
-             + _peca_servico(k, 434, 282, 'aws.rds', 'Amazon RDS', T('nEstoque')))
-    notas = _nota(k, 0, 0, 'nota1') + _nota(k, 214, 280, 'nota2')
-    chips = (_chip(k, 194, 220, T('chama')) + _chip(k, 412, 192, T('chama')) + _chip(k, 518, 250, T('escreve')))
-    return f'<div style="position:relative;width:760px;height:440px;zoom:0.86;">{grupos}{linhas}{pecas}{notas}{chips}</div>'
+        + linha('M148 246H186Q194 246 194 238V154Q194 146 202 146H222')
+        + linha('M390 146H434')
+        + linha('M518 172V196')
+        + linha('M518 306V346')
+        + linha('M574 252H780')
+        + '</svg>')
+    grupos = (_grupo(k, 190, 40, 560, 410, 'regiao', 'us-east-1')
+              + _grupo(k, 206, 76, 196, 132, 'publica')
+              + _grupo(k, 420, 76, 316, 360, 'privada'))
+    pecas = (_peca(k, -20, 220, 'cliente', T('pCliente'), T('nApp'))
+             + _peca_servico(k, 222, 120, 'aws.elb', 'Elastic Load Balancing', T('nEntrada'))
+             + _peca_servico(k, 434, 120, 'aws.lambda', 'AWS Lambda', T('nPedidos'))
+             + _decisao(k, 462, 196, 'nDecisao')
+             + _peca_servico(k, 434, 346, 'aws.rds', 'Amazon RDS', T('nEstoque'))
+             + _peca_servico(k, 780, 226, 'aws.ses', 'Amazon SES', T('nAvisar')))
+    notas = _nota(k, -20, 40, 'nota1') + _nota(k, 214, 300, 'nota2')
+    rotulo = lambda rel, cond: f'{T(rel)} <span style="color:{k["fg"]};">· {T(cond)}</span>'
+    chips = (_chip(k, 194, 196, T('chama')) + _chip(k, 412, 146, T('chama')) + _chip(k, 518, 184, T('chama'))
+             + _chip(k, 518, 326, rotulo('escreve', 'sim')) + _chip(k, 680, 252, rotulo('chama', 'nao')))
+    return f'<div style="position:relative;width:960px;height:460px;zoom:0.84;">{grupos}{linhas}{pecas}{notas}{chips}</div>'
 
 
 def tela_desenho_livre(k):
@@ -152,7 +173,7 @@ def tela_desenho_livre(k):
         f'<div style="border-top:1px solid {k["muted"]};"><div style="display:flex;align-items:center;height:38px;padding:0 12px 0 14px;">'
         f'{_titulo_secao(titulo, k, forte=False)}<span style="margin-left:auto;font-family:{MONO};font-size:11px;color:{k["mfg"]};">{direita}</span></div>{conteudo}</div>')
     pecas = secao(T('pecasTit'), f'<ul style="margin:0;padding:0 6px 8px;list-style:none;">'
-                  + ''.join(item(i, T(n)) for i, n in [('cliente', 'pCliente'), ('balanceador', 'pBalanceador'), ('api', 'pApi'), ('banco', 'pBanco'), ('cache', 'pCache'), ('fila', 'pFila')]) + '</ul>')
+                  + ''.join(item(i, T(n)) for i, n in [('cliente', 'pCliente'), ('decisao', 'pDecisao'), ('balanceador', 'pBalanceador'), ('api', 'pApi'), ('banco', 'pBanco'), ('cache', 'pCache'), ('fila', 'pFila')]) + '</ul>')
     grupos = secao(T('gruposTit'), f'<ul style="margin:0;padding:0 6px 8px;list-style:none;">'
                    + ''.join(item('grupo', T(g)) for g in ('gRegiao', 'gZona', 'gVpc', 'gPublica', 'gPrivada')) + '</ul>')
     notas = secao(T('notasTit'), f'<ul style="margin:0;padding:0 6px 4px;list-style:none;">{item("nota", T("nota"))}</ul>'
