@@ -733,6 +733,12 @@ const STRINGS: Record<string, unknown> = {
     status_notes_one: "{{count}} nota",
     status_notes_other: "{{count}} notas",
     open_in_playground: "Abrir no desenho livre",
+    condition: "Condição",
+    conditions: {
+      yes: "sim",
+      no: "não",
+      error: "erro",
+    },
     pick: {
       title: "Defeito",
       count_one: "{{count}} de {{max}} marcada",

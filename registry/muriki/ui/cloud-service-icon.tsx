@@ -17,7 +17,7 @@ import type * as React from "react"
 
 import { cn } from "@/lib/utils"
 
-/** Os ids do catálogo (muriki-content catalog/services.yaml) com ícone curado. */
+/** Os ids do catálogo (muriki-content catalog/services.yaml, pacote 2026.10.05-1) com ícone curado. */
 export const CLOUD_SERVICE_ICON_IDS = new Set([
   "aws.lambda",
   "aws.ecs",
@@ -41,6 +41,14 @@ export const CLOUD_SERVICE_ICON_IDS = new Set([
   "aws.cloudwatch",
   "aws.secrets-manager",
   "aws.appsync",
+  "aws.batch",
+  "aws.ses",
+  "aws.kinesis-data-streams",
+  "aws.msk",
+  "aws.route-53",
+  "aws.waf",
+  "aws.redshift",
+  "aws.ecr",
   "gcp.cloud-run",
   "gcp.cloud-run-functions",
   "gcp.gke",
@@ -63,6 +71,17 @@ export const CLOUD_SERVICE_ICON_IDS = new Set([
   "gcp.cloud-monitoring",
   "gcp.cloud-logging",
   "gcp.secret-manager",
+  // o Cloud Run jobs não tem ícone próprio: é o do Cloud Run
+  "gcp.cloud-run-jobs",
+  "gcp.batch",
+  // sem ícone próprio no pacote do Google: o da categoria Data Analytics, como o Google orienta
+  "gcp.managed-kafka",
+  // do pacote de marca do Firebase
+  "gcp.firebase-cloud-messaging",
+  "gcp.cloud-dns",
+  "gcp.cloud-armor",
+  "gcp.bigquery",
+  "gcp.artifact-registry",
   "azure.functions",
   "azure.container-apps",
   "azure.aks",
@@ -90,6 +109,15 @@ export const CLOUD_SERVICE_ICON_IDS = new Set([
   "azure.key-vault",
   "azure.web-pubsub",
   "azure.signalr",
+  // o Container Apps jobs não tem ícone próprio: é o do Container Apps
+  "azure.container-apps-jobs",
+  "azure.batch",
+  "azure.communication-services",
+  "azure.notification-hubs",
+  "azure.dns",
+  "azure.web-application-firewall",
+  "azure.synapse-analytics",
+  "azure.container-registry",
 ])
 
 /** O caminho público do ícone, ou null se o id não tem ícone curado. */
