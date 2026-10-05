@@ -1361,6 +1361,22 @@
    "h": 900,
    "title": "Achar o defeito · marcar a peça que derruba o sistema, os números no Responda e a bancada só leitura · escuro",
    "is_interactive": true
+  },
+  "PlanosCarregando.dc.html": {
+   "x": 6080,
+   "y": 5280,
+   "w": 1440,
+   "h": 900,
+   "title": "Planos · carregando: a silhueta dos cartões, o Pro já tingido",
+   "is_interactive": true
+  },
+  "PlanosCarregandoEscuro.dc.html": {
+   "x": 6080,
+   "y": 6600,
+   "w": 1440,
+   "h": 900,
+   "title": "Planos · carregando: a silhueta dos cartões, o Pro já tingido · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1671,7 +1687,9 @@
   "DesenhoLivre.dc.html",
   "DesenhoLivreEscuro.dc.html",
   "ExercicioArquiteturaDefeito.dc.html",
-  "ExercicioArquiteturaDefeitoEscuro.dc.html"
+  "ExercicioArquiteturaDefeitoEscuro.dc.html",
+  "PlanosCarregando.dc.html",
+  "PlanosCarregandoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

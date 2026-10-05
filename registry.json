@@ -1017,7 +1017,8 @@
         "utils",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/button",
-        "SwellSystem/muriki-ds/skeleton"
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/i18n"
       ],
       "files": [
         {
@@ -1031,6 +1032,11 @@
           "target": "components/blocks/plan-card/plan-card-skeleton.tsx"
         },
         {
+          "path": "registry/muriki/blocks/plan-card/plan-feature-rows.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/plan-card/plan-feature-rows.tsx"
+        },
+        {
           "path": "registry/muriki/blocks/plan-card/plan-grid.tsx",
           "type": "registry:component",
           "target": "components/blocks/plan-card/plan-grid.tsx"
@@ -1041,7 +1047,7 @@
           "target": "components/blocks/plan-card/index.ts"
         }
       ],
-      "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão. O recomendado (emphasized) tem o destaque do platform: anel, fio de luz no topo, brilho no canto e o card um pouco maior; o badgeSlot vira a aba azul colada no canto de cima (passe só o texto). Os outros cards têm o botão no cinza que vira azul no hover."
+      "docs": "O skeleton é o exemplo da regra: nome curto, descrição longa, selo, preço grande, quatro linhas de feature com larguras diferentes e o botão. O recomendado (emphasized) tem o destaque do platform: anel, fio de luz no topo, brilho no canto e o card um pouco maior; o badgeSlot vira a aba azul colada no canto de cima (passe só o texto). Os outros cards têm o botão no cinza que vira azul no hover. Recursos em linhas (PlanFeatureRows, plan-feature-rows.tsx): os recursos tipados do GET /plans ({ key, name, kind: \"boolean\"|\"limit\"|\"value\", value, unit?, icon? }) viram as mesmas linhas em todos os cards, com o ícone num quadradinho, o nome e o valor à direita: limit com unit vira \"50 por mês\"/\"7 dias\" (plan_features.* no i18n, com plural), limit null vira o selo \"sem limite\", boolean true o check e false o \"—\" apagado, value o texto. compareTo (os recursos do plano de base) pinta o que melhora na cor da marca. O nome vem sem a unidade (\"Interações com a IA\", não \"… por mês\"). Ícones sugeridos para o Code: ai_interactions → ChatCircleTextIcon, free_drawings → PencilSimpleIcon, history_days → ClockCounterClockwiseIcon, language_families → ArrowsLeftRightIcon, languages → TerminalWindowIcon, review → EyeIcon. PlanFeatureRowsSkeleton é a silhueta; PlanCardSkeleton featureRows a usa no lugar das quatro frases."
     },
     {
       "name": "onboarding-pricing",
@@ -1112,7 +1118,7 @@
           "target": "components/blocks/onboarding-pricing/coupon-field.tsx"
         }
       ],
-      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador. showPeriodToggle={false} tira o seletor de período quando só há um período à venda. Cupom: <PricingScreen toolbar={<CouponField labels={…} onApply={validar} applied={cupom} error={erro} pending={validando} onRemove={…} />} />, e o plano com desconto leva originalAmountInCents (o preço cheio aparece riscado)."
+      "docs": "Portado do platform e adaptado à casa. O preço rola os dígitos sem framer-motion: a mesma transform, em CSS. Os wrappers BillingPeriodToggle e AccountTypeToggle não vieram — eram trinta linhas em volta do ViewToggle, que a tela monta direto. O selo de teste é o Badge da casa, e o título abandonou font-serif, que aqui cairia na serifada do navegador. showPeriodToggle={false} tira o seletor de período quando só há um período à venda. Cupom: <PricingScreen toolbar={<CouponField labels={…} onApply={validar} applied={cupom} error={erro} pending={validando} onRemove={…} />} />, e o plano com desconto leva originalAmountInCents (o preço cheio aparece riscado). featureLayout=\"rows\" com featureRows em cada plano: os recursos em linhas iguais nos cards (PlanFeatureRows do plan-card, título por featureRowsTitle), o esqueleto com a mesma silhueta e, com dois cards, a grade em 800px. Sem isso, as frases de sempre (o Platform segue assim)."
     },
     {
       "name": "choice-card",
@@ -1219,7 +1225,8 @@
         "SwellSystem/muriki-ds/button",
         "SwellSystem/muriki-ds/skeleton",
         "SwellSystem/muriki-ds/view-toggle",
-        "SwellSystem/muriki-ds/onboarding-pricing"
+        "SwellSystem/muriki-ds/onboarding-pricing",
+        "SwellSystem/muriki-ds/plan-card"
       ],
       "files": [
         {
@@ -1233,7 +1240,7 @@
           "target": "components/blocks/plans-page/subscription-status.tsx"
         }
       ],
-      "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, emphasized: true, tab: \"Atual\", trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O card é próprio, não o PlanCard: aquele tem a hierarquia de quem escolhe o primeiro plano. emphasized deixa o botão sólido (um por tela, ex.: o Pro para quem está no Starter). O trial vira texto verde depois do priceNote. Escolha obrigatória (403 PLAN_CHOICE_REQUIRED: o app segura a pessoa em /plans): labels.title \"Escolha seu plano\", status={<SubscriptionStatus tone=\"required\" label=\"Falta escolher\" description=\"O Code abre assim que você escolher um plano. Nada é cobrado sem você assinar.\" />} (azul tingido, selo sem ponto, sem ação) e três planos: { id: \"starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", ctaLabel: \"Ficar no Starter\" }, { id: \"trial\", name: \"Pro\", badge: \"teste grátis\", amountInCents: 0, priceNote: \"por 14 dias, sem cartão\", features: [\"Tudo do Pro durante o teste\", \"Sem cobrança: o teste acaba sozinho\", \"No fim, você escolhe entre Starter e Pro\"], emphasized: true, tab: \"Recomendado\", ctaLabel: \"Testar o Pro grátis\" } e { id: \"pro\", ctaLabel: \"Assinar o Pro\" } sem emphasized. O teste confirma direto no onSelectPlan, sem checkout; escolher o Starter durante o teste encerra o teste, e isso vai nas rules. badge é o selo verde ao lado do nome. Com três planos (ou loadingCount 3), a grade fica em três colunas do lg para cima e empilha abaixo; com dois, segue em duas a partir do md. Canvas: PlanosEscolha e PlanosEscolhaMovel."
+      "docs": "<PlansPage labels={…} plans={[{ id: \"starter\", name: \"Starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", features, pendingFeatures: [\"Limite mensal de exercícios\"], ctaLabel: \"Mudar para o Starter\" }, { id: \"pro\", name: \"Pro\", amountInCents: 4990, current: true, emphasized: true, tab: \"Atual\", trial: \"grátis até 1º de outubro\", features, ctaLabel: \"Seu plano atual\" }]} period={period} onPeriodChange={setPeriod} onSelectPlan={assinar} status={<SubscriptionStatus tone=\"trial\" label=\"Teste grátis\" description=\"O Pro é grátis até 1º de outubro; a primeira cobrança vem depois.\" action={{ label: \"Gerenciar assinatura\", onClick: abrirPortal }} />} rules={[{ icon: <ClockIcon />, text: \"Cancelou? O Pro fica até o fim do período pago.\" }]} />. Tons do status a partir da assinatura: trialing → trial, active → active, cancelAtPeriodEnd → canceling, past_due/unpaid → overdue. O card é próprio, não o PlanCard: aquele tem a hierarquia de quem escolhe o primeiro plano. emphasized deixa o botão sólido (um por tela, ex.: o Pro para quem está no Starter). O trial vira texto verde depois do priceNote. Escolha obrigatória (403 PLAN_CHOICE_REQUIRED: o app segura a pessoa em /plans): labels.title \"Escolha seu plano\", status={<SubscriptionStatus tone=\"required\" label=\"Falta escolher\" description=\"O Code abre assim que você escolher um plano. Nada é cobrado sem você assinar.\" />} (azul tingido, selo sem ponto, sem ação) e três planos: { id: \"starter\", amountInCents: 0, priceNote: \"para sempre, sem cartão\", ctaLabel: \"Ficar no Starter\" }, { id: \"trial\", name: \"Pro\", badge: \"teste grátis\", amountInCents: 0, priceNote: \"por 14 dias, sem cartão\", features: [\"Tudo do Pro durante o teste\", \"Sem cobrança: o teste acaba sozinho\", \"No fim, você escolhe entre Starter e Pro\"], emphasized: true, tab: \"Recomendado\", ctaLabel: \"Testar o Pro grátis\" } e { id: \"pro\", ctaLabel: \"Assinar o Pro\" } sem emphasized. O teste confirma direto no onSelectPlan, sem checkout; escolher o Starter durante o teste encerra o teste, e isso vai nas rules. badge é o selo verde ao lado do nome. Com três planos (ou loadingCount 3), a grade fica em três colunas do lg para cima e empilha abaixo; com dois, segue em duas a partir do md. Canvas: PlanosEscolha e PlanosEscolhaMovel. Compacto (quadros Planos e PlanosCarregando): até 880px com dois cards e 1200px com três; nome de 16px, description curta, preço de 28px, o botão logo abaixo do preço e, por último, os recursos. Com featureRows (os recursos do GET /plans, PlanFeatureRows) cada card mostra as mesmas linhas, e o que o primeiro plano não tem ou tem menos sai em destaque; labels.featuresTitle é o título mono (\"O que vem no plano\"). Não liste só o que mudou de um plano para o outro: mande todos os recursos em todos os planos. features (as frases) continua para quem não migrou. O esqueleto tem a silhueta das linhas, e o destacado (o último de dois, o do meio de três) vem com o anel, a aba e o botão tingidos."
     },
     {
       "name": "notice-page",

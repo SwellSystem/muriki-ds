@@ -21,6 +21,7 @@ import type { ReactNode } from "react"
 // plan-card.tsx, onde não existe.
 import { PlanCard } from "@/components/blocks/plan-card/plan-card"
 import { PlanCardSkeleton } from "@/components/blocks/plan-card/plan-card-skeleton"
+import { PlanFeatureRows } from "@/components/blocks/plan-card/plan-feature-rows"
 import { PlanGrid } from "@/components/blocks/plan-card/plan-grid"
 import { Badge } from "@/components/ui/badge"
 import { ViewToggle } from "@/components/ui/view-toggle"
@@ -88,6 +89,14 @@ export interface PricingScreenProps {
   loading?: boolean
   /** Quantos esqueletos mostrar enquanto carrega. Padrão 3. */
   loadingCount?: number
+  /**
+   * `"rows"`: os recursos em linhas iguais em todos os cards (`featureRows` de
+   * cada plano), o esqueleto com a mesma silhueta e, com dois cards, a grade
+   * em 800px, para as linhas não quebrarem. `"list"` (padrão): as frases.
+   */
+  featureLayout?: "list" | "rows"
+  /** O título mono acima das linhas, ex.: "O que vem no plano". */
+  featureRowsTitle?: string
   locale?: string
   className?: string
 }
@@ -110,9 +119,13 @@ export function PricingScreen({
   toolbar,
   loading = false,
   loadingCount = 3,
+  featureLayout = "list",
+  featureRowsTitle,
   locale = "pt-BR",
   className,
 }: PricingScreenProps) {
+  const linhas = featureLayout === "rows"
+  const base = plans[0]?.featureRows
   const intervalLabel =
     period === "year" ? labels.intervalYear : labels.intervalMonth
 
@@ -179,10 +192,10 @@ export function PricingScreen({
           ) : null}
         </div>
 
-        <PlanGrid>
+        <PlanGrid className={linhas && (loading ? loadingCount : plans.length) === 2 ? "w-full md:max-w-[800px]" : undefined}>
           {loading
             ? Array.from({ length: loadingCount }, (_, i) => (
-                <PlanCardSkeleton key={i} emphasized={i === 1} />
+                <PlanCardSkeleton key={i} emphasized={i === 1} featureRows={linhas} />
               ))
             : plans.map((plan) => (
                 <PlanCard
@@ -210,6 +223,14 @@ export function PricingScreen({
                     />
                   }
                   featuresSlot={
+                    linhas && plan.featureRows ? (
+                      <PlanFeatureRows
+                        features={plan.featureRows}
+                        compareTo={plan.featureRows === base ? undefined : base}
+                        title={featureRowsTitle}
+                        locale={locale}
+                      />
+                    ) : (
                     <PlanFeatures
                       items={plan.features}
                       title={plan.featuresTitle}
@@ -220,6 +241,7 @@ export function PricingScreen({
                       // dois sinais para o mesmo significado, na mesma grade.
                       accent={plan.featuresTitle ? "sparkle" : "check"}
                     />
+                    )
                   }
                   extraSlots={plan.extra}
                   cta={{

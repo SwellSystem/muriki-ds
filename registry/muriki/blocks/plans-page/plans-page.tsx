@@ -1,16 +1,20 @@
-// A tela de Planos de dentro do app (design/muriki-code, tela_planos).
+// A tela de Planos de dentro do app (design/muriki-code, tela_planos e o
+// quadro PlanosCarregando).
 // Não é a do onboarding, e por isso o card também não é o PlanCard: aquele
 // tem a hierarquia de quem está ESCOLHENDO (nome grande, preço que rola,
 // selo de teste acima do preço, botão tingido). Aqui a pessoa já tem um
-// plano e está conferindo: nome pequeno com o selo "atual" na mesma
-// linha, preço de 34px, o teste como texto verde na linha de baixo, a
-// lista com filete em cima e o botão no contorno. O destaque do card, esse
+// plano e está conferindo, e o cartão é compacto: nome de 16px com o selo
+// "atual" na mesma linha, a descrição curta, preço de 28px, o teste como
+// texto verde na linha de baixo, o botão logo abaixo do preço e, por
+// último, os recursos em linhas (PlanFeatureRows), as mesmas nos dois
+// cartões, para comparar de olho. O destaque do card, esse
 // sim, é o mesmo do PlanCard: anel, fio de luz no topo, brilho no canto e
 // a aba, para /plans falar a língua do onboarding.
 //
-// Cabeçalho, faixa de status, cards e regras moram numa coluna só, de até
-// 1200px, que cresce com o palco: o seletor de período termina alinhado
-// com a borda do último card, e não sobra faixa morta à direita.
+// Cabeçalho, faixa de status, cards e regras moram numa coluna só: até
+// 880px com dois cards (cada um perto de 430px; mais que isso, o preço e a
+// lista se perdem no meio do cartão) e até 1200px com três. O seletor de
+// período termina alinhado com a borda do último card.
 //
 // A escolha pode ser obrigatória (conta nova que ainda não escolheu: a API
 // responde 403 PLAN_CHOICE_REQUIRED e o app segura a pessoa em /plans). Aí
@@ -24,6 +28,11 @@ import { useId, type ReactNode } from "react"
 import { CheckIcon, SpinnerGap } from "@phosphor-icons/react"
 
 import { RollingPrice } from "@/components/blocks/onboarding-pricing/plan-price"
+import {
+  PlanFeatureRows,
+  PlanFeatureRowsSkeleton,
+  type PlanFeature,
+} from "@/components/blocks/plan-card/plan-feature-rows"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -36,6 +45,8 @@ export type PlansPageCurrency = "BRL" | "USD" | "EUR"
 export interface PlansPagePlan {
   id: string
   name: string
+  /** A frase curta abaixo do nome (o `description` do plano). */
+  description?: string
   /** Valor em centavos no período selecionado. Zero cai no rótulo grátis. */
   amountInCents: number
   /** O preço cheio quando um cupom baixou o valor: aparece riscado acima. */
@@ -45,7 +56,14 @@ export interface PlansPagePlan {
   priceNote?: string
   /** O teste, em verde depois da nota, ex.: "grátis até 1º de outubro". */
   trial?: string
-  features: string[]
+  /**
+   * Os recursos tipados do GET /plans, em linhas: o que o plano de base (o
+   * primeiro) não tem ou tem menos sai em destaque. Com eles, `features` não
+   * aparece.
+   */
+  featureRows?: PlanFeature[]
+  /** A lista antiga, de frases com o check. */
+  features?: string[]
   /** O que ainda não tem número: esmaecido, com o selo tracejado. */
   pendingFeatures?: string[]
   /** O selo verde ao lado do nome, ex.: "teste grátis" no card do teste do Pro. */
@@ -76,6 +94,8 @@ export interface PlansPageLabels {
   current: string
   /** O selo tracejado das features sem número, ex.: "a definir". */
   pending: string
+  /** O título mono acima das linhas de recursos, ex.: "O que vem no plano". */
+  featuresTitle?: string
 }
 
 export interface PlansPageRule {
@@ -127,9 +147,11 @@ export function PlansPage({
   className,
 }: PlansPageProps) {
   const intervalo = period === "year" ? labels.intervalYear : labels.intervalMonth
+  const quantos = loading ? loadingCount : plans.length
+  const base = plans[0]?.featureRows
 
   return (
-    <div className={cn("flex w-full max-w-[1200px] flex-col gap-6", className)}>
+    <div className={cn("flex w-full flex-col gap-6", quantos >= 3 ? "max-w-[1200px]" : "max-w-[880px]", className)}>
       <header className="flex flex-col gap-4 md:flex-row md:items-end md:gap-6">
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <h1 className="text-[28px] leading-[34px] font-semibold tracking-[-0.01em] text-foreground-strong">
@@ -167,12 +189,15 @@ export function PlansPage({
 
         <div
           className={cn(
-            "grid gap-6",
-            (loading ? loadingCount : plans.length) >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"
+            "grid items-start gap-5",
+            quantos >= 3 ? "lg:grid-cols-3" : "md:grid-cols-2"
           )}
         >
           {loading
-            ? Array.from({ length: loadingCount }, (_, i) => <PlanTileSkeleton key={i} />)
+            ? Array.from({ length: loadingCount }, (_, i) => (
+                // o destaque fica onde o Pro costuma estar: o último de dois, o do meio de três
+                <PlanTileSkeleton key={i} emphasized={i === (loadingCount >= 3 ? 1 : loadingCount - 1)} />
+              ))
             : plans.map((plan) => (
                 <PlanTile
                   key={plan.id}
@@ -180,6 +205,7 @@ export function PlansPage({
                   labels={labels}
                   intervalo={intervalo}
                   locale={locale}
+                  base={base}
                   pending={plan.id === pendingPlanId}
                   blocked={pendingPlanId !== null && plan.id !== pendingPlanId}
                   onSelect={() => onSelectPlan(plan.id)}
@@ -188,11 +214,11 @@ export function PlansPage({
         </div>
 
         {rules.length > 0 ? (
-          <ul className="grid gap-4 border-t border-muted px-1 pt-5 md:grid-cols-3 md:gap-7">
+          <ul className="grid gap-4 border-t border-muted px-0.5 pt-4 md:grid-cols-3 md:gap-6">
             {rules.map((rule, i) => (
               <li
                 key={i}
-                className="flex items-start gap-2.5 text-[13px] leading-5 text-muted-foreground [&>svg]:mt-0.5 [&>svg]:size-[15px] [&>svg]:shrink-0"
+                className="flex items-start gap-2.5 text-[12.5px] leading-[19px] text-muted-foreground [&>svg]:mt-0.5 [&>svg]:size-[14px] [&>svg]:shrink-0"
               >
                 {rule.icon}
                 <span>{rule.text}</span>
@@ -210,6 +236,7 @@ function PlanTile({
   labels,
   intervalo,
   locale,
+  base,
   pending,
   blocked,
   onSelect,
@@ -218,6 +245,7 @@ function PlanTile({
   labels: PlansPageLabels
   intervalo: string
   locale: string
+  base?: PlanFeature[]
   pending: boolean
   blocked: boolean
   onSelect: () => void
@@ -230,10 +258,8 @@ function PlanTile({
     <section
       aria-labelledby={nameId}
       className={cn(
-        "relative flex min-w-0 flex-col gap-5 overflow-hidden rounded-2xl bg-card px-[30px] py-7",
-        plan.emphasized
-          ? "shadow-float ring-[1.5px] ring-primary/60 md:scale-[1.03]"
-          : "shadow-sm"
+        "relative flex min-w-0 flex-col gap-4 overflow-hidden rounded-2xl bg-card px-6 pt-[22px] pb-3",
+        plan.emphasized ? "shadow-float ring-[1.5px] ring-primary/60" : "shadow-sm"
       )}
     >
       {/* O mesmo destaque do PlanCard recomendado. */}
@@ -250,23 +276,28 @@ function PlanTile({
         </>
       ) : null}
       {plan.tab ? (
-        <div className="absolute top-0 right-0 z-10 rounded-bl-lg bg-primary px-2 py-0.5 text-[10px] font-semibold tracking-wide text-primary-foreground">
+        <div className="absolute top-0 right-5 z-10 rounded-b-lg bg-primary px-2.5 py-[3px] text-[11.5px] font-semibold text-primary-foreground">
           {plan.tab}
         </div>
       ) : null}
 
-      <div className="relative flex items-center gap-2">
-        <h2 id={nameId} className="text-lg font-semibold text-foreground-strong">
-          {plan.name}
-        </h2>
-        {/* No destacado quem diz "atual" é a aba; aqui fica só a marca discreta. */}
-        {plan.current && !plan.emphasized ? (
-          <Badge tone="blue">{labels.current}</Badge>
+      <div className="relative flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <h2 id={nameId} className="text-base leading-[22px] font-semibold text-foreground-strong">
+            {plan.name}
+          </h2>
+          {/* No destacado quem diz "atual" é a aba; aqui fica só a marca discreta. */}
+          {plan.current && !plan.emphasized ? (
+            <Badge tone="blue">{labels.current}</Badge>
+          ) : null}
+          {plan.badge ? <Badge tone="green">{plan.badge}</Badge> : null}
+        </div>
+        {plan.description ? (
+          <p className="text-[13px] leading-[19px] text-muted-foreground">{plan.description}</p>
         ) : null}
-        {plan.badge ? <Badge tone="green">{plan.badge}</Badge> : null}
       </div>
 
-      <div className="relative flex flex-col gap-1">
+      <div className="relative flex flex-col gap-0.5">
         {!gratis &&
         plan.originalAmountInCents !== undefined &&
         plan.originalAmountInCents > plan.amountInCents ? (
@@ -275,20 +306,20 @@ function PlanTile({
           </s>
         ) : null}
         {/* O preço rola os dígitos na troca Mensal/Anual, o mesmo do onboarding. */}
-        <p className="flex flex-wrap items-baseline gap-x-1.5 text-[34px] leading-10 font-semibold tracking-[-0.02em] text-foreground-strong">
+        <p className="flex flex-wrap items-baseline gap-x-1 text-[28px] leading-[34px] font-semibold tracking-[-0.02em] text-foreground-strong">
           {gratis ? (
             labels.free
           ) : (
             <>
               <RollingPrice value={preco(plan.amountInCents, plan.currency ?? "BRL", locale)} />
-              <span className="text-[15px] font-medium tracking-normal text-muted-foreground">
+              <span className="text-sm font-medium tracking-normal text-muted-foreground">
                 /{intervalo}
               </span>
             </>
           )}
         </p>
         {plan.priceNote || plan.trial ? (
-          <span className="text-[13px] text-muted-foreground">
+          <span className="text-[12.5px] leading-[18px] text-muted-foreground">
             {plan.priceNote}
             {plan.priceNote && plan.trial ? " · " : null}
             {plan.trial ? <b className="font-medium text-success">{plan.trial}</b> : null}
@@ -296,28 +327,11 @@ function PlanTile({
         ) : null}
       </div>
 
-      <ul className="relative flex flex-1 flex-col gap-3 border-t border-muted pt-[18px]">
-        {plan.features.map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm leading-[22px] text-foreground">
-            <CheckIcon aria-hidden size={15} className="mt-[3px] shrink-0 text-success" />
-            <span>{item}</span>
-          </li>
-        ))}
-        {plan.pendingFeatures?.map((item) => (
-          <li key={item} className="flex items-start gap-2.5 text-sm leading-[22px] text-muted-foreground">
-            <span className="flex-1">{item}</span>
-            <Badge variant="dashed" className="mt-px">
-              {labels.pending}
-            </Badge>
-          </li>
-        ))}
-      </ul>
-
       <Button
         type="button"
         size="lg"
         variant={plan.emphasized && !plan.current ? "solid" : "outline"}
-        className="relative h-10 w-full"
+        className="relative h-[38px] w-full"
         onClick={onSelect}
         disabled={desligado}
         aria-busy={pending}
@@ -325,25 +339,60 @@ function PlanTile({
         {pending ? <SpinnerGap aria-hidden size={16} className="animate-spin" /> : null}
         {plan.ctaLabel}
       </Button>
+      {plan.featureRows ? (
+        <PlanFeatureRows
+          features={plan.featureRows}
+          compareTo={plan.featureRows === base ? undefined : base}
+          title={labels.featuresTitle}
+          locale={locale}
+          className="relative border-t border-muted"
+        />
+      ) : (
+        <ul className="relative flex flex-1 flex-col gap-3 border-t border-muted pt-4 pb-3">
+          {plan.features?.map((item) => (
+            <li key={item} className="flex items-start gap-2.5 text-sm leading-[22px] text-foreground">
+              <CheckIcon aria-hidden size={15} className="mt-[3px] shrink-0 text-success" />
+              <span>{item}</span>
+            </li>
+          ))}
+          {plan.pendingFeatures?.map((item) => (
+            <li key={item} className="flex items-start gap-2.5 text-sm leading-[22px] text-muted-foreground">
+              <span className="flex-1">{item}</span>
+              <Badge variant="dashed" className="mt-px">
+                {labels.pending}
+              </Badge>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
 
-function PlanTileSkeleton() {
-  // A mesma silhueta do card: nome, preço, quatro features e o botão.
+function PlanTileSkeleton({ emphasized = false }: { emphasized?: boolean }) {
+  // A mesma silhueta do card: nome e descrição, preço e nota, o botão e as
+  // linhas de recursos. O destacado já vem com o anel, a aba e o botão
+  // tingidos, para o olho saber onde vai estar o Pro (como o esqueleto do
+  // onboarding do platform).
   return (
-    <div aria-hidden className="flex flex-col gap-5 rounded-2xl bg-card px-[30px] py-7 shadow-sm">
-      <Skeleton className="h-5 w-24" />
+    <div
+      aria-hidden
+      className={cn(
+        "relative flex flex-col gap-4 rounded-2xl bg-card px-6 pt-[22px] pb-3",
+        emphasized ? "shadow-sm ring-[1.5px] ring-primary/35" : "shadow-sm"
+      )}
+    >
+      {emphasized ? <Skeleton className="absolute top-0 right-5 h-5 w-24 rounded-t-none rounded-b-lg bg-primary/25!" /> : null}
+      <div className="flex flex-col gap-2 pt-0.5">
+        <Skeleton className="h-4 w-[72px]" />
+        <Skeleton className="h-3 w-[78%]" />
+      </div>
       <div className="flex flex-col gap-2">
-        <Skeleton className="h-9 w-40" />
-        <Skeleton className="h-3.5 w-48" />
+        <Skeleton className="h-[30px] w-[116px]" />
+        <Skeleton className="h-3 w-[150px]" />
       </div>
-      <div className="flex flex-col gap-3 border-t border-muted pt-[18px]">
-        {[72, 88, 64, 80].map((w) => (
-          <Skeleton key={w} className="h-4" style={{ width: `${w}%` }} />
-        ))}
-      </div>
-      <Skeleton className="h-10 w-full" />
+      <Skeleton className={cn("h-[38px] w-full", emphasized && "bg-primary/25!")} />
+      <PlanFeatureRowsSkeleton className="border-t border-muted" />
     </div>
   )
 }

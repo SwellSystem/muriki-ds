@@ -1,5 +1,7 @@
 import type { ReactNode } from "react"
 
+import type { PlanFeature } from "@/components/blocks/plan-card/plan-feature-rows"
+
 import type { PlanCurrency } from "./plan-price"
 
 export interface PricingPlan {
@@ -14,6 +16,12 @@ export interface PricingPlan {
   /** Linha pequena abaixo do preço, ex.: "por usuário, cobrado mensal". */
   priceNote?: string
   features: string[]
+  /**
+   * Os recursos tipados do GET /plans, em linhas iguais em todos os cards
+   * (PlanFeatureRows), com `featureLayout="rows"` no PricingScreen. O que o
+   * primeiro plano não tem ou tem menos sai em destaque.
+   */
+  featureRows?: PlanFeature[]
   /** Título mono da lista, ex.: "Tudo do Solo, mais". */
   featuresTitle?: string
   /** Texto do selo de teste grátis, ex.: "14 dias grátis". */

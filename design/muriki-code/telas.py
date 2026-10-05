@@ -645,61 +645,109 @@ def tela_conectar(k):
 
 
 # ── 6 · Planos: dois, e independentes do Platform ──────────────────────
-def tela_planos(k):
-    toggle = (f'<div role="radiogroup" aria-label="{T("periodo")}" style="display:inline-flex;padding:3px;border-radius:999px;'
-              f'background:{k["sunken"]};box-shadow:inset 0 1px 2px rgba(0,0,0,0.06);">'
-              f'<button type="button" role="radio" aria-checked="true" style="height:30px;padding:0 16px;border-radius:999px;border:0;'
-              f'background:{k["card"]};box-shadow:{k["sombra"]};font-family:{FONTE};font-size:13px;font-weight:500;color:{k["fgs"]};">{T("mensal")}</button>'
-              f'<button type="button" role="radio" aria-checked="false" style="height:30px;padding:0 16px;border-radius:999px;border:0;'
-              f'background:transparent;font-family:{FONTE};font-size:13px;color:{k["mfg"]};">{T("anual")}</button></div>')
-    cab = cabecalho(k, None, T('titulo'), T('sub'), direita=toggle)
+# Os recursos vêm do GET /plans?product=code (features tipadas: limit, value, boolean). Cada cartão
+# mostra as MESMAS linhas, na mesma ordem, para comparar de olho: o ícone do recurso, o nome e o valor à
+# direita, com a unidade ("50 por mês", "7 dias"). Sem limite vira o selo "sem limite"; o que o plano não
+# tem é "—", apagado; o que o Pro melhora sai na cor da marca. Compacto: no máximo 880px, o preço e o
+# botão em cima, a lista embaixo.
+RECURSOS_CODE = [
+    # (ícone, nome, Starter, Pro, melhora no Pro)
+    ('peer', 'fIa', 'fIaS', 'fIaP', True),
+    ('lapis', 'fDesenhos', '3', None, True),
+    ('relogio', 'fHistorico', 'fHistS', None, True),
+    ('troca', 'fFamilias', 'fFamS', 'fFamP', True),
+    ('terminal', 'fLinguagens', 'fLingV', 'fLingV', False),
+    ('olho', 'fRevisao', False, True, True),
+]
 
-    def item(t, ok=True, tracejado=False):
-        if tracejado:
-            marca = f'<span style="margin-top:1px;">{badge(T("aDefinir"), k, tracejado=True)}</span>'
-            return (f'<li style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:22px;color:{k["mfg"]};">'
-                    f'<span style="flex:1;">{t}</span>{marca}</li>')
-        return (f'<li style="display:flex;gap:10px;align-items:flex-start;font-size:14px;line-height:22px;color:{k["fg"]};">'
-                f'<span style="margin-top:3px;">{ic("check", 15, k["ok"])}</span><span>{t}</span></li>')
 
-    def plano(nome, aria, preco, sub, itens, acao, destaque=False, selo=''):
-        borda = f'box-shadow:0 0 0 1.5px {k["pri"]}, {k["sombraFlut"]};' if destaque else f'box-shadow:{k["sombra"]};'
-        return (f'<section aria-label="{aria}" style="flex:1;min-width:0;background:{k["card"]};border-radius:16px;{borda}'
-                f'padding:28px 30px;display:flex;flex-direction:column;gap:20px;">'
-                f'<div style="display:flex;align-items:center;gap:8px;">'
-                f'<h2 style="margin:0;font-size:18px;font-weight:600;color:{k["fgs"]};">{nome}</h2>{selo}</div>'
+def linhas_recursos(k, pro):
+    # as mesmas linhas nos dois cartões: o ícone, o nome e o valor com a unidade; o que o Pro melhora na
+    # cor da marca, sem limite no selo, o que falta em "—"
+    def valor(v, melhora):
+        cor = k['pri'] if (pro and melhora) else k['fgs']
+        if v is None:
+            return (f'<span style="display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:999px;'
+                    f'background:{k["prisub"]};color:{k["prisubfg"]};font-size:12px;font-weight:600;white-space:nowrap;">{T("semLimite")}</span>')
+        if v is True:
+            return f'<span style="display:flex;color:{k["ok"]};">{ic("check", 16)}</span>'
+        if v is False:
+            return f'<span style="font-size:14px;color:{k["mfg"]};">—</span>'
+        txt = v if v.isdigit() else T(v)
+        return f'<span style="font-size:13.5px;font-weight:600;color:{cor};white-space:nowrap;font-variant-numeric:tabular-nums;">{txt}</span>'
+    out = ''
+    for i, (icone, nome, vs, vp, melhora) in enumerate(RECURSOS_CODE):
+        v = vp if pro else vs
+        realce = pro and melhora
+        out += (f'<li style="display:flex;align-items:center;gap:12px;min-height:44px;{"" if i == 0 else "border-top:1px solid " + k["muted"] + ";"}">'
+                f'<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:8px;flex:0 0 auto;'
+                f'background:{k["prisub"] if realce else k["sunken"]};color:{k["prisubfg"] if realce else k["mfg"]};">{ic(icone, 15)}</span>'
+                f'<span style="flex:1;min-width:0;font-size:13.5px;line-height:19px;color:{k["mfg"] if v is False else k["fg"]};">{T(nome)}</span>'
+                f'{valor(v, melhora)}</li>')
+    return f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;">{out}</ul>'
+
+
+def linhas_esqueleto(k):
+    sk = lambda estilo: f'<span class="muriki-skeleton" style="display:block;{estilo}"></span>'
+    return ('<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;">' + ''.join(
+        f'<li style="display:flex;align-items:center;gap:12px;min-height:44px;{"" if i == 0 else "border-top:1px solid " + k["muted"] + ";"}">'
+        + sk('width:28px;height:28px;flex:0 0 auto;')
+        + f'<span style="flex:1;">{sk(f"height:12px;width:{l}%;")}</span>'
+        + sk(f'height:12px;width:{v}px;') + '</li>'
+        for i, (l, v) in enumerate([(62, 64), (48, 24), (56, 52), (70, 60), (58, 112), (66, 18)])) + '</ul>')
+
+
+def _plano_esqueleto(k, pro=False):
+    # a silhueta do cartão enquanto o GET /plans carrega, como o PlanCardSkeleton do platform-old: o Pro
+    # já vem com o anel, a aba e o botão tingidos, para o olho saber onde vai estar o destaque
+    sk = lambda estilo: f'<span class="muriki-skeleton" style="display:block;{estilo}"></span>'
+    tinta = f'background-color:color-mix(in oklch, {k["pri"]} 22%, transparent);'
+    borda = f'box-shadow:0 0 0 1.5px color-mix(in oklch, {k["pri"]} 35%, transparent), {k["sombra"]};' if pro else f'box-shadow:{k["sombra"]};'
+    aba = sk(f'position:absolute;top:0;right:20px;width:96px;height:20px;border-radius:0 0 8px 8px;{tinta}') if pro else ''
+    return (f'<div aria-hidden="true" style="position:relative;flex:1;min-width:0;background:{k["card"]};border-radius:16px;{borda}'
+            f'padding:22px 24px 12px;display:flex;flex-direction:column;gap:16px;">{aba}'
+            f'<div style="display:flex;flex-direction:column;gap:8px;padding-top:2px;">{sk("height:16px;width:72px;")}{sk("height:12px;width:78%;")}</div>'
+            f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:30px;width:116px;")}{sk("height:12px;width:150px;")}</div>'
+            + sk('height:38px;width:100%;' + (tinta if pro else ''))
+            + f'<div style="display:flex;flex-direction:column;gap:8px;padding-top:16px;border-top:1px solid {k["muted"]};">{sk("height:10px;width:124px;")}'
+            f'{linhas_esqueleto(k)}</div></div>')
+
+
+def tela_planos(k, carregando=False):
+    cab = cabecalho(k, None, T('titulo'), T('sub'))
+
+    def plano(nome, aria, desc, preco, nota, acao, pro=False, selo=''):
+        borda = f'box-shadow:0 0 0 1.5px color-mix(in oklch, {k["pri"]} 60%, transparent), {k["sombraFlut"]};' if pro else f'box-shadow:{k["sombra"]};'
+        aba = (f'<span style="position:absolute;top:-1px;right:20px;padding:3px 10px;border-radius:0 0 8px 8px;background:{k["pri"]};'
+               f'color:{k["prifg"]};font-size:11.5px;font-weight:600;">{T("recomendadoAba")}</span>') if pro else ''
+        return (f'<section aria-label="{aria}" style="position:relative;flex:1;min-width:0;background:{k["card"]};border-radius:16px;{borda}'
+                f'padding:22px 24px 12px;display:flex;flex-direction:column;gap:16px;">{aba}'
                 f'<div style="display:flex;flex-direction:column;gap:4px;">'
-                f'<span style="font-size:34px;line-height:40px;font-weight:600;color:{k["fgs"]};letter-spacing:-0.02em;">{preco}</span>'
-                f'<span style="font-size:13px;color:{k["mfg"]};">{sub}</span></div>'
-                f'<ul style="margin:0;padding:18px 0 0;border-top:1px solid {k["muted"]};list-style:none;display:flex;flex-direction:column;gap:12px;flex:1;">{itens}</ul>'
-                f'{acao}</section>')
+                f'<div style="display:flex;align-items:center;gap:8px;"><h2 style="margin:0;font-size:16px;line-height:22px;font-weight:600;color:{k["fgs"]};">{nome}</h2>{selo}</div>'
+                f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{desc}</p></div>'
+                f'<div style="display:flex;flex-direction:column;gap:2px;">'
+                f'<span style="display:flex;align-items:baseline;gap:2px;height:34px;font-size:28px;line-height:34px;font-weight:600;color:{k["fgs"]};letter-spacing:-0.02em;">{preco}</span>'
+                f'<span style="font-size:12.5px;line-height:18px;color:{k["mfg"]};">{nota}</span></div>'
+                f'{acao}'
+                f'<div style="display:flex;flex-direction:column;gap:4px;padding-top:4px;border-top:1px solid {k["muted"]};">'
+                f'<span style="padding-top:12px;">{rotulo(T("oQueVem"), k["mfg"])}</span>{linhas_recursos(k, pro)}</div></section>')
 
-    starter = plano(
-        'Starter', T('ariaStarter'), T('gratis'), T('semCartao'),
-        item(T('s1'))
-        + item(T('s2'))
-        + item(T('s3'))
-        + item(T('s4'), tracejado=True)
-        + item(T('peer'), tracejado=True),
-        botao(T('mudarStarter'), k, 'outline', 40, largura='100%'))
-    pro = plano(
-        'Pro', T('ariaPro'), f'{T("preco")}<span style="font-size:15px;font-weight:500;color:{k["mfg"]};">{T("porMes")}</span>',
-        f'{T("porAno")} · <b style="font-weight:500;color:{k["ok"]};">{T("testeAte")}</b>',
-        item(T('p1'))
-        + item(T('p2'))
-        + item(T('p3'))
-        + item(T('p4'))
-        + item(T('p5'), tracejado=True),
-        botao(T('atualBotao'), k, 'outline', 40, largura='100%', desativado=True),
-        destaque=True, selo=badge(T('atual'), k, 'blue'))
+    starter = plano('Starter', T('ariaStarter'), T('descStarter'), T('gratis'), T('semCartao'),
+                    botao(T('atualBotao'), k, 'outline', 38, largura='100%', desativado=True), selo=badge(T('atual'), k, 'blue'))
+    pro = plano('Pro', T('ariaPro'), T('descPro'),
+                f'{T("precoPro")}<span style="font-size:14px;font-weight:500;color:{k["mfg"]};">{T("porMes")}</span>',
+                f'<b style="font-weight:500;color:{k["ok"]};">{T("teste7")}</b> · {T("cancele")}',
+                botao(T('assinarPro'), k, 'solid', 38, largura='100%'), pro=True)
 
-    regra = lambda icone, t: (f'<li style="display:flex;gap:10px;align-items:flex-start;flex:1;font-size:13px;line-height:20px;color:{k["mfg"]};">'
-                              f'<span style="margin-top:2px;">{ic(icone, 15, k["mfg"])}</span><span>{t}</span></li>')
-    regras = (f'<ul style="margin:0;padding:18px 4px 0;list-style:none;display:flex;gap:28px;border-top:1px solid {k["muted"]};">'
+    regra = lambda icone, t: (f'<li style="display:flex;gap:10px;align-items:flex-start;flex:1;font-size:12.5px;line-height:19px;color:{k["mfg"]};">'
+                              f'<span style="margin-top:2px;">{ic(icone, 14, k["mfg"])}</span><span>{t}</span></li>')
+    regras = (f'<ul style="margin:0;padding:16px 2px 0;list-style:none;display:flex;gap:24px;border-top:1px solid {k["muted"]};max-width:880px;">'
               f'{regra("relogio", T("r1"))}'
               f'{regra("troca", T("r2"))}'
               f'{regra("peer", T("r3"))}</ul>')
-    return app(k, 'plano', cab + f'<div style="display:flex;gap:24px;max-width:980px;">{starter}{pro}</div>{regras}')
+    if carregando:
+        starter, pro = _plano_esqueleto(k), _plano_esqueleto(k, pro=True)
+    return app(k, 'plano', cab + f'<div style="display:flex;gap:20px;max-width:880px;align-items:flex-start;">{starter}{pro}</div>{regras}')
 
 
 # ── Entrar e criar conta: o bloco login-page do DS, com a mensagem do Code ──
@@ -1023,13 +1071,6 @@ def tela_plano_inicial(k, sufixo):
     controles = lambda cupom_: (f'<div style="display:flex;align-items:flex-start;gap:12px;min-height:36px;">{cupom_}'
                                 f'<span style="margin-left:auto;"><sc-if value="{h("doisPeriodos")}" hint-placeholder-val="{{{{ true }}}}">{periodo}</sc-if></span></div>')
 
-    def feature(t, faisca=False):
-        if faisca:
-            return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;font-weight:500;color:{k["fgs"]};">'
-                    f'<span style="margin-top:2px;display:flex;color:{k["pri"]};">{ic("brilho", 14)}</span><span>{t}</span></li>')
-        return (f'<li style="display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:19px;color:{k["fg"]};">'
-                f'<span style="margin-top:2px;display:flex;color:{k["ok"]};">{ic("check", 14)}</span><span>{t}</span></li>')
-
     def card(nome, desc, selo, preco, nota, feats, titulo_feats, cta, destaque, teste='', destino=''):
         borda = (f'border:1px solid {k["pri"]};box-shadow:0 4px 12px rgba(0,0,0,0.08);transform:scale(1.03);' if destaque
                  else f'border:1px solid {k["border"]};box-shadow:{k["sombra"]};')
@@ -1045,20 +1086,19 @@ def tela_plano_inicial(k, sufixo):
                 f'{regua}<div style="display:flex;flex-direction:column;gap:6px;">{teste}'
                 f'<p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 6px;">{preco}</p>'
                 f'<span style="font-size:12.5px;color:{k["mfg"]};">{nota}</span></div>'
-                f'{regua}<div style="flex:1;display:flex;flex-direction:column;gap:8px;">{tf}'
-                f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;">{feats}</ul></div>'
+                f'{regua}<div style="flex:1;display:flex;flex-direction:column;gap:4px;">{tf}{feats}</div>'
                 f'<a href="{destino}" style="display:flex;align-items:center;justify-content:center;height:36px;'
                 f'border-radius:9px;{botao_}font-size:14px;font-weight:500;">{cta}</a></article>')
 
     valor = lambda v: f'<span style="font-size:30px;line-height:1;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{v}</span>'
     starter = card('Starter', T('descStarter'), '', valor(T('gratis')), T('notaStarter'),
-                   feature(T('s1')) + feature(T('s2')) + feature(T('s3')), '', T('ctaStarter'), False,
+                   linhas_recursos(k, False), T('oQueVem'), T('ctaStarter'), False,
                    destino=f'Preferencias{sufixo}.dc.html')
     pro = card('Pro', T('descPro'), badge(T('recomendado'), k, 'blue'),
                f'<sc-if value="{h("cp.aplicado")}" hint-placeholder-val="{{{{ false }}}}">'
                f'<s style="width:100%;font-size:14px;color:{k["mfg"]};">{h("per.cheio")}</s></sc-if>'
                + valor(h('per.preco')) + f'<span style="font-size:14px;color:{k["mfg"]};">/{h("per.intervalo")}</span>', h('per.nota'),
-               feature(T('p2'), True) + feature(T('p3'), True) + feature(T('p4'), True), T('tudoStarter'), T('ctaPro'), True,
+               linhas_recursos(k, True), T('oQueVem'), T('ctaPro'), True,
                teste=(f'<span style="align-self:flex-start;">{badge(T("teste"), k, "green", mono=True)}</span>'),
                destino=f'Pagamento{sufixo}.dc.html')
 
@@ -1070,11 +1110,10 @@ def tela_plano_inicial(k, sufixo):
                 f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:20px;width:144px;")}{sk("height:12px;width:176px;")}</div>'
                 f'{sk("height:20px;width:112px;border-radius:999px;")}'
                 f'<div style="display:flex;flex-direction:column;gap:8px;">{sk("height:40px;width:176px;")}{sk("height:12px;width:64px;")}</div>'
-                f'<div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px;">'
-                f'{sk("height:12px;width:85%;")}{sk("height:12px;width:72%;")}{sk("height:12px;width:78%;")}{sk("height:12px;width:60%;")}</div>'
+                f'<div style="flex:1;display:flex;flex-direction:column;gap:6px;">{sk("height:10px;width:124px;")}{linhas_esqueleto(k)}</div>'
                 + sk(f'height:40px;width:100%;' + (f'background-color:color-mix(in oklch, {k["pri"]} 25%, transparent);' if destaque else '')) + '</div>')
 
-    grade = lambda filhos: (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;width:672px;margin:0 auto;">{filhos}</div>')
+    grade = lambda filhos: (f'<div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:24px;width:800px;margin:0 auto;">{filhos}</div>')
     # o cupom vale para o Pro (POST /billing/checkout aceita coupon): fica embaixo da grade, na largura dela
     campo_cupom = lambda borda: (f'<div style="display:flex;gap:8px;">'
                                  f'<input aria-label="{T("cupomLabel")}" value="{h("cp.codigo")}" placeholder="{T("cupomPh")}" spellcheck="false" '
@@ -1098,7 +1137,7 @@ def tela_plano_inicial(k, sufixo):
     planos = (f'<sc-if value="{h("pronto")}" hint-placeholder-val="{{{{ true }}}}">{grade(starter + pro)}</sc-if>'
               f'<sc-if value="{h("carregando")}" hint-placeholder-val="{{{{ false }}}}">{grade(esqueleto(False) + esqueleto(True))}</sc-if>')
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, "Muriki Code")}'
-            f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:32px 24px 40px;">'
+            f'<main style="flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:36px;width:1024px;align-self:center;padding:32px 24px 40px;box-sizing:border-box;">'
             f'{cab}<div style="display:flex;flex-direction:column;gap:20px;">{secao}{controles(cupom)}{planos}</div></main></div>')
 
 
@@ -1431,6 +1470,8 @@ def _montar(tela, tema, sufixo):
         return web(CONECTAR, tela_conectar(k))
     if tela['id'] == 'planos':
         return web(PLANOS, tela_planos(k))
+    if tela['id'] == 'planos_carregando':
+        return web(PLANOS, tela_planos(k, carregando=True), css=CSS_DIVIDER_SKELETON)
     if tela['id'] == 'conta_dados':
         return web(MINHA_CONTA, tela_conta_dados(k), ANTES_CONTA_DADOS, VALORES_CONTA_DADOS, PROPS_CONTA_DADOS)
     if tela['id'] == 'conta_aprendizado':
