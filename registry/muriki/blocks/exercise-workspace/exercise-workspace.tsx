@@ -19,6 +19,10 @@
  * O Peer mora numa aba do cartão do enunciado (ExerciseStatement `peer`, com <PeerHistory
  * variant="tab" />), e não embaixo dele: o histórico crescia e espremia o enunciado. A aba Peer
  * acende um ponto quando chega fala nova com ela fechada.
+ *
+ * O enunciado (ExerciseStatement) começa pelo objetivo numa frase (`objective`, que fica à vista com
+ * o cartão recolhido), e no cabeçalho traz a lição, o guia de sintaxe e "Ler em tela cheia", que abre
+ * o mesmo texto num painel largo, na medida de leitura.
  * O editor ocupa o resto, na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo
  * empilha: cabeçalho, painel (na altura do conteúdo, sem rolar por dentro), editor, e dentro do
  * editor a árvore e os testes sobem para cima do código.
@@ -35,12 +39,15 @@
 import * as React from "react"
 import { createPortal } from "react-dom"
 import {
+  ArrowsOutSimpleIcon,
+  BookOpenIcon,
   CaretDownIcon,
   CaretRightIcon,
   CheckCircleIcon,
   CheckIcon,
   CircleIcon,
   FileIcon,
+  InfoIcon,
   LaptopIcon,
   LightbulbIcon,
   LockIcon,
@@ -63,6 +70,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Modal, ModalBody, ModalContent, ModalHeader, ModalTitle } from "@/components/ui/modal"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslate } from "@/lib/i18n"
@@ -603,6 +611,17 @@ export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   /** O rótulo mono. Sem isto, "Enunciado". */
   label?: string
   /**
+   * O que a pessoa tem que entregar, numa frase: vem em cima, em destaque, e fica à vista com o
+   * cartão recolhido. Sem isto, o enunciado começa direto nos filhos.
+   */
+  objective?: React.ReactNode
+  /** O ícone "Abrir a lição" no cabeçalho do cartão. Sem isto, não aparece. */
+  onOpenLesson?: () => void
+  /** O ícone "Guia de sintaxe" no cabeçalho do cartão. Sem isto, não aparece. */
+  onOpenSyntaxGuide?: () => void
+  /** O ícone "Ler em tela cheia": o mesmo enunciado num painel largo, na medida de leitura. Sem isto, aparece. */
+  fullScreen?: boolean
+  /**
    * O Peer como segunda aba do cartão: <PeerHistory variant="tab" />. Com isto, o título vira as abas
    * Enunciado | Peer, e o enunciado não divide a altura com o histórico.
    */
@@ -616,15 +635,23 @@ export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   className?: string
 }
 
-// aberto, ocupa o que sobra e encolhe até umas cinco linhas de leitura; recolhido, é só o título.
-// No corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
-const CARTAO_DO_ENUNCIADO = "lg:data-[state=open]:min-h-[160px] lg:data-[state=open]:flex-1 lg:data-[state=open]:shrink"
 const CORPO_QUE_ROLA = "muriki-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+// os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
 const CORPO_DO_ENUNCIADO = cn(CORPO_QUE_ROLA, "flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground")
+const ABA = "flex h-[26px] items-center gap-1.5 rounded-md px-1.5 font-mono uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
 
+/**
+ * O cartão do enunciado: o objetivo em cima, o texto, e no cabeçalho a lição, o guia de sintaxe e a
+ * tela cheia. Com `peer`, o título vira as abas Enunciado | Peer. Aberto, ocupa o que sobra da
+ * coluna (encolhe até umas cinco linhas) e só o corpo rola; recolhido, guarda a frase do objetivo.
+ */
 export function ExerciseStatement({
   children,
   label,
+  objective,
+  onOpenLesson,
+  onOpenSyntaxGuide,
+  fullScreen = true,
   peer,
   peerCount = 0,
   tab,
@@ -636,74 +663,17 @@ export function ExerciseStatement({
   className,
 }: ExerciseStatementProps) {
   const t = useTranslate()
-  const titulo = label ?? t("exercise_workspace.statement")
-  if (peer === undefined)
-    return (
-      <ExerciseSection
-        data-slot="exercise-statement"
-        title={titulo}
-        divider={false}
-        titleClassName={TITULO_DO_CARTAO}
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={onOpenChange}
-        className={cn(CARTAO, CARTAO_DO_ENUNCIADO, className)}
-        bodyClassName={CORPO_DO_ENUNCIADO}
-      >
-        {children}
-      </ExerciseSection>
-    )
-  return (
-    <CartaoComAbas
-      titulo={titulo}
-      peer={peer}
-      peerCount={peerCount}
-      tab={tab}
-      defaultTab={defaultTab}
-      onTabChange={onTabChange}
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
-      className={className}
-    >
-      {children}
-    </CartaoComAbas>
-  )
-}
-
-function CartaoComAbas({
-  titulo,
-  peer,
-  peerCount,
-  tab,
-  defaultTab,
-  onTabChange,
-  open,
-  defaultOpen,
-  onOpenChange,
-  className,
-  children,
-}: {
-  titulo: string
-  peer: React.ReactNode
-  peerCount: number
-  tab?: ExerciseSideTab
-  defaultTab: ExerciseSideTab
-  onTabChange?: (tab: ExerciseSideTab) => void
-  open?: boolean
-  defaultOpen: boolean
-  onOpenChange?: (open: boolean) => void
-  className?: string
-  children: React.ReactNode
-}) {
-  const t = useTranslate()
   const id = React.useId()
+  const titulo = label ?? t("exercise_workspace.statement")
+  const comPeer = peer !== undefined
   const [aberta, mudarAberta] = useAberta(open, defaultOpen, onOpenChange)
   const [aba, mudarAba] = useAberta<ExerciseSideTab>(tab, defaultTab, onTabChange)
+  const [telaCheia, setTelaCheia] = React.useState(false)
   // as falas que já estavam ao abrir a tela contam como vistas; as que chegam depois, com a aba
   // fechada, acendem o ponto até a pessoa passar por ela
   const [vistas, setVistas] = React.useState(peerCount)
-  const novas = aba === "peer" && aberta ? 0 : Math.max(0, peerCount - vistas)
+  const naAba = comPeer ? aba : "statement"
+  const novas = naAba === "peer" && aberta ? 0 : Math.max(0, peerCount - vistas)
   const lista = React.useRef<HTMLDivElement>(null)
   const Seta = aberta ? CaretDownIcon : CaretRightIcon
   const abas: Array<{ valor: ExerciseSideTab; rotulo: string }> = [
@@ -722,82 +692,156 @@ function CartaoComAbas({
     ir(abas[j].valor)
     lista.current?.querySelectorAll<HTMLButtonElement>("[role=tab]")[j]?.focus()
   }
+  const recolher = () => {
+    if (aberta && naAba === "peer") setVistas(peerCount)
+    mudarAberta(!aberta)
+  }
+
+  const objetivo = objective ? (
+    <p className="m-0 text-[15.5px] leading-6 font-medium text-pretty text-foreground-strong">{objective}</p>
+  ) : null
+  const acoes = (
+    <>
+      {onOpenLesson ? <IconeDoCartao rotulo={t("exercise_workspace.statement_lesson")} onClick={onOpenLesson} icone={BookOpenIcon} /> : null}
+      {onOpenSyntaxGuide ? <IconeDoCartao rotulo={t("exercise_workspace.statement_syntax")} onClick={onOpenSyntaxGuide} icone={InfoIcon} /> : null}
+      {fullScreen ? <IconeDoCartao rotulo={t("exercise_workspace.statement_full_screen")} onClick={() => setTelaCheia(true)} icone={ArrowsOutSimpleIcon} /> : null}
+    </>
+  )
 
   return (
     <section
       data-slot="exercise-statement"
       data-state={aberta ? "open" : "closed"}
-      data-tab={aba}
-      className={cn("relative flex flex-col", CARTAO, CARTAO_DO_ENUNCIADO, className)}
+      data-tab={naAba}
+      className={cn(
+        "relative flex flex-col",
+        CARTAO,
+        "lg:data-[state=open]:min-h-[160px] lg:data-[state=open]:flex-1 lg:data-[state=open]:shrink",
+        className
+      )}
     >
       <div className="flex h-[38px] shrink-0 items-center gap-1 pr-1.5 pl-2.5">
-        <button
-          type="button"
-          aria-expanded={aberta}
-          aria-controls={`${id}-${aba}`}
-          aria-label={titulo}
-          onClick={() => {
-            if (aberta && aba === "peer") setVistas(peerCount)
-            mudarAberta(!aberta)
-          }}
-          className="flex size-[26px] items-center justify-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
-        >
-          <Seta aria-hidden className="size-3" />
-        </button>
-        <div ref={lista} role="tablist" onKeyDown={aoTeclar} className="flex items-center gap-0.5">
-          {abas.map((a) => {
-            const ativa = a.valor === aba
-            return (
-              <button
-                key={a.valor}
-                id={`${id}-${a.valor}-tab`}
-                type="button"
-                role="tab"
-                aria-selected={ativa}
-                aria-controls={`${id}-${a.valor}`}
-                tabIndex={ativa ? 0 : -1}
-                onClick={() => ir(a.valor)}
-                className={cn(
-                  "flex h-[26px] items-center gap-1.5 rounded-md px-1.5 font-mono uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
-                  TITULO_DO_CARTAO,
-                  ativa ? "underline decoration-primary decoration-2 underline-offset-[7px]" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {a.rotulo}
-                {a.valor === "peer" && peerCount > 0 ? (
-                  <span className="font-normal tracking-normal text-muted-foreground tabular-nums">{peerCount}</span>
-                ) : null}
-                {a.valor === "peer" && novas > 0 ? (
-                  <>
-                    <span aria-hidden className="size-1.5 rounded-full bg-primary" />
-                    <span className="sr-only">, {t("exercise_workspace.peer.new", { count: novas })}</span>
-                  </>
-                ) : null}
-              </button>
-            )
-          })}
-        </div>
+        {comPeer ? (
+          <>
+            <button
+              type="button"
+              aria-expanded={aberta}
+              aria-controls={`${id}-${naAba}`}
+              aria-label={titulo}
+              onClick={recolher}
+              className="flex size-[26px] items-center justify-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+            >
+              <Seta aria-hidden className="size-3" />
+            </button>
+            <div ref={lista} role="tablist" onKeyDown={aoTeclar} className="flex items-center gap-0.5">
+              {abas.map((a) => {
+                const ativa = a.valor === aba
+                return (
+                  <button
+                    key={a.valor}
+                    id={`${id}-${a.valor}-tab`}
+                    type="button"
+                    role="tab"
+                    aria-selected={ativa}
+                    aria-controls={`${id}-${a.valor}`}
+                    tabIndex={ativa ? 0 : -1}
+                    onClick={() => ir(a.valor)}
+                    className={cn(
+                      ABA,
+                      TITULO_DO_CARTAO,
+                      ativa ? "underline decoration-primary decoration-2 underline-offset-[7px]" : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    {a.rotulo}
+                    {a.valor === "peer" && peerCount > 0 ? (
+                      <span className="font-normal tracking-normal text-muted-foreground tabular-nums">{peerCount}</span>
+                    ) : null}
+                    {a.valor === "peer" && novas > 0 ? (
+                      <>
+                        <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+                        <span className="sr-only">, {t("exercise_workspace.peer.new", { count: novas })}</span>
+                      </>
+                    ) : null}
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            aria-expanded={aberta}
+            aria-controls={`${id}-statement`}
+            onClick={recolher}
+            className="flex h-[26px] items-center gap-1.5 rounded-md px-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+          >
+            <Seta aria-hidden className="size-3" />
+            <span className={cn("font-mono text-[9.5px] font-medium tracking-[0.2em] uppercase", TITULO_DO_CARTAO)}>{titulo}</span>
+          </button>
+        )}
+        <span className="ml-auto flex items-center gap-0.5">{acoes}</span>
       </div>
+      {/* recolhido, o cartão não vira só o título: a frase do objetivo fica */}
+      {!aberta && objective ? (
+        // o respiro fica fora do <p>: com padding nele, a linha cortada vazava no espaço de baixo
+        <div className="pr-4 pb-3 pl-[42px]">
+          <p className="m-0 line-clamp-2 text-[13px] leading-[19px] text-foreground">{objective}</p>
+        </div>
+      ) : null}
       <div
         id={`${id}-statement`}
-        role="tabpanel"
-        aria-labelledby={`${id}-statement-tab`}
-        hidden={!aberta || aba !== "statement"}
+        role={comPeer ? "tabpanel" : undefined}
+        aria-labelledby={comPeer ? `${id}-statement-tab` : undefined}
+        hidden={!aberta || naAba !== "statement"}
         className={CORPO_DO_ENUNCIADO}
       >
+        {objetivo}
         {children}
       </div>
       {/* a aba fechada fica montada: cada uma volta para onde a pessoa parou de ler */}
-      <div
-        id={`${id}-peer`}
-        role="tabpanel"
-        aria-labelledby={`${id}-peer-tab`}
-        hidden={!aberta || aba !== "peer"}
-        className={cn(CORPO_QUE_ROLA, "px-4 pb-2")}
-      >
-        {peer}
-      </div>
+      {comPeer ? (
+        <div
+          id={`${id}-peer`}
+          role="tabpanel"
+          aria-labelledby={`${id}-peer-tab`}
+          hidden={!aberta || aba !== "peer"}
+          className={cn(CORPO_QUE_ROLA, "px-4 pb-2")}
+        >
+          {peer}
+        </div>
+      ) : null}
+      {fullScreen ? (
+        <Modal open={telaCheia} onOpenChange={setTelaCheia}>
+          <ModalContent className="sm:max-w-[760px]" sheetClassName="h-[92dvh]">
+            <ModalHeader>
+              <ModalTitle className="flex items-center gap-2">
+                <span className={cn("font-mono uppercase", TITULO_DO_CARTAO)}>{titulo}</span>
+              </ModalTitle>
+            </ModalHeader>
+            <ModalBody className="muriki-scroll overflow-y-auto">
+              {/* a medida de leitura: umas 65 letras por linha, a letra e o respiro maiores */}
+              <div className="mx-auto flex max-w-[620px] flex-col gap-4 py-2 text-[15px] leading-[26px] text-foreground [&>*]:shrink-0">
+                {objective ? (
+                  <p className="m-0 text-[17px] leading-7 font-medium text-pretty text-foreground-strong">{objective}</p>
+                ) : null}
+                {children}
+              </div>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+      ) : null}
     </section>
+  )
+}
+
+function IconeDoCartao({ rotulo, onClick, icone: Icone }: { rotulo: string; onClick: () => void; icone: React.ElementType }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger render={<Button variant="ghost" size="icon-sm" aria-label={rotulo} onClick={onClick} className="text-muted-foreground" />}>
+        <Icone aria-hidden />
+      </TooltipTrigger>
+      <TooltipContent>{rotulo}</TooltipContent>
+    </Tooltip>
   )
 }
 
