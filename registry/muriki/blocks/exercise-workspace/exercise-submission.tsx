@@ -36,8 +36,8 @@ const NIVEIS: ExerciseLevel[] = ["fundamentos", "junior", "pleno", "senior"]
 export interface ExerciseSubmissionResult {
   passed: boolean
   tests: { passed: number; total: number }
-  /** Os testes ocultos: só o nome e o status. */
-  items?: { name: string; status: "pass" | "fail" }[]
+  /** Os testes ocultos: o nome, o rótulo (o `hiddenTestLabels` da API; sem ele, o nome) e o status. */
+  items?: { name: string; label?: string; status: "pass" | "fail" }[]
   /** No exercício de arquitetura (unit "rules"): as regras, só com o título e o status. */
   rules?: { title: string; status: "pass" | "fail"; visibility: "visible" | "hidden" }[]
   /**
@@ -183,7 +183,7 @@ export function ExerciseSubmission({
                           <span className="sr-only">
                             {item.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
                           </span>
-                          {item.name}
+                          {item.label ?? item.name}
                         </span>
                       </li>
                     ))}

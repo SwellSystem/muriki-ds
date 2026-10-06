@@ -1143,7 +1143,10 @@ export function ExerciseSection({
 }
 
 export interface ExerciseTestItem {
+  /** O nome que o runner põe no TestReport: liga o teste ao Console, à fala do Peer e ao onOpenTest. */
   name: string
+  /** O que a pessoa lê (o `testLabels` da API, na língua do exercício). Sem isto, o `name`. */
+  label?: string
   /** Sem status, o teste ainda não rodou. */
   status?: "pass" | "fail"
   expected?: string
@@ -1213,7 +1216,7 @@ export function ExerciseTests({ summary, items, error, ranAt, onOpenTest, peerNo
                     item.status === "fail" ? "text-foreground-strong" : "text-foreground"
                   )}
                 >
-                  {item.name}
+                  {item.label ?? item.name}
                 </span>
               </span>
               {item.status === "fail" && (item.expected !== undefined || item.received !== undefined) ? (
@@ -1292,6 +1295,8 @@ export interface ExerciseLog {
 export interface ExerciseOutput {
   logs: ExerciseLog[]
   truncated?: boolean
+  /** Os rótulos dos testes ({ [name]: texto }, o `testLabels` da API), para o título de cada grupo. Sem o rótulo, o nome. */
+  labels?: Record<string, string>
 }
 
 // os Testes (no rail) e o Console (embaixo do código) conversam por aqui, dentro do ExerciseEditor
@@ -1621,7 +1626,7 @@ function ExerciseConsole({
                 className={cn("flex flex-col rounded-md", g.test !== undefined && g.test === focus && "ring-2 ring-primary/35 ring-offset-2 ring-offset-rail")}
               >
                 <span className="font-sans text-[11.5px] font-medium text-muted-foreground">
-                  {g.test ?? t("exercise_workspace.console.on_load")}
+                  {g.test !== undefined ? (output.labels?.[g.test] ?? g.test) : t("exercise_workspace.console.on_load")}
                 </span>
                 {g.logs.map((log, i) => (
                   <span
