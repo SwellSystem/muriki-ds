@@ -254,7 +254,10 @@ def faixa_console(k, saida):
 def tela_exercicio(k, primeira=False, peer=None, console=False):
     # console: a coluna da esquerda recolhida (o editor expandido) e o Console embaixo do código
     # peer (design/muriki-code/peer_exercicio.py): dict com 'testes' (a fala no painel de testes),
-    # 'faixa' (a fala acima da barra de status), 'historico' (o cartão na coluna) e 'status'
+    # 'faixa' (a fala acima da barra de status), 'historico' (o cartão na coluna) e 'status';
+    # 'abas' (função que recebe o corpo do enunciado e devolve o cartão Enunciado | Peer), 'largura'
+    # (a coluna, 372 por padrão) e 'alca' (a alça de largura entre a coluna e o editor, em uso)
+    # 'explicacao': no lugar do cartão da explicação (ex.: recolhido, design/muriki-code/enunciado.py)
     peer = peer or {}
     realce = lambda n: f'position:relative;z-index:{{{{g.z{n}}}}};box-shadow:{{{{g.anel{n}}}}};' if primeira else ''
     chips = (badge('Testing', k, 'blue') + badge('Debugging', k, 'blue') + badge(T('nivel'), k, 'gray')
@@ -278,14 +281,15 @@ def tela_exercicio(k, primeira=False, peer=None, console=False):
                             f'<span style="margin-top:8px;width:5px;height:5px;border-radius:999px;background:{k["mfg"]};flex:0 0 auto;"></span>'
                             f'<span>{conteudo}</span></li>')
     reqs = (req(T('req1')) + req(T('req2')) + req(f'{T("req3")} {mono("DurationVazia", k, None, 12)}.') + req(T('req4')))
-    enunciado = cartao(
-        f'{rotulo(T("enunciado"), k["mfg"])}'
+    corpo_enunciado = (
         f'<p style="margin:0;font-size:14px;line-height:22px;color:{k["fg"]};">{T("enunciadoTexto")}</p>'
         f'{exemplos}'
         f'<div style="display:flex;flex-direction:column;gap:6px;">'
         f'<h2 style="margin:0;font-size:13px;line-height:18px;font-weight:600;color:{k["fgs"]};">{T("precisa")}</h2>'
-        f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:20px;">{reqs}</ul></div>',
-        k, pad='16px 20px', extra='gap:12px;')
+        f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;font-size:13px;line-height:20px;">{reqs}</ul></div>')
+    enunciado = cartao(f'{rotulo(T("enunciado"), k["mfg"])}{corpo_enunciado}', k, pad='16px 20px', extra='gap:12px;')
+    if peer.get('abas'):
+        enunciado = peer['abas'](corpo_enunciado)
 
     explicacao = cartao(
         f'<div style="display:flex;align-items:center;gap:8px;">{rotulo(T("explique"), k["mfg"])}'
@@ -309,13 +313,16 @@ def tela_exercicio(k, primeira=False, peer=None, console=False):
              f'{ic("dica", 16, k["warn"])}<span style="display:flex;flex-direction:column;flex:1;min-width:0;">{dicas_txt}</span>'
              f'{dicas_botao}</div>')
 
+    if peer.get('explicacao'):
+        explicacao = peer['explicacao']
     if peer.get('recolher'):
         # o enunciado recolhido, como a pessoa deixa depois de ler: só o cabeçalho do cartão
         enunciado = cartao(f'<div style="display:flex;align-items:center;gap:8px;">{rotulo(T("enunciado"), k["mfg"])}'
                            f'<span style="margin-left:auto;display:flex;color:{k["mfg"]};transform:rotate(-90deg);">{ic("baixo", 12)}</span></div>',
                            k, pad='14px 20px')
-    esquerda = (f'<div style="width:372px;flex:0 0 372px;display:flex;flex-direction:column;gap:12px;">'
-                f'{enunciado}{explicacao}{dicas}{peer.get("historico", "")}</div>')
+    largura = peer.get('largura', 372)
+    esquerda = (f'<div style="position:relative;width:{largura}px;flex:0 0 {largura}px;display:flex;flex-direction:column;gap:12px;">'
+                f'{enunciado}{explicacao}{dicas}{peer.get("historico", "")}{peer.get("alca", "")}</div>')
     if console:
         esquerda = ''
 
@@ -327,7 +334,7 @@ def tela_exercicio(k, primeira=False, peer=None, console=False):
              else f'color:{k["mfg"]};')
         cur = ' aria-selected="true"' if at else ' aria-selected="false"'
         abas += (f'<button type="button" role="tab"{cur} style="display:flex;align-items:center;gap:7px;height:40px;padding:0 13px;'
-                 f'border:0;background:transparent;font-family:{MONO};font-size:12px;{f}">{ic("arquivo", 13)}{nome}</button>')
+                 f'flex:0 0 auto;white-space:nowrap;border:0;background:transparent;font-family:{MONO};font-size:12px;{f}">{ic("arquivo", 13)}{nome}</button>')
     atual = 3 if primeira else 10
     codigo = ''.join(
         f'<div style="display:flex;{"background:" + k["prisub"] + ";" if i == atual else ""}">'
@@ -356,7 +363,7 @@ def tela_exercicio(k, primeira=False, peer=None, console=False):
         f'border-radius:12px;box-shadow:{k["sombra"]};overflow:hidden;">{lateral}'
         f'<div style="flex:1;min-width:0;display:flex;flex-direction:column;">'
         f'<div style="display:flex;align-items:center;gap:2px;padding:0 8px 0 4px;border-bottom:1px solid {k["muted"]};">'
-        f'<div role="tablist" aria-label="{T("abertos")}" style="display:flex;">{abas}</div>'
+        f'<div role="tablist" aria-label="{T("abertos")}" style="display:flex;min-width:0;overflow:hidden;">{abas}</div>'
         f'<span style="margin-left:auto;display:flex;align-items:center;gap:8px;">{botao_expandir(k, console)}{botao(T("rodar"), k, "primary", 30, "rodar")}</span></div>'
         f'{area}{faixa_console(k, SAIDA_DO_CONSOLE) if console else ""}{peer.get("faixa", "")}'
         f'<div style="display:flex;align-items:center;gap:14px;height:30px;padding:0 16px;border-top:1px solid {k["muted"]};'
@@ -1410,10 +1417,18 @@ def _montar(tela, tema, sufixo):
             return web(juntar(EXERCICIO, LICAO), li.tela_guia_voce_sabia(k), valores=VALORES_EXERCICIO)
         return web(juntar(EXERCICIO, LICAO, {l: {kk: v for kk, v in PEER_EXERCICIO[l].items() if kk in ('peerNome', 'entendi', 'peerAcompanhando', 'historicoTit', 'h2hora', 'h2Gatilho', 'tipoPergunta', 'peerPausa')} for l in PEER_EXERCICIO}),
                    li.tela_peer_voce_sabia(k), valores=VALORES_EXERCICIO)
-    if tela['id'] in ('peer_testes', 'peer_faixa', 'peer_retorno'):
+    if tela['id'] in ('enunciado', 'enunciado_foco', 'enunciado_recolhido'):
+        from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO
+        from textos_enunciado import TEXTOS as ENUNCIADO
+        import enunciado as en
+        fazer = {'enunciado': en.tela_enunciado, 'enunciado_foco': en.tela_enunciado_foco,
+                 'enunciado_recolhido': en.tela_enunciado_recolhido}[tela['id']]
+        return web(juntar(EXERCICIO, PEER_EXERCICIO, ENUNCIADO), fazer(k), valores=VALORES_EXERCICIO)
+    if tela['id'] in ('peer_testes', 'peer_faixa', 'peer_retorno', 'peer_aba'):
         from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO
         import peer_exercicio as pe
-        fazer = {'peer_testes': pe.tela_peer_testes, 'peer_faixa': pe.tela_peer_faixa, 'peer_retorno': pe.tela_peer_retorno}[tela['id']]
+        fazer = {'peer_testes': pe.tela_peer_testes, 'peer_faixa': pe.tela_peer_faixa, 'peer_retorno': pe.tela_peer_retorno,
+                 'peer_aba': pe.tela_peer_aba}[tela['id']]
         return web(juntar(EXERCICIO, PEER_EXERCICIO), fazer(k), valores=VALORES_EXERCICIO)
     if tela['id'] in ('starter_exercicio', 'starter_evolucao', 'starter_competencia'):
         from textos_peer_exercicio import TEXTOS as PEER_EXERCICIO

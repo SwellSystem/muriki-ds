@@ -1393,6 +1393,70 @@
    "h": 900,
    "title": "Desenho livre · a Revisão do Pro: o painel com os cinco pilares, o achado clicado destaca o Estoque no quadro · escuro",
    "is_interactive": true
+  },
+  "ExercicioPeerAba.dc.html": {
+   "x": 38000,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer no exercício · a aba Peer no cartão do enunciado e a coluna alargada pela alça",
+   "is_interactive": true
+  },
+  "ExercicioPeerAbaEscuro.dc.html": {
+   "x": 38000,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Peer no exercício · a aba Peer no cartão do enunciado e a coluna alargada pela alça · escuro",
+   "is_interactive": true
+  },
+  "ExercicioEnunciado.dc.html": {
+   "x": 39520,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · objetivo em cima, regras com o estado dos testes (depende do conteúdo ligar teste e regra) e o Peer apontando a regra",
+   "is_interactive": true
+  },
+  "ExercicioEnunciadoEscuro.dc.html": {
+   "x": 39520,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · objetivo em cima, regras com o estado dos testes (depende do conteúdo ligar teste e regra) e o Peer apontando a regra · escuro",
+   "is_interactive": true
+  },
+  "ExercicioEnunciadoFoco.dc.html": {
+   "x": 41040,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · ler em tela cheia: o painel largo na medida de leitura, o código à vista",
+   "is_interactive": true
+  },
+  "ExercicioEnunciadoFocoEscuro.dc.html": {
+   "x": 41040,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · ler em tela cheia: o painel largo na medida de leitura, o código à vista · escuro",
+   "is_interactive": true
+  },
+  "ExercicioEnunciadoRecolhido.dc.html": {
+   "x": 42560,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · recolhido: o objetivo e a conta das regras ficam",
+   "is_interactive": true
+  },
+  "ExercicioEnunciadoRecolhidoEscuro.dc.html": {
+   "x": 42560,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Enunciado · recolhido: o objetivo e a conta das regras ficam · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1707,7 +1771,15 @@
   "PlanosCarregando.dc.html",
   "PlanosCarregandoEscuro.dc.html",
   "DesenhoRevisao.dc.html",
-  "DesenhoRevisaoEscuro.dc.html"
+  "DesenhoRevisaoEscuro.dc.html",
+  "ExercicioPeerAba.dc.html",
+  "ExercicioPeerAbaEscuro.dc.html",
+  "ExercicioEnunciado.dc.html",
+  "ExercicioEnunciadoEscuro.dc.html",
+  "ExercicioEnunciadoFoco.dc.html",
+  "ExercicioEnunciadoFocoEscuro.dc.html",
+  "ExercicioEnunciadoRecolhido.dc.html",
+  "ExercicioEnunciadoRecolhidoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

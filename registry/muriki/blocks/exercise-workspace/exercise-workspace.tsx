@@ -10,10 +10,15 @@
  *     foot={<><ExerciseExplanation …/><ExerciseHints …/></>}
  *     editor={<ExerciseEditor sidebar={<><ExerciseFileTree …/><ExerciseTests …/></>}>{editor}</ExerciseEditor>} />
  *
- * No desktop (lg), a lateral é uma coluna de 372px com três cartões recolhíveis, como Código e
- * Testes no rail: o enunciado aberto ocupa o que sobra e só o corpo dele rola, com o cartão parado;
- * a explicação e as dicas vêm embaixo, no tamanho delas. Recolhido, o enunciado vira só o título e
- * os outros sobem. Quem quer mais espaço para ler recolhe a explicação.
+ * No desktop (lg), a lateral é uma coluna de 372px (420px a partir do 2xl) com cartões recolhíveis,
+ * como Código e Testes no rail: o enunciado aberto ocupa o que sobra e só o corpo dele rola, com o
+ * cartão parado; a explicação e as dicas vêm embaixo, no tamanho delas. Recolhido, o enunciado vira
+ * só o título e os outros sobem. A alça entre a coluna e o editor muda a largura (arrastar ou setas,
+ * de 320 a 560px; dois cliques voltam ao padrão), e `sideWidth` deixa o app lembrar por pessoa.
+ *
+ * O Peer mora numa aba do cartão do enunciado (ExerciseStatement `peer`, com <PeerHistory
+ * variant="tab" />), e não embaixo dele: o histórico crescia e espremia o enunciado. A aba Peer
+ * acende um ponto quando chega fala nova com ela fechada.
  * O editor ocupa o resto, na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo
  * empilha: cabeçalho, painel (na altura do conteúdo, sem rolar por dentro), editor, e dentro do
  * editor a árvore e os testes sobem para cima do código.
@@ -220,7 +225,23 @@ export interface ExerciseWorkspaceProps {
   expanded?: boolean
   defaultExpanded?: boolean
   onExpandedChange?: (expanded: boolean) => void
+  /**
+   * A largura da coluna da esquerda, em px (só no desktop). Sem isto, 372px, ou 420px a partir do 2xl.
+   * A pessoa muda pela alça, entre 320 e 560.
+   */
+  sideWidth?: number
+  defaultSideWidth?: number
+  /** Ao soltar a alça e a cada seta; `undefined` quando os dois cliques voltam ao padrão. */
+  onSideWidthChange?: (width: number | undefined) => void
   className?: string
+}
+
+const LARGURA_MIN = 320
+const LARGURA_MAX = 560
+const PASSO_DA_SETA = 16
+
+function limitar(largura: number) {
+  return Math.round(Math.min(LARGURA_MAX, Math.max(LARGURA_MIN, largura)))
 }
 
 export function ExerciseWorkspace({
@@ -232,10 +253,26 @@ export function ExerciseWorkspace({
   expanded,
   defaultExpanded = false,
   onExpandedChange,
+  sideWidth,
+  defaultSideWidth,
+  onSideWidthChange,
   className,
 }: ExerciseWorkspaceProps) {
+  const t = useTranslate()
   const ativo = !!guide && guide.step >= 1 && guide.step <= PASSOS
   const [expandido, mudarExpandido] = useAberta(expanded, defaultExpanded, onExpandedChange)
+  // a largura: a do app, a escolhida aqui, ou nenhuma (o padrão do css, que muda no 2xl). Durante o
+  // arrasto vale a do arrasto, e o app só fica sabendo ao soltar.
+  const [larguraSolta, setLarguraSolta] = React.useState(defaultSideWidth)
+  const [arrasto, setArrasto] = React.useState<number | null>(null)
+  const largura = arrasto ?? sideWidth ?? larguraSolta
+  const coluna = React.useRef<HTMLDivElement>(null)
+  const inicio = React.useRef<{ x: number; largura: number } | null>(null)
+  const fixar = (v: number | undefined) => {
+    if (sideWidth === undefined) setLarguraSolta(v)
+    onSideWidthChange?.(v)
+  }
+  const atual = () => largura ?? coluna.current?.offsetWidth ?? 372
   // o guia aponta para a explicação no passo 3: com ele na tela, a coluna não some
   const recolhida = expandido && !ativo
   React.useEffect(() => {
@@ -260,18 +297,69 @@ export function ExerciseWorkspace({
               por dentro ele fica na largura de sempre, para não refluir no caminho. `invisible` (só no
               desktop, onde ela recolhe) tira o que sumiu do Tab e do leitor no fim da transição. Com
               reduzir movimento, só troca. */}
+          {/* A largura mora em --side-w; o vão de 16px até o editor é a alça. Arrastando, sem transição. */}
           <div
             data-slot="exercise-side"
             data-state={recolhida ? "collapsed" : "open"}
+            data-resizing={arrasto !== null || undefined}
+            style={largura !== undefined ? ({ "--side-w": `${largura}px` } as React.CSSProperties) : undefined}
             className={cn(
-              "flex min-w-0 flex-col lg:min-h-0 lg:shrink-0 lg:overflow-hidden",
-              "lg:transition-[width,margin,opacity,visibility] lg:duration-300 lg:ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:motion-reduce:transition-none",
-              recolhida ? "lg:invisible lg:mr-0 lg:w-0 lg:opacity-0" : "lg:mr-4 lg:w-[372px] lg:opacity-100"
+              "relative flex min-w-0 flex-col lg:min-h-0 lg:shrink-0 lg:overflow-hidden lg:[--side-w:372px] 2xl:[--side-w:420px]",
+              "lg:transition-[width,padding,opacity,visibility] lg:duration-300 lg:ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:motion-reduce:transition-none lg:data-resizing:transition-none",
+              recolhida ? "lg:invisible lg:w-0 lg:pr-0 lg:opacity-0" : "lg:w-[calc(var(--side-w)+1rem)] lg:pr-4 lg:opacity-100"
             )}
           >
-            <div className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:flex-1">
+            <div ref={coluna} className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-(--side-w) lg:flex-1">
               {side}
               {foot}
+            </div>
+            <div
+              role="separator"
+              aria-orientation="vertical"
+              aria-label={t("exercise_workspace.resize")}
+              aria-valuemin={LARGURA_MIN}
+              aria-valuemax={LARGURA_MAX}
+              aria-valuenow={largura}
+              data-resizing={arrasto !== null || undefined}
+              tabIndex={0}
+              onPointerDown={(e) => {
+                if (e.button !== 0) return
+                e.preventDefault()
+                e.currentTarget.setPointerCapture(e.pointerId)
+                inicio.current = { x: e.clientX, largura: atual() }
+                setArrasto(inicio.current.largura)
+              }}
+              onPointerMove={(e) => {
+                if (inicio.current) setArrasto(limitar(inicio.current.largura + e.clientX - inicio.current.x))
+              }}
+              onPointerUp={() => {
+                if (!inicio.current) return
+                inicio.current = null
+                if (arrasto !== null) fixar(arrasto)
+                setArrasto(null)
+              }}
+              onPointerCancel={() => {
+                inicio.current = null
+                setArrasto(null)
+              }}
+              onDoubleClick={() => fixar(undefined)}
+              onKeyDown={(e) => {
+                const nova =
+                  e.key === "ArrowLeft" ? atual() - PASSO_DA_SETA
+                  : e.key === "ArrowRight" ? atual() + PASSO_DA_SETA
+                  : e.key === "Home" ? LARGURA_MIN
+                  : e.key === "End" ? LARGURA_MAX
+                  : null
+                if (nova === null) return
+                e.preventDefault()
+                fixar(limitar(nova))
+              }}
+              className="group absolute inset-y-0 right-0 w-4 cursor-col-resize touch-none outline-none max-lg:hidden"
+            >
+              <span
+                aria-hidden
+                className="absolute inset-y-3 left-1/2 w-0.5 -translate-x-1/2 rounded-full transition-colors group-hover:bg-input group-focus-visible:bg-primary group-data-resizing:bg-primary"
+              />
             </div>
           </div>
           {editor}
@@ -488,11 +576,11 @@ export const CARTAO = "shrink-0 overflow-hidden rounded-xl bg-card shadow-xs"
  *  rótulo cinza de 9,5px some, e o negrito do próprio enunciado passava a parecer o título. */
 export const TITULO_DO_CARTAO = "text-[10.5px] font-semibold tracking-[0.16em] text-foreground-strong"
 
-/** Aberta ou recolhida: controlada por `open`, ou solta a partir de `defaultOpen`. */
-function useAberta(open: boolean | undefined, defaultOpen: boolean, onOpenChange?: (open: boolean) => void) {
+/** Aberta ou recolhida (ou a aba): controlada por `open`, ou solta a partir de `defaultOpen`. */
+function useAberta<T = boolean>(open: T | undefined, defaultOpen: T, onOpenChange?: (open: T) => void) {
   const [solta, setSolta] = React.useState(defaultOpen)
   const aberta = open ?? solta
-  const mudar = (v: boolean) => {
+  const mudar = (v: T) => {
     if (open === undefined) setSolta(v)
     onOpenChange?.(v)
   }
@@ -507,39 +595,209 @@ export interface ExerciseCollapsibleProps {
   onOpenChange?: (open: boolean) => void
 }
 
+export type ExerciseSideTab = "statement" | "peer"
+
 export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   /** O enunciado já renderizado (o app transforma o Markdown). */
   children: React.ReactNode
   /** O rótulo mono. Sem isto, "Enunciado". */
   label?: string
+  /**
+   * O Peer como segunda aba do cartão: <PeerHistory variant="tab" />. Com isto, o título vira as abas
+   * Enunciado | Peer, e o enunciado não divide a altura com o histórico.
+   */
+  peer?: React.ReactNode
+  /** Quantas falas o Peer teve neste exercício. As que chegam com a aba fechada acendem o ponto nela. */
+  peerCount?: number
+  tab?: ExerciseSideTab
+  /** Sem isto, o enunciado. */
+  defaultTab?: ExerciseSideTab
+  onTabChange?: (tab: ExerciseSideTab) => void
   className?: string
 }
+
+// aberto, ocupa o que sobra e encolhe até umas cinco linhas de leitura; recolhido, é só o título.
+// No corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
+const CARTAO_DO_ENUNCIADO = "lg:data-[state=open]:min-h-[160px] lg:data-[state=open]:flex-1 lg:data-[state=open]:shrink"
+const CORPO_QUE_ROLA = "muriki-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+const CORPO_DO_ENUNCIADO = cn(CORPO_QUE_ROLA, "flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground")
 
 export function ExerciseStatement({
   children,
   label,
+  peer,
+  peerCount = 0,
+  tab,
+  defaultTab = "statement",
+  onTabChange,
   open,
   defaultOpen = true,
   onOpenChange,
   className,
 }: ExerciseStatementProps) {
   const t = useTranslate()
+  const titulo = label ?? t("exercise_workspace.statement")
+  if (peer === undefined)
+    return (
+      <ExerciseSection
+        data-slot="exercise-statement"
+        title={titulo}
+        divider={false}
+        titleClassName={TITULO_DO_CARTAO}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        className={cn(CARTAO, CARTAO_DO_ENUNCIADO, className)}
+        bodyClassName={CORPO_DO_ENUNCIADO}
+      >
+        {children}
+      </ExerciseSection>
+    )
   return (
-    <ExerciseSection
-      data-slot="exercise-statement"
-      title={label ?? t("exercise_workspace.statement")}
-      divider={false}
-      titleClassName={TITULO_DO_CARTAO}
+    <CartaoComAbas
+      titulo={titulo}
+      peer={peer}
+      peerCount={peerCount}
+      tab={tab}
+      defaultTab={defaultTab}
+      onTabChange={onTabChange}
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={onOpenChange}
-      // aberto, ocupa o que sobra e encolhe até umas cinco linhas de leitura; recolhido, é só o
-      // título. No corpo, os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
-      className={cn(CARTAO, "lg:data-[state=open]:min-h-[160px] lg:data-[state=open]:flex-1 lg:data-[state=open]:shrink", className)}
-      bodyClassName="muriki-scroll flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
+      className={className}
     >
       {children}
-    </ExerciseSection>
+    </CartaoComAbas>
+  )
+}
+
+function CartaoComAbas({
+  titulo,
+  peer,
+  peerCount,
+  tab,
+  defaultTab,
+  onTabChange,
+  open,
+  defaultOpen,
+  onOpenChange,
+  className,
+  children,
+}: {
+  titulo: string
+  peer: React.ReactNode
+  peerCount: number
+  tab?: ExerciseSideTab
+  defaultTab: ExerciseSideTab
+  onTabChange?: (tab: ExerciseSideTab) => void
+  open?: boolean
+  defaultOpen: boolean
+  onOpenChange?: (open: boolean) => void
+  className?: string
+  children: React.ReactNode
+}) {
+  const t = useTranslate()
+  const id = React.useId()
+  const [aberta, mudarAberta] = useAberta(open, defaultOpen, onOpenChange)
+  const [aba, mudarAba] = useAberta<ExerciseSideTab>(tab, defaultTab, onTabChange)
+  // as falas que já estavam ao abrir a tela contam como vistas; as que chegam depois, com a aba
+  // fechada, acendem o ponto até a pessoa passar por ela
+  const [vistas, setVistas] = React.useState(peerCount)
+  const novas = aba === "peer" && aberta ? 0 : Math.max(0, peerCount - vistas)
+  const lista = React.useRef<HTMLDivElement>(null)
+  const Seta = aberta ? CaretDownIcon : CaretRightIcon
+  const abas: Array<{ valor: ExerciseSideTab; rotulo: string }> = [
+    { valor: "statement", rotulo: titulo },
+    { valor: "peer", rotulo: t("exercise_workspace.peer.name") },
+  ]
+
+  const ir = (nova: ExerciseSideTab) => {
+    setVistas(peerCount)
+    if (nova !== aba) mudarAba(nova)
+    if (!aberta) mudarAberta(true)
+  }
+  const aoTeclar = (e: React.KeyboardEvent) => {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return
+    const j = (abas.findIndex((a) => a.valor === aba) + 1) % abas.length
+    ir(abas[j].valor)
+    lista.current?.querySelectorAll<HTMLButtonElement>("[role=tab]")[j]?.focus()
+  }
+
+  return (
+    <section
+      data-slot="exercise-statement"
+      data-state={aberta ? "open" : "closed"}
+      data-tab={aba}
+      className={cn("relative flex flex-col", CARTAO, CARTAO_DO_ENUNCIADO, className)}
+    >
+      <div className="flex h-[38px] shrink-0 items-center gap-1 pr-1.5 pl-2.5">
+        <button
+          type="button"
+          aria-expanded={aberta}
+          aria-controls={`${id}-${aba}`}
+          aria-label={titulo}
+          onClick={() => {
+            if (aberta && aba === "peer") setVistas(peerCount)
+            mudarAberta(!aberta)
+          }}
+          className="flex size-[26px] items-center justify-center rounded-md text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+        >
+          <Seta aria-hidden className="size-3" />
+        </button>
+        <div ref={lista} role="tablist" onKeyDown={aoTeclar} className="flex items-center gap-0.5">
+          {abas.map((a) => {
+            const ativa = a.valor === aba
+            return (
+              <button
+                key={a.valor}
+                id={`${id}-${a.valor}-tab`}
+                type="button"
+                role="tab"
+                aria-selected={ativa}
+                aria-controls={`${id}-${a.valor}`}
+                tabIndex={ativa ? 0 : -1}
+                onClick={() => ir(a.valor)}
+                className={cn(
+                  "flex h-[26px] items-center gap-1.5 rounded-md px-1.5 font-mono uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35",
+                  TITULO_DO_CARTAO,
+                  ativa ? "underline decoration-primary decoration-2 underline-offset-[7px]" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {a.rotulo}
+                {a.valor === "peer" && peerCount > 0 ? (
+                  <span className="font-normal tracking-normal text-muted-foreground tabular-nums">{peerCount}</span>
+                ) : null}
+                {a.valor === "peer" && novas > 0 ? (
+                  <>
+                    <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+                    <span className="sr-only">, {t("exercise_workspace.peer.new", { count: novas })}</span>
+                  </>
+                ) : null}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+      <div
+        id={`${id}-statement`}
+        role="tabpanel"
+        aria-labelledby={`${id}-statement-tab`}
+        hidden={!aberta || aba !== "statement"}
+        className={CORPO_DO_ENUNCIADO}
+      >
+        {children}
+      </div>
+      {/* a aba fechada fica montada: cada uma volta para onde a pessoa parou de ler */}
+      <div
+        id={`${id}-peer`}
+        role="tabpanel"
+        aria-labelledby={`${id}-peer-tab`}
+        hidden={!aberta || aba !== "peer"}
+        className={cn(CORPO_QUE_ROLA, "px-4 pb-2")}
+      >
+        {peer}
+      </div>
+    </section>
   )
 }
 
