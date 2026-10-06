@@ -368,6 +368,14 @@ export function ExerciseWorkspace({
                 aria-hidden
                 className="absolute inset-y-3 left-1/2 w-0.5 -translate-x-1/2 rounded-full transition-colors group-hover:bg-input group-focus-visible:bg-primary group-data-resizing:bg-primary"
               />
+              {arrasto !== null ? (
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 rounded-md bg-foreground-strong px-1.5 py-[3px] font-mono text-[11px] whitespace-nowrap text-background tabular-nums"
+                >
+                  {arrasto}px
+                </span>
+              ) : null}
             </div>
           </div>
           {editor}
@@ -637,7 +645,7 @@ export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
 
 const CORPO_QUE_ROLA = "muriki-scroll lg:min-h-0 lg:flex-1 lg:overflow-y-auto"
 // os filhos não encolhem: um <pre> com overflow ficaria esmagado em 20px
-const CORPO_DO_ENUNCIADO = cn(CORPO_QUE_ROLA, "flex flex-col gap-3 px-4 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground")
+const CORPO_DO_ENUNCIADO = cn(CORPO_QUE_ROLA, "flex flex-col gap-3 px-5 pt-1 pb-4 [&>*]:shrink-0 text-sm leading-[22px] text-foreground")
 const ABA = "flex h-[26px] items-center gap-1.5 rounded-md px-1.5 font-mono uppercase focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
 
 /**
@@ -805,7 +813,7 @@ export function ExerciseStatement({
           role="tabpanel"
           aria-labelledby={`${id}-peer-tab`}
           hidden={!aberta || aba !== "peer"}
-          className={cn(CORPO_QUE_ROLA, "px-4 pb-2")}
+          className={cn(CORPO_QUE_ROLA, "px-5 pt-1 pb-4")}
         >
           {peer}
         </div>
@@ -898,7 +906,7 @@ export function ExerciseExplanation({
       open={mostrar}
       onOpenChange={mudar}
       className={cn(CARTAO, destaque, className)}
-      bodyClassName="flex flex-col gap-2.5 px-4 pb-4"
+      bodyClassName="flex flex-col gap-2.5 px-5 pb-4"
     >
       <label htmlFor={id} className="text-sm leading-[21px] font-medium text-foreground-strong">
         {question}
@@ -1013,6 +1021,7 @@ export function ExerciseAnswerNumbers({
   )
 }
 
+/** `open`, `defaultOpen` e `onOpenChange` ficam por compatibilidade: as dicas são uma linha só e não recolhem. */
 export interface ExerciseHintsProps extends ExerciseCollapsibleProps {
   /** Quantas dicas o exercício tem. */
   total: number
@@ -1032,25 +1041,17 @@ export function ExerciseHints({
   onRequest,
   onView,
   loading,
-  open,
-  defaultOpen = true,
-  onOpenChange,
   className,
 }: ExerciseHintsProps) {
   const t = useTranslate()
   if (total <= 0) return null
   const acabou = used >= total
   return (
-    <ExerciseSection
+    // uma linha só, sem o título: o ícone já diz o que é, e o cabeçalho de 38px comia a coluna
+    <section
       data-slot="exercise-hints"
-      title={t("exercise_workspace.hints.title")}
-      divider={false}
-      titleClassName={TITULO_DO_CARTAO}
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={onOpenChange}
-      className={cn(CARTAO, className)}
-      bodyClassName="flex items-center gap-2.5 pr-3 pb-3 pl-4"
+      aria-label={t("exercise_workspace.hints.title")}
+      className={cn(CARTAO, "flex items-center gap-2.5 py-2.5 pr-3 pl-4", className)}
     >
       <LightbulbIcon aria-hidden className="size-4 shrink-0 text-warning" />
       <span className="flex min-w-0 flex-1 flex-col items-start">
@@ -1074,7 +1075,7 @@ export function ExerciseHints({
           {used === 0 ? t("exercise_workspace.hints.request") : t("exercise_workspace.hints.next")}
         </Button>
       )}
-    </ExerciseSection>
+    </section>
   )
 }
 
