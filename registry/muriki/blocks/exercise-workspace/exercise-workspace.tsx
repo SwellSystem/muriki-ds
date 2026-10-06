@@ -613,6 +613,26 @@ export interface ExerciseCollapsibleProps {
 
 export type ExerciseSideTab = "statement" | "peer"
 
+/** Uma regra do enunciado, como a API manda em `rules`. */
+export interface ExerciseRule {
+  id: string
+  text: React.ReactNode
+  /** Os nomes dos testes visíveis que cobrem a regra (os do TestReport). */
+  tests: string[]
+  /** Quantos testes ocultos cobrem a regra: rodam só no envio. */
+  hiddenCount: number
+}
+
+type EstadoDaRegra = "pass" | "fail" | "pending" | "hidden"
+
+/** O estado da regra pelos testes visíveis: um que falhou basta; sem visíveis, ela espera o envio. */
+function estadoDaRegra(regra: ExerciseRule, resultados?: Record<string, "pass" | "fail">): EstadoDaRegra {
+  if (regra.tests.length === 0) return "hidden"
+  const rodados = regra.tests.map((nome) => resultados?.[nome])
+  if (rodados.includes("fail")) return "fail"
+  return rodados.every((r) => r === "pass") ? "pass" : "pending"
+}
+
 export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   /** O enunciado já renderizado (o app transforma o Markdown). */
   children: React.ReactNode
@@ -623,6 +643,15 @@ export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
    * cartão recolhido. Sem isto, o enunciado começa direto nos filhos.
    */
   objective?: React.ReactNode
+  /**
+   * As regras ("O que precisa acontecer"), logo depois do objetivo, cada uma com o estado dos testes
+   * que a cobrem: passou, falhou, ainda não rodou ou oculto (só no envio). Vazio ou sem isto, nada.
+   */
+  rules?: ExerciseRule[]
+  /** O que a última rodada deu, por nome de teste ({ [name]: "pass" | "fail" }). Sem isto, nada rodou. */
+  testResults?: Record<string, "pass" | "fail">
+  /** A regra que o Peer apontou: acende e vem para a vista. */
+  highlightRule?: string
   /** O ícone "Abrir a lição" no cabeçalho do cartão. Sem isto, não aparece. */
   onOpenLesson?: () => void
   /** O ícone "Guia de sintaxe" no cabeçalho do cartão. Sem isto, não aparece. */
@@ -660,6 +689,9 @@ export function ExerciseStatement({
   onOpenLesson,
   onOpenSyntaxGuide,
   fullScreen = true,
+  rules,
+  testResults,
+  highlightRule,
   peer,
   peerCount = 0,
   tab,
@@ -804,6 +836,7 @@ export function ExerciseStatement({
         className={CORPO_DO_ENUNCIADO}
       >
         {objetivo}
+        {rules && rules.length > 0 ? <RegrasDoEnunciado rules={rules} results={testResults} highlight={highlightRule} /> : null}
         {children}
       </div>
       {/* a aba fechada fica montada: cada uma volta para onde a pessoa parou de ler */}
@@ -832,6 +865,7 @@ export function ExerciseStatement({
                 {objective ? (
                   <p className="m-0 text-[17px] leading-7 font-medium text-pretty text-foreground-strong">{objective}</p>
                 ) : null}
+                {rules && rules.length > 0 ? <RegrasDoEnunciado rules={rules} results={testResults} grande /> : null}
                 {children}
               </div>
             </ModalBody>
@@ -839,6 +873,95 @@ export function ExerciseStatement({
         </Modal>
       ) : null}
     </section>
+  )
+}
+
+const MARCA_DA_REGRA: Record<EstadoDaRegra, { icone: React.ElementType; cor: string }> = {
+  pass: { icone: CheckIcon, cor: "text-success" },
+  fail: { icone: XIcon, cor: "text-destructive" },
+  pending: { icone: CircleIcon, cor: "text-muted-foreground" },
+  hidden: { icone: LockIcon, cor: "text-muted-foreground" },
+}
+
+function RegrasDoEnunciado({
+  rules,
+  results,
+  highlight,
+  grande,
+}: {
+  rules: ExerciseRule[]
+  results?: Record<string, "pass" | "fail">
+  highlight?: string
+  grande?: boolean
+}) {
+  const t = useTranslate()
+  const [lista, setLista] = React.useState<HTMLUListElement | null>(null)
+  const estados = rules.map((r) => estadoDaRegra(r, results))
+  const cumpridas = estados.filter((e) => e === "pass").length
+  // a regra que o Peer apontou vem para a vista dentro do corpo que rola
+  React.useEffect(() => {
+    if (!highlight || !lista) return
+    lista.querySelector(`[data-rule="${CSS.escape(highlight)}"]`)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+  }, [highlight, lista])
+  return (
+    <div data-slot="exercise-rules" className="flex flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <h2 className={cn("m-0 font-semibold text-foreground-strong", grande ? "text-[14px] leading-5" : "text-[13px] leading-[18px]")}>
+          {t("exercise_workspace.rules.title")}
+        </h2>
+        <span
+          aria-label={t("exercise_workspace.rules.count_label", { done: cumpridas, total: rules.length })}
+          className="ml-auto rounded-[5px] bg-muted px-1.5 py-px font-mono text-[11px] text-muted-foreground tabular-nums"
+        >
+          {t("exercise_workspace.rules.count", { done: cumpridas, total: rules.length })}
+        </span>
+      </div>
+      <ul ref={setLista} className="m-0 flex list-none flex-col gap-0.5 p-0">
+        {rules.map((regra, i) => {
+          const estado = estados[i]
+          const { icone: Icone, cor } = MARCA_DA_REGRA[estado]
+          const falharam = regra.tests.filter((n) => results?.[n] === "fail").length
+          const meta =
+            estado === "hidden"
+              ? t("exercise_workspace.rules.hidden", { count: regra.hiddenCount })
+              : estado === "fail"
+                ? t("exercise_workspace.rules.failed", { count: falharam })
+                : estado === "pass"
+                  ? t("exercise_workspace.rules.passed", { count: regra.tests.length })
+                  : t("exercise_workspace.rules.not_run")
+          const mais = estado !== "hidden" && regra.hiddenCount > 0 ? t("exercise_workspace.rules.plus_hidden", { count: regra.hiddenCount }) : null
+          return (
+            <li
+              key={regra.id}
+              data-rule={regra.id}
+              data-state={estado}
+              className={cn(
+                "-mx-2 flex items-start gap-2.5 rounded-lg px-2 py-1.5",
+                regra.id === highlight && "bg-primary-subtle shadow-[0_0_0_2px_color-mix(in_oklch,var(--primary)_45%,transparent)]"
+              )}
+            >
+              <Icone aria-hidden weight={estado === "pending" ? "regular" : "bold"} className={cn("mt-1 size-3 shrink-0", cor)} />
+              <span className="flex min-w-0 flex-col gap-px">
+                <span
+                  className={cn(
+                    grande ? "text-[14.5px] leading-6" : "text-[13px] leading-5",
+                    estado === "fail" ? "text-foreground-strong" : "text-foreground"
+                  )}
+                >
+                  <span className="mr-1.5 font-mono text-[11px] text-muted-foreground">{i + 1}</span>
+                  {regra.text}
+                </span>
+                <span className={cn("text-[11.5px] leading-4", estado === "fail" ? "text-destructive" : "text-muted-foreground")}>
+                  <span className="sr-only">{t(`exercise_workspace.rules.state.${estado}`)}: </span>
+                  {meta}
+                  {mais ? <span className="text-muted-foreground"> · {mais}</span> : null}
+                </span>
+              </span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
   )
 }
 
