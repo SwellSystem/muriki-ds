@@ -194,7 +194,7 @@ def tela_guia_voce_sabia(k):
 
 def tela_peer_voce_sabia(k):
     # quando o Peer acha a armadilha no código (aqui, == na linha 4), a fala dele é o "Você sabia?"
-    from peer_exercicio import _avatar, _acao, status, historico, H_PAUSA
+    from peer_exercicio import _avatar, _acao, status, abas, H_PAUSA
     faixa = (f'<div role="note" style="display:flex;align-items:flex-start;gap:12px;padding:10px 16px;border-top:1px solid {k["muted"]};'
              f'background:color-mix(in oklch, {k["accent"]} 14%, {k["card"]});">{_avatar(k, 22)}'
              f'<div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">'
@@ -202,9 +202,9 @@ def tela_peer_voce_sabia(k):
              f'text-transform:uppercase;color:{k["tyellowfg"]};">'
              f'<span style="display:flex;">{ic("brilho", 12)}</span>{T("peerNome")} · {T("voceSabia")}</span>'
              f'<span style="font-size:13.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("vs2Tit")}</span>'
-             f'<span style="font-size:13px;line-height:19px;color:{k["fg"]};">{T("peerVsTxt")}</span></div>'
-             f'<span style="display:flex;gap:14px;align-items:center;align-self:center;">{_acao(k, T("lerNoGuia"))}{_acao(k, T("entendi"), False)}</span></div>')
-    return tela_exercicio(k, peer=dict(recolher=True, faixa=faixa, historico=historico(k, [H_PAUSA]), status=status(k)))
+             f'<span style="font-size:13px;line-height:19px;color:{k["fg"]};">{T("peerVsTxt")}</span>'
+             f'<span style="display:flex;gap:12px;padding-top:2px;">{_acao(k, T("lerNoGuia"))}{_acao(k, T("entendi"), False)}</span></div></div>')
+    return tela_exercicio(k, peer=dict(faixa=faixa, abas=abas(k, [H_PAUSA], nova=True), status=status(k)))
 
 
 def tela_licao_movel(k):

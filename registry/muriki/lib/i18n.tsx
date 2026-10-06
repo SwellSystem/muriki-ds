@@ -420,6 +420,7 @@ const STRINGS: Record<string, unknown> = {
     submit: "Enviar solução",
     soon: "em breve",
     statement: "Enunciado",
+    resize: "Largura do enunciado",
     explain: "Explique sua solução",
     goes_to_review: "vai para a avaliação",
     explain_placeholder: "Escreva com as suas palavras. Não precisa ser longo.",
@@ -509,6 +510,9 @@ const STRINGS: Record<string, unknown> = {
       paused: "Peer em pausa",
       review_pro: "revisão da IA no Pro",
       history: "Peer neste exercício",
+      new_one: "1 fala nova",
+      new_other: "{{count}} falas novas",
+      empty: "O Peer ainda não falou neste exercício. Ele acompanha e aparece quando ajuda.",
       dismiss: "Entendi",
       read_more: "Ler no guia",
       action: {

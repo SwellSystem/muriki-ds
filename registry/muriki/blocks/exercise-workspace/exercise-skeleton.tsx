@@ -1,6 +1,6 @@
 /**
  * O exercício carregando, com o formato do ExerciseWorkspace: o cabeçalho (o voltar e a trilha, o
- * título, os chips e as duas ações), a coluna de 372px com o enunciado, a explicação e as dicas, e a
+ * título, os chips e as duas ações), a coluna de 372px (420px no 2xl) com o enunciado, a explicação e as dicas, e a
  * moldura do editor (a lateral de 248px com a árvore e os testes, as abas, as linhas numeradas e a
  * barra de status). Abaixo de lg, empilha como a tela. E a lição no painel lateral
  * (ExerciseLessonSkeleton), que abre a partir do exercício.
@@ -54,7 +54,7 @@ export function ExerciseWorkspaceSkeleton({ className }: { className?: string })
       </div>
 
       <div className="flex min-w-0 flex-col gap-4 lg:min-h-0 lg:flex-1 lg:flex-row">
-        <div className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0">
+        <div className="flex min-w-0 flex-col gap-3 lg:min-h-0 lg:w-[372px] lg:shrink-0 2xl:w-[420px]">
           <div className={cn(CARTAO, "flex flex-col lg:min-h-[160px] lg:flex-1")}>
             <CabecaDeSecao />
             <div className="flex flex-col gap-3 px-4 pb-4">

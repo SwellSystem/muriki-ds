@@ -1,0 +1,45 @@
+# Textos do enunciado novo (2026-10-06), nos três idiomas da web: o objetivo numa frase em cima,
+# os exemplos, as regras com o estado dos testes que as cobrem e o porquê no fim; a leitura em tela
+# cheia; e o cartão recolhido, que guarda o objetivo.
+
+TEXTOS = {
+    'pt-BR': dict(
+        objetivo='Escreva parseDuration: recebe uma duração digitada, como "1h30", e devolve o total em minutos.',
+        exemplosTit='Exemplos', copiar='Copiar os exemplos',
+        regrasConta='1 de 4', regrasContaRot='1 de 4 regras cumpridas',
+        r1Testes='3 testes passam', r2Testes='o teste falhou', r3Testes='o teste falhou', r4Testes='teste oculto, roda no envio',
+        porqueTit='Por que importa',
+        porqueTexto='A agenda recebe durações digitadas por pessoas. Um "90s" mal arredondado vira um compromisso de 1 minuto e meio que ninguém marcou.',
+        abrirLicao='Abrir a lição', guiaSintaxe='Guia de sintaxe', telaCheia='Ler em tela cheia',
+        fechar='Fechar', escFecha='esc fecha',
+        verNoEnunciado='Ver no enunciado',
+        rascunho='rascunho escrito',
+        peerRegra='O teste do arredondamento falhou. A regra 2 do enunciado diz para onde os segundos vão: em que unidade está o total quando chega no Math.round?',
+    ),
+    'en-US': dict(
+        objetivo='Write parseDuration: it takes a typed duration, like "1h30", and returns the total in minutes.',
+        exemplosTit='Examples', copiar='Copy the examples',
+        regrasConta='1 of 4', regrasContaRot='1 of 4 rules met',
+        r1Testes='3 tests pass', r2Testes='the test failed', r3Testes='the test failed', r4Testes='hidden test, runs on submit',
+        porqueTit='Why it matters',
+        porqueTexto='The calendar takes durations typed by people. A badly rounded "90s" becomes a one-and-a-half-minute meeting nobody booked.',
+        abrirLicao='Open the lesson', guiaSintaxe='Syntax guide', telaCheia='Read full screen',
+        fechar='Close', escFecha='esc closes',
+        verNoEnunciado='See in the problem',
+        rascunho='draft written',
+        peerRegra='The rounding test failed. Rule 2 of the problem says where the seconds go: what unit is the total in when it reaches Math.round?',
+    ),
+    'es-ES': dict(
+        objetivo='Escribe parseDuration: recibe una duración escrita, como "1h30", y devuelve el total en minutos.',
+        exemplosTit='Ejemplos', copiar='Copiar los ejemplos',
+        regrasConta='1 de 4', regrasContaRot='1 de 4 reglas cumplidas',
+        r1Testes='pasan 3 tests', r2Testes='el test falló', r3Testes='el test falló', r4Testes='test oculto, corre al enviar',
+        porqueTit='Por qué importa',
+        porqueTexto='La agenda recibe duraciones escritas por personas. Un "90s" mal redondeado se vuelve una cita de un minuto y medio que nadie agendó.',
+        abrirLicao='Abrir la lección', guiaSintaxe='Guía de sintaxis', telaCheia='Leer en pantalla completa',
+        fechar='Cerrar', escFecha='esc cierra',
+        verNoEnunciado='Ver en el enunciado',
+        rascunho='borrador escrito',
+        peerRegra='Falló el test del redondeo. La regla 2 del enunciado dice adónde van los segundos: ¿en qué unidad está el total cuando llega a Math.round?',
+    ),
+}
