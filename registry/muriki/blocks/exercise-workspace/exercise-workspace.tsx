@@ -22,7 +22,7 @@
  *
  * O enunciado (ExerciseStatement) começa pelo objetivo numa frase (`objective`, que fica à vista com
  * o cartão recolhido), e no cabeçalho traz a lição, o guia de sintaxe e "Ler em tela cheia", que abre
- * o mesmo texto num painel largo, na medida de leitura.
+ * o mesmo texto no painel lateral do guia de sintaxe, pela esquerda, na medida de leitura.
  * O editor ocupa o resto, na altura que o app der à tela (a moldura estica). Abaixo de lg, tudo
  * empilha: cabeçalho, painel (na altura do conteúdo, sem rolar por dentro), editor, e dentro do
  * editor a árvore e os testes sobem para cima do código.
@@ -70,7 +70,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Modal, ModalBody, ModalContent, ModalHeader, ModalTitle } from "@/components/ui/modal"
+import { Sheet, SheetBody, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { Textarea } from "@/components/ui/textarea"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useTranslate } from "@/lib/i18n"
@@ -656,7 +656,7 @@ export interface ExerciseStatementProps extends ExerciseCollapsibleProps {
   onOpenLesson?: () => void
   /** O ícone "Guia de sintaxe" no cabeçalho do cartão. Sem isto, não aparece. */
   onOpenSyntaxGuide?: () => void
-  /** O ícone "Ler em tela cheia": o mesmo enunciado num painel largo, na medida de leitura. Sem isto, aparece. */
+  /** O ícone "Ler em tela cheia": o mesmo enunciado num painel lateral pela esquerda, na medida de leitura. Sem isto, aparece. */
   fullScreen?: boolean
   /**
    * O Peer como segunda aba do cartão: <PeerHistory variant="tab" />. Com isto, o título vira as abas
@@ -852,25 +852,25 @@ export function ExerciseStatement({
         </div>
       ) : null}
       {fullScreen ? (
-        <Modal open={telaCheia} onOpenChange={setTelaCheia}>
-          <ModalContent className="sm:max-w-[760px]" sheetClassName="h-[92dvh]">
-            <ModalHeader>
-              <ModalTitle className="flex items-center gap-2">
-                <span className={cn("font-mono uppercase", TITULO_DO_CARTAO)}>{titulo}</span>
-              </ModalTitle>
-            </ModalHeader>
-            <ModalBody className="muriki-scroll overflow-y-auto">
+        // o mesmo painel do guia de sintaxe e da lição (Sheet framed, max-w-xl, flutuando), mas pela
+        // esquerda: sai de onde o enunciado mora e deixa o código à vista, à direita
+        <Sheet open={telaCheia} onOpenChange={setTelaCheia}>
+          <SheetContent side="left" anatomy="framed" closeLabel={t("exercise_workspace.statement_close")} className="max-w-xl">
+            <SheetHeader>
+              <SheetTitle>{titulo}</SheetTitle>
+            </SheetHeader>
+            <SheetBody>
               {/* a medida de leitura: umas 65 letras por linha, a letra e o respiro maiores */}
-              <div className="mx-auto flex max-w-[620px] flex-col gap-4 py-2 text-[15px] leading-[26px] text-foreground [&>*]:shrink-0">
+              <div className="flex flex-col gap-4 px-5 py-4 text-[15px] leading-[26px] text-foreground [&>*]:shrink-0">
                 {objective ? (
                   <p className="m-0 text-[17px] leading-7 font-medium text-pretty text-foreground-strong">{objective}</p>
                 ) : null}
                 {rules && rules.length > 0 ? <RegrasDoEnunciado rules={rules} results={testResults} grande /> : null}
                 {children}
               </div>
-            </ModalBody>
-          </ModalContent>
-        </Modal>
+            </SheetBody>
+          </SheetContent>
+        </Sheet>
       ) : null}
     </section>
   )
