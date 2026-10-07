@@ -243,12 +243,25 @@ export interface FlowSimulation {
 }
 
 /**
- * Executa o desenho: um pulso parte de toda peça `client` e anda pelas ligações no sentido do
+ * Executa o desenho: um pulso parte de toda peça que aciona o sistema (`simulationOrigins`: o `client`,
+ * e o `worker` que nada aciona, o que roda por agenda) e anda pelas ligações no sentido do
  * trabalho, o mesmo do `flow` da API (muriki-api graph-rules.ts, `workArcs`): a seta conta, e
  * `consumes` anda ao contrário, de quem publica para quem consome. A peça derrubada sai do caminho,
  * e o grupo derrubado derruba tudo o que está dentro dele pelo `parent`, nunca pela posição.
  * Estado passageiro: nada disto vai para o grafo.
  */
+/** Os kinds de onde o pulso da simulação pode partir. A regra `flow` da API tem a origem própria, no exercício. */
+export const SIM_ORIGINS = ["client", "worker"]
+
+/**
+ * As peças de onde o pulso parte: todo `client`, e o `worker` que nada aciona (não consome fila e
+ * ninguém chama). O que consome uma fila é acionado por ela, e fica sem caminho quando ela fica.
+ */
+export function simulationOrigins(graph: Pick<ArchitectureGraphV2, "nodes" | "edges">) {
+  const acionados = new Set(graph.edges.map((e) => (e.relation === "consumes" ? e.from : e.to)))
+  return graph.nodes.filter((n) => n.kind === "client" || (n.kind === "worker" && !acionados.has(n.id)))
+}
+
 export function simulateFlow(
   graph: Pick<ArchitectureGraphV2, "nodes" | "edges" | "groups">,
   down: { nodes: string[]; groups: string[] }
@@ -267,7 +280,7 @@ export function simulateFlow(
   }
   const depth = new Map<string, number>()
   const edges = new Set<string>()
-  let fronteira = graph.nodes.filter((n) => n.kind === "client" && !fora.has(n.id)).map((n) => n.id)
+  let fronteira = simulationOrigins(graph).filter((n) => !fora.has(n.id)).map((n) => n.id)
   for (const id of fronteira) depth.set(id, 0)
   for (let passo = 1; fronteira.length; passo++) {
     const proxima: string[] = []
