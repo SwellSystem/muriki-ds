@@ -424,6 +424,7 @@ const STRINGS: Record<string, unknown> = {
     statement_lesson: "Abrir a lição",
     statement_syntax: "Guia de sintaxe",
     statement_full_screen: "Ler em tela cheia",
+    statement_close: "Fechar o enunciado",
     rules: {
       title: "O que precisa acontecer",
       count: "{{done}} de {{total}}",
