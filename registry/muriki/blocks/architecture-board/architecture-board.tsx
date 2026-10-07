@@ -124,9 +124,12 @@ import {
   Position,
   ReactFlow,
   ReactFlowProvider,
+  getBezierPath,
   getSmoothStepPath,
+  useConnection,
   useReactFlow,
   type Connection,
+  type ConnectionLineComponentProps,
   type Edge,
   type EdgeChange,
   type EdgeProps,
@@ -559,6 +562,97 @@ const ALCAS = [
   { id: "l", position: Position.Left },
 ]
 
+/**
+ * As alças da peça: as quatro bolinhas, com 24px de alvo em volta dos 10px visíveis, e a borda, um
+ * anel por fora da peça (no losango, os cantos vazios da caixa) de onde também sai uma ligação. O
+ * miolo continua movendo a peça. As bolinhas aparecem no hover, na seleção, no toque (não há hover)
+ * e em todas as peças enquanto uma ligação é puxada.
+ */
+function Alcas({ selected, losango }: { selected: boolean; losango?: boolean }) {
+  const { readOnly } = useBancada()
+  const puxando = useConnection((c) => c.inProgress)
+  return (
+    <>
+      {/* só leitura (ou simulando): sem borda, e as bolinhas ficam só para as ligações se apoiarem */}
+      {readOnly ? null : (
+      <Handle
+        data-alca
+        id="borda"
+        type="source"
+        position={Position.Top}
+        // atrás do conteúdo: só a faixa de fora (ou os cantos do losango) pega o ponteiro
+        style={{
+          inset: losango ? 0 : -10,
+          width: "auto",
+          height: "auto",
+          transform: "none",
+          zIndex: -1,
+          borderRadius: losango ? 0 : 16,
+        }}
+        // o base.css do React Flow pinta a alça: aqui ela é só área de pegar
+        className="cursor-crosshair !bg-transparent"
+        aria-hidden
+      />
+      )}
+      {ALCAS.map((a) => (
+        <Handle
+          key={a.id}
+          data-alca
+          id={a.id}
+          type="source"
+          position={a.position}
+          isConnectable={!readOnly}
+          className={cn(
+            "group/alca flex !size-6 items-center justify-center !bg-transparent",
+            readOnly && "invisible"
+          )}
+        >
+          {/* sempre à mostra, vazada; cheia no hover, na seleção e enquanto se puxa uma ligação */}
+          <span
+            className={cn(
+              "pointer-events-none size-2.5 rounded-full border-[1.5px] border-muted-foreground/70 bg-card transition-[transform,background-color,border-color]",
+              "group-hover:border-primary group-hover/alca:scale-125 group-hover/alca:bg-primary",
+              (selected || puxando) && "border-primary"
+            )}
+          />
+        </Handle>
+      ))}
+    </>
+  )
+}
+
+const OPOSTO = { top: Position.Bottom, bottom: Position.Top, left: Position.Right, right: Position.Left } as const
+
+/**
+ * A linha enquanto se puxa uma ligação, em curva. Da bolinha, sai dela; da borda (uma alça só, que
+ * sairia sempre de cima), sai do lado da peça virado para o ponteiro.
+ */
+function LinhaPuxada({ fromNode, fromHandle, fromX, fromY, fromPosition, toX, toY, connectionLineStyle }: ConnectionLineComponentProps) {
+  let origem = { x: fromX, y: fromY, lado: fromPosition }
+  if (fromHandle.id === "borda") {
+    const w = fromNode.measured.width ?? LARGURA_DA_PECA
+    const h = fromNode.measured.height ?? ALTURA_DA_PECA
+    const cx = fromNode.internals.positionAbsolute.x + w / 2
+    const cy = fromNode.internals.positionAbsolute.y + h / 2
+    const dx = toX - cx
+    const dy = toY - cy
+    // o lado é o que a reta do centro ao ponteiro cruza; a linha sai do meio dele
+    const horizontal = Math.abs(dx) * h > Math.abs(dy) * w
+    origem = horizontal
+      ? { x: cx + (dx > 0 ? w / 2 : -w / 2), y: cy, lado: dx > 0 ? Position.Right : Position.Left }
+      : { x: cx, y: cy + (dy > 0 ? h / 2 : -h / 2), lado: dy > 0 ? Position.Bottom : Position.Top }
+  }
+  const [d] = getBezierPath({
+    sourceX: origem.x,
+    sourceY: origem.y,
+    sourcePosition: origem.lado,
+    targetX: toX,
+    targetY: toY,
+    targetPosition: OPOSTO[origem.lado],
+  })
+  return <path d={d} fill="none" style={connectionLineStyle} />
+}
+
 /** O destaque da revisão: moldura cheia e solta da peça, no tom da marca, mais leve que a seleção. */
 const DESTAQUE = "outline-2 outline-offset-4 outline-primary/55"
 
@@ -568,6 +662,8 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
   const marcada = marcadas.has(id)
   const trancada = trancadas.has(id)
   const t = useTranslate()
+  // puxando uma ligação de outra peça: a peça acende sob o ponteiro, para mostrar onde soltar
+  const alvo = useConnection((c) => c.inProgress && c.fromNode.id !== id)
   const servico = servicoDe(data.service)
   // no desenho misto, a peça de uma nuvem que não é a principal diz qual é
   const outraNuvem = misto && servico ? nuvemDe(servico.id) : undefined
@@ -585,6 +681,7 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
         "group relative flex w-[168px] min-h-[52px] items-center gap-2.5 rounded-[10px] bg-card py-2 pr-2.5 pl-2 text-left transition-opacity",
         "shadow-[0_0_0_1px_var(--input),0_1px_2px_oklch(0_0_0/0.06)]",
         selected && "shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.06)]",
+        alvo && "hover:shadow-[0_0_0_2px_var(--primary),0_1px_2px_oklch(0_0_0/0.06)] hover:bg-primary-subtle/40",
         // o cinza vale para o conteúdo; o X continua vermelho
         derrubada && "bg-muted [&>:not([data-x]):not([data-alca])]:opacity-60 [&>:not([data-x]):not([data-alca])]:grayscale",
         fora && !selected && "shadow-[0_0_0_1.5px_var(--destructive),0_1px_2px_oklch(0_0_0/0.06)]",
@@ -660,23 +757,7 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
           </span>
         )}
       </span>
-      {ALCAS.map((a) => (
-        <Handle
-          key={a.id}
-          data-alca
-          id={a.id}
-          type="source"
-          position={a.position}
-          isConnectable={!readOnly}
-          className={cn(
-            "!size-2.5 !rounded-full !border-2 !border-card !bg-primary opacity-0 transition-opacity",
-            "group-hover:opacity-100",
-            selected && "opacity-100",
-            // só leitura (ou simulando), não dá para ligar: a alça não aparece
-            readOnly && "!invisible"
-          )}
-        />
-      ))}
+      <Alcas selected={selected} />
     </div>
   )
 }
@@ -938,9 +1019,36 @@ function Ligacao(props: EdgeProps<LigacaoEdge>) {
  */
 const LADO_DA_DECISAO = 112
 
+/** O losango de lado `L` com os vértices arredondados: cada vértice vira uma curva de raio `r`. */
+function losangoArredondado(L: number, r: number) {
+  const m = 2
+  const v = [
+    [L / 2, m],
+    [L - m, L / 2],
+    [L / 2, L - m],
+    [m, L / 2],
+  ]
+  // o ponto a `r` do vértice `i`, andando na direção do vértice `j`
+  const rumo = (i: number, j: number) => {
+    const [x, y] = v[i]
+    const dx = v[j][0] - x
+    const dy = v[j][1] - y
+    const d = Math.hypot(dx, dy)
+    return `${x + (dx / d) * r},${y + (dy / d) * r}`
+  }
+  let d = `M${rumo(0, 1)}`
+  for (let k = 1; k <= 4; k++) {
+    const i = k % 4
+    d += ` L${rumo(i, k - 1)} Q${v[i][0]},${v[i][1]} ${rumo(i, (i + 1) % 4)}`
+  }
+  return `${d} Z`
+}
+
 function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
   const { tituloDe, editando, setEditando, readOnly, sim, marcadas, destacadas } = useBancada()
   const t = useTranslate()
+  // puxando uma ligação de outra peça: o losango acende sob o ponteiro, para mostrar onde soltar
+  const alvo = useConnection((c) => c.inProgress && c.fromNode.id !== id)
   const derrubada = !!sim?.resultado.down.has(id)
   const apagada = !!sim && !derrubada && !sim.resultado.reached.has(id)
   const L = LADO_DA_DECISAO
@@ -949,14 +1057,20 @@ function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
       onDoubleClick={() => !readOnly && setEditando(id)}
       data-sim={derrubada ? "down" : apagada ? "unreached" : sim ? "reached" : undefined}
       title={tituloDe(data.kind)}
-      className={cn("group relative flex items-center justify-center transition-opacity", apagada && "opacity-35")}
+      // só o losango pega o ponteiro: os cantos vazios da caixa são a borda, de onde sai a ligação
+      className={cn(
+        "group pointer-events-none relative flex items-center justify-center transition-opacity [&>*]:pointer-events-auto",
+        apagada && "opacity-35"
+      )}
       style={{ width: L, height: L }}
     >
-      <svg aria-hidden viewBox={`0 0 ${L} ${L}`} width={L} height={L} className="absolute inset-0 overflow-visible">
-        <polygon
-          points={`${L / 2},2 ${L - 2},${L / 2} ${L / 2},${L - 2} 2,${L / 2}`}
+      <svg aria-hidden viewBox={`0 0 ${L} ${L}`} width={L} height={L} className="pointer-events-none! absolute inset-0 overflow-visible">
+        <path
+          d={losangoArredondado(L, 14)}
           strokeLinejoin="round"
           className={cn(
+            "pointer-events-auto",
+            alvo && "hover:stroke-primary hover:[stroke-width:2]",
             derrubada ? "fill-muted" : "fill-card",
             selected ? "stroke-primary [stroke-width:2]" : "stroke-input [stroke-width:1.25]",
             marcadas.has(id) && "stroke-destructive [stroke-dasharray:5_4] [stroke-width:2]",
@@ -986,22 +1100,7 @@ function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
           <span className="sr-only">{t("architecture_board.sim.down")}</span>
         </span>
       ) : null}
-      {ALCAS.map((a) => (
-        <Handle
-          key={a.id}
-          data-alca
-          id={a.id}
-          type="source"
-          position={a.position}
-          isConnectable={!readOnly}
-          className={cn(
-            "!size-2.5 !rounded-full !border-2 !border-card !bg-primary opacity-0 transition-opacity",
-            "group-hover:opacity-100",
-            selected && "opacity-100",
-            readOnly && "!invisible"
-          )}
-        />
-      ))}
+      <Alcas selected={selected} losango />
     </div>
   )
 }
@@ -1069,6 +1168,12 @@ function Moldura({
   const [copia, setCopia] = React.useState<Copia | null>(null)
   const palco = React.useRef<HTMLDivElement>(null)
   const [selecao, setSelecao] = React.useState<Selecao>(null)
+  // a linha solta no vazio: onde abre a paleta (no palco) e onde a peça nasce (no diagrama)
+  const [pecaNova, setPecaNova] = React.useState<{
+    de: string
+    tela: { x: number; y: number }
+    ponto: { x: number; y: number }
+  } | null>(null)
   const [editando, setEditando] = React.useState<string | null>(null)
   // o React Flow mede cada peça e precisa receber a medida de volta; ela não é do grafo, e fica em
   // estado (não numa ref lida no render, que o react-hooks/refs dos apps barra)
@@ -1225,7 +1330,8 @@ function Moldura({
       : { x: 0, y: 0 }
   }
 
-  const porPeca = (kind: string, ponto?: { x: number; y: number }) => {
+  /** Põe uma peça do tipo; com `ligadaA`, ela já nasce ligada a partir daquela peça (a linha solta no vazio). */
+  const porPeca = (kind: string, ponto?: { x: number; y: number }, ligadaA?: string) => {
     if (readOnly || cheioDePecas) return
     let posicao = ponto
     if (!posicao) {
@@ -1259,7 +1365,11 @@ function Moldura({
     const no: GraphNode = { id, kind, x: Math.round(posicao.x - base.x), y: Math.round(posicao.y - base.y) }
     if (service) no.service = service
     if (pai) no.parent = pai.id
-    mudar(acomodar({ ...graph, nodes: [...graph.nodes, no] }, { kind: "node", id }, alturas))
+    const edges =
+      ligadaA && porId.has(ligadaA) && !cheioDeLigacoes
+        ? [...graph.edges, { id: nextId("e", graph), from: ligadaA, to: id, relation: "calls" as Relation }]
+        : graph.edges
+    mudar(acomodar({ ...graph, nodes: [...graph.nodes, no], edges }, { kind: "node", id }, alturas))
     setSelecao({ tipo: "peca", id })
   }
 
@@ -1434,6 +1544,29 @@ function Moldura({
     const ponto = "changedTouches" in e ? e.changedTouches[0] : e
     const id = document.elementFromPoint(ponto.clientX, ponto.clientY)?.closest<HTMLElement>(".react-flow__node")?.dataset.id
     return id && porId.has(id) ? id : undefined
+  }
+
+  /**
+   * A linha solta no vazio (ou no vazio de um grupo) abre a paleta ali, e a peça escolhida nasce no
+   * ponto, já ligada. Solta fora do palco, numa nota ou com o diagrama cheio, a linha só some.
+   */
+  const abrirPecaNova = (e: MouseEvent | TouchEvent, de: string) => {
+    const caixa = palco.current?.getBoundingClientRect()
+    if (readOnly || cheioDePecas || !caixa || palette.length === 0) return
+    const p = "changedTouches" in e ? e.changedTouches[0] : e
+    const sob = document.elementFromPoint(p.clientX, p.clientY)
+    if (!sob || !palco.current?.contains(sob)) return
+    const no = sob.closest<HTMLElement>(".react-flow__node")?.dataset.id
+    if (no && !graph.groups.some((g) => g.id === no)) return
+    setPecaNova({
+      de,
+      // a paleta abre no ponto, mas sem sair do palco
+      tela: {
+        x: Math.max(8, Math.min(p.clientX - caixa.left, caixa.width - LARGURA_DA_PECA_NOVA - 8)),
+        y: Math.max(8, Math.min(p.clientY - caixa.top, caixa.height - ALTURA_DA_PECA_NOVA - 8)),
+      },
+      ponto: screenToFlowPosition({ x: p.clientX, y: p.clientY }),
+    })
   }
 
   const copiar = () => {
@@ -2040,7 +2173,11 @@ function Moldura({
                 if (estado.isValid || !estado.fromNode) return
                 const alvo = pecaNoPonto(e)
                 if (alvo) ligar(estado.fromNode.id, alvo)
+                else abrirPecaNova(e, estado.fromNode.id)
               }}
+              connectionLineComponent={LinhaPuxada}
+              connectionRadius={28}
+              onMoveStart={() => setPecaNova(null)}
               edgesReconnectable={!readOnly}
               onReconnect={(velha, nova) => religar(velha.id, nova.source, nova.target)}
               onReconnectEnd={(e, ligacao, ponta, estado) => {
@@ -2054,6 +2191,7 @@ function Moldura({
               onPaneClick={() => {
                 setSelecao(null)
                 setEditando(null)
+                setPecaNova(null)
               }}
               connectionMode={ConnectionMode.Loose}
               connectionLineStyle={{ stroke: "var(--primary)", strokeWidth: 1.5 }}
@@ -2076,6 +2214,18 @@ function Moldura({
             >
               <Background gap={18} size={1} color="var(--input)" />
             </ReactFlow>
+            {pecaNova ? (
+              <PecaNova
+                lugar={pecaNova.tela}
+                palette={palette}
+                onEscolher={(kind) => {
+                  const { ponto, de } = pecaNova
+                  porPeca(kind, { x: ponto.x - LARGURA_DA_PECA / 2, y: ponto.y - ALTURA_DA_PECA / 2 }, de)
+                  setPecaNova(null)
+                }}
+                onFechar={() => setPecaNova(null)}
+              />
+            ) : null}
             {simulando ? (
               <div aria-hidden className="pointer-events-none absolute inset-0 z-10 shadow-[inset_0_0_0_2px_color-mix(in_oklab,var(--primary)_40%,transparent)]" />
             ) : null}
@@ -2746,6 +2896,83 @@ function LigarA({
         </ul>
       </PopoverContent>
     </Popover>
+  )
+}
+
+// ── a peça nova, da linha solta no vazio ────────────────────────────────
+
+const LARGURA_DA_PECA_NOVA = 240
+const ALTURA_DA_PECA_NOVA = 300
+
+/** A paleta que abre onde a linha foi solta: busca no topo, ↵ escolhe a primeira, Esc fecha. */
+function PecaNova({
+  lugar,
+  palette,
+  onEscolher,
+  onFechar,
+}: {
+  lugar: { x: number; y: number }
+  palette: PaletteItem[]
+  onEscolher: (kind: string) => void
+  onFechar: () => void
+}) {
+  const t = useTranslate()
+  const caixa = React.useRef<HTMLDivElement>(null)
+  const [busca, setBusca] = React.useState("")
+  React.useEffect(() => {
+    const fora = (e: PointerEvent) => {
+      if (!caixa.current?.contains(e.target as globalThis.Node)) onFechar()
+    }
+    document.addEventListener("pointerdown", fora)
+    return () => document.removeEventListener("pointerdown", fora)
+  }, [onFechar])
+  const termo = busca.trim().toLocaleLowerCase()
+  const achadas = termo ? palette.filter((p) => p.title.toLocaleLowerCase().includes(termo)) : palette
+  return (
+    <div
+      ref={caixa}
+      role="dialog"
+      aria-label={t("architecture_board.new_linked_piece")}
+      className="absolute z-20 flex flex-col overflow-hidden rounded-[var(--radius-float)] bg-popover text-popover-foreground shadow-[var(--float)]"
+      style={{ left: lugar.x, top: lugar.y, width: LARGURA_DA_PECA_NOVA, maxHeight: ALTURA_DA_PECA_NOVA }}
+      onKeyDown={(e) => {
+        // a bancada apaga e cola pelo teclado: aqui as teclas são da busca
+        e.stopPropagation()
+        if (e.key === "Escape") onFechar()
+      }}
+    >
+      <span className="block px-3 pt-2.5 pb-1.5 font-mono text-[9.5px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
+        {t("architecture_board.new_linked_piece")}
+      </span>
+      <div className="px-2 pb-1.5">
+        <input
+          autoFocus
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && achadas[0]) onEscolher(achadas[0].id)
+          }}
+          placeholder={t("architecture_board.search_piece")}
+          aria-label={t("architecture_board.search_piece")}
+          className="h-8 w-full rounded-md bg-sunken px-2 text-[12.5px] text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/35"
+        />
+      </div>
+      <ul className="muriki-scroll m-0 flex min-h-0 list-none flex-col gap-px overflow-y-auto px-1.5 pb-1.5">
+        {achadas.map((p) => (
+          <li key={p.id}>
+            <button
+              type="button"
+              onClick={() => onEscolher(p.id)}
+              title={p.description}
+              className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-[12.5px] text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/35"
+            >
+              <IconeDaPeca kind={p.id} className="size-[15px] shrink-0 text-muted-foreground" />
+              <span className="truncate">{p.title}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
