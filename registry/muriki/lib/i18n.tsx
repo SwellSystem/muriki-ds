@@ -812,6 +812,7 @@ const STRINGS: Record<string, unknown> = {
       down_count_one: "{{count}} peça fora do ar",
       down_count_other: "{{count}} peças fora do ar",
       and: " e ",
+      or: " ou ",
       all_reached: "Nenhuma peça ficou sem caminho a partir de {{from}}.",
       unreachable_one: "{{names}} ficou sem caminho a partir de {{from}}.",
       unreachable_other: "{{names}} ficaram sem caminho a partir de {{from}}.",

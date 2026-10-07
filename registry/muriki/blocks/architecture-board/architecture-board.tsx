@@ -31,7 +31,7 @@
  * revisão da IA aponta). O exercício fica em "single", como sempre.
  *
  * SIMULAR É PASSAGEIRO. O modo Simular executa o desenho (`simulateFlow`): um pulso parte das peças
- * Cliente e anda pelas ligações no sentido do trabalho; derrubar uma peça, uma zona ou uma região
+ * Cliente e Worker e anda pelas ligações no sentido do trabalho; derrubar uma peça, uma zona ou uma região
  * mostra até onde ele ainda chega. Nada disso vai para o grafo, e sair do modo volta tudo. Durante a
  * simulação, o desenho não se edita.
  *
@@ -159,6 +159,7 @@ import {
   deleteGroup,
   nextId,
   reparent,
+  SIM_ORIGINS,
   simulateFlow,
   subtreeOf,
   type ArchitectureGraphV2,
@@ -565,12 +566,10 @@ const ALCAS = [
 /**
  * As alças da peça: as quatro bolinhas, com 24px de alvo em volta dos 10px visíveis, e a borda, um
  * anel por fora da peça (no losango, os cantos vazios da caixa) de onde também sai uma ligação. O
- * miolo continua movendo a peça. As bolinhas aparecem no hover, na seleção, no toque (não há hover)
- * e em todas as peças enquanto uma ligação é puxada.
+ * miolo continua movendo a peça. As bolinhas ficam sempre à mostra, na cor da marca.
  */
-function Alcas({ selected, losango }: { selected: boolean; losango?: boolean }) {
+function Alcas({ losango }: { losango?: boolean }) {
   const { readOnly } = useBancada()
-  const puxando = useConnection((c) => c.inProgress)
   return (
     <>
       {/* só leitura (ou simulando): sem borda, e as bolinhas ficam só para as ligações se apoiarem */}
@@ -602,20 +601,15 @@ function Alcas({ selected, losango }: { selected: boolean; losango?: boolean }) 
           type="source"
           position={a.position}
           isConnectable={!readOnly}
+          // sempre à mostra, na cor da marca; cresce no hover
+          // a alça é a bolinha de 10px: a ponta da ligação encosta nela. Os 24px de pegar vêm do ::before
           className={cn(
-            "group/alca flex !size-6 items-center justify-center !bg-transparent",
+            "!size-2.5 rounded-full border-2 border-card !bg-primary transition-[scale]",
+            "before:absolute before:-inset-[7px] before:rounded-full before:content-['']",
+            "hover:scale-125",
             readOnly && "invisible"
           )}
-        >
-          {/* sempre à mostra, vazada; cheia no hover, na seleção e enquanto se puxa uma ligação */}
-          <span
-            className={cn(
-              "pointer-events-none size-2.5 rounded-full border-[1.5px] border-muted-foreground/70 bg-card transition-[transform,background-color,border-color]",
-              "group-hover:border-primary group-hover/alca:scale-125 group-hover/alca:bg-primary",
-              (selected || puxando) && "border-primary"
-            )}
-          />
-        </Handle>
+        />
       ))}
     </>
   )
@@ -757,7 +751,7 @@ function Peca({ id, data, selected }: NodeProps<PecaNode>) {
           </span>
         )}
       </span>
-      <Alcas selected={selected} />
+      <Alcas />
     </div>
   )
 }
@@ -1100,7 +1094,7 @@ function Decisao({ id, data, selected }: NodeProps<PecaNode>) {
           <span className="sr-only">{t("architecture_board.sim.down")}</span>
         </span>
       ) : null}
-      <Alcas selected={selected} losango />
+      <Alcas losango />
     </div>
   )
 }
@@ -2337,11 +2331,14 @@ function ResumoDaSimulacao({
     const n = graph.nodes.find((x) => x.id === id)
     return n ? (n.label ?? tituloDe(n.kind)) : id
   }
-  const clientes = graph.nodes.filter((n) => n.kind === "client")
-  const de = clientes.length === 1 ? nome(clientes[0].id) : tituloDe("client")
+  // de onde o pulso parte: a peça, se é uma só; senão, os tipos presentes ("Cliente e Worker")
+  const origens = graph.nodes.filter((n) => SIM_ORIGINS.includes(n.kind))
+  const tipos = SIM_ORIGINS.filter((k) => origens.some((n) => n.kind === k))
+  const de = origens.length === 1 ? nome(origens[0].id) : tipos.map(tituloDe).join(t("architecture_board.sim.and"))
   const fora = resultado.unreachable
   let texto: string
-  if (!clientes.length) texto = t("architecture_board.sim.no_client", { client: tituloDe("client") })
+  if (!origens.length)
+    texto = t("architecture_board.sim.no_client", { client: SIM_ORIGINS.map(tituloDe).join(t("architecture_board.sim.or")) })
   else if (!fora.length) texto = t("architecture_board.sim.all_reached", { from: de })
   else if (fora.length <= 2)
     texto = t("architecture_board.sim.unreachable", { count: fora.length, names: fora.map(nome).join(t("architecture_board.sim.and")), from: de })
