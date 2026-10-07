@@ -504,6 +504,8 @@ const STRINGS: Record<string, unknown> = {
       shortcut: "⌘ ↵ roda os testes",
       no_autocomplete: "sem autocompletar: aqui quem escreve é você",
       expand: "Expandir o editor",
+      show_sidebar: "Mostrar arquivos e testes",
+      hide_sidebar: "Esconder arquivos e testes",
       collapse: "Mostrar o enunciado",
     },
     console: {
