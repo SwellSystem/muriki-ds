@@ -10,11 +10,11 @@
  *     foot={<><ExerciseExplanation …/><ExerciseHints …/></>}
  *     editor={<ExerciseEditor sidebar={<><ExerciseFileTree …/><ExerciseTests …/></>}>{editor}</ExerciseEditor>} />
  *
- * No desktop (lg), a lateral é uma coluna de 372px (420px a partir do 2xl) com cartões recolhíveis,
+ * No desktop (lg), a lateral é uma coluna de 372px (460px no xl, 520px no 2xl) com cartões recolhíveis,
  * como Código e Testes no rail: o enunciado aberto ocupa o que sobra e só o corpo dele rola, com o
  * cartão parado; a explicação e as dicas vêm embaixo, no tamanho delas. Recolhido, o enunciado vira
  * só o título e os outros sobem. A alça entre a coluna e o editor muda a largura (arrastar ou setas,
- * de 320 a 560px; dois cliques voltam ao padrão), e `sideWidth` deixa o app lembrar por pessoa.
+ * de 320 a 640px; dois cliques voltam ao padrão), e `sideWidth` deixa o app lembrar por pessoa.
  *
  * O Peer mora numa aba do cartão do enunciado (ExerciseStatement `peer`, com <PeerHistory
  * variant="tab" />), e não embaixo dele: o histórico crescia e espremia o enunciado. A aba Peer
@@ -54,6 +54,7 @@ import {
   PaperPlaneTiltIcon,
   PlayIcon,
   SidebarSimpleIcon,
+  TreeViewIcon,
   WarningCircleIcon,
   XIcon,
 } from "@phosphor-icons/react"
@@ -234,8 +235,8 @@ export interface ExerciseWorkspaceProps {
   defaultExpanded?: boolean
   onExpandedChange?: (expanded: boolean) => void
   /**
-   * A largura da coluna da esquerda, em px (só no desktop). Sem isto, 372px, ou 420px a partir do 2xl.
-   * A pessoa muda pela alça, entre 320 e 560.
+   * A largura da coluna da esquerda, em px (só no desktop). Sem isto, 372px no lg, 460px no xl e 520px
+   * no 2xl. A pessoa muda pela alça, entre 320 e 640.
    */
   sideWidth?: number
   defaultSideWidth?: number
@@ -245,7 +246,7 @@ export interface ExerciseWorkspaceProps {
 }
 
 const LARGURA_MIN = 320
-const LARGURA_MAX = 560
+const LARGURA_MAX = 640
 const PASSO_DA_SETA = 16
 
 function limitar(largura: number) {
@@ -312,7 +313,7 @@ export function ExerciseWorkspace({
             data-resizing={arrasto !== null || undefined}
             style={largura !== undefined ? ({ "--side-w": `${largura}px` } as React.CSSProperties) : undefined}
             className={cn(
-              "relative flex min-w-0 flex-col lg:min-h-0 lg:shrink-0 lg:overflow-hidden lg:[--side-w:372px] 2xl:[--side-w:420px]",
+              "relative flex min-w-0 flex-col lg:min-h-0 lg:shrink-0 lg:overflow-hidden lg:[--side-w:372px] xl:[--side-w:460px] 2xl:[--side-w:520px]",
               "lg:transition-[width,padding,opacity,visibility] lg:duration-300 lg:ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:motion-reduce:transition-none lg:data-resizing:transition-none",
               recolhida ? "lg:invisible lg:w-0 lg:pr-0 lg:opacity-0" : "lg:w-[calc(var(--side-w)+1rem)] lg:pr-4 lg:opacity-100"
             )}
@@ -1436,6 +1437,14 @@ export interface ExerciseEditorProps {
   runDisabledReason?: string
   /** A lateral: <ExerciseFileTree/> e <ExerciseTests/>. */
   sidebar?: React.ReactNode
+  /**
+   * A lateral aberta (só no desktop; abaixo de lg ela fica sempre, em cima do código). O botão no
+   * começo das abas alterna. O app decide quando ela começa recolhida (pouco arquivo, testes sem
+   * rodar) e a abre quando chega resultado: controle com `sidebarOpen`, ou só `defaultSidebarOpen`.
+   */
+  sidebarOpen?: boolean
+  defaultSidebarOpen?: boolean
+  onSidebarOpenChange?: (open: boolean) => void
   /** O começo da barra de status, ex.: "src/solution.js · 11:18". */
   status?: React.ReactNode
   /** "⌘ ↵ roda os testes". `null` tira. */
@@ -1472,6 +1481,9 @@ export function ExerciseEditor({
   shortcutLabel,
   statusEnd,
   legend = true,
+  sidebarOpen,
+  defaultSidebarOpen = true,
+  onSidebarOpenChange,
   peerBar,
   output,
   children,
@@ -1500,6 +1512,12 @@ export function ExerciseEditor({
     : null
   const { ancorar, classe: destaque, balao: balaoDoGuia } = usePassoDoGuia<HTMLDivElement>(1, "inset", "dentro")
   const podeRodar = !!onRun && !runDisabledReason && !running
+  const [lateralAberta, mudarLateral] = useAberta(sidebarOpen, defaultSidebarOpen, onSidebarOpenChange)
+  // o passo 2 do guia aponta os testes, que moram na lateral: com ele na tela, ela abre
+  const guia = React.useContext(GuiaContexto)
+  const lateral = lateralAberta || guia?.step === 2
+  const idDaLateral = React.useId()
+  const rotuloDaLateral = t(lateral ? "exercise_workspace.editor.hide_sidebar" : "exercise_workspace.editor.show_sidebar")
   const listaDeAbas = React.useRef<HTMLDivElement>(null)
 
   // ⌘ ↵ (Ctrl ↵) em qualquer lugar da moldura, o editor junto
@@ -1531,7 +1549,18 @@ export function ExerciseEditor({
       )}
     >
       {sidebar ? (
-        <div className="muriki-scroll flex shrink-0 flex-col border-muted bg-rail max-lg:border-b lg:w-[248px] lg:overflow-y-auto lg:border-r">
+        // recolhida, a largura vai a zero e o conteúdo fica nos 248px por dentro, para não refluir
+        <div
+          id={idDaLateral}
+          data-slot="exercise-editor-sidebar"
+          data-state={lateral ? "open" : "closed"}
+          className={cn(
+            "flex shrink-0 flex-col overflow-hidden border-muted bg-rail max-lg:border-b lg:border-r",
+            "lg:transition-[width,visibility] lg:duration-300 lg:ease-[cubic-bezier(0.2,0.8,0.2,1)] lg:motion-reduce:transition-none",
+            lateral ? "lg:w-[248px]" : "lg:invisible lg:w-0 lg:border-r-0"
+          )}
+        >
+        <div className="muriki-scroll flex min-h-0 flex-1 flex-col lg:w-[248px] lg:overflow-y-auto">
           {sidebar}
           <div className="flex-1" />
           {legend ? (
@@ -1547,9 +1576,30 @@ export function ExerciseEditor({
             </div>
           ) : null}
         </div>
+        </div>
       ) : null}
       <div className="flex min-h-[420px] min-w-0 flex-1 flex-col">
         <div className="flex items-center gap-0.5 border-b border-muted pr-2 pl-1">
+          {sidebar ? (
+            <Tooltip>
+              <TooltipTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-expanded={lateral}
+                    aria-controls={idDaLateral}
+                    aria-label={rotuloDaLateral}
+                    onClick={() => mudarLateral(!lateral)}
+                    className="mr-0.5 text-muted-foreground max-lg:hidden"
+                  />
+                }
+              >
+                <TreeViewIcon aria-hidden weight={lateral ? "fill" : "regular"} />
+              </TooltipTrigger>
+              <TooltipContent>{rotuloDaLateral}</TooltipContent>
+            </Tooltip>
+          ) : null}
           <div
             ref={listaDeAbas}
             role="tablist"
