@@ -161,6 +161,7 @@ import {
   reparent,
   SIM_ORIGINS,
   simulateFlow,
+  simulationOrigins,
   subtreeOf,
   type ArchitectureGraphV2,
   type FlowSimulation,
@@ -566,7 +567,7 @@ const ALCAS = [
 /**
  * As alças da peça: as quatro bolinhas, com 24px de alvo em volta dos 10px visíveis, e a borda, um
  * anel por fora da peça (no losango, os cantos vazios da caixa) de onde também sai uma ligação. O
- * miolo continua movendo a peça. As bolinhas ficam sempre à mostra, na cor da marca.
+ * miolo continua movendo a peça. As bolinhas ficam sempre à mostra, vazadas no contorno da marca.
  */
 function Alcas({ losango }: { losango?: boolean }) {
   const { readOnly } = useBancada()
@@ -601,12 +602,12 @@ function Alcas({ losango }: { losango?: boolean }) {
           type="source"
           position={a.position}
           isConnectable={!readOnly}
-          // sempre à mostra, na cor da marca; cresce no hover
+          // sempre à mostra, vazada: contorno da marca e miolo do fundo da peça (claro e escuro); cheia no hover
           // a alça é a bolinha de 10px: a ponta da ligação encosta nela. Os 24px de pegar vêm do ::before
           className={cn(
-            "!size-2.5 rounded-full border-2 border-card !bg-primary transition-[scale]",
+            "!size-2.5 rounded-full border-[1.5px] border-primary !bg-card transition-[scale,background-color]",
             "before:absolute before:-inset-[7px] before:rounded-full before:content-['']",
-            "hover:scale-125",
+            "hover:scale-125 hover:!bg-primary",
             readOnly && "invisible"
           )}
         />
@@ -2332,7 +2333,7 @@ function ResumoDaSimulacao({
     return n ? (n.label ?? tituloDe(n.kind)) : id
   }
   // de onde o pulso parte: a peça, se é uma só; senão, os tipos presentes ("Cliente e Worker")
-  const origens = graph.nodes.filter((n) => SIM_ORIGINS.includes(n.kind))
+  const origens = simulationOrigins(graph)
   const tipos = SIM_ORIGINS.filter((k) => origens.some((n) => n.kind === k))
   const de = origens.length === 1 ? nome(origens[0].id) : tipos.map(tituloDe).join(t("architecture_board.sim.and"))
   const fora = resultado.unreachable
