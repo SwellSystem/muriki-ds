@@ -257,6 +257,16 @@ export interface ArchitectureBoardProps {
    * vazio (ou ausente) não destaca nada.
    */
   highlight?: string[]
+  /**
+   * A faixa em cima do palco, acima da barra: as etapas da migração (<ArchitectureStages />). O app
+   * passa o grafo da etapa ativa em `graph`, e `readOnly` com o início à vista.
+   */
+  stageBar?: React.ReactNode
+  /**
+   * Na migração, a etapa à vista (a partir de 0): o selo das regras diz a etapa e a nota explica que
+   * o Verificar confere todas as etapas. `rules` e `summary` são os da etapa.
+   */
+  rulesStage?: number
   className?: string
 }
 
@@ -1143,6 +1153,8 @@ function Moldura({
   pick,
   locked,
   highlight,
+  stageBar,
+  rulesStage,
   className,
 }: ArchitectureBoardProps) {
   const t = useTranslate()
@@ -2002,10 +2014,11 @@ function Moldura({
               onMostrar={(id) => setSelecao({ tipo: "peca", id })}
             />
           ) : null}
-          {rules ? <Regras rules={rules} summary={summary ?? null} checkError={checkError} /> : null}
+          {rules ? <Regras rules={rules} summary={summary ?? null} checkError={checkError} stage={rulesStage} /> : null}
         </div>
 
         <div className="flex min-h-[420px] min-w-0 flex-1 flex-col">
+          {stageBar}
           {/* dois lados que não disputam espaço: à esquerda a dica ou as ações da seleção, que encolhem
               (a dica trunca, as ações quebram a linha por dentro); à direita Expandir, Simular e
               Verificar, sempre na primeira linha */}
@@ -2980,7 +2993,13 @@ function Regras({
   rules,
   summary,
   checkError,
-}: { rules: BoardRule[]; summary: ArchitectureBoardProps["summary"]; checkError: ArchitectureBoardProps["checkError"] }) {
+  stage,
+}: {
+  rules: BoardRule[]
+  summary: ArchitectureBoardProps["summary"]
+  checkError: ArchitectureBoardProps["checkError"]
+  stage?: number
+}) {
   const t = useTranslate()
   let resumo: React.ReactNode
   if (checkError) resumo = <Badge tone="red" dot>{t("architecture_board.error_badge")}</Badge>
@@ -2988,7 +3007,9 @@ function Regras({
   else
     resumo = (
       <Badge tone={summary.passing === summary.total ? "green" : "red"} dot>
-        {t("architecture_board.passing", { passing: summary.passing, total: summary.total })}
+        {stage === undefined
+          ? t("architecture_board.passing", { passing: summary.passing, total: summary.total })
+          : t("architecture_board.passing_stage", { n: stage + 1, passing: summary.passing, total: summary.total })}
       </Badge>
     )
   return (
@@ -3036,7 +3057,7 @@ function Regras({
         ))}
       </ul>
       <span className="block px-4 pt-1.5 pb-2.5 text-[11.5px] text-muted-foreground">
-        {t("architecture_board.check_hint")}
+        {t(stage === undefined ? "architecture_board.check_hint" : "architecture_board.stages.rules_note")}
       </span>
     </ExerciseSection>
   )

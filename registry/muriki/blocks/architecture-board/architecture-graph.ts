@@ -346,3 +346,38 @@ export function cleanAnnotationText(text: string): string | undefined {
     .slice(0, ANNOTATION_LIMITS.text)
   return limpo || undefined
 }
+
+// ── as etapas da migração ───────────────────────────────────────────────
+
+/** O que mudou de uma etapa para a seguinte, como o `stepLimit` da API conta. */
+export interface GraphStep {
+  nodes: number
+  edges: number
+}
+
+/**
+ * O passo entre dois grafos, a mesma conta do `graphStep` da API (graph-rules.ts): a peça conta por
+ * id com o kind (criar, apagar ou trocar o kind conta 1), a ligação pela trinca (from, relation, to).
+ * Rótulo, posição, id da ligação, grupo, provedor e serviço não contam.
+ */
+export function graphStep(
+  before: Pick<ArchitectureGraphV2, "nodes" | "edges">,
+  after: Pick<ArchitectureGraphV2, "nodes" | "edges">
+): GraphStep {
+  const kindAntes = new Map(before.nodes.map(({ id, kind }) => [id, kind]))
+  const ficou = new Set(after.nodes.map(({ id }) => id))
+  const trincas = (g: Pick<ArchitectureGraphV2, "edges">) => new Set(g.edges.map(({ from, relation, to }) => JSON.stringify([from, relation, to])))
+  const antes = trincas(before)
+  const depois = trincas(after)
+  return {
+    nodes:
+      after.nodes.filter(({ id, kind }) => kindAntes.get(id) !== kind).length + before.nodes.filter(({ id }) => !ficou.has(id)).length,
+    edges: [...depois].filter((t) => !antes.has(t)).length + [...antes].filter((t) => !depois.has(t)).length,
+  }
+}
+
+/** A etapa (a partir de 0) do `details[].path` de um `422 GRAPH_INVALID`, ex.: "/stages/2" → 2. Outro caminho, `undefined`. */
+export function stageOfPath(path: string | undefined): number | undefined {
+  const achou = /^\/stages\/(\d+)$/.exec(path ?? "")
+  return achou ? Number(achou[1]) : undefined
+}

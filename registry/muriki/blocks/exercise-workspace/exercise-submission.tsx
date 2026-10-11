@@ -18,7 +18,7 @@
  * explicação mostra o porquê".
  */
 import * as React from "react"
-import { CheckIcon, ClockIcon, WarningIcon, XIcon } from "@phosphor-icons/react"
+import { CheckIcon, ClockIcon, LockIcon, WarningIcon, XIcon } from "@phosphor-icons/react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -38,13 +38,24 @@ export interface ExerciseSubmissionResult {
   tests: { passed: number; total: number }
   /** Os testes ocultos: o nome, o rótulo (o `hiddenTestLabels` da API; sem ele, o nome) e o status. */
   items?: { name: string; label?: string; status: "pass" | "fail" }[]
-  /** No exercício de arquitetura (unit "rules"): as regras, só com o título e o status. */
-  rules?: { title: string; status: "pass" | "fail"; visibility: "visible" | "hidden" }[]
   /**
-   * As partes da resposta (`parts` do envio), além das regras: as peças marcadas e cada número, com
-   * a pergunta. Só o status: nunca a resposta certa.
+   * No exercício de arquitetura (unit "rules"): as regras, só com o título e o status. Na migração,
+   * a visível vem uma vez por etapa em que foi julgada, com `stage` (a partir de 0), e a lista se
+   * agrupa por etapa; a oculta vem uma vez por envio, sem `stage` (regra 10 do produto), e sai num
+   * grupo à parte depois das etapas. A API antiga ainda manda a oculta por etapa, e isso continua
+   * aparecendo dentro da etapa, com o cadeado.
    */
-  parts?: Array<{ kind: "pick"; status: "pass" | "fail" } | { kind: "number"; prompt: React.ReactNode; status: "pass" | "fail" }>
+  rules?: { title: string; status: "pass" | "fail"; visibility: "visible" | "hidden"; stage?: number }[]
+  /**
+   * As partes da resposta (`parts` do envio), além das regras: as peças marcadas, cada número com a
+   * pergunta, as opções marcadas (`choices`) e a ordem (`order`), com o prompt de cada uma (sem ele,
+   * um nome genérico). Só o status: nunca a resposta certa.
+   */
+  parts?: Array<
+    | { kind: "pick"; status: "pass" | "fail" }
+    | { kind: "number"; prompt: React.ReactNode; status: "pass" | "fail" }
+    | { kind: "choices" | "order"; prompt?: React.ReactNode; status: "pass" | "fail" }
+  >
   /** A nota da explicação: 0, 1 ou 2; null quando não houve explicação. */
   understanding: 0 | 1 | 2 | null
   /** Um parágrafo de texto, nunca o gabarito. */
@@ -64,6 +75,11 @@ export interface ExerciseSubmissionError {
   requestId?: string
   /** No rate_limit: em quantos segundos dá para enviar de novo. */
   retryIn?: number
+  /**
+   * No rejected da migração: a etapa recusada, a partir de 0 (o `details[].path` "/stages/2" do
+   * `422 GRAPH_INVALID`, via `stageOfPath`). Aparece como "Na etapa 3" em cima da mensagem.
+   */
+  stage?: number
 }
 
 export interface ExerciseSubmissionProps {
@@ -78,7 +94,7 @@ export interface ExerciseSubmissionProps {
   result?: ExerciseSubmissionResult
   error?: ExerciseSubmissionError
   onRetry?: () => void
-  /** "Voltar ao código". Sem isto, fecha. */
+  /** "Voltar ao código" ("Voltar ao desenho" com unit "rules"). Sem isto, fecha. */
   onBackToCode?: () => void
   /** "Próxima etapa", quando passou. */
   onNext?: () => void
@@ -116,7 +132,7 @@ export function ExerciseSubmission({
         {ocupado ? (
           <Enviando state={state} unit={unit} />
         ) : state === "error" && error ? (
-          <Erro error={error} onRetry={onRetry} onBack={voltar} />
+          <Erro error={error} unit={unit} onRetry={onRetry} onBack={voltar} />
         ) : result ? (
           <>
             <ModalHeader>
@@ -165,7 +181,11 @@ export function ExerciseSubmission({
               {!result.passed && result.parts?.length ? <ListaDePartes partes={result.parts} /> : null}
 
               {unit === "rules" && !result.passed && result.rules?.length ? (
-                <ListaDeRegras regras={result.rules} />
+                result.rules.some((r) => r.stage !== undefined) ? (
+                  <RegrasPorEtapa regras={result.rules} />
+                ) : (
+                  <ListaDeRegras regras={result.rules} />
+                )
               ) : null}
 
               {unit === "tests" && !result.passed && result.items?.length ? (
@@ -209,7 +229,7 @@ export function ExerciseSubmission({
             </ModalBody>
             <ModalFooter>
               <Button variant={result.passed ? "ghost" : "solid"} size="lg" onClick={voltar}>
-                {t("exercise_workspace.submission.back")}
+                {t(unit === "rules" ? "exercise_workspace.submission.back_rules" : "exercise_workspace.submission.back")}
               </Button>
               {result.passed && (nextRender || onNext) ? (
                 <Button variant="solid" size="lg" render={nextRender} nativeButton={!nextRender} onClick={nextRender ? undefined : onNext}>
@@ -242,7 +262,11 @@ function ListaDePartes({ partes }: { partes: NonNullable<ExerciseSubmissionResul
               <span className="sr-only">
                 {parte.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
               </span>
-              {parte.kind === "pick" ? t("exercise_workspace.submission.part_pick") : parte.prompt}
+              {parte.kind === "pick"
+                ? t("exercise_workspace.submission.part_pick")
+                : parte.kind === "number"
+                  ? parte.prompt
+                  : (parte.prompt ?? t(`exercise_workspace.submission.part_${parte.kind}`))}
               <span className="text-muted-foreground">
                 {" · "}
                 {t(parte.status === "pass" ? "exercise_workspace.submission.part_right" : "exercise_workspace.submission.part_wrong")}
@@ -372,7 +396,17 @@ function Explicacao({ nota }: { nota: 0 | 1 | 2 | null }) {
   )
 }
 
-function Erro({ error, onRetry, onBack }: { error: ExerciseSubmissionError; onRetry?: () => void; onBack: () => void }) {
+function Erro({
+  error,
+  unit,
+  onRetry,
+  onBack,
+}: {
+  error: ExerciseSubmissionError
+  unit: "tests" | "rules"
+  onRetry?: () => void
+  onBack: () => void
+}) {
   const t = useTranslate()
   // no 429, a contagem até poder enviar de novo; o botão só volta quando ela acaba
   const [faltam, setFaltam] = React.useState(error.kind === "rate_limit" ? (error.retryIn ?? 60) : 0)
@@ -407,8 +441,13 @@ function Erro({ error, onRetry, onBack }: { error: ExerciseSubmissionError; onRe
           </span>
         </span>
       </ModalHeader>
-      {(error.message || error.requestId) && error.kind !== "rate_limit" ? (
+      {(error.message || error.requestId || error.stage !== undefined) && error.kind !== "rate_limit" ? (
         <ModalBody className="flex flex-col gap-3">
+          {error.stage !== undefined ? (
+            <span className="self-start">
+              <Badge tone="red">{t("exercise_workspace.submission.error.stage", { n: error.stage + 1 })}</Badge>
+            </span>
+          ) : null}
           {error.message ? (
             error.kind === "runner" ? (
               <p className="m-0 rounded-lg bg-sunken px-3 py-2.5 font-mono text-[11.5px] leading-4 break-words whitespace-pre-wrap text-foreground">
@@ -428,7 +467,7 @@ function Erro({ error, onRetry, onBack }: { error: ExerciseSubmissionError; onRe
       ) : null}
       <ModalFooter>
         <Button variant="ghost" size="lg" onClick={onBack}>
-          {t("exercise_workspace.submission.back")}
+          {t(unit === "rules" ? "exercise_workspace.submission.back_rules" : "exercise_workspace.submission.back")}
         </Button>
         {onRetry ? (
           <Button variant="solid" size="lg" onClick={onRetry} disabled={faltam > 0}>
@@ -476,5 +515,80 @@ function ListaDeRegras({ regras }: { regras: NonNullable<ExerciseSubmissionResul
         </section>
       ))}
     </>
+  )
+}
+
+// Na migração, as regras com `stage` por etapa, cada etapa com a conta dela: uma visível aparece em
+// toda etapa em que foi julgada (a "intermediária" só antes da última, a "final" só na última). As
+// sem `stage` (a oculta, uma vez por envio pela regra 10 do produto) saem num grupo à parte depois
+// das etapas. Se a oculta ainda vier dentro de uma etapa (a API antiga), fica marcada pelo cadeado.
+function RegrasPorEtapa({ regras }: { regras: NonNullable<ExerciseSubmissionResult["rules"]> }) {
+  const t = useTranslate()
+  const etapas = [...new Set(regras.flatMap((r) => (r.stage === undefined ? [] : [r.stage])))].sort((a, b) => a - b)
+  const semEtapa = regras.filter((r) => r.stage === undefined)
+  const temOculta = regras.some((r) => r.visibility === "hidden")
+  return (
+    <section className="flex flex-col gap-3">
+      {etapas.map((etapa) => {
+        const itens = regras.filter((r) => r.stage === etapa)
+        const passaram = itens.filter((r) => r.status === "pass").length
+        return (
+          <div key={etapa} className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-2">
+              <Rotulo>{t("exercise_workspace.submission.stage", { n: etapa + 1 })}</Rotulo>
+              <span className="font-mono text-[11px] text-muted-foreground tabular-nums">
+                {t("exercise_workspace.submission.stage_count", { passed: passaram, total: itens.length })}
+              </span>
+            </span>
+            <ul className="m-0 flex list-none flex-col gap-1 p-0">
+              {itens.map((regra, i) => (
+                <li key={`${regra.title}-${i}`} className="flex items-start gap-2 text-[13px] leading-[18px]">
+                  {regra.status === "pass" ? (
+                    <CheckIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-success" />
+                  ) : (
+                    <XIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+                  )}
+                  <span className={regra.status === "fail" ? "text-foreground-strong" : "text-foreground"}>
+                    <span className="sr-only">
+                      {regra.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
+                    </span>
+                    {regra.title}
+                    {regra.visibility === "hidden" ? (
+                      <span className="text-muted-foreground">
+                        {" · "}
+                        <LockIcon aria-hidden className="inline size-3 align-[-1px]" /> {t("exercise_workspace.submission.hidden_rule")}
+                      </span>
+                    ) : null}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      })}
+      {semEtapa.length ? (
+        <div className="flex flex-col gap-1.5">
+          <Rotulo>{t("exercise_workspace.submission.hidden_rules")}</Rotulo>
+          <ul className="m-0 flex list-none flex-col gap-1 p-0">
+            {semEtapa.map((regra, i) => (
+              <li key={`${regra.title}-${i}`} className="flex items-start gap-2 text-[13px] leading-[18px]">
+                {regra.status === "pass" ? (
+                  <CheckIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-success" />
+                ) : (
+                  <XIcon aria-hidden weight="bold" className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+                )}
+                <span className={regra.status === "fail" ? "text-foreground-strong" : "text-foreground"}>
+                  <span className="sr-only">
+                    {regra.status === "pass" ? t("exercise_workspace.tests.pass") : t("exercise_workspace.tests.fail")}:{" "}
+                  </span>
+                  {regra.title}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+      {temOculta ? <span className="text-xs text-muted-foreground">{t("exercise_workspace.submission.hidden_rules_note")}</span> : null}
+    </section>
   )
 }

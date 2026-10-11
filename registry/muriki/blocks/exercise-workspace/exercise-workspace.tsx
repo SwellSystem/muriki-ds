@@ -985,8 +985,13 @@ export interface ExerciseExplanationProps extends ExerciseCollapsibleProps {
   placeholder?: string
   /** A nota embaixo. Sem isto, "Entra na avaliação e no seu perfil". */
   note?: React.ReactNode
-  /** O selo à direita do rótulo. Sem isto, "vai para a avaliação"; `null` tira. */
+  /** O selo à direita do rótulo. Sem isto, "vai para a avaliação" ("obrigatória" com `required`); `null` tira. */
   badge?: React.ReactNode | null
+  /**
+   * A explicação é parte do envio (incidente e migração: sem ela, a API responde `422 ANSWER_INVALID`
+   * `missing_explanation`). Muda o selo e a nota, e marca o campo como obrigatório.
+   */
+  required?: boolean
   className?: string
 }
 
@@ -997,6 +1002,7 @@ export function ExerciseExplanation({
   placeholder,
   note,
   badge,
+  required,
   open,
   defaultOpen = true,
   onOpenChange,
@@ -1017,7 +1023,12 @@ export function ExerciseExplanation({
         {t("exercise_workspace.explain_draft")}
       </span>
     ) : badge === null ? null : (
-      (badge ?? <Badge tone="blue">{t("exercise_workspace.goes_to_review")}</Badge>)
+      (badge ??
+        (required ? (
+          <Badge tone="yellow">{t("exercise_workspace.explain_required")}</Badge>
+        ) : (
+          <Badge tone="blue">{t("exercise_workspace.goes_to_review")}</Badge>
+        )))
     )
   return (
     <ExerciseSection
@@ -1042,11 +1053,12 @@ export function ExerciseExplanation({
         autoResize
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        aria-required={required || undefined}
         placeholder={placeholder ?? t("exercise_workspace.explain_placeholder")}
         className="muriki-scroll max-h-40 resize-none"
         style={{ overflowY: "auto" }}
       />
-      <span className="text-xs text-muted-foreground">{note ?? t("exercise_workspace.explain_note")}</span>
+      <span className="text-xs text-muted-foreground">{note ?? t(required ? "exercise_workspace.explain_required_note" : "exercise_workspace.explain_note")}</span>
       {balaoDoGuia}
     </ExerciseSection>
   )
