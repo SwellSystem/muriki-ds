@@ -1457,6 +1457,70 @@
    "h": 900,
    "title": "Enunciado · recolhido: o objetivo e a conta das regras ficam · escuro",
    "is_interactive": true
+  },
+  "ExercicioArquiteturaIncidente.dc.html": {
+   "x": 44080,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Incidente · o defeito marcado, o desenho corrigido, o Ordene e a explicação obrigatória",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaIncidenteEscuro.dc.html": {
+   "x": 44080,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Incidente · o defeito marcado, o desenho corrigido, o Ordene e a explicação obrigatória · escuro",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaEscalar.dc.html": {
+   "x": 45600,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Escalar 10x · o desenho que cresce, os números no Responda e o Marque",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaEscalarEscuro.dc.html": {
+   "x": 45600,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Escalar 10x · o desenho que cresce, os números no Responda e o Marque · escuro",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaMigracao.dc.html": {
+   "x": 47120,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Migração aos poucos · as etapas em cima do palco, o passo desde a anterior e as regras da etapa à vista",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaMigracaoEscuro.dc.html": {
+   "x": 47120,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Migração aos poucos · as etapas em cima do palco, o passo desde a anterior e as regras da etapa à vista · escuro",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaMigracaoResultado.dc.html": {
+   "x": 48640,
+   "y": 2640,
+   "w": 1440,
+   "h": 900,
+   "title": "Migração aos poucos · o resultado do envio com as regras por etapa",
+   "is_interactive": true
+  },
+  "ExercicioArquiteturaMigracaoResultadoEscuro.dc.html": {
+   "x": 48640,
+   "y": 3960,
+   "w": 1440,
+   "h": 900,
+   "title": "Migração aos poucos · o resultado do envio com as regras por etapa · escuro",
+   "is_interactive": true
   }
  },
  "createdOnFiles": {
@@ -1779,7 +1843,15 @@
   "ExercicioEnunciadoFoco.dc.html",
   "ExercicioEnunciadoFocoEscuro.dc.html",
   "ExercicioEnunciadoRecolhido.dc.html",
-  "ExercicioEnunciadoRecolhidoEscuro.dc.html"
+  "ExercicioEnunciadoRecolhidoEscuro.dc.html",
+  "ExercicioArquiteturaIncidente.dc.html",
+  "ExercicioArquiteturaIncidenteEscuro.dc.html",
+  "ExercicioArquiteturaEscalar.dc.html",
+  "ExercicioArquiteturaEscalarEscuro.dc.html",
+  "ExercicioArquiteturaMigracao.dc.html",
+  "ExercicioArquiteturaMigracaoEscuro.dc.html",
+  "ExercicioArquiteturaMigracaoResultado.dc.html",
+  "ExercicioArquiteturaMigracaoResultadoEscuro.dc.html"
  ],
  "pages": [],
  "title": "Muriki Code"

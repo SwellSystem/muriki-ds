@@ -1460,6 +1460,12 @@ def _montar(tela, tema, sufixo):
         return web(ARQUITETURA, tela_exercicio_defeito(k))
     if tela['id'] == 'arquitetura_nuvem':
         return web(ARQUITETURA, tela_exercicio_arquitetura(k, nuvem=True))
+    if tela['id'] in ('arquitetura_incidente', 'arquitetura_escalar', 'arquitetura_migracao', 'arquitetura_migracao_resultado'):
+        from textos_arquitetura_tarefas import TEXTOS as TAREFAS
+        import arquitetura_tarefas as at
+        fazer = {'arquitetura_incidente': at.tela_incidente, 'arquitetura_escalar': at.tela_escalar,
+                 'arquitetura_migracao': at.tela_migracao, 'arquitetura_migracao_resultado': at.tela_migracao_resultado}[tela['id']]
+        return web(juntar(ARQUITETURA, TAREFAS), fazer(k))
     if tela['id'] == 'desb_trilhas':
         return web(DESBLOQUEIO, tela_trilhas_bloqueada(k))
     if tela['id'] == 'desb_trilha':
