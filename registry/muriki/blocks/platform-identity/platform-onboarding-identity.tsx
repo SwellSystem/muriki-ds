@@ -16,8 +16,9 @@
  *
  * O botão só liga com os três campos no formato, o @usuário e o endereço livres (`available`) ou
  * não conferidos (`unchecked`, a API confere no envio), cada status valendo para o valor da tela
- * (`statusFor`), e os termos aceitos. Sem `username` (a pessoa já tem @usuário, por exemplo quem
- * vem do Code), o campo não aparece e o botão não conta com ele. O componente só junta os campos e
+ * (`statusFor`), e os termos aceitos. Sem `username`, o campo não aparece e o botão não conta com
+ * ele; quem vem do Code e já tem @usuário usa o PlatformExistingAccount (`platform-onboarding`),
+ * com o aviso da conta Muriki e o @ na prévia. O componente só junta os campos e
  * chama `onSubmit`: a ordem das chamadas (o aceite, o @usuário, o workspace) é do app, e o erro
  * que voltar chega por `error`.
  *

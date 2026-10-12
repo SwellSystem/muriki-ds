@@ -25,6 +25,8 @@ JORNADA = [
     # o convite
     ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta'),
     ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite'),
+    ('convidado', 'OnboardingConvidado', 'Primeiro acesso', 'Convidado · 1 de 1: o @usuário e os termos, antes do aceite (2 de 2 depois do código)'),
+    ('convidado_ocupado', 'OnboardingConvidadoOcupado', 'Primeiro acesso', 'Convidado · o @usuário ocupado: fora da prévia, o botão desligado'),
     ('convite_invalido', 'ConviteInvalido', 'Convite', 'Convite · inválido ou vencido (o 422 uniforme, sem o motivo)'),
     # dentro do produto: as configurações do workspace (bloco platform-members)
     ('membros_owner', 'WorkspaceMembros', 'Membros', 'Membros · vista do owner (o único owner: "Sair" desligado, com o motivo)'),
@@ -50,7 +52,8 @@ FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('primeiroAcesso', 8, 'Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos '
                           'numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco '
                           'com a prévia ao vivo à esquerda, o formulário à direita'),
-    ('convite', 3, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece'),
+    ('convite', 5, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece. '
+                  'Quem ainda não tem o onboarding do Platform passa pelo passo do convidado antes do aceite'),
     ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
                    'ações que pode usar'),
     ('cobranca', 12, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Team e '
@@ -126,6 +129,14 @@ notas.setdefault('semFiscal', {}).update(
     text='Fora do Brasil não há campo fiscal: o país declarado no checkout manda (aqui, EUA, em USD), e o número fiscal da '
          'empresa, se houver, é pedido no Stripe. Nos Planos, antes da compra, a moeda segue a região do navegador, só para exibir.')
 notas['semFiscal'].setdefault('w', 240)
+
+# a nota do passo do convidado, em cima do primeiro quadro dele
+_col, _lin = next((c, l) for i, _, _, _, c, l, _ in TELAS if i == 'convidado')
+notas.setdefault('convidado', {}).update(
+    x=_col * PASSO_X, y=_lin * LINHA_Y - 190,
+    text='Aparece para o convidado sem o onboarding do Platform ou sem @usuário, antes do aceite: a API exige os dois. '
+         'Não cria workspace; o botão conclui o onboarding e aceita o convite.')
+notas['convidado'].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=2)
 print(f'{len(gerados)} quadros em {SAIDA}')

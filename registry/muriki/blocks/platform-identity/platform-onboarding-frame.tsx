@@ -29,7 +29,11 @@ export interface PlatformOnboardingFrameProps {
   children: ReactNode
   /** A marca, no canto de cima à esquerda. */
   brand?: ReactNode
-  /** Idioma, tema e a conta, no canto de cima à direita. */
+  /**
+   * Idioma, tema e a conta, no canto de cima à direita. No celular a barra encolhe para caber: o
+   * texto longo (o e-mail da conta) vem com `truncate`, e o que ainda passar é cortado, sem empurrar
+   * a largura da página.
+   */
   utilities?: ReactNode
 }
 
@@ -38,8 +42,10 @@ export function PlatformOnboardingFrame({ stage, children, brand, utilities }: P
     <div className="relative flex min-h-svh flex-col bg-background lg:grid lg:h-dvh lg:min-h-[40rem] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       {brand || utilities ? (
         <header className="z-10 flex h-16 shrink-0 items-center gap-3 px-6 md:px-8 lg:absolute lg:inset-x-0 lg:top-0">
-          {brand}
-          <div className="ml-auto flex items-center gap-1">{utilities}</div>
+          {/* a marca não encolhe nem quebra em duas linhas; quem encolhe são as utilities, que cortam o
+              que passar (o `p-1 -m-1` deixa o anel de foco dos botões fora do corte) */}
+          <div className="flex shrink-0 items-center whitespace-nowrap">{brand}</div>
+          <div className="-m-1 ml-auto flex min-w-0 items-center justify-end gap-1 overflow-hidden p-1 *:min-w-0">{utilities}</div>
         </header>
       ) : null}
 

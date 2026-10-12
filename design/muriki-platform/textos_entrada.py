@@ -26,6 +26,9 @@ ENTRADA = {
         invalidoTit='Este convite não está disponível',
         invalidoTxt='Peça um convite novo a quem te chamou. Se você já faz parte do workspace, é só entrar.',
         irEntrar='Entrar no Muriki Platform',
+        # o passo do convidado: só o @usuário e os termos, antes do aceite
+        convidadoTit='Quase lá: escolha seu @usuário', convidadoSubA='Depois disso, você entra no', convidadoSubB='como',
+        convidadoBotao='Entrar no', convidadoPreviaA='Um lugar no time está esperando por',
     ),
     'en-US': dict(
         entrarBotao='Sign in', codigoAria='6-digit code', verificarBotao='Verify', criarBotao='Create account',
@@ -45,6 +48,8 @@ ENTRADA = {
         invalidoTit='This invitation isn’t available',
         invalidoTxt='Ask whoever invited you for a new one. If you’re already in the workspace, just sign in.',
         irEntrar='Sign in to Muriki Platform',
+        convidadoTit='Almost there: pick your @username', convidadoSubA='Then you join', convidadoSubB='as',
+        convidadoBotao='Join', convidadoPreviaA='A seat on the team is waiting for',
     ),
     'es-ES': dict(
         entrarBotao='Entrar', codigoAria='Código de 6 dígitos', verificarBotao='Verificar', criarBotao='Crear cuenta',
@@ -64,6 +69,8 @@ ENTRADA = {
         invalidoTit='Esta invitación no está disponible',
         invalidoTxt='Pide una invitación nueva a quien te invitó. Si ya eres parte del workspace, solo tienes que entrar.',
         irEntrar='Entrar en Muriki Platform',
+        convidadoTit='Casi listo: elige tu @usuario', convidadoSubA='Después, entras en', convidadoSubB='como',
+        convidadoBotao='Entrar en', convidadoPreviaA='Un lugar en el equipo está esperando a',
     ),
 }
 
