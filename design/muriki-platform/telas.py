@@ -9,6 +9,8 @@ from textos_entrada import ENTRADA, CONVIDAR
 from entrada import TELAS_A2, COM_IDENTIDADE, COM_CONVIDAR, _adicionar, _lista_convidados
 from textos_membros import MEMBROS
 from acesso import montar_acesso
+from cobranca import TELAS_C, pagina_cb
+from textos_cobranca import COBRANCA
 from pecas import raiz, topo, PRODUTO, EMAIL, FONTE, I, svg
 from base import badge  # noqa: E402
 
@@ -384,6 +386,8 @@ def montar(tela, tema):
         return pagina(tela['titulo'], tela_identidade(K, i.split('_', 1)[1]), tema, IDENTIDADE)
     if i in TELAS_B:
         return pagina(tela['titulo'], TELAS_B[i](K), tema, juntar(ENTRADA, CONVIDAR, MEMBROS))
+    if i in TELAS_C:
+        return pagina_cb(tela['titulo'], TELAS_C[i](K), tema, COBRANCA)
     if i in TELAS_A2:
         textos = juntar(IDENTIDADE, ENTRADA) if i in COM_IDENTIDADE else ENTRADA
         if i in COM_CONVIDAR:

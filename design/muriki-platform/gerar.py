@@ -31,6 +31,19 @@ JORNADA = [
     ('membros_maintainer', 'WorkspaceMembrosMaintainer', 'Membros', 'Membros · vista da maintainer (gere só member e guest)'),
     ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
     ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free (3 pessoas)'),
+    # dentro do produto: planos e cobrança (bloco platform-billing)
+    ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · mensal, no teste do Team (a moeda ainda troca)'),
+    ('planos_anual', 'WorkspacePlanosAnual', 'Planos', 'Planos · anual, por pessoa/ano como vem da API; a moeda travada'),
+    ('planos_carregando', 'WorkspacePlanosCarregando', 'Planos', 'Planos · carregando (o esqueleto, o Team já no destaque)'),
+    ('assinar_team', 'WorkspaceAssinarTeam', 'Assinar o Team', 'Assinar o Team · a página de checkout: o CNPJ e a razão social à esquerda, o resumo fixo à direita'),
+    ('assinar_cupom', 'WorkspaceAssinarCupom', 'Assinar o Team', 'Assinar o Team · o cupom aplicado (só percentual): o desconto e o total riscado'),
+    ('assinar_solo', 'WorkspaceAssinarSolo', 'Assinar o Solo', 'Assinar o Solo · no anual, o CPF'),
+    ('assinar_erro', 'WorkspaceAssinarErro', 'Assinar o Team', 'Assinar o Team · o CNPJ com o dígito verificador errado'),
+    ('assinar_eua', 'WorkspaceAssinarSemFiscal', 'Assinar o Team', 'Assinar o Team · empresa dos EUA: sem campo fiscal, em USD'),
+    ('comercial', 'WorkspaceComercial', 'Falar com o comercial', 'Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois'),
+    ('comercial_enviado', 'WorkspaceComercialEnviado', 'Falar com o comercial', 'Falar com o comercial · enviado: a confirmação no lugar do formulário'),
+    ('cobranca', 'WorkspaceCobranca', 'Cobrança', 'Cobrança · a próxima cobrança, os assentos e o que mudou no período'),
+    ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Team: a contagem até o fim, sem cobrança prevista'),
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
@@ -40,6 +53,8 @@ FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('convite', 3, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece'),
     ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
                    'ações que pode usar'),
+    ('cobranca', 12, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Team e '
+                     'no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)'),
 ]
 TELAS, _i = [], 0
 for fileira, (_, n, _) in enumerate(FILEIRAS):
@@ -67,7 +82,10 @@ order = canvas.setdefault('order', [])
 REMOVIDAS = ['EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'EsqueciSenha', 'RedefinirSenha',
              'ConfiraEmail', 'CriarSenha',
              # as três variantes de convidar o time: a tela de cima ficou com a lista
-             'OnboardingConvidarA', 'OnboardingConvidarB', 'OnboardingConvidarC']
+             'OnboardingConvidarA', 'OnboardingConvidarB', 'OnboardingConvidarC',
+             # o checkout da primeira rodada do C (as telas viraram WorkspaceAssinar*) e a variante B da
+             # terceira, que virou o WorkspaceAssinarTeam
+             'CheckoutFiscalSolo', 'CheckoutFiscalTeam', 'CheckoutFiscalTeamErro', 'WorkspaceAssinarTeamPagina']
 for base_nome in REMOVIDAS:
     for arquivo in (f'{base_nome}.dc.html', f'{base_nome}Escuro.dc.html'):
         boards.pop(arquivo, None)
@@ -100,6 +118,14 @@ for fileira, (chave, n, texto) in enumerate(FILEIRAS):
     for lin, ch, tx in [(2 * fileira, chave, texto), (2 * fileira + 1, f'{chave}Escuro', f'{texto.split(":")[0]} no tema escuro')]:
         notas.setdefault(ch, {}).update(x=0, y=lin * LINHA_Y - 300, text=tx, kind='title1', maxW=largura(n))
         notas[ch].setdefault('w', 240)
+
+# a nota da variante sem campo fiscal, em cima do quadro dela
+_col, _lin = next((c, l) for i, _, _, _, c, l, _ in TELAS if i == 'assinar_eua')
+notas.setdefault('semFiscal', {}).update(
+    x=_col * PASSO_X, y=_lin * LINHA_Y - 190,
+    text='Fora do Brasil não há campo fiscal: o país declarado no checkout manda (aqui, EUA, em USD), e o número fiscal da '
+         'empresa, se houver, é pedido no Stripe. Nos Planos, antes da compra, a moeda segue a região do navegador, só para exibir.')
+notas['semFiscal'].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=2)
 print(f'{len(gerados)} quadros em {SAIDA}')
