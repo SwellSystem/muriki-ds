@@ -18,7 +18,7 @@ ENTRADA = {
         papel='Papel', remover='Remover', pular='Pular por agora',
         papelMaintainer='Maintainer', papelMember='Member', papelGuest='Guest',
         # aceite de convite
-        conviteTitA='Seu convite para', conviteSubA='te chamou para participar como', enviadoPara='Enviado para',
+        conviteTitA='te convidou para', conviteSubA='Você entra como', enviadoPara='Enviado para',
         conviteDeslogadoA='Para aceitar, entre com a conta de', conviteDeslogadoB='ou crie uma com esse e-mail.',
         validade='O convite vale 7 dias.', aceitarBotao='Aceitar convite',
         conviteLogado='Ao aceitar, o workspace aparece na sua conta.',
@@ -37,7 +37,7 @@ ENTRADA = {
         convidarTit='Bring in your team',
         papel='Role', remover='Remove', pular='Skip for now',
         papelMaintainer='Maintainer', papelMember='Member', papelGuest='Guest',
-        conviteTitA='Your invitation to', conviteSubA='invited you to join as', enviadoPara='Sent to',
+        conviteTitA='invited you to', conviteSubA='You join as', enviadoPara='Sent to',
         conviteDeslogadoA='To accept, sign in with the account for', conviteDeslogadoB='or create one with that email.',
         validade='The invitation is valid for 7 days.', aceitarBotao='Accept invitation',
         conviteLogado='Once you accept, the workspace shows up in your account.',
@@ -56,7 +56,7 @@ ENTRADA = {
         convidarTit='Trae a tu equipo',
         papel='Rol', remover='Quitar', pular='Saltar por ahora',
         papelMaintainer='Maintainer', papelMember='Member', papelGuest='Guest',
-        conviteTitA='Tu invitación a', conviteSubA='te invitó a participar como', enviadoPara='Enviada a',
+        conviteTitA='te invitó a', conviteSubA='Entras como', enviadoPara='Enviada a',
         conviteDeslogadoA='Para aceptar, entra con la cuenta de', conviteDeslogadoB='o crea una con ese email.',
         validade='La invitación vale 7 días.', aceitarBotao='Aceptar invitación',
         conviteLogado='Al aceptar, el workspace aparece en tu cuenta.',
@@ -78,7 +78,7 @@ CONVIDAR = {
         cvFrase='Você e mais 3 pessoas a caminho. Cada uma entra quando aceitar o convite.',
         cvMedidorA='4 pessoas no', cvMedidorConta='você + 3',
         cvZonaFree='Free, até 3 pessoas', cvZonaTeam='Team',
-        cvMedidorPreco='14 dias de Team grátis; depois, Team: 4 × R$ 29 = R$ 116/mês. Só conta quem aceitar o convite.',
+        cvMedidorPreco='14 dias de Team grátis. Depois do teste, para continuar com 4 pessoas: Team, 4 × R$ 29 = R$ 116/mês. Só conta quem aceitar o convite.',
     ),
     'en-US': dict(
         cvSub='Each person gets an invitation by email and joins when they accept.',
@@ -88,7 +88,7 @@ CONVIDAR = {
         cvFrase='You and 3 more people on the way. Each one joins when they accept.',
         cvMedidorA='4 people in', cvMedidorConta='you + 3',
         cvZonaFree='Free, up to 3 people', cvZonaTeam='Team',
-        cvMedidorPreco='14 days of Team free; then Team: 4 × $16 = $64/month. Only people who accept count.',
+        cvMedidorPreco='14 days of Team free. After the trial, to keep 4 people: Team, 4 × $16 = $64/month. Only people who accept count.',
     ),
     'es-ES': dict(
         cvSub='Cada persona recibe una invitación por email y entra al aceptarla.',
@@ -98,6 +98,6 @@ CONVIDAR = {
         cvFrase='Tú y 3 personas más en camino. Cada una entra cuando acepte la invitación.',
         cvMedidorA='4 personas en', cvMedidorConta='tú + 3',
         cvZonaFree='Free, hasta 3 personas', cvZonaTeam='Team',
-        cvMedidorPreco='14 días de Team gratis; después, Team: 4 × US$ 16 = US$ 64/mes. Solo cuenta quien acepte la invitación.',
+        cvMedidorPreco='14 días de Team gratis. Después de la prueba, para seguir con 4 personas: Team, 4 × US$ 16 = US$ 64/mes. Solo cuenta quien acepte la invitación.',
     ),
 }

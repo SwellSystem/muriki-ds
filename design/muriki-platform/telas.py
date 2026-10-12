@@ -6,8 +6,11 @@ from pecas import (K, T, ic, pagina, pagina_identidade, cabecalho_passo, campo, 
                    juntar, COMUM, PROPS_IDIOMA, props_tema)
 from textos_identidade import IDENTIDADE, MOVIMENTO
 from textos_entrada import ENTRADA, CONVIDAR
-from entrada import TELAS_A2, COM_IDENTIDADE, COM_CONVIDAR
+from entrada import TELAS_A2, COM_IDENTIDADE, COM_CONVIDAR, _adicionar, _lista_convidados
+from textos_membros import MEMBROS
 from acesso import montar_acesso
+from pecas import raiz, topo, PRODUTO, EMAIL, FONTE, I, svg
+from base import badge  # noqa: E402
 
 
 # ── Onboarding · @usuário e workspace (bloco platform-identity) ─────────
@@ -195,6 +198,180 @@ clearTimeout(this._troca);
 }"""
 
 
+# ── Workspace · membros e convites (bloco platform-members) ─────────────
+# Dentro do produto, nas configurações do workspace: a barra do topo do Platform e o título da página,
+# sem navegação de funcionalidades (ainda não definidas). As tabelas são a ResourceTable do DS: o
+# cabeçalho na faixa do rail, linhas de 52px, as ações da linha no hover (o "…" do RowActions) e o
+# destrutivo no menu. O que cada papel vê é o memberActions (F6); os convites seguem F7.
+def pagina_produto(k, titulo, sub, conteudo, largura=1040):
+    cabeca_ = (f'<header style="display:flex;flex-direction:column;gap:6px;">'
+               f'<h1 style="margin:0;font-size:28px;line-height:34px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{titulo}</h1>'
+               + (f'<p style="margin:0;font-size:14px;line-height:20px;color:{k["mfg"]};">{sub}</p>' if sub else '') + '</header>')
+    return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, PRODUTO, EMAIL)}'
+            f'<main style="display:flex;flex-direction:column;gap:24px;width:{largura}px;margin:0 auto;padding:24px 0 40px;">'
+            f'{cabeca_}{conteudo}</main></div>')
+
+
+def _tabela(k, rotulo_, colunas, cabecalhos, linhas):
+    cabs = ''.join(f'<span role="columnheader" style="font-size:12px;font-weight:500;color:{k["mfg"]};">{c}</span>' for c in cabecalhos)
+    return (f'<section role="table" aria-label="{rotulo_}" style="display:flex;flex-direction:column;border-radius:12px;background:{k["card"]};'
+            f'box-shadow:{k["sombra"]};">'
+            f'<div role="row" style="display:grid;grid-template-columns:{colunas};gap:20px;align-items:center;height:38px;padding:0 16px;'
+            f'border-radius:12px 12px 0 0;background:{k["rail"]};box-shadow:inset 0 -1px 0 {k["border"]};">{cabs}</div>'
+            f'{"".join(linhas)}</section>')
+
+
+def _linha(k, colunas, celulas, hover=False, apagada=False, ultima=False):
+    fundo = f'background:{k["muted"]};' if hover else ''
+    cor = f'color:{k["mfg"]};' if apagada else ''
+    sombra = '' if ultima else f'box-shadow:inset 0 -1px 0 {k["border"]};'
+    return (f'<div role="row" style="position:relative;display:grid;grid-template-columns:{colunas};gap:20px;align-items:center;height:52px;'
+            f'padding:0 16px;font-size:13px;{sombra}{fundo}{cor}">{"".join(celulas)}</div>')
+
+
+def _iniciais(k, txt, tracejado=False):
+    est = (f'border:1.5px dashed {k["input"]};color:{k["mfg"]};text-transform:uppercase;' if tracejado
+           else f'background:{k["muted"]};color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["border"]};')
+    return (f'<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 auto;'
+            f'box-sizing:border-box;border-radius:50%;{est}font-size:11px;font-weight:600;">{txt}</span>')
+
+
+def _seletor(k, valor, aria):
+    # o Select do DS, tamanho sm: o gatilho é campo (--field, o filete), o caret parado
+    return (f'<button type="button" aria-label="{aria}" aria-haspopup="listbox" style="display:flex;align-items:center;gap:6px;width:132px;'
+            f'height:28px;padding:0 8px 0 10px;border:0;border-radius:7px;background:{k["field"]};box-shadow:inset 0 0 0 1px {k["input"]};'
+            f'font-family:{FONTE};font-size:12.5px;color:{k["fg"]};cursor:pointer;">{valor}'
+            f'<span style="display:flex;margin-left:auto;opacity:0.6;">{ic("baixo", 12)}</span></button>')
+
+
+def _mais(k, aberto=False, fim=True):
+    fundo = f'background:{k["sunken"]};' if aberto else ''
+    pontos = ''.join(f'<span style="width:3px;height:3px;border-radius:50%;background:currentColor;"></span>' for _ in range(3))
+    return (f'<span style="display:flex;{"justify-content:flex-end;" if fim else ""}"><button type="button" aria-label="{T("mbMais")}" aria-expanded="{"true" if aberto else "false"}" '
+            f'style="display:flex;align-items:center;justify-content:center;gap:2px;width:28px;height:28px;padding:0;border:0;border-radius:7px;'
+            f'{fundo}color:{k["mfg"]};cursor:pointer;">{pontos}</button></span>')
+
+
+def _menu(k, itens, topo_):
+    # o DropdownMenu do row-actions: superfície flutuante, item de 28px, o destrutivo tingido; o
+    # desligado meio apagado, com o motivo no rótulo
+    def item(icone, txt, desligado):
+        op = 'opacity:0.5;' if desligado else ''
+        d = ' aria-disabled="true"' if desligado else ''
+        return (f'<div role="menuitem"{d} style="display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;'
+                f'font-size:13px;line-height:18px;color:{k["bad"]};{op}"><span style="display:flex;margin-top:1px;">{ic(icone, 15)}</span>{txt}</div>')
+    return (f'<div role="menu" style="position:absolute;right:12px;top:{topo_}px;z-index:3;width:208px;padding:4px;border-radius:12px;'
+            f'background:{k["card"]};box-shadow:{k["sombraFlut"]}, 0 0 0 1px {k["border"]};">'
+            + ''.join(item(*i) for i in itens) + '</div>')
+
+
+I.update(
+    remover_pessoa=svg('<circle cx="6.4" cy="5.6" r="2.6"/><path d="M1.8 13.4c.5-2.5 2.4-3.9 4.6-3.9s4.1 1.4 4.6 3.9"/><path d="M11 7.4h3.6"/>'),
+    proibido=svg('<circle cx="8" cy="8" r="6"/><path d="M3.8 3.8l8.4 8.4"/>'),
+)
+
+PESSOAS = [  # id, nome, @usuário, papel, data
+    ('u1', 'Rafael Moura', 'rafael.moura', 'owner', 'mbD1'),
+    ('u2', 'Ana Lima', 'ana.lima', 'maintainer', 'mbD2'),
+    ('u3', 'João Pereira', 'joao', 'member', 'mbD3'),
+    ('u4', 'Bia Costa', 'bia.costa', 'member', 'mbD4'),
+    ('u5', 'Carlos Souza', 'carlos_s', 'guest', 'mbD5'),
+]
+PAPEL = {'owner': 'cvOwner', 'maintainer': 'papelMaintainer', 'member': 'papelMember', 'guest': 'papelGuest'}
+# o que cada papel gere (F6): o select aparece nessas linhas, o "…" com Remover também
+GERE = {'owner': {'owner', 'maintainer', 'member', 'guest'}, 'maintainer': {'member', 'guest'}}
+
+
+def tela_membros(k, quem):
+    # quem vê: o owner (Rafael, o único owner: o "Sair" dele aparece desligado, com o motivo, no menu
+    # aberto) ou a maintainer (Ana: gere só member e guest; o menu aberto na linha da Bia)
+    eu = {'owner': 'u1', 'maintainer': 'u2'}[quem]
+    menu_em = {'owner': 'u1', 'maintainer': 'u4'}[quem]
+    colunas = 'minmax(0,1fr) 148px 168px 28px'
+    linhas = []
+    for i, (id_, nome, usuario, papel, data) in enumerate(PESSOAS):
+        voce = id_ == eu
+        marca = (f'<span style="display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;'
+                 f'box-shadow:inset 0 0 0 1px {k["input"]};font-size:11px;font-weight:500;color:{k["mfg"]};">{T("mbVoce")}</span>' if voce else '')
+        pessoa = (f'<span style="display:flex;align-items:center;gap:10px;min-width:0;">'
+                  f'{_iniciais(k, "".join(p[0] for p in nome.split()[:2]))}'
+                  f'<span style="display:flex;flex-direction:column;min-width:0;">'
+                  f'<span style="display:flex;align-items:center;gap:6px;"><span style="font-weight:500;color:{k["fgs"]};">{nome}</span>{marca}</span>'
+                  f'<span style="font-size:12px;color:{k["mfg"]};">@{usuario}</span></span></span>')
+        gere = not voce and papel in GERE[quem]
+        papel_ = _seletor(k, T(PAPEL[papel]), nome) if gere else f'<span style="display:flex;">{badge(T(PAPEL[papel]), k)}</span>'
+        aberto = id_ == menu_em
+        acoes = _mais(k, aberto) if aberto else '<span></span>'
+        linhas.append(_linha(k, colunas, [pessoa, papel_, f'<span style="color:{k["mfg"]};">{T(data)}</span>', acoes],
+                             hover=aberto, ultima=i == len(PESSOAS) - 1))
+    if quem == 'owner':
+        menu = _menu(k, [('sair', T('mbSairUltimo'), True)], 38 + 52 - 6)
+    else:
+        menu = _menu(k, [('remover_pessoa', T('mbRemover'), False)], 38 + 4 * 52 - 6)
+    tabela = (f'<div style="position:relative;">'
+              f'{_tabela(k, T("mbTabelaMembros"), colunas, [T("mbPessoa"), T("papel"), T("mbEntrou"), ""], linhas)}{menu}</div>')
+    return pagina_produto(k, T('mbMembros'), T('mbMembrosSub'), tabela)
+
+
+CONVITES = [  # e-mail, papel, estado, prazo, quem convidou, data, hover
+    ('duda@moura.dev', 'member', 'pendente', 'mbVenceEm', 'Rafael Moura', 'mbI1', False),
+    ('eva@moura.dev', 'guest', 'venceu', 'mbVenceuHa', 'Ana Lima', 'mbI2', True),
+    ('bia@moura.dev', 'member', 'aceito', None, 'Rafael Moura', 'mbI3', False),
+    ('fabio@moura.dev', 'maintainer', 'revogado', None, 'Rafael Moura', 'mbI4', False),
+    ('gabi@moura.dev', 'member', 'substituido', None, 'Rafael Moura', 'mbI5', False),
+]
+ESTADO = {'pendente': ('mbPendente', 'blue'), 'venceu': ('mbVenceu', 'orange'), 'aceito': ('mbAceito', 'green'),
+          'revogado': ('mbRevogado', 'gray'), 'substituido': ('mbSubstituido', 'gray')}
+
+
+def tela_convites(k):
+    # os quatro estados da API e o "venceu" (um pendente com expiresAt no passado); Reenviar (o ícone)
+    # e Revogar (no "…") só no pendente, vencido ou não: o vencido está com o cursor em cima
+    colunas = 'minmax(0,1fr) 104px 236px 140px 140px 68px'
+    linhas = []
+    for i, (email, papel, estado, prazo, por, data, hover) in enumerate(CONVITES):
+        apagada = estado in ('revogado', 'substituido')
+        rot, tom = ESTADO[estado]
+        mail = (f'<span style="display:flex;align-items:center;gap:10px;min-width:0;">{_iniciais(k, email[0], True)}'
+                f'<span style="font-weight:500;color:{k["mfg"] if apagada else k["fgs"]};">{email}</span></span>')
+        selo = (f'<span style="display:flex;align-items:center;gap:8px;">{badge(T(rot), k, tom, ponto=True)}'
+                + (f'<span style="font-size:12px;color:{k["mfg"]};white-space:nowrap;">{T(prazo)}</span>' if prazo else '') + '</span>')
+        acoes = '<span></span>'
+        if hover:
+            reenviar = (f'<button type="button" aria-label="{T("mbReenviar")}" style="display:flex;align-items:center;justify-content:center;'
+                        f'width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:{k["mfg"]};">{ic("recarregar", 15)}</button>')
+            acoes = (f'<span style="display:flex;align-items:center;justify-content:flex-end;gap:1px;">{reenviar}'
+                     f'<span style="width:1px;height:16px;margin:0 4px;background:{k["border"]};"></span>{_mais(k, fim=False)}</span>')
+        linhas.append(_linha(k, colunas, [mail, f'<span>{T(PAPEL[papel])}</span>', selo, f'<span>{por}</span>',
+                                          f'<span style="color:{k["mfg"]};">{T(data)}</span>', acoes],
+                             hover=hover, apagada=apagada, ultima=i == len(CONVITES) - 1))
+    tabela = _tabela(k, T('mbTabelaConvites'), colunas,
+                     [T('mbEmail'), T('papel'), T('mbEstado'), T('mbPor'), T('mbEnviado'), ''], linhas)
+    return pagina_produto(k, T('mbConvites'), T('mbConvitesSub'), tabela, largura=1120)
+
+
+def tela_convidar_limite(k):
+    # o InviteForm dentro do produto, com o limite do Free: 3 pessoas no plano, 2 no workspace e 3 na
+    # lista; o aviso diz quantas tirar, e o envio desliga
+    aviso = (f'<p role="status" style="margin:0;display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;'
+             f'background:{k["torange"]};color:{k["torangefg"]};font-size:13px;line-height:19px;">'
+             f'<span style="display:flex;margin-top:2px;">{ic("aviso", 14)}</span><span>{T("mbLimite")}</span></p>')
+    botao = (f'<div style="display:flex;justify-content:flex-end;padding-top:4px;"><button type="submit" disabled aria-disabled="true" '
+             f'style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border:0;border-radius:8px;background:{k["pri"]};'
+             f'color:{k["prifg"]};font-family:{FONTE};font-size:13px;font-weight:500;opacity:0.45;">{T("cvBotao")}</button></div>')
+    form = (f'<form style="margin:0;display:flex;flex-direction:column;gap:12px;width:560px;">{_adicionar(k)}'
+            f'{_lista_convidados(k, invalido_="")}{aviso}{botao}</form>')
+    return pagina_produto(k, T('mbConvidar'), T('cvSub'), form)
+
+
+TELAS_B = {
+    'membros_owner': lambda k: tela_membros(k, 'owner'),
+    'membros_maintainer': lambda k: tela_membros(k, 'maintainer'),
+    'convites': tela_convites,
+    'convidar_limite': tela_convidar_limite,
+}
+
+
 def montar(tela, tema):
     i = tela['id']
     if i in ('entrar', 'criar_conta'):
@@ -205,6 +382,8 @@ def montar(tela, tema):
                      {**PROPS_IDIOMA, **props_tema(tema)}, CSS_MOVIMENTO)
     if i.startswith('identidade_'):
         return pagina(tela['titulo'], tela_identidade(K, i.split('_', 1)[1]), tema, IDENTIDADE)
+    if i in TELAS_B:
+        return pagina(tela['titulo'], TELAS_B[i](K), tema, juntar(ENTRADA, CONVIDAR, MEMBROS))
     if i in TELAS_A2:
         textos = juntar(IDENTIDADE, ENTRADA) if i in COM_IDENTIDADE else ENTRADA
         if i in COM_CONVIDAR:

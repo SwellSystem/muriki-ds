@@ -15,6 +15,8 @@ from base import botao_idioma, botao_tema  # noqa: E402
 
 WORKSPACE = 'Moura & Filhos'
 EMAIL_MASCARADO = 'r•••@moura.dev'
+# o invitedBy.name da prévia do convite
+CONVIDOU = 'Rafael Moura'
 
 
 # ── A moldura ───────────────────────────────────────────────────────────
@@ -217,9 +219,10 @@ def _papel(k, i, papel):
             f'<span style="display:flex;margin-left:auto;opacity:0.55;">{ic("baixo", 11)}</span></button>')
 
 
-def _lista_convidados(k):
+def _lista_convidados(k, convidados=CONVIDADOS, invalido_=INVALIDO):
     # uma linha por pessoa, alinhadas em colunas (inicial, e-mail, papel, ×) e separadas por fio fino; a
-    # altura máxima acompanha a da janela e, passando dela, a lista rola por dentro
+    # altura máxima acompanha a da janela e, passando dela, a lista rola por dentro. Sem `invalido_`,
+    # só as linhas válidas (o convidar dentro do produto)
     colunas = 'grid-template-columns:28px minmax(0,1fr) 128px 28px;gap:12px;'
     filete = f'box-shadow:inset 0 1px 0 color-mix(in oklab, {k["fg"]} 8%, transparent);'
 
@@ -234,14 +237,14 @@ def _lista_convidados(k):
                 f'<span style="font-size:14.5px;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{email}</span>'
                 f'{_papel(k, i + 1, papel)}{remover(email, k["mfg"])}</li>')
 
-    invalido = (f'<li aria-invalid="true" aria-describedby="convidar-invalido" style="display:grid;{colunas}align-items:center;height:48px;'
+    invalido = '' if not invalido_ else (f'<li aria-invalid="true" aria-describedby="convidar-invalido" style="display:grid;{colunas}align-items:center;height:48px;'
                 f'padding:0 8px 0 12px;background:color-mix(in oklch, {k["bad"]} 8%, transparent);{filete}">'
                 f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;'
                 f'outline:1.5px dashed color-mix(in oklch, {k["bad"]} 60%, transparent);outline-offset:2px;color:{k["bad"]};">{ic("alerta", 13)}</span>'
-                f'<span style="font-size:14.5px;font-weight:500;color:{k["bad"]};">{INVALIDO}</span>'
+                f'<span style="font-size:14.5px;font-weight:500;color:{k["bad"]};">{invalido_}</span>'
                 f'<span id="convidar-invalido" style="font-size:13px;color:{k["bad"]};">{T("cvInvalido")}</span>'
-                f'{remover(INVALIDO, k["bad"])}</li>')
-    linhas = ''.join(linha(i, e, p) for i, (e, p) in enumerate(CONVIDADOS)) + invalido
+                f'{remover(invalido_, k["bad"])}</li>')
+    linhas = ''.join(linha(i, e, p) for i, (e, p) in enumerate(convidados)) + invalido
     return (f'<ul aria-label="{T("cvLista")}" style="margin:0;padding:0;list-style:none;max-height:clamp(96px, calc(100vh - 580px), 240px);'
             f'overflow-y:auto;border-radius:12px;background:{k["card"]};'
             f'box-shadow:inset 0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);">{linhas}</ul>')
@@ -309,7 +312,8 @@ def tela_convidar(k):
 
 
 # ── Convite ─────────────────────────────────────────────────────────────
-# O preview da API é { workspace: { name }, role, email mascarado }: sem quem convidou. O token vem
+# O preview da API é { workspace: { name }, role, email mascarado, invitedBy: { name } } (acerto de
+# 2026-10-12): o título diz quem convidou, só pelo nome de exibição. O token vem
 # do fragmento da URL (/invite#token=…) e fica no app: a tela não mostra nem põe em link.
 def tela_convite(k, logado):
     detalhe = lambda rot, valor: (f'<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;">'
@@ -329,7 +333,7 @@ def tela_convite(k, logado):
                  f'<span style="font-family:{MONO};font-size:13px;color:{k["fgs"]};">{EMAIL_MASCARADO}</span> {T("conviteDeslogadoB")}</p>'
                  f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
                  f'{botao_solido(k, T("entrarBotao"), seta=False)}{botao_contorno(k, T("criarBotao"))}</div>')
-    form = (cabeca(k, f'{T("conviteTitA")} {esc(WORKSPACE)}', f'{forte(k, esc(WORKSPACE))} {T("conviteSubA")} {forte(k, T("papelMember"))}.')
+    form = (cabeca(k, f'{CONVIDOU} {T("conviteTitA")} {esc(WORKSPACE)}', f'{T("conviteSubA")} {forte(k, T("papelMember"))}.')
             + cartao + acoes + nota(k, T('validade'), 'relogio'))
     return pagina_a2(k, form, _previa_time(k, T('convitePrevia'), 1, 2), logado=logado)
 
