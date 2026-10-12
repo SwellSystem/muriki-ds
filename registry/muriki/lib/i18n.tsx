@@ -1753,6 +1753,52 @@ const STRINGS: Record<string, unknown> = {
         },
       },
     },
+    // o caminho de entrada que é só do Platform (platform-onboarding): o código por e-mail, quem já
+    // tem conta Muriki e o aceite de convite. O contador de passos é o de platform.identity
+    onboarding: {
+      code: {
+        title: "Confirme seu e-mail",
+        // seguido do e-mail mascarado, em negrito, e de um ponto
+        subtitle: "Mandamos um código de 6 dígitos para",
+        label: "Código de 6 dígitos",
+        expires: "O código vale por 10 minutos.",
+        submit: "Verificar",
+        not_received: "Não chegou?",
+        resend: "Reenviar código",
+        // {{time}} é a espera em m:ss ("0:48")
+        resend_in: "Reenviar em {{time}}",
+        spam: "Olhe também o spam e as promoções.",
+      },
+      existing_account: {
+        title: "Você já tem conta Muriki",
+        text: "É a mesma do Muriki Code, e o seu @usuário vem junto. Aqui falta só aceitar os termos do Platform e criar o workspace.",
+      },
+      invitation: {
+        // {{name}} é só o nome de exibição de quem convidou; sem ele, o título diz só o workspace
+        title: "{{name}} te convidou para {{workspace}}",
+        title_anonymous: "Você recebeu um convite para {{workspace}}",
+        // seguido do papel, em negrito, e de um ponto
+        subtitle: "Você entra como",
+        role: "Papel",
+        sent_to: "Enviado para",
+        // em volta do e-mail mascarado
+        signed_out_prefix: "Para aceitar, entre com a conta de",
+        signed_out_suffix: "ou crie uma com esse e-mail.",
+        sign_in: "Entrar",
+        sign_up: "Criar conta",
+        accept: "Aceitar convite",
+        accept_note: "Ao aceitar, o workspace aparece na sua conta.",
+        validity: "O convite vale 7 dias.",
+        // o esqueleto enquanto o preview não volta, para o leitor de tela
+        loading: "Carregando o convite",
+        // a frase da prévia no palco
+        preview: "Um lugar no time está esperando por você.",
+        // o 422 uniforme: nunca o motivo
+        invalid_title: "Este convite não está disponível",
+        invalid_text: "Peça um convite novo a quem te chamou. Se você já faz parte do workspace, é só entrar.",
+        invalid_action: "Entrar no Muriki Platform",
+      },
+    },
   },
 }
 

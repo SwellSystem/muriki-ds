@@ -28,10 +28,10 @@ def topo_entrada(k):
             f'<span style="margin-left:auto;display:flex;align-items:center;gap:4px;">{botao_idioma(k)}{botao_tema(k)}</span></header>')
 
 
-def pagina_a2(k, formulario, palco_, logado=False, largura=440):
+def pagina_a2(k, formulario, palco_, logado=False, largura=440, email=EMAIL):
     # a grade do primeiro acesso (1.2fr / 1fr), a barra do topo por cima das duas colunas, o palco à
     # esquerda e o formulário numa coluna centrada na vertical, à direita
-    barra = topo(k, PRODUTO, EMAIL) if logado else topo_entrada(k)
+    barra = topo(k, PRODUTO, email) if logado else topo_entrada(k)
     return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);")}'
             f'<div style="position:absolute;inset:0 0 auto 0;z-index:1;">{barra}</div>'
             f'{palco(k, palco_)}'
@@ -338,6 +338,33 @@ def tela_convite(k, logado):
     return pagina_a2(k, form, _previa_time(k, T('convitePrevia'), 1, 2), logado=logado)
 
 
+# ── O passo do convidado ────────────────────────────────────────────────
+# Quem chega por convite e ainda não concluiu o onboarding do Platform, ou não tem o @usuário, passa
+# por aqui antes do aceite (a API exige os dois). Não cria workspace: só o @usuário (o UsernameField)
+# e os termos do PlatformOnboardingIdentity, no molde do primeiro acesso. "1 de 1"; "2 de 2" quando
+# antes veio o código por e-mail. O palco é a prévia do convite, e o @ entra na frase quando está
+# livre (ocupado, a frase volta para "você", como na identidade). A convidada é a Renata, dona do
+# r•••@moura.dev do convite.
+CONVIDADA = 'renata@moura.dev'
+CONVIDADO_ESTADOS = {'livre': ('renata.moura', 'available'), 'ocupado': ('renata', 'taken')}
+
+
+def tela_convidado(k, estado):
+    usuario, st = CONVIDADO_ESTADOS[estado]
+    livre = st == 'available'
+    frase_usuario = f'@{usuario} {T("usuarioLivre")}' if livre else T('usuarioOcupado')
+    link = lambda txt: f'<a href="#" style="color:{k["fg"]};font-weight:500;">{txt}</a>'
+    sub = f'{T("convidadoSubA")} {forte(k, esc(WORKSPACE))} {T("convidadoSubB")} {forte(k, T("papelMember"))}.'
+    form = (cabecalho_passo(k, 1, 1, T('convidadoTit'), sub)
+            + '<form style="margin:0;display:flex;flex-direction:column;gap:23px;">'
+            + campo(k, 'usuario', T('usuario'), usuario, st, frase_usuario, afixo='@', mono=True)
+            + caixa_marcar(k, True, f'{T("termosA")} {link(T("termos"))} {T("termosE")} {link(T("privacidade"))}.')
+            + '</form>'
+            + botao_passo(k, f'{T("convidadoBotao")} {esc(WORKSPACE)}', livre))
+    frase = f'{T("convidadoPreviaA")} @{usuario}.' if livre else T('convitePrevia')
+    return pagina_a2(k, form, _previa_time(k, frase, 1, 2), logado=True, largura=512, email=CONVIDADA)
+
+
 def tela_convite_invalido(k):
     # o 422 uniforme: vencido, usado, cancelado ou de outra conta dão a mesma tela, sem o motivo
     marca = (f'<span style="display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:16px;'
@@ -353,9 +380,11 @@ TELAS_A2 = {
     'convidar': tela_convidar,
     'convite': lambda k: tela_convite(k, False),
     'convite_logado': lambda k: tela_convite(k, True),
+    'convidado': lambda k: tela_convidado(k, 'livre'),
+    'convidado_ocupado': lambda k: tela_convidado(k, 'ocupado'),
     'convite_invalido': tela_convite_invalido,
 }
 # as telas que usam os textos do passo de identidade (o contador de passos e a tela do bloco A)
-COM_IDENTIDADE = {'codigo', 'ja_tem_conta', 'convidar'}
+COM_IDENTIDADE = {'codigo', 'ja_tem_conta', 'convidar', 'convidado', 'convidado_ocupado'}
 # convidar o time: também os textos de CONVIDAR
 COM_CONVIDAR = {'convidar'}
