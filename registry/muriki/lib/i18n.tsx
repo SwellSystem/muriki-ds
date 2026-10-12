@@ -1655,6 +1655,103 @@ const STRINGS: Record<string, unknown> = {
           done: "Feito:",
         },
       },
+      // a página de Cobrança (billing-overview): a próxima cobrança, os assentos, o que mudou no período
+      // e os dados fiscais. O valor cobrado vem pronto da API (F12); as datas saem no Intl do idioma
+      overview: {
+        title: "Cobrança",
+        subtitle: "O plano do workspace, os assentos e os dados da cobrança.",
+        hero: {
+          next: "Próxima cobrança",
+          // a folhinha do calendário, para o leitor de tela
+          next_date: "Próxima cobrança em {{date}}",
+          breakdown_one: "1 assento × {{price}}",
+          breakdown_other: "{{count}} assentos × {{price}}",
+          none: "Nenhuma cobrança prevista.",
+          status: {
+            active: "Ativa",
+            trialing: "No teste",
+            past_due: "Pagamento pendente",
+            unpaid: "Não paga",
+            canceled: "Cancelada",
+          },
+          manage: "Gerenciar no Stripe",
+          manage_note: "Cartão, faturas e cancelamento ficam no Stripe.",
+          plans: "Ver planos",
+          trial: {
+            label: "Teste do {{plan}}",
+            ends: "O teste do {{plan}} termina em {{date}}",
+            days_one: "dia de teste",
+            days_other: "dias de teste",
+            today: "hoje",
+            // a barra dos dias, para o leitor de tela
+            progress: "Faltam {{remaining}} de {{total}} dias de teste",
+            note: "Sem cobrança prevista. Sem assinatura, o workspace volta para o Free no fim do teste.",
+            subscribe: "Assinar o {{plan}}",
+            // assinou durante o teste: a assinatura paga começa no fim dele
+            subscribed: "A assinatura começa em {{date}}.",
+          },
+        },
+        seats: {
+          title: "Assentos",
+          active_one: "ativo",
+          active_other: "ativos",
+          paid_one: "pago neste período",
+          paid_other: "pagos neste período",
+          paid_trial_zero: "pagos no teste",
+          paid_trial_one: "pago no teste",
+          paid_trial_other: "pagos no teste",
+          // a barra, para o leitor de tela
+          bar_one: "1 assento pago neste período; ativos: {{active}}",
+          bar_other: "{{count}} assentos pagos neste período; ativos: {{active}}",
+          bar_trial: "{{active}} assentos ativos, nenhum pago no teste",
+          legend_active: "ativo",
+          legend_minimum: "mínimo do plano",
+          legend_leaving: "pago até a renovação",
+          // os dois avisos do CA10, sob a legenda
+          rules: "Quem entra é cobrado proporcional, na hora. Quem sai deixa de ser cobrado só na renovação.",
+          trial_note_one: "No teste, 1 pessoa usa o {{plan}} sem pagar.",
+          trial_note_other: "No teste, as {{count}} pessoas usam o {{plan}} sem pagar.",
+          you: "você",
+          in_trial: "No teste",
+          paid_until: "pago até {{date}}",
+          leaving: "sai na renovação",
+          more_one: "mais 1 pessoa",
+          more_other: "mais {{count}} pessoas",
+          code_pro: "Code Pro",
+          code_pro_active_one: "Muriki Code Pro para 1 ativo",
+          code_pro_active_other: "Muriki Code Pro para os {{count}} ativos",
+          code_pro_included: "incluso na assinatura do {{plan}}",
+          // sem o direito ainda (teste, não paga, cancelada), o Code Pro fica apagado (R37)
+          code_pro_pending_title: "Muriki Code Pro",
+          code_pro_pending: "O Code Pro entra com a assinatura paga.",
+        },
+        changes: {
+          title: "Neste período",
+          period: "{{start}} a {{end}}",
+          joined: "{{name}} entrou em {{date}}",
+          joined_no_date: "{{name}} entrou",
+          joined_prorated: "cobrança proporcional, na hora",
+          leaving: "{{name}} sai na renovação",
+          leaving_note: "saída em {{date}}, pago até {{until}}",
+          leaving_note_short: "saída em {{date}}",
+          empty: "Ninguém entrou nem saiu neste período.",
+        },
+        fiscal: {
+          applies: "Valem a partir da próxima cobrança.",
+          edit: "Editar",
+          trial: "Os dados fiscais são pedidos ao assinar.",
+          none: "Nenhum documento informado.",
+        },
+        // no teste, a conta de quem assinar (TrialSubscribeCard)
+        subscribe_card: {
+          title: "Se assinar o {{plan}}",
+          per: {
+            monthly: "/mês",
+            yearly: "/ano",
+          },
+          note: "a conta, com as pessoas de hoje",
+        },
+      },
     },
   },
 }
