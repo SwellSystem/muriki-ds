@@ -15,7 +15,7 @@
  *   sai, tracejado, "pago até") e "Muriki Code Pro para os N ativos". No teste, ninguém paga; no Free,
  *   só os ativos; no `personal`, sem os avisos de quem entra e quem sai. O Code Pro segue o direito (R37), que o app passa em `codePro`.
  * - SeatChangesCard: "Neste período", as entradas e saídas (`seatChanges` do GET …/billing, no máximo
- *   10, só o nome de exibição). Sem o `seatChanges`, o app não renderiza o cartão.
+ *   10, só o nome de exibição). Com a lista vazia, o app não renderiza o cartão.
  * - TrialSubscribeCard: no teste, "Se assinar o Pro" com "N pessoas × preço = total/mês".
  * - FiscalDataCard: o CPF ou o CNPJ como vem da API, já mascarado, e a razão social.
  * - BillingOverview: a composição da página (o título, o herói e a grade de duas colunas), por slots.
@@ -44,7 +44,7 @@ import { isBrazil } from "./tax-id"
 /** O status da assinatura do workspace, como o GET …/billing manda. */
 export type BillingStatus = "trialing" | "free" | "active" | "past_due" | "unpaid" | "canceled"
 
-/** A fatura prevista do Stripe (`nextInvoice` do GET …/billing): nula no Free e no teste. */
+/** A fatura prevista do Stripe (`nextInvoice` do GET …/billing): nula no Free, no teste sem assinatura e com o Stripe fora. */
 export interface NextInvoice {
   /** O valor que o Stripe vai cobrar, em centavos, pronto (F12): o DS não calcula. */
   amountInCents: number
@@ -646,7 +646,7 @@ export interface SeatChange {
 export const SEAT_CHANGES_MAX = 10
 
 export interface SeatChangesCardProps {
-  /** As mudanças, da mais antiga à mais nova. Sem o `seatChanges` na API, o app não renderiza o cartão. */
+  /** As mudanças, da mais antiga à mais nova. Com a lista vazia, o app não renderiza o cartão. */
   changes: SeatChange[]
   /** O período corrente, no canto ("12 de out. a 12 de nov."). */
   period?: { start: string; end: string }
@@ -804,7 +804,7 @@ export function TrialSubscribeCard({
 // ── Dados fiscais ───────────────────────────────────────────────────────
 
 export interface FiscalDataCardProps {
-  /** O documento como a API manda, já mascarado (ex.: `12.ABC.•••/••••-35`); nunca o valor inteiro. */
+  /** O documento como a API manda, já mascarado (ex.: `***.***.247-25` no CPF; no CNPJ, só os dois primeiros e os dois últimos dígitos à vista); nunca o valor inteiro. */
   taxId?: { kind: "cpf" | "cnpj"; masked: string } | null
   /** A razão social, no CNPJ. */
   legalName?: string | null

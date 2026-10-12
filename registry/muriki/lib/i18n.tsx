@@ -1812,6 +1812,8 @@ const STRINGS: Record<string, unknown> = {
         accept: "Aceitar convite",
         accept_note: "Ao aceitar, o workspace aparece na sua conta.",
         validity: "O convite vale 7 dias.",
+        // com o expiresAt da prévia: "19 de out., 14:30"
+        validity_until: "O convite vale até {{date}}.",
         // o esqueleto enquanto o preview não volta, para o leitor de tela
         loading: "Carregando o convite",
         // a frase da prévia no palco
