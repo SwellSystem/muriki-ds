@@ -217,46 +217,105 @@ def _topo_painel(k, ponto, titulo):
             f'<span style="margin-left:auto;width:20px;height:16px;border-radius:999px;background:{k["card"]};"></span></div>')
 
 
+# "IA trabalhando": um cartão-esqueleto com a faísca e as linhas se preenchendo (no quadro parado, as
+# primeiras cheias e a última vazia, o quadro 0 do loop). Na tela de Play, CSS_MOVIMENTO enche as
+# linhas uma a uma, passa o brilho e pulsa a faísca. Sem texto: só o sinal de que algo trabalha ali.
+_ENCHE_PARADO = [1, 1, 0]
+_FAISCA = ('<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="display:block;">'
+           '<path d="M8 1.5l1.6 4.9L14.5 8l-4.9 1.6L8 14.5l-1.6-4.9L1.5 8l4.9-1.6z" fill="currentColor"/></svg>')
+
+
+def _faisca(k, vivo):
+    cor = f'color-mix(in oklab, {k["pri"]} 75%, transparent)' if vivo else k['input']
+    if vivo == VIVO_CSS:
+        cor = 'var(--faisca)'
+    return f'<span class="mv-faisca" style="display:flex;width:16px;height:16px;flex:0 0 auto;align-items:center;justify-content:center;color:{cor};">{_FAISCA}</span>'
+
+
+def _linhas_ia(k, vivo, larguras, alt=8, gap=8, extra=''):
+    # cada linha: o trilho apagado e, por cima, o preenchimento que cresce da esquerda; com duas
+    # linhas valem as duas últimas da tabela (as mesmas do componente)
+    tabela = _ENCHE_PARADO[len(_ENCHE_PARADO) - len(larguras):]
+    nomes = ['mv-ia1', 'mv-ia2', 'mv-ia3'][3 - len(larguras):]
+    linhas = ''.join(
+        f'<span style="display:block;flex:0 0 auto;width:{w};height:{alt}px;overflow:hidden;border-radius:999px;'
+        f'background:color-mix(in oklab, {k["sunken"]} 45%, transparent);">'
+        f'<span class="{n}" style="display:block;width:100%;height:100%;border-radius:999px;transform-origin:left;'
+        f'transform:scaleX({e});background:{_azul(k, vivo)};"></span></span>'
+        for w, e, n in zip(larguras, tabela, nomes))
+    return f'<div style="display:flex;flex-direction:column;gap:{gap}px;min-width:0;{extra}">{linhas}</div>'
+
+
+def _brilho():
+    # o brilho que passa: só existe na tela de Play (no parado não há nada passando)
+    return ('<span class="mv-brilho" style="position:absolute;top:0;bottom:0;left:0;width:50%;opacity:0;pointer-events:none;'
+            'background:linear-gradient(90deg, transparent, color-mix(in oklab, var(--pri) 10%, transparent), transparent);"></span>')
+
+
 def _quadro(k, vivo):
     # cada coluna termina no último cartão, como num quadro de verdade (align-items:start); o cartão
-    # tem 99px (11vh em 900)
+    # tem 99px (11vh em 900). Na tela de Play o segundo cartão da primeira coluna (mv-arrasta) viaja
+    # para o topo da segunda e volta; a vaga dele fecha (margem) e a da segunda abre (mv-vaga)
+    mov = vivo == VIVO_CSS
     colunas = [([('78%', '52%'), ('64%', '40%'), ('70%', '46%')], '64px'),
                ([('58%', '72%'), ('82%', '36%')], '80px'),
                ([('66%', '48%')], '48px')]
     html = ''
     for c, (cartoes, titulo) in enumerate(colunas):
         filhos = _topo_painel(k, _azul(k, vivo, True) if c == 0 else f'color-mix(in oklab, {k["input"]} 70%, transparent)', titulo)
+        if mov and c == 1:
+            filhos += '<div class="mv-vaga" style="flex:0 0 auto;height:0;margin-bottom:-12px;"></div>'
         for i, (a, b) in enumerate(cartoes):
             destaque = c == 0 and i == 0
+            arrasta = mov and c == 0 and i == 1
             anel = f'0 0 0 1px color-mix(in oklab, {k["pri"]} 60%, transparent)' if destaque and vivo else '0 1px 2px rgba(0,0,0,0.05)'
             if destaque and vivo == VIVO_CSS:
                 anel = 'var(--anel)'
             selo = (f'<span style="position:absolute;top:0;right:0;width:48px;height:14px;border-bottom-left-radius:7px;'
                     f'background:{_azul(k, vivo)};"></span>' if destaque else '')
-            filhos += (f'<div style="position:relative;display:flex;flex-direction:column;gap:8px;flex:0 0 auto;height:99px;box-sizing:border-box;'
+            filhos += (f'<div{" class=\"mv-arrasta\"" if arrasta else ""} style="position:relative;{"z-index:2;" if arrasta else ""}display:flex;flex-direction:column;gap:8px;flex:0 0 auto;height:99px;box-sizing:border-box;'
                        f'padding:12px;overflow:hidden;border-radius:9px;background:{k["card"]};box-shadow:{anel};">{selo}'
                        f'{_barra(k, a)}{_barra(k, b, cor=f"color-mix(in oklab, {k["sunken"]} 70%, transparent)")}'
                        f'<div style="margin-top:auto;display:flex;align-items:center;gap:6px;">'
                        f'<span style="width:16px;height:16px;border-radius:50%;background:{_azul(k, vivo, True) if destaque else k["sunken"]};"></span>'
                        f'{_barra(k, "32px", 6)}</div></div>')
-        html += _painel(k, filhos)
+        if c == 2:
+            filhos += (f'<div style="position:relative;display:flex;flex-direction:column;gap:10px;flex:0 0 auto;height:99px;box-sizing:border-box;'
+                       f'padding:12px;overflow:hidden;border-radius:9px;background:{k["card"]};box-shadow:0 1px 2px rgba(0,0,0,0.05);">'
+                       f'{_brilho() if mov else ""}{_faisca(k, vivo)}{_linhas_ia(k, vivo, ["84%", "66%", "42%"])}</div>')
+        html += _painel(k, filhos, 'position:relative;z-index:1;' if mov and c == 0 else '')
     return (f'<div style="display:flex;flex-direction:column;gap:18px;">{_faixa(k, vivo, ["64px", "48px", "56px"])}'
             f'<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:12px;">{html}</div></div>')
 
 
 def _lista(k, vivo):
-    # Muriki Focus: a lista de tarefas (seis, de 49px: 5.4vh em 900) e, ao lado, o anel do dia e a agenda
-    # de hoje embaixo; as duas colunas com a altura da lista
+    # Muriki Focus: a lista (seis linhas de 49px: 5.4vh em 900) e, ao lado, o anel do dia e a agenda de
+    # hoje embaixo; as duas colunas com a altura da lista. Em cima, a linha da IA trabalhando; depois as
+    # quatro por fazer e, embaixo, a feita. Na tela de Play cada tarefa segue a mesma volta de 5 ciclos
+    # (mv-tarefa), defasada de um ciclo (--k): a de cima é marcada e desce, a feita mais antiga sai e
+    # uma nova chega; --n é a casa dela no DOM
+    mov = vivo == VIVO_CSS
     linhas = _topo_painel(k, _azul(k, vivo, True), '56px')
-    for i, w in enumerate(['68%', '54%', '76%', '44%', '60%', '50%']):
-        feita = i == 0
-        caixa = (f'background:{_azul(k, vivo, True)};' if feita else f'box-shadow:inset 0 0 0 1.5px {k["input"]};')
-        linhas += (f'<div style="display:flex;align-items:center;gap:12px;flex:0 0 auto;height:49px;padding:0 12px;box-sizing:border-box;'
+    linhas += (f'<div style="position:relative;display:flex;align-items:center;gap:12px;flex:0 0 auto;height:49px;padding:0 12px;box-sizing:border-box;'
+               f'overflow:hidden;border-radius:9px;background:{k["card"]};box-shadow:0 1px 2px rgba(0,0,0,0.05);">'
+               f'{_brilho() if mov else ""}{_faisca(k, vivo)}{_linhas_ia(k, vivo, ["62%", "38%"], 6, 6, "flex:1;")}</div>')
+    # (largura, feita, pílula azul): por fazer 54/76/44/60, a feita 68 embaixo (a ordem do componente)
+    for n, (w, feita, pilula) in enumerate([('54%', False, False), ('76%', False, True), ('44%', False, False),
+                                            ('60%', False, False), ('68%', True, False)]):
+        cheio = f'transform:scale({1 if feita else 0});opacity:{1 if feita else 0};'
+        caixa = (f'<span style="position:relative;width:16px;height:16px;flex:0 0 auto;border-radius:5px;box-shadow:inset 0 0 0 1.5px {k["input"]};">'
+                 f'<span{" class=\"mv-check\"" if mov else ""} style="position:absolute;inset:0;border-radius:5px;{cheio}background:{_azul(k, vivo, True)};"></span></span>')
+        tarefa = ' class="mv-tarefa"' if mov else ''
+        defasagem = f'--k:{3 - n if n < 4 else 4};--n:{n};' if mov else ''
+        barra = _barra(k, w, cor=f"color-mix(in oklab, {k['sunken']} 60%, transparent)" if feita else None,
+                       extra='flex:0 1 auto;min-width:0;')
+        if mov:
+            barra = barra.replace('<span style=', '<span class="mv-tarefa-barra" style=', 1)
+        linhas += (f'<div{tarefa} style="{defasagem}display:flex;align-items:center;gap:12px;flex:0 0 auto;height:49px;padding:0 12px;box-sizing:border-box;'
                    f'border-radius:9px;background:{k["card"]};box-shadow:0 1px 2px rgba(0,0,0,0.05);">'
-                   f'<span style="width:16px;height:16px;flex:0 0 auto;border-radius:5px;{caixa}"></span>'
-                   f'{_barra(k, w, cor=f"color-mix(in oklab, {k["sunken"]} 60%, transparent)" if feita else None, extra="flex:0 1 auto;min-width:0;")}'
+                   f'{caixa}{barra}'
                    f'<span style="margin-left:auto;width:40px;height:16px;flex:0 0 auto;border-radius:999px;'
-                   f'background:{_azul(k, vivo) if i == 1 else k["sunken"]};"></span></div>')
+                   f'background:{_azul(k, vivo) if pilula else k["sunken"]};"></span></div>')
     # o anel do dia: 38% da volta de um círculo de raio 42 (só formas no SVG, nada de texto)
     volta = 2 * 3.141592653589793 * 42
     arco = f'color-mix(in oklab, {k["pri"]} 70%, transparent)' if vivo else f'color-mix(in oklab, {k["input"]} 60%, transparent)'
@@ -363,6 +422,29 @@ def previa_movimento(k):
 
 
 _CURVA = 'cubic-bezier(0.16,1,0.3,1)'
+# a mudança de lugar da prévia viva (a mesma do componente): devagar, sem pressa
+_MUDA = 'cubic-bezier(0.45,0,0.2,1)'
+_SOMBRA = '0 1px 2px rgba(0,0,0,0.05), 0 0 0 rgba(0,0,0,0)'
+_ERGUIDO = '0 2px 6px rgba(0,0,0,0.08), 0 14px 28px -8px rgba(0,0,0,0.22)'
+_IA_TEMPOS = [0, 4, 16, 62, 70, 71, 74, 80, 86, 92, 100]
+_IA_ENCHE = [[1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1], [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1], [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0]]
+_IA_SOME = [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1]
+
+
+def _POS(coluna):
+    # o cartão que viaja: na casa dele (0) ou no topo da segunda coluna (1)
+    return 'translate(calc(100% + 32px),-111px)' if coluna else 'translate(0px,0px)'
+
+
+def _CASA(casa, opacidade=1):
+    # a tarefa na casa `casa` da lista (49px + 10px de vão), contando da casa dela no DOM (--n)
+    return f'transform:translateY(calc(({casa} - var(--n)) * 59px));opacity:{opacidade};'
+
+
+def _quadros(nome, passos):
+    return f'@keyframes {nome}{{' + ''.join(f'{q}{{{v}}}' for q, v in passos) + '}'
+
+
 CSS_MOVIMENTO = (
     # as letras do nome: sobem e saem do desfoque (o Letreiro)
     f'.mv-letra{{display:inline-block;white-space:pre;animation:mv-letra 320ms {_CURVA} both;}}'
@@ -387,8 +469,47 @@ CSS_MOVIMENTO = (
     '.mv-corpo>div>div:nth-child(2)>:nth-child(2){animation-delay:100ms;}'
     '.mv-corpo>div>div:nth-child(2)>:nth-child(3){animation-delay:150ms;}'
     '@keyframes mv-item{from{opacity:0;transform:translateY(14px) scale(0.97);}}'
+    # a prévia viva: só com o nome (.vivo), e o primeiro passo de cada volta é uma pausa
+    '.mv-previa{--faisca:var(--input);}'
+    '.mv-previa.vivo{--faisca:color-mix(in oklab, var(--pri) 75%, transparent);}'
+    # Projects (8,1 s): parado, ergue, viaja para o topo da segunda coluna, assenta; ergue e volta. A vaga
+    # da origem fecha (margem) e a do destino abre (mv-vaga); 100% + 32px é a largura da coluna e o vão
+    f'.mv-previa.vivo .mv-arrasta{{animation:mv-arrasta 8.1s {_MUDA} infinite both;}}'
+    f'.mv-previa.vivo .mv-vaga{{animation:mv-vaga 8.1s {_MUDA} infinite both;}}'
+    + _quadros('mv-arrasta', [
+        ('0%,32.1%', f'transform:{_POS(0)} rotate(0deg) scale(1);box-shadow:{_SOMBRA};margin-bottom:0;'),
+        ('37.7%', f'transform:{_POS(0)} rotate(2.5deg) scale(1.035);box-shadow:{_ERGUIDO};margin-bottom:0;'),
+        ('50%', f'transform:{_POS(1)} rotate(2.5deg) scale(1.035);box-shadow:{_ERGUIDO};margin-bottom:-111px;'),
+        ('54.3%,82.1%', f'transform:{_POS(1)} rotate(0deg) scale(1);box-shadow:{_SOMBRA};margin-bottom:-111px;'),
+        ('87.7%', f'transform:{_POS(1)} rotate(2.5deg) scale(1.035);box-shadow:{_ERGUIDO};margin-bottom:-111px;'),
+        ('96.9%', f'transform:{_POS(0)} rotate(2.5deg) scale(1.035);box-shadow:{_ERGUIDO};margin-bottom:0;'),
+        ('100%', f'transform:{_POS(0)} rotate(0deg) scale(1);box-shadow:{_SOMBRA};margin-bottom:0;')])
+    + _quadros('mv-vaga', [('0%,37.7%,96.9%,100%', 'height:0;margin-bottom:-12px;'), ('50%,87.7%', 'height:99px;margin-bottom:0;')])
+    # Focus (5 voltas de 6,4 s): cada tarefa entra embaixo das por fazer, sobe uma casa por volta, é
+    # marcada no topo e desce para junto das feitas, desce mais uma e sai; --k defasa as cinco
+    + f'.mv-previa.vivo .mv-tarefa{{animation:mv-tarefa 32s {_MUDA} infinite both;animation-delay:calc(var(--k) * -6.4s);}}'
+    '.mv-previa.vivo .mv-check{animation:mv-check 32s cubic-bezier(0.34,1.4,0.64,1) infinite both;animation-delay:calc(var(--k) * -6.4s);}'
+    '.mv-previa.vivo .mv-tarefa-barra{animation:mv-tarefa-barra 32s ease infinite both;animation-delay:calc(var(--k) * -6.4s);}'
+    + _quadros('mv-tarefa', [('0%,11.56%', _CASA(3)), ('14.38%,31.56%', _CASA(2)), ('34.38%,51.56%', _CASA(1)),
+                             ('54.38%,71.56%', _CASA(0)), ('74.38%,77.19%', _CASA(3)), ('80%,97.19%', _CASA(4)),
+                             ('98.44%', _CASA(4, 0)), ('98.47%,98.75%', _CASA(3, 0)), ('100%', _CASA(3))])
+    + _quadros('mv-check', [('0%,67.5%,98.47%,100%', 'transform:scale(0);opacity:0;'), ('68.9%,98.44%', 'transform:scale(1);opacity:1;')])
+    + _quadros('mv-tarefa-barra', [('0%,71.56%,98.47%,100%', 'background:var(--sunken);'),
+                                   ('74.38%,98.44%', 'background:color-mix(in oklab, var(--sunken) 60%, transparent);')])
+    # a IA trabalhando (8 s, depois de 1,2 s): as linhas enchem uma a uma, ficam, somem e recomeçam; o
+    # quadro 0 é o parado. O brilho passa devagar, com pausa; a faísca pulsa de leve
+    + ''.join(f'.mv-previa.vivo .mv-ia{n + 1}{{animation:mv-ia{n + 1} 8s ease-in-out 1.2s infinite both;}}'
+              + _quadros(f'mv-ia{n + 1}', [(f'{t:g}%', f'transform:scaleX({e});opacity:{o};')
+                                         for t, e, o in zip(_IA_TEMPOS, enche, _IA_SOME)])
+              for n, enche in enumerate(_IA_ENCHE))
+    + '.mv-previa.vivo .mv-brilho{animation:mv-brilho 4.4s ease-in-out 1.2s infinite both;}'
+    + _quadros('mv-brilho', [('0%', 'opacity:1;transform:translateX(-100%) skewX(-12deg);'),
+                             ('45.4%', 'opacity:1;transform:translateX(260%) skewX(-12deg);'),
+                             ('45.5%,100%', 'opacity:1;transform:translateX(-100%) skewX(-12deg);')])
+    + '.mv-previa.vivo .mv-faisca{animation:mv-faisca 2.8s ease-in-out infinite both;}'
+    + _quadros('mv-faisca', [('0%,100%', 'opacity:0.55;transform:scale(0.92);'), ('50%', 'opacity:1;transform:scale(1);')])
     # o verificando dos campos
-    '.giro{transform-origin:8px 8px;animation:mv-giro 800ms linear infinite;}'
+    + '.giro{transform-origin:8px 8px;animation:mv-giro 800ms linear infinite;}'
     '@keyframes mv-giro{to{transform:rotate(360deg);}}'
     # sem movimento: tudo troca na hora
     '@media (prefers-reduced-motion: reduce){.mc *{animation:none !important;transition:none !important;}}'

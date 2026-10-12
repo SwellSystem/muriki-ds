@@ -31,7 +31,19 @@
  * pessoa e o papel (o cartão "Você" com `youRole`, padrão Owner). Quem chega entra com o mesmo
  * movimento; passando de três, as duas primeiras ficam e o resto vira "+N", igual nos lugares e na
  * fileira.
+ *
+ * A prévia viva: com o nome escrito, a janela ganha vida num loop calmo (ciclos de 6 a 9 s, com pausas).
+ * Antes do nome ela fica parada, para não competir com as letras e o acender do azul; o primeiro
+ * movimento espera essa reação assentar. No Projects, um cartão é erguido, desliza da primeira para a
+ * segunda coluna e volta, e as colunas fecham e abrem o espaço (layout animation). No Focus, a
+ * primeira tarefa é marcada (o check enche), desce para junto das feitas, e a feita mais antiga sai
+ * enquanto uma nova chega. Nos dois há um cartão de "IA trabalhando": um esqueleto com uma faísca, um
+ * brilho passando e as linhas se preenchendo uma a uma, sem texto. Os passos andam por um timer (o
+ * setState fica no callback, nunca no corpo do efeito); o resto é animação declarativa. Com
+ * `prefers-reduced-motion` nada disso anda: fica o quadro parado, com as linhas da IA a meio.
  */
+import { useEffect, useState } from "react"
+import { SparkleIcon } from "@phosphor-icons/react"
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Transition, type Variants } from "framer-motion"
 
 import { MurikiLogo } from "@/components/ui/muriki-logo"
@@ -360,10 +372,14 @@ function Faixa({ vivo, abas, item }: { vivo: boolean; abas: string[]; item: Vari
 /** Muriki Projects: colunas de cartões, com um cartão em destaque (o anel e o selo azuis). */
 function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
   const { grupo, item } = variantes(reduzir)
+  const fase = useCiclo(ARRASTO, vivo && !reduzir) % ARRASTO.length
+  // o cartão "b" vai para o topo da segunda coluna nas fases 2 a 4 e volta; erguido enquanto viaja
+  const naSegunda = fase >= 2 && fase <= 4
+  const erguido = fase === 1 || fase === 2 || fase === 4 || fase === 5
   const colunas = [
-    { cartoes: [["78%", "52%"], ["64%", "40%"], ["70%", "46%"]], titulo: "w-16" },
-    { cartoes: [["58%", "72%"], ["82%", "36%"]], titulo: "w-20" },
-    { cartoes: [["66%", "48%"]], titulo: "w-12" },
+    { ids: naSegunda ? ["a", "c"] : ["a", "b", "c"], titulo: "w-16" },
+    { ids: naSegunda ? ["b", "d", "e"] : ["d", "e"], titulo: "w-20" },
+    { ids: ["f"], titulo: "w-12", ia: true },
   ]
   return (
     <motion.div
@@ -379,21 +395,37 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
         {colunas.map((coluna, c) => (
           <motion.div
             key={c}
+            layout
             variants={item}
-            className="flex min-h-0 flex-col gap-[clamp(0.5rem,1.4vh,0.75rem)] rounded-[12px] bg-sunken/55 p-2.5"
+            transition={{ layout: MUDA }}
+            // a coluna que leva o cartão erguido fica por cima da outra durante a viagem
+            style={{ borderRadius: 12, zIndex: coluna.ids.includes("b") ? 1 : 0 }}
+            className="relative flex min-h-0 flex-col gap-[clamp(0.5rem,1.4vh,0.75rem)] bg-sunken/55 p-2.5"
           >
-            <div className="flex shrink-0 items-center gap-2 px-1 pt-0.5">
+            <motion.div layout="position" transition={{ layout: MUDA }} className="flex shrink-0 items-center gap-2 px-1 pt-0.5">
               <span className={cn("size-2 rounded-full", c === 0 ? azul(vivo, true) : "bg-input/70")} />
               <Barra className={coluna.titulo} />
               <span className="ml-auto h-4 w-5 rounded-full bg-card" />
-            </div>
-            {coluna.cartoes.map(([a, b], i) => {
-              const destaque = c === 0 && i === 0
+            </motion.div>
+            {coluna.ids.map((id) => {
+              const [a, b] = CARTOES[id]
+              const destaque = id === "a"
+              const arrastado = id === "b"
               return (
-                <div
-                  key={i}
+                <motion.div
+                  key={id}
+                  layout="position"
+                  layoutId={arrastado ? "arrastado" : undefined}
+                  initial={false}
+                  animate={
+                    arrastado
+                      ? { rotate: erguido ? 2.5 : 0, scale: erguido ? 1.035 : 1, boxShadow: erguido ? SOMBRA_ERGUIDO : SOMBRA_CARTAO }
+                      : undefined
+                  }
+                  transition={{ layout: MUDA, default: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }}
                   className={cn(
-                    "relative flex h-[clamp(4.5rem,11vh,6.5rem)] shrink-0 flex-col gap-2 overflow-hidden rounded-[9px] bg-card p-[clamp(0.5rem,1.3vh,0.75rem)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
+                    CARTAO,
+                    !arrastado && "shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
                     destaque && vivo && "ring-1 ring-primary/60",
                     "transition-shadow duration-500 motion-reduce:transition-none"
                   )}
@@ -407,9 +439,16 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
                     <span className={cn("size-4 rounded-full", destaque ? azul(vivo, true) : "bg-sunken")} />
                     <span className="h-1.5 w-8 rounded-full bg-sunken" />
                   </div>
-                </div>
+                </motion.div>
               )
             })}
+            {coluna.ia ? (
+              <div className={cn(CARTAO, "gap-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.05)]")}>
+                <Brilho animar={vivo && !reduzir} />
+                <Faisca vivo={vivo} animar={vivo && !reduzir} />
+                <LinhasIA larguras={["84%", "66%", "42%"]} vivo={vivo} animar={vivo && !reduzir} />
+              </div>
+            ) : null}
           </motion.div>
         ))}
       </div>
@@ -417,14 +456,152 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
   )
 }
 
+const CARTAO =
+  "relative flex h-[clamp(4.5rem,11vh,6.5rem)] shrink-0 flex-col gap-2 overflow-hidden rounded-[9px] bg-card p-[clamp(0.5rem,1.3vh,0.75rem)]"
+// as linhas de cada cartão do quadro, pela chave estável
+const CARTOES: Record<string, [string, string]> = {
+  a: ["78%", "52%"],
+  b: ["64%", "40%"],
+  c: ["70%", "46%"],
+  d: ["58%", "72%"],
+  e: ["82%", "36%"],
+  f: ["66%", "48%"],
+}
+// as duas sombras com o mesmo número de camadas, para o motion interpolar
+const SOMBRA_CARTAO = "0 1px 2px rgba(0,0,0,0.05), 0 0 0 rgba(0,0,0,0)"
+const SOMBRA_ERGUIDO = "0 2px 6px rgba(0,0,0,0.08), 0 14px 28px -8px rgba(0,0,0,0.22)"
+// a mudança de lugar (o cartão viajando, a lista reordenando): devagar, sem pressa
+const MUDA: Transition = { duration: 0.9, ease: [0.45, 0, 0.2, 1] }
+
+// os passos da vida, em ms. Projects: parado, ergue, viaja, assenta na segunda; ergue, volta (≈ 8 s)
+const ARRASTO = [2600, 450, 1000, 2600, 450, 1000] as const
+// Focus: parado, o check enche, a tarefa desce (≈ 6,5 s)
+const MARCAR = [2400, 1300, 2700] as const
+
 /**
- * Muriki Focus: o trabalho de uma pessoa. À esquerda, a lista de tarefas (a primeira feita, em azul);
+ * O relógio da prévia viva: um contador que anda um passo de cada vez, cada passo com a sua duração.
+ * O setState fica no callback do timer, nunca síncrono no efeito. Desligado (sem nome ou com
+ * movimento reduzido), o contador volta ao zero: o quadro parado.
+ */
+function useCiclo(duracoes: readonly number[], ativo: boolean) {
+  const [passo, setPasso] = useState(0)
+  useEffect(() => {
+    if (!ativo) return
+    let atual = 0
+    let relogio: ReturnType<typeof setTimeout>
+    const andar = () => {
+      relogio = setTimeout(() => {
+        atual += 1
+        setPasso(atual)
+        andar()
+      }, duracoes[atual % duracoes.length])
+    }
+    andar()
+    return () => {
+      clearTimeout(relogio)
+      setPasso(0)
+    }
+  }, [ativo, duracoes])
+  return ativo ? passo : 0
+}
+
+// "IA trabalhando": as linhas enchem uma a uma, ficam, somem juntas e recomeçam. O quadro 0 é o
+// parado (as primeiras cheias, a última vazia), então o loop começa e termina nele. 8 s por volta.
+const IA_TEMPOS = [0, 0.04, 0.16, 0.62, 0.7, 0.71, 0.74, 0.8, 0.86, 0.92, 1]
+const IA_ENCHE = [
+  [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1],
+  [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+]
+const IA_SOME = [1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1]
+const IA_VOLTA: Transition = { duration: 8, times: IA_TEMPOS, ease: "easeInOut", repeat: Infinity, delay: 1.2 }
+
+/** As linhas do cartão da IA: um trilho apagado e, por cima, o preenchimento que cresce da esquerda. */
+function LinhasIA({
+  larguras,
+  vivo,
+  animar,
+  fina = false,
+  className,
+}: {
+  larguras: string[]
+  vivo: boolean
+  animar: boolean
+  fina?: boolean
+  className?: string
+}) {
+  // com duas linhas, valem as duas últimas da tabela
+  const enche = IA_ENCHE.slice(IA_ENCHE.length - larguras.length)
+  return (
+    <div className={cn("flex min-w-0 flex-col", fina ? "gap-1.5" : "gap-2", className)}>
+      {larguras.map((largura, i) => (
+        <span key={largura} style={{ width: largura }} className={cn("block shrink-0 overflow-hidden rounded-full bg-sunken/45", fina ? "h-1.5" : "h-2")}>
+          <motion.span
+            initial={false}
+            animate={animar ? { scaleX: enche[i], opacity: IA_SOME } : { scaleX: enche[i][0], opacity: 1 }}
+            transition={animar ? IA_VOLTA : { duration: 0 }}
+            className={cn("block h-full w-full origin-left rounded-full", azul(vivo))}
+          />
+        </span>
+      ))}
+    </div>
+  )
+}
+
+/** O brilho que passa pelo cartão da IA, devagar e com pausa. */
+function Brilho({ animar }: { animar: boolean }) {
+  if (!animar) return null
+  return (
+    <motion.span
+      initial={{ x: "-100%" }}
+      animate={{ x: "260%" }}
+      transition={{ duration: 2, ease: "easeInOut", repeat: Infinity, repeatDelay: 2.4, delay: 1.2 }}
+      className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 bg-linear-to-r from-transparent via-primary/10 to-transparent"
+    />
+  )
+}
+
+/** A faísca da IA: azul com o nome, pulsando de leve. */
+function Faisca({ vivo, animar, className }: { vivo: boolean; animar: boolean; className?: string }) {
+  return (
+    <motion.span
+      initial={false}
+      animate={animar ? { opacity: [0.55, 1, 0.55], scale: [0.92, 1, 0.92] } : { opacity: 1, scale: 1 }}
+      transition={animar ? { duration: 2.8, ease: "easeInOut", repeat: Infinity } : { duration: 0 }}
+      className={cn(
+        "flex size-4 shrink-0 items-center justify-center transition-colors duration-500 motion-reduce:transition-none",
+        vivo ? "text-primary/75" : "text-input",
+        className
+      )}
+    >
+      <SparkleIcon weight="fill" className="size-3.5" />
+    </motion.span>
+  )
+}
+
+/**
+ * Muriki Focus: o trabalho de uma pessoa. À esquerda, a lista: em cima a linha da IA trabalhando,
+ * depois as tarefas por fazer e, embaixo, a feita (em azul);
  * à direita, o anel do dia com o arco azul e a ação principal e, embaixo, a agenda de hoje. As duas
  * colunas têm a mesma altura, a da lista.
  */
+// as tarefas, pela chave estável (o índice): a largura da linha de cada uma
+const TAREFAS = ["68%", "54%", "76%", "44%", "60%", "50%"]
+const LINHA =
+  "flex h-[clamp(2.25rem,5.4vh,3rem)] shrink-0 items-center gap-3 rounded-[9px] bg-card px-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+
 function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
   const { grupo, item } = variantes(reduzir)
-  const tarefas = ["68%", "54%", "76%", "44%", "60%", "50%"]
+  const animar = vivo && !reduzir
+  const passo = useCiclo(MARCAR, animar)
+  // a volta r: por fazer r+1..r+4, feita r. Na fase 1 o check de r+1 enche; na 2, r+1 desce para
+  // junto das feitas. Na volta seguinte, r sai e r+5 chega: sempre seis linhas (com a da IA)
+  const r = Math.floor(passo / MARCAR.length)
+  const fase = passo % MARCAR.length
+  const id = (n: number) => n % TAREFAS.length
+  const porFazer = [1, 2, 3, 4].map((n) => id(r + n))
+  const feitas = fase === 0 ? [id(r)] : [porFazer[0], id(r)]
+  const ordem = fase === 2 ? [...porFazer.slice(1), porFazer[0], id(r)] : [...porFazer, id(r)]
   // o arco do anel: 38% da volta de um círculo de raio 42
   const volta = 2 * Math.PI * 42
   return (
@@ -439,31 +616,49 @@ function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
       <div className="grid min-h-0 grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-3">
         <motion.div
           variants={item}
-          className="flex min-h-0 flex-col gap-[clamp(0.375rem,1.1vh,0.625rem)] rounded-[12px] bg-sunken/55 p-2.5"
+          className="relative flex min-h-0 flex-col gap-[clamp(0.375rem,1.1vh,0.625rem)] rounded-[12px] bg-sunken/55 p-2.5"
         >
           <div className="flex shrink-0 items-center gap-2 px-1 pt-0.5 pb-0.5">
             <span className={cn("size-2 rounded-full", azul(vivo, true))} />
             <Barra className="w-14" />
             <span className="ml-auto h-4 w-5 rounded-full bg-card" />
           </div>
-          {tarefas.map((largura, i) => {
-            const feita = i === 0
-            return (
-              <div
-                key={largura}
-                className="flex h-[clamp(2.25rem,5.4vh,3rem)] shrink-0 items-center gap-3 rounded-[9px] bg-card px-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
-              >
-                <span
-                  className={cn(
-                    "size-4 shrink-0 rounded-[5px]",
-                    feita ? azul(vivo, true) : "shadow-[inset_0_0_0_1.5px_var(--input)]"
-                  )}
-                />
-                <Barra largura={largura} className={cn("min-w-0 shrink", feita && "bg-sunken/60")} />
-                <span className={cn("ml-auto h-4 w-10 shrink-0 rounded-full", i === 1 ? azul(vivo) : "bg-sunken")} />
-              </div>
-            )
-          })}
+          <div className={cn(LINHA, "relative overflow-hidden")}>
+            <Brilho animar={animar} />
+            <Faisca vivo={vivo} animar={animar} />
+            <LinhasIA larguras={["62%", "38%"]} vivo={vivo} animar={animar} fina className="flex-1" />
+          </div>
+          <AnimatePresence initial={false} mode="popLayout">
+            {ordem.map((t) => {
+              const feita = feitas.includes(t)
+              return (
+                <motion.div
+                  key={t}
+                  layout="position"
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ layout: MUDA, default: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
+                  className={LINHA}
+                >
+                  {/* o check: a caixa vazia e, por cima, o azul que enche do meio */}
+                  <span className="relative size-4 shrink-0 rounded-[5px] shadow-[inset_0_0_0_1.5px_var(--input)]">
+                    <motion.span
+                      initial={false}
+                      animate={{ scale: feita ? 1 : 0, opacity: feita ? 1 : 0 }}
+                      transition={{ duration: 0.45, ease: [0.34, 1.4, 0.64, 1] }}
+                      className={cn("absolute inset-0 rounded-[5px]", azul(vivo, true))}
+                    />
+                  </span>
+                  <Barra
+                    largura={TAREFAS[t]}
+                    className={cn("min-w-0 shrink transition-colors duration-500 motion-reduce:transition-none", feita && "bg-sunken/60")}
+                  />
+                  <span className={cn("ml-auto h-4 w-10 shrink-0 rounded-full", t === 2 ? azul(vivo) : "bg-sunken")} />
+                </motion.div>
+              )
+            })}
+          </AnimatePresence>
         </motion.div>
         <motion.div variants={item} className="flex min-h-0 flex-col gap-3">
           <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.75rem,2vh,1.125rem)] rounded-[12px] bg-sunken/55 p-4">
