@@ -698,7 +698,7 @@ def _fiscal(k, teste):
               f'background:transparent;box-shadow:inset 0 0 0 1px {k["input"]};font-family:{FONTE};font-size:12.5px;font-weight:500;color:{k["fg"]};">'
               f'{T("cbEditarFiscal")}</button>')
     dl = (f'<dl style="margin:0;display:flex;flex-direction:column;gap:12px;">'
-          + linha('CNPJ', f'<span style="font-family:{MONO};font-size:13px;">12.ABC.•••/••••-35</span>')
+          + linha('CNPJ', f'<span style="font-family:{MONO};font-size:13px;">12.***.***/****-35</span>')
           + linha(T('cbRazao'), 'Moura &amp; Filhos Tecnologia Ltda.') + '</dl>')
     cab = (f'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">'
            f'<div style="display:flex;flex-direction:column;gap:2px;">'

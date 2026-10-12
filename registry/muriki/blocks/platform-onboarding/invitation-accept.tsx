@@ -5,7 +5,7 @@
  * canvas, na moldura do primeiro acesso (PlatformOnboardingFrame), do lado do login.
  *
  * O app lê o token do fragmento do link (`/invite#token=…`), chama `POST /platform/invitations/preview`
- * e passa a resposta em `invitation`: `{ workspace: { name }, role, email, invitedBy: { name } }`,
+ * e passa a resposta em `invitation`: `{ workspace: { name }, role, email, invitedBy: { name }, expiresAt }`,
  * com o e-mail já mascarado pela API e só o nome de exibição de quem convidou. O token nunca entra
  * aqui: a tela não o mostra, não o põe em link e não o guarda.
  *
@@ -22,7 +22,8 @@
  *
  * O palco mostra a janela do workspace com o lugar esperando ("Um lugar no time está esperando por
  * você."); no inválido, as janelas dos dois produtos em esqueleto. Sem o nome de quem convidou
- * (a API manda `''` quando não acha a conta), o título diz só o workspace.
+ * (a API manda `''` quando não acha a conta), o título diz só o workspace. Com o `expiresAt` e o
+ * `locale`, a nota do relógio diz até quando o convite vale ("O convite vale até 19 de out., 14:30.").
  */
 import { useEffect, useRef, type ReactNode, type Ref } from "react"
 import { ArrowRightIcon, ClockIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react"
@@ -36,6 +37,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { MurikiI18nProvider, useTranslate, type TranslateFn } from "@/lib/i18n"
 
 import { PlatformBrandStage } from "./brand-stage"
+import { formatInvitationExpiry } from "./countdown"
 
 export type PlatformInvitationState = "loading" | "signed-out" | "signed-in" | "invalid"
 
@@ -47,6 +49,8 @@ export interface PlatformInvitationPreview {
   email: string
   /** Só o nome de exibição; `''` quando a API não acha a conta. */
   invitedBy: { name: string }
+  /** Até quando o convite vale, ISO com hora. Sem ele, a nota diz só "O convite vale 7 dias." */
+  expiresAt?: string
 }
 
 export interface PlatformInvitationAcceptProps {
@@ -67,6 +71,8 @@ export interface PlatformInvitationAcceptProps {
   brand?: ReactNode
   /** Idioma, tema e a conta, no canto de cima à direita. */
   utilities?: ReactNode
+  /** O idioma da data do `expiresAt`, ex.: `pt-BR`. Sem ele, a nota fica sem data. */
+  locale?: string
 }
 
 // o cabeçalho das telas de convite, sem contador de passos: o título é um degrau menor que o dos passos
@@ -98,6 +104,7 @@ export function PlatformInvitationAccept({
   error,
   brand,
   utilities,
+  locale,
 }: PlatformInvitationAcceptProps) {
   const t = useTranslate()
   const invalido = state === "invalid" || (state !== "loading" && !invitation)
@@ -166,6 +173,7 @@ export function PlatformInvitationAccept({
   const titulo = quem
     ? t("platform.onboarding.invitation.title", { name: quem, workspace: invitation.workspace.name })
     : t("platform.onboarding.invitation.title_anonymous", { workspace: invitation.workspace.name })
+  const vence = locale ? formatInvitationExpiry(invitation.expiresAt, locale) : null
   const email = <span className="font-mono text-[13px] text-foreground-strong">{invitation.email}</span>
 
   // a prévia fala do lugar esperando, não do workspace nascendo: a frase do time vira a do convite
@@ -244,7 +252,7 @@ export function PlatformInvitationAccept({
 
         <p className="flex items-center gap-2 text-[13px] leading-[19px] text-muted-foreground">
           <ClockIcon aria-hidden className="size-3.5 shrink-0" />
-          {t("platform.onboarding.invitation.validity")}
+          {vence ? t("platform.onboarding.invitation.validity_until", { date: vence }) : t("platform.onboarding.invitation.validity")}
         </p>
       </div>
     </PlatformOnboardingFrame>
