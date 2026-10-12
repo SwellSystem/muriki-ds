@@ -1335,6 +1335,7 @@ const STRINGS: Record<string, unknown> = {
         personal: "Só para mim",
       },
       submit: "Criar workspace",
+      submit_personal: "Criar meu espaço",
       terms_prefix: "Li e aceito os",
       terms: "termos de uso",
       terms_and: "e a",
@@ -1357,7 +1358,11 @@ const STRINGS: Record<string, unknown> = {
       },
       workspace: {
         name_label: "Nome do workspace",
-        name_placeholder: "Ex.: Acme Labs",
+        name_label_personal: "Nome do seu espaço",
+        // o exemplo do campo, que a prévia também mostra, apagado, enquanto o nome não chega
+        name_example: "Acme Labs",
+        name_example_personal: "Meu espaço",
+        name_placeholder: "Ex.: {{example}}",
         name_invalid: "Use de 1 a {{max}} caracteres, sem caracteres invisíveis.",
         slug_label: "Endereço",
       },
@@ -1372,7 +1377,6 @@ const STRINGS: Record<string, unknown> = {
       },
       // a prévia ao vivo, ao lado do formulário (WorkspacePreview)
       preview: {
-        name_placeholder: "Seu workspace",
         // a frase embaixo do nome em destaque (por isso não o repete): o que está nascendo; sem nome, o
         // convite a escrever
         empty: "O nome que você escrever aparece aqui.",

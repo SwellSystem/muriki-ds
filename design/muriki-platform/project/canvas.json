@@ -74,6 +74,22 @@
       "h": 900,
       "title": "Onboarding · @usuário e workspace · só para mim (Muriki Focus) · escuro",
       "is_interactive": true
+    },
+    "OnboardingIdentidadeMovimento.dc.html": {
+      "x": 6080,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · movimento (Play)",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeMovimentoEscuro.dc.html": {
+      "x": 6080,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · movimento (Play) · escuro",
+      "is_interactive": true
     }
   },
   "order": [
@@ -84,7 +100,9 @@
     "OnboardingIdentidadeLivre.dc.html",
     "OnboardingIdentidadeLivreEscuro.dc.html",
     "OnboardingIdentidadeFoco.dc.html",
-    "OnboardingIdentidadeFocoEscuro.dc.html"
+    "OnboardingIdentidadeFocoEscuro.dc.html",
+    "OnboardingIdentidadeMovimento.dc.html",
+    "OnboardingIdentidadeMovimentoEscuro.dc.html"
   ],
   "notes": {
     "onboarding": {

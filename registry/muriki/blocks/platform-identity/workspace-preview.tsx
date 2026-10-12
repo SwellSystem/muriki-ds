@@ -5,10 +5,15 @@
  * enquanto a pessoa preenche. Sem barra de endereço (o endereço fica só no campo do slug): no topo,
  * a logo da Muriki e o produto da escolha, Muriki Projects (`team`) ou Muriki Focus (`personal`);
  * logo abaixo, o nome do workspace em destaque e uma frase que diz o que nasce, com o @usuário.
+ * Sem nome, o lugar do nome mostra apagado o mesmo exemplo do campo ("Acme Labs", "Meu espaço").
+ *
+ * A prévia não confere nada: mostra o `username` que receber. Quem a usa passa só o @ que pode
+ * aparecer (o PlatformOnboardingIdentity passa o @ livre, verificando ou não conferido, nunca o
+ * ocupado, o reservado ou o inválido); sem ele, a frase sai sem @ e o lugar "você" fica neutro.
  *
  * O resto são esqueletos sem nome (as funcionalidades não estão definidas e a prévia não promete
  * nada), com a anatomia do produto: colunas e lugares para o time no Projects, uma lista de tarefas
- * pessoais no Focus. As partes azuis (como o Pro de "Planos carregando") só ganham a cor quando o
+ * pessoais e o dia no Focus. No Focus não há lugares: é de uma pessoa só. As partes azuis (como o Pro de "Planos carregando") só ganham a cor quando o
  * nome chega: antes disso a janela é toda cinza, à espera. Esqueleto parado, sem a varredura do
  * Skeleton, porque aqui nada está carregando.
  *
@@ -16,7 +21,9 @@
  * cross-fade quando o @ aparece, e a troca Projects↔Focus sai e entra em sequência. Com
  * `prefers-reduced-motion`, tudo troca na hora, sem animação.
  *
- * Ocupa a altura que o pai der (`h-full`): os esqueletos se esticam e encolhem com ela, sem corte.
+ * A altura é a do conteúdo, medida pela altura da janela (`vh`): os painéis terminam onde o conteúdo
+ * termina, sem fundo vazio, e encolhem nas telas baixas. Para não passar do palco, o pai limita a
+ * altura (`max-h-full`); o que sobrar some por baixo, sem rolar.
  * É decorativa: `aria-hidden`, nada focável, sem clique. O leitor de tela já tem os campos.
  */
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Transition, type Variants } from "framer-motion"
@@ -24,6 +31,8 @@ import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Transitio
 import { MurikiLogo } from "@/components/ui/muriki-logo"
 import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+
+import { workspaceNameExample } from "./workspace-form"
 
 export type WorkspaceAudience = "team" | "personal"
 
@@ -40,7 +49,7 @@ export interface WorkspacePreviewProps {
   /** Para quem é: Muriki Projects (`team`) ou Muriki Focus (`personal`). */
   audience: WorkspaceAudience
   workspaceName: string
-  /** Sem ela, a frase fica sem @. */
+  /** O @ que pode aparecer (quem usa decide). Sem ele, a frase fica sem @ e o lugar "você", neutro. */
   username?: string
   className?: string
 }
@@ -100,7 +109,7 @@ export function WorkspacePreview({ audience, workspaceName, username, className 
                   vivo ? "text-foreground-strong" : "text-muted-foreground/45"
                 )}
               >
-                {vivo ? <Letreiro texto={nome} reduzir={reduzir} /> : t("platform.identity.preview.name_placeholder")}
+                {vivo ? <Letreiro texto={nome} reduzir={reduzir} /> : t(workspaceNameExample(audience))}
               </h2>
               <div className="grid min-h-10 text-[clamp(0.8125rem,1.7vh,0.9375rem)] leading-5 text-muted-foreground">
                 <AnimatePresence initial={false} mode="popLayout">
@@ -116,7 +125,9 @@ export function WorkspacePreview({ audience, workspaceName, username, className 
                 </AnimatePresence>
               </div>
             </div>
-            <Lugares audience={audience} vivo={vivo} />
+            <AnimatePresence initial={false}>
+              {audience === "team" ? <Lugares key="lugares" voce={!!username} /> : null}
+            </AnimatePresence>
           </div>
 
           <AnimatePresence initial={false} mode="wait">
@@ -170,26 +181,21 @@ function azul(vivo: boolean, forte = false) {
   )
 }
 
-/** Os lugares no canto: você (azul) e, no time, os lugares vazios de quem vem no próximo passo. */
-function Lugares({ audience, vivo }: { audience: WorkspaceAudience; vivo: boolean }) {
+/** Os lugares do time no canto: você (azul quando o @ aparece) e os lugares vazios de quem vem no
+ * próximo passo. Só no Projects. */
+function Lugares({ voce }: { voce: boolean }) {
   return (
-    <div className="mt-2 flex shrink-0 items-center">
-      <motion.span layout className={cn("size-8 rounded-full", azul(vivo, true))} />
-      <AnimatePresence initial={false}>
-        {audience === "team"
-          ? [0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                layout
-                initial={{ opacity: 0, x: -10, scale: 0.6 }}
-                animate={{ opacity: 1, x: 0, scale: 1, transition: { delay: 0.06 * i } }}
-                exit={{ opacity: 0, x: -10, scale: 0.6 }}
-                className="ml-1.5 size-8 rounded-full border-[1.5px] border-dashed border-input"
-              />
-            ))
-          : null}
-      </AnimatePresence>
-    </div>
+    <motion.div
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -10 }}
+      className="mt-2 flex shrink-0 items-center"
+    >
+      <span className={cn("size-8 rounded-full", azul(voce, true))} />
+      {[0, 1, 2].map((i) => (
+        <span key={i} className="ml-1.5 size-8 rounded-full border-[1.5px] border-dashed border-input" />
+      ))}
+    </motion.div>
   )
 }
 
@@ -241,10 +247,11 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
       initial="oculto"
       animate="visivel"
       exit="saida"
-      className="flex min-h-0 flex-1 flex-col gap-[clamp(0.75rem,2vh,1.25rem)]"
+      className="flex min-h-0 flex-col gap-[clamp(0.75rem,2vh,1.25rem)]"
     >
       <Faixa vivo={vivo} abas={["w-16", "w-12", "w-14"]} item={item} />
-      <div className="grid min-h-0 flex-1 grid-cols-3 gap-3">
+      {/* cada coluna termina no último cartão, como num quadro de verdade */}
+      <div className="grid min-h-0 grid-cols-3 items-start gap-3">
         {colunas.map((coluna, c) => (
           <motion.div
             key={c}
@@ -262,7 +269,7 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
                 <div
                   key={i}
                   className={cn(
-                    "relative flex max-h-28 min-h-0 flex-1 flex-col gap-2 overflow-hidden rounded-[9px] bg-card p-[clamp(0.5rem,1.3vh,0.75rem)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
+                    "relative flex h-[clamp(4.5rem,11vh,6.5rem)] shrink-0 flex-col gap-2 overflow-hidden rounded-[9px] bg-card p-[clamp(0.5rem,1.3vh,0.75rem)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]",
                     destaque && vivo && "ring-1 ring-primary/60",
                     "transition-shadow duration-500 motion-reduce:transition-none"
                   )}
@@ -288,11 +295,12 @@ function Quadro({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
 
 /**
  * Muriki Focus: o trabalho de uma pessoa. À esquerda, a lista de tarefas (a primeira feita, em azul);
- * à direita, o anel do dia com o arco azul e a ação principal.
+ * à direita, o anel do dia com o arco azul e a ação principal e, embaixo, a agenda de hoje. As duas
+ * colunas têm a mesma altura, a da lista.
  */
 function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
   const { grupo, item } = variantes(reduzir)
-  const tarefas = ["68%", "54%", "76%", "44%", "60%"]
+  const tarefas = ["68%", "54%", "76%", "44%", "60%", "50%"]
   // o arco do anel: 38% da volta de um círculo de raio 42
   const volta = 2 * Math.PI * 42
   return (
@@ -301,10 +309,10 @@ function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
       initial="oculto"
       animate="visivel"
       exit="saida"
-      className="flex min-h-0 flex-1 flex-col gap-[clamp(0.75rem,2vh,1.25rem)]"
+      className="flex min-h-0 flex-col gap-[clamp(0.75rem,2vh,1.25rem)]"
     >
       <Faixa vivo={vivo} abas={["w-14", "w-10"]} item={item} />
-      <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-3">
+      <div className="grid min-h-0 grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] gap-3">
         <motion.div
           variants={item}
           className="flex min-h-0 flex-col gap-[clamp(0.375rem,1.1vh,0.625rem)] rounded-[12px] bg-sunken/55 p-2.5"
@@ -319,7 +327,7 @@ function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
             return (
               <div
                 key={largura}
-                className="flex max-h-14 min-h-0 flex-1 items-center gap-3 rounded-[9px] bg-card px-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
+                className="flex h-[clamp(2.25rem,5.4vh,3rem)] shrink-0 items-center gap-3 rounded-[9px] bg-card px-3 shadow-[0_1px_2px_rgba(0,0,0,0.05)]"
               >
                 <span
                   className={cn(
@@ -333,31 +341,43 @@ function Lista({ vivo, reduzir }: { vivo: boolean; reduzir: boolean }) {
             )
           })}
         </motion.div>
-        <motion.div
-          variants={item}
-          className="flex min-h-0 flex-col items-center justify-center gap-[clamp(0.75rem,2vh,1.25rem)] rounded-[12px] bg-sunken/55 p-4"
-        >
-          <svg viewBox="0 0 100 100" className="aspect-square w-[min(70%,clamp(5rem,16vh,9rem))] -rotate-90">
-            <circle cx="50" cy="50" r="42" fill="none" strokeWidth="9" className="stroke-card" />
-            <circle
-              cx="50"
-              cy="50"
-              r="42"
-              fill="none"
-              strokeWidth="9"
-              strokeLinecap="round"
-              strokeDasharray={`${volta * 0.38} ${volta}`}
-              className={cn(
-                "transition-colors duration-500 motion-reduce:transition-none",
-                vivo ? "stroke-primary/70" : "stroke-input/60"
-              )}
-            />
-          </svg>
-          <div className="flex w-full flex-col items-center gap-2">
-            <Barra className="w-[55%]" />
-            <Barra className="w-[38%] bg-sunken/70" />
+        <motion.div variants={item} className="flex min-h-0 flex-col gap-3">
+          <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-[clamp(0.75rem,2vh,1.125rem)] rounded-[12px] bg-sunken/55 p-4">
+            <svg viewBox="0 0 100 100" className="aspect-square w-[min(70%,clamp(4.5rem,12vh,7.5rem))] -rotate-90">
+              <circle cx="50" cy="50" r="42" fill="none" strokeWidth="9" className="stroke-card" />
+              <circle
+                cx="50"
+                cy="50"
+                r="42"
+                fill="none"
+                strokeWidth="9"
+                strokeLinecap="round"
+                strokeDasharray={`${volta * 0.38} ${volta}`}
+                className={cn(
+                  "transition-colors duration-500 motion-reduce:transition-none",
+                  vivo ? "stroke-primary/70" : "stroke-input/60"
+                )}
+              />
+            </svg>
+            <div className="flex w-full flex-col items-center gap-2">
+              <Barra className="w-[55%]" />
+              <Barra className="w-[38%] bg-sunken/70" />
+            </div>
+            <span className={cn("h-7 w-[60%] rounded-[8px]", azul(vivo))} />
           </div>
-          <span className={cn("h-7 w-[60%] rounded-[8px]", azul(vivo))} />
+          {/* a agenda de hoje: duas horas marcadas, a primeira tingida */}
+          <div className="flex shrink-0 flex-col gap-2 rounded-[12px] bg-sunken/55 p-2.5">
+            <div className="flex items-center gap-2 px-1 pt-0.5">
+              <span className="size-2 rounded-full bg-input/70" />
+              <Barra className="w-12" />
+            </div>
+            {["62%", "48%"].map((largura, i) => (
+              <div key={largura} className="flex h-7 items-center gap-2.5 rounded-[8px] bg-card px-2.5">
+                <span className={cn("h-3.5 w-1 shrink-0 rounded-full", i === 0 ? azul(vivo, true) : "bg-sunken")} />
+                <Barra largura={largura} className="min-w-0 shrink" />
+              </div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </motion.div>

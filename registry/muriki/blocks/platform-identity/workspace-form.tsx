@@ -13,6 +13,9 @@
  *
  * O slug é o mesmo campo do @usuário (HandleField), com o endereço inteiro na frente
  * (`platform.muriki.app/` + slug) e os mesmos estados: formato na hora, disponibilidade do app.
+ *
+ * Com `audience="personal"` o nome é o "do seu espaço", e o exemplo do campo muda junto: é o mesmo
+ * que a WorkspacePreview mostra, apagado, enquanto o nome não chega (workspaceNameExample).
  */
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -20,7 +23,12 @@ import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 import { WORKSPACE_NAME_MAX, nextSlugOnNameChange, normalizeHandle, workspaceNameIssue, type HandleStatus } from "./handles"
-import { HandleField } from "./username-field"
+import { DICA, HandleField } from "./username-field"
+import type { WorkspaceAudience } from "./workspace-preview"
+
+/** A chave do exemplo de nome de cada público: o placeholder do campo e o nome apagado da prévia. */
+export const workspaceNameExample = (audience: WorkspaceAudience) =>
+  audience === "personal" ? "platform.identity.workspace.name_example_personal" : "platform.identity.workspace.name_example"
 
 export interface WorkspaceFormProps {
   name: string
@@ -32,6 +40,8 @@ export interface WorkspaceFormProps {
   slugStatus: HandleStatus
   /** O `slug` da resposta de disponibilidade: `slugStatus` só vale para ele. */
   slugStatusFor?: string
+  /** `personal` troca o rótulo e o exemplo do nome ("Nome do seu espaço"). Padrão: `team`. */
+  audience?: WorkspaceAudience
   /** O endereço antes do slug. Padrão: `platform.muriki.app/`. */
   urlPrefix?: string
   disabled?: boolean
@@ -45,6 +55,7 @@ export function WorkspaceForm({
   onSlugChange,
   slugStatus,
   slugStatusFor,
+  audience = "team",
   urlPrefix = "platform.muriki.app/",
   disabled,
   className,
@@ -62,15 +73,17 @@ export function WorkspaceForm({
   return (
     <div data-slot="workspace-form" className={cn("flex flex-col gap-5", className)}>
       <Field disabled={disabled} invalid={nomeErrado}>
-        <FieldLabel>{t("platform.identity.workspace.name_label")}</FieldLabel>
+        <FieldLabel>
+          {t(audience === "personal" ? "platform.identity.workspace.name_label_personal" : "platform.identity.workspace.name_label")}
+        </FieldLabel>
         <Input
           size="touch"
           value={name}
           onChange={(e) => mudarNome(e.target.value)}
-          placeholder={t("platform.identity.workspace.name_placeholder")}
+          placeholder={t("platform.identity.workspace.name_placeholder", { example: t(workspaceNameExample(audience)) })}
           autoComplete="organization"
         />
-        {nomeErrado ? <FieldError>{t("platform.identity.workspace.name_invalid", { max: WORKSPACE_NAME_MAX })}</FieldError> : null}
+        {nomeErrado ? <FieldError className={DICA}>{t("platform.identity.workspace.name_invalid", { max: WORKSPACE_NAME_MAX })}</FieldError> : null}
       </Field>
       <HandleField
         kind="slug"

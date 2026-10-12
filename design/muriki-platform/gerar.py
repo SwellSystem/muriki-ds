@@ -15,6 +15,8 @@ TELAS = [
      'Onboarding · @usuário e workspace · tudo livre, o botão ligado', 2, 0, 1),
     ('identidade_foco', 'OnboardingIdentidadeFoco', 'Primeiro acesso',
      'Onboarding · @usuário e workspace · só para mim (Muriki Focus)', 3, 0, 1),
+    ('identidade_movimento', 'OnboardingIdentidadeMovimento', 'Primeiro acesso',
+     'Onboarding · movimento (Play)', 4, 0, 1),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420

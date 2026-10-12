@@ -43,6 +43,9 @@ import {
 
 const LIMITES = { username: USERNAME_LIMITS, slug: SLUG_LIMITS } as const
 
+// a frase embaixo do campo, maior que a do Field (11.5px): aqui ela explica a regra e precisa ser lida
+export const DICA = "text-[13px] leading-[18px]"
+
 const ERROS: HandleStatus[] = ["taken", "reserved", "invalid"]
 
 const ICONES: Partial<Record<HandleStatus, ReactNode>> = {
@@ -120,9 +123,9 @@ export function HandleField({
         className="font-mono"
       />
       {erro ? (
-        <FieldError>{frase}</FieldError>
+        <FieldError className={DICA}>{frase}</FieldError>
       ) : (
-        <FieldDescription aria-live="polite" className={cn(estado === "available" && "text-success")}>
+        <FieldDescription aria-live="polite" className={cn(DICA, estado === "available" && "text-success")}>
           {frase}
         </FieldDescription>
       )}
