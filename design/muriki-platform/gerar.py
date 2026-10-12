@@ -5,27 +5,41 @@ from pecas import AQUI, W, H
 SAIDA = os.path.join(AQUI, 'project')
 os.makedirs(SAIDA, exist_ok=True)
 
+# A ordem do canvas é a jornada: a entrada, o primeiro acesso e o convite, uma fileira cada, com a
+# escura logo abaixo da clara. O número no título do quadro é o passo na jornada.
 # (id, arquivo base, título da tela, título do quadro, coluna, fileira no claro, fileira no escuro)
-TELAS = [
-    ('identidade_vazio', 'OnboardingIdentidade', 'Primeiro acesso',
-     'Onboarding · @usuário e workspace · vazio', 0, 0, 1),
-    ('identidade_ocupado', 'OnboardingIdentidadeOcupado', 'Primeiro acesso',
-     'Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado', 1, 0, 1),
-    ('identidade_livre', 'OnboardingIdentidadeLivre', 'Primeiro acesso',
-     'Onboarding · @usuário e workspace · tudo livre, o botão ligado', 2, 0, 1),
-    ('identidade_foco', 'OnboardingIdentidadeFoco', 'Primeiro acesso',
-     'Onboarding · @usuário e workspace · só para mim (Muriki Focus)', 3, 0, 1),
-    ('identidade_movimento', 'OnboardingIdentidadeMovimento', 'Primeiro acesso',
-     'Onboarding · movimento (Play)', 4, 0, 1),
-    # A2: o primeiro acesso que falta e o convite (fileiras 2 e 3)
-    ('codigo', 'OnboardingCodigo', 'Primeiro acesso', 'Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa)', 0, 2, 3),
+JORNADA = [
+    # a entrada: a tela de login compartilhada com o Code e o Backoffice, só com a marca do Platform
+    ('entrar', 'Entrar', 'Entrar', 'Entrar · a tela compartilhada (auth-page + login-page)'),
+    ('criar_conta', 'CriarConta', 'Criar conta', 'Criar conta · a tela compartilhada (nome + e-mail, Turnstile)'),
+    # o primeiro acesso: do lado do login (o palco à esquerda, o formulário à direita)
+    ('codigo', 'OnboardingCodigo', 'Primeiro acesso', 'Código por e-mail · 1 de 3 (só sem a prova da caixa)'),
+    ('identidade_vazio', 'OnboardingIdentidade', 'Primeiro acesso', 'Workspace · vazio'),
+    ('identidade_ocupado', 'OnboardingIdentidadeOcupado', 'Primeiro acesso', 'Workspace · o @usuário ocupado e o endereço reservado'),
+    ('identidade_livre', 'OnboardingIdentidadeLivre', 'Primeiro acesso', 'Workspace · tudo livre, o botão ligado'),
+    ('identidade_foco', 'OnboardingIdentidadeFoco', 'Primeiro acesso', 'Workspace · só para mim (Muriki Focus)'),
+    ('identidade_movimento', 'OnboardingIdentidadeMovimento', 'Primeiro acesso', 'Workspace · movimento (Play)'),
     ('ja_tem_conta', 'OnboardingContaMuriki', 'Primeiro acesso',
-     'Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário)', 1, 2, 3),
-    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Primeiro acesso · 3 de 3 · convidar o time: adicionar, a lista e as pessoas no plano', 2, 2, 3),
-    ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta', 3, 2, 3),
-    ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite', 4, 2, 3),
-    ('convite_invalido', 'ConviteInvalido', 'Convite', 'Convite · inválido ou vencido (o 422 uniforme, sem o motivo)', 5, 2, 3),
+     'Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário)'),
+    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano'),
+    # o convite
+    ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta'),
+    ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite'),
+    ('convite_invalido', 'ConviteInvalido', 'Convite', 'Convite · inválido ou vencido (o 422 uniforme, sem o motivo)'),
 ]
+FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
+    ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
+    ('primeiroAcesso', 8, 'Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos '
+                          'numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco '
+                          'com a prévia ao vivo à esquerda, o formulário à direita'),
+    ('convite', 3, 'Convite: o aceite mostra o workspace, o papel e o e-mail mascarado; o token nunca aparece'),
+]
+TELAS, _i = [], 0
+for fileira, (_, n, _) in enumerate(FILEIRAS):
+    for col in range(n):
+        id_, base_nome, titulo, quadro = JORNADA[_i]
+        _i += 1
+        TELAS.append((id_, base_nome, titulo, f'{_i} · {quadro}', col, 2 * fileira, 2 * fileira + 1))
 
 PASSO_X, LINHA_Y = W + 80, H + 420
 
@@ -41,9 +55,10 @@ canvas.setdefault('designSystems', [])
 boards = canvas.setdefault('boards', {})
 order = canvas.setdefault('order', [])
 
-# o que este gerador já criou e não gera mais: as telas de entrada do A2 (o app usa o login do DS)
-REMOVIDAS = ['Entrar', 'EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'EsqueciSenha', 'RedefinirSenha',
-             'CriarConta', 'ConfiraEmail', 'CriarSenha',
+# o que este gerador já criou e não gera mais: as telas de entrada próprias do A2 (o app usa o login
+# do DS, que Entrar e CriarConta mostram)
+REMOVIDAS = ['EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'EsqueciSenha', 'RedefinirSenha',
+             'ConfiraEmail', 'CriarSenha',
              # as três variantes de convidar o time: a tela de cima ficou com a lista
              'OnboardingConvidarA', 'OnboardingConvidarB', 'OnboardingConvidarC']
 for base_nome in REMOVIDAS:
@@ -62,27 +77,22 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
         b = boards.setdefault(arquivo, {})
         b.update(x=col * PASSO_X, y=(lin_claro if tema == 'claro' else lin_escuro) * LINHA_Y, w=W, h=H,
                  title=quadro if tema == 'claro' else f'{quadro} · escuro', is_interactive=True)
-        if arquivo not in order:
-            order.append(arquivo)
         gerados.append(arquivo)
+# a ordem dos quadros é a da jornada; o que não é deste gerador fica depois
+order[:] = gerados + [a for a in order if a not in gerados]
 
 # o editor limita a largura de uma nota a 8000px e guarda w: 240
 largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 # só as notas de título que este gerador criou; nota de outro tipo (posta à mão) fica
-for chave in ('entrada', 'entradaEscuro', 'convidarPlano', 'convidarPlanoEscuro'):
+for chave in ('acesso', 'acessoEscuro', 'onboarding', 'onboardingEscuro', 'primeiroConvite', 'primeiroConviteEscuro',
+              'convidarPlano', 'convidarPlanoEscuro'):
     if notas.get(chave, {}).get('kind') == 'title1':
         del notas[chave]
-for chave, lin, n, texto in [
-    ('onboarding', 0, 4, 'Onboarding do Platform: para quem é, o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; '
-                         'cabe sem rolar; à direita, a prévia ao vivo: Muriki Projects (time) ou Muriki Focus (só para mim), no estado final'),
-    ('onboardingEscuro', 1, 4, 'Onboarding no tema escuro'),
-    ('primeiroConvite', 2, 6, 'Primeiro acesso e convite: o código por e-mail, quem já tem conta Muriki e convidar o time; '
-                              'o aceite de convite mostra o workspace, o papel e o e-mail mascarado, e o token nunca aparece'),
-    ('primeiroConviteEscuro', 3, 6, 'Primeiro acesso e convite no tema escuro'),
-]:
-    notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
-    notas[chave].setdefault('w', 240)
+for fileira, (chave, n, texto) in enumerate(FILEIRAS):
+    for lin, ch, tx in [(2 * fileira, chave, texto), (2 * fileira + 1, f'{chave}Escuro', f'{texto.split(":")[0]} no tema escuro')]:
+        notas.setdefault(ch, {}).update(x=0, y=lin * LINHA_Y - 300, text=tx, kind='title1', maxW=largura(n))
+        notas[ch].setdefault('w', 240)
 
 json.dump(canvas, open(canvas_path, 'w'), ensure_ascii=False, indent=2)
 print(f'{len(gerados)} quadros em {SAIDA}')

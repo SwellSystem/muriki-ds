@@ -63,23 +63,32 @@ def cabecalho_passo(k, n, total, titulo, sub=''):
 
 
 def manchas(k):
-    # as manchas desfocadas da marca no fundo do palco, as mesmas do componente (MANCHAS)
-    return (f'radial-gradient(45% 55% at 18% 22%, color-mix(in oklch, {k["pri"]} 44%, transparent), transparent 70%), '
-            f'radial-gradient(50% 60% at 88% 82%, color-mix(in oklch, {k["pri"]} 36%, transparent), transparent 70%), '
-            f'radial-gradient(35% 40% at 78% 12%, color-mix(in oklch, {k["pri"]} 24%, transparent), transparent 70%)')
+    # as manchas desfocadas da marca no fundo do palco, as mesmas do componente (MANCHAS): espelhadas para
+    # o palco à esquerda, e a borda que encosta no formulário termina num degradê para o fundo da página
+    return (f'linear-gradient(to right, transparent calc(100% - 176px), {k["bg"]}), '
+            f'radial-gradient(45% 55% at 72% 22%, color-mix(in oklch, {k["pri"]} 44%, transparent), transparent 70%), '
+            f'radial-gradient(50% 60% at 12% 82%, color-mix(in oklch, {k["pri"]} 36%, transparent), transparent 70%), '
+            f'radial-gradient(35% 40% at 22% 12%, color-mix(in oklch, {k["pri"]} 24%, transparent), transparent 70%)')
+
+
+def palco(k, conteudo):
+    # o lado visual, à esquerda: o palco azul (primary-subtle com as manchas desfocadas da marca) e, por
+    # cima, o conteúdo (a janela do produto). O que é absoluto no conteúdo (o Recomeçar da tela em
+    # movimento) se mede pelo palco
+    return (f'<div style="position:relative;display:flex;align-items:center;justify-content:center;min-height:0;'
+            f'padding:64px 58px 45px;background-color:{k["prisub"]};background-image:{manchas(k)};">{conteudo}</div>')
 
 
 def pagina_identidade(k, formulario, previa):
-    # o PlatformOnboardingIdentity a partir do lg, medido em 1440×900: a grade 1fr / 1.2fr da altura da
-    # janela, a barra do topo por cima das duas colunas, o formulário numa coluna de 512px centrada na
-    # vertical e, à direita, o palco azul (primary-subtle com as manchas desfocadas) com a janela da prévia.
+    # o PlatformOnboardingIdentity a partir do lg, medido em 1440×900: a grade 1.2fr / 1fr da altura da
+    # janela, a barra do topo por cima das duas colunas, o palco com a janela da prévia à esquerda (o
+    # lado do login) e o formulário numa coluna de 512px centrada na vertical, à direita.
     # Os clamp() do componente, resolvidos para 900 de altura
-    return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);")}'
+    return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);")}'
             f'<div style="position:absolute;inset:0 0 auto 0;z-index:1;">{topo(k, PRODUTO, EMAIL)}</div>'
+            f'{palco(k, previa)}'
             f'<main style="display:flex;flex-direction:column;justify-content:center;gap:32px;width:512px;justify-self:center;'
-            f'padding:64px 0 27px;">{formulario}</main>'
-            f'<div style="display:flex;align-items:center;justify-content:center;min-height:0;padding:64px 58px 45px;'
-            f'background-color:{k["prisub"]};background-image:{manchas(k)};">{previa}</div></div>')
+            f'padding:64px 0 27px;">{formulario}</main></div>')
 
 
 # o estado do campo: (ícone no fim, cor do ícone, a frase é erro?)

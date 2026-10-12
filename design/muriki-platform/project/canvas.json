@@ -12,83 +12,83 @@
   "designSystems": [],
   "boards": {
     "OnboardingIdentidade.dc.html": {
-      "x": 0,
-      "y": 0,
+      "x": 1520,
+      "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · vazio",
+      "title": "4 · Workspace · vazio",
       "is_interactive": true
     },
     "OnboardingIdentidadeEscuro.dc.html": {
-      "x": 0,
-      "y": 1320,
+      "x": 1520,
+      "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · vazio · escuro",
+      "title": "4 · Workspace · vazio · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeOcupado.dc.html": {
-      "x": 1520,
-      "y": 0,
+      "x": 3040,
+      "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado",
+      "title": "5 · Workspace · o @usuário ocupado e o endereço reservado",
       "is_interactive": true
     },
     "OnboardingIdentidadeOcupadoEscuro.dc.html": {
-      "x": 1520,
-      "y": 1320,
+      "x": 3040,
+      "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado · escuro",
+      "title": "5 · Workspace · o @usuário ocupado e o endereço reservado · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeLivre.dc.html": {
-      "x": 3040,
-      "y": 0,
+      "x": 4560,
+      "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · tudo livre, o botão ligado",
+      "title": "6 · Workspace · tudo livre, o botão ligado",
       "is_interactive": true
     },
     "OnboardingIdentidadeLivreEscuro.dc.html": {
-      "x": 3040,
-      "y": 1320,
+      "x": 4560,
+      "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · tudo livre, o botão ligado · escuro",
+      "title": "6 · Workspace · tudo livre, o botão ligado · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeFoco.dc.html": {
-      "x": 4560,
-      "y": 0,
+      "x": 6080,
+      "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · só para mim (Muriki Focus)",
+      "title": "7 · Workspace · só para mim (Muriki Focus)",
       "is_interactive": true
     },
     "OnboardingIdentidadeFocoEscuro.dc.html": {
-      "x": 4560,
-      "y": 1320,
+      "x": 6080,
+      "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · @usuário e workspace · só para mim (Muriki Focus) · escuro",
+      "title": "7 · Workspace · só para mim (Muriki Focus) · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeMovimento.dc.html": {
-      "x": 6080,
-      "y": 0,
+      "x": 7600,
+      "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · movimento (Play)",
+      "title": "8 · Workspace · movimento (Play)",
       "is_interactive": true
     },
     "OnboardingIdentidadeMovimentoEscuro.dc.html": {
-      "x": 6080,
-      "y": 1320,
+      "x": 7600,
+      "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Onboarding · movimento (Play) · escuro",
+      "title": "8 · Workspace · movimento (Play) · escuro",
       "is_interactive": true
     },
     "OnboardingCodigo.dc.html": {
@@ -96,7 +96,7 @@
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa)",
+      "title": "3 · Código por e-mail · 1 de 3 (só sem a prova da caixa)",
       "is_interactive": true
     },
     "OnboardingCodigoEscuro.dc.html": {
@@ -104,91 +104,129 @@
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa) · escuro",
+      "title": "3 · Código por e-mail · 1 de 3 (só sem a prova da caixa) · escuro",
       "is_interactive": true
     },
     "OnboardingContaMuriki.dc.html": {
-      "x": 1520,
+      "x": 9120,
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário)",
+      "title": "9 · Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário)",
       "is_interactive": true
     },
     "OnboardingContaMurikiEscuro.dc.html": {
-      "x": 1520,
+      "x": 9120,
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário) · escuro",
+      "title": "9 · Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário) · escuro",
       "is_interactive": true
     },
     "OnboardingConvidar.dc.html": {
-      "x": 3040,
+      "x": 10640,
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 3 de 3 · convidar o time: adicionar, a lista e as pessoas no plano",
+      "title": "10 · Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano",
       "is_interactive": true
     },
     "OnboardingConvidarEscuro.dc.html": {
-      "x": 3040,
+      "x": 10640,
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "Primeiro acesso · 3 de 3 · convidar o time: adicionar, a lista e as pessoas no plano · escuro",
+      "title": "10 · Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano · escuro",
       "is_interactive": true
     },
     "Convite.dc.html": {
-      "x": 4560,
-      "y": 2640,
+      "x": 0,
+      "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "Convite · o aceite, sem sessão: entrar ou criar conta",
+      "title": "11 · Convite · o aceite, sem sessão: entrar ou criar conta",
       "is_interactive": true
     },
     "ConviteEscuro.dc.html": {
-      "x": 4560,
-      "y": 3960,
+      "x": 0,
+      "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "Convite · o aceite, sem sessão: entrar ou criar conta · escuro",
+      "title": "11 · Convite · o aceite, sem sessão: entrar ou criar conta · escuro",
       "is_interactive": true
     },
     "ConviteLogado.dc.html": {
-      "x": 6080,
-      "y": 2640,
+      "x": 1520,
+      "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "Convite · o aceite, com sessão: aceitar convite",
+      "title": "12 · Convite · o aceite, com sessão: aceitar convite",
       "is_interactive": true
     },
     "ConviteLogadoEscuro.dc.html": {
-      "x": 6080,
-      "y": 3960,
+      "x": 1520,
+      "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "Convite · o aceite, com sessão: aceitar convite · escuro",
+      "title": "12 · Convite · o aceite, com sessão: aceitar convite · escuro",
       "is_interactive": true
     },
     "ConviteInvalido.dc.html": {
-      "x": 7600,
-      "y": 2640,
+      "x": 3040,
+      "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "Convite · inválido ou vencido (o 422 uniforme, sem o motivo)",
+      "title": "13 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo)",
       "is_interactive": true
     },
     "ConviteInvalidoEscuro.dc.html": {
-      "x": 7600,
-      "y": 3960,
+      "x": 3040,
+      "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "Convite · inválido ou vencido (o 422 uniforme, sem o motivo) · escuro",
+      "title": "13 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo) · escuro",
+      "is_interactive": true
+    },
+    "Entrar.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "1 · Entrar · a tela compartilhada (auth-page + login-page)",
+      "is_interactive": true
+    },
+    "EntrarEscuro.dc.html": {
+      "x": 0,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "1 · Entrar · a tela compartilhada (auth-page + login-page) · escuro",
+      "is_interactive": true
+    },
+    "CriarConta.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "2 · Criar conta · a tela compartilhada (nome + e-mail, Turnstile)",
+      "is_interactive": true
+    },
+    "CriarContaEscuro.dc.html": {
+      "x": 1520,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "2 · Criar conta · a tela compartilhada (nome + e-mail, Turnstile) · escuro",
       "is_interactive": true
     }
   },
   "order": [
+    "Entrar.dc.html",
+    "EntrarEscuro.dc.html",
+    "CriarConta.dc.html",
+    "CriarContaEscuro.dc.html",
+    "OnboardingCodigo.dc.html",
+    "OnboardingCodigoEscuro.dc.html",
     "OnboardingIdentidade.dc.html",
     "OnboardingIdentidadeEscuro.dc.html",
     "OnboardingIdentidadeOcupado.dc.html",
@@ -199,8 +237,6 @@
     "OnboardingIdentidadeFocoEscuro.dc.html",
     "OnboardingIdentidadeMovimento.dc.html",
     "OnboardingIdentidadeMovimentoEscuro.dc.html",
-    "OnboardingCodigo.dc.html",
-    "OnboardingCodigoEscuro.dc.html",
     "OnboardingContaMuriki.dc.html",
     "OnboardingContaMurikiEscuro.dc.html",
     "OnboardingConvidar.dc.html",
@@ -213,36 +249,52 @@
     "ConviteInvalidoEscuro.dc.html"
   ],
   "notes": {
-    "onboarding": {
+    "entrada": {
       "x": 0,
       "y": -300,
-      "text": "Onboarding do Platform: para quem é, o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; cabe sem rolar; à direita, a prévia ao vivo: Muriki Projects (time) ou Muriki Focus (só para mim), no estado final",
+      "text": "Entrada: a tela de login compartilhada com o Code e o Backoffice",
       "kind": "title1",
-      "maxW": 6000,
+      "maxW": 2960,
       "w": 240
     },
-    "onboardingEscuro": {
+    "entradaEscuro": {
       "x": 0,
       "y": 1020,
-      "text": "Onboarding no tema escuro",
+      "text": "Entrada no tema escuro",
       "kind": "title1",
-      "maxW": 6000,
+      "maxW": 2960,
       "w": 240
     },
-    "primeiroConvite": {
+    "primeiroAcesso": {
       "x": 0,
       "y": 2340,
-      "text": "Primeiro acesso e convite: o código por e-mail, quem já tem conta Muriki e convidar o time; o aceite de convite mostra o workspace, o papel e o e-mail mascarado, e o token nunca aparece",
+      "text": "Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco com a prévia ao vivo à esquerda, o formulário à direita",
       "kind": "title1",
       "maxW": 8000,
       "w": 240
     },
-    "primeiroConviteEscuro": {
+    "primeiroAcessoEscuro": {
       "x": 0,
       "y": 3660,
-      "text": "Primeiro acesso e convite no tema escuro",
+      "text": "Primeiro acesso no tema escuro",
       "kind": "title1",
       "maxW": 8000,
+      "w": 240
+    },
+    "convite": {
+      "x": 0,
+      "y": 4980,
+      "text": "Convite: o aceite mostra o workspace, o papel e o e-mail mascarado; o token nunca aparece",
+      "kind": "title1",
+      "maxW": 4480,
+      "w": 240
+    },
+    "conviteEscuro": {
+      "x": 0,
+      "y": 6300,
+      "text": "Convite no tema escuro",
+      "kind": "title1",
+      "maxW": 4480,
       "w": 240
     }
   }

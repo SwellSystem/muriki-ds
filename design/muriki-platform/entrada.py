@@ -1,13 +1,14 @@
 # O primeiro acesso que falta e o convite do Platform (bloco A2). Seguem a linguagem do primeiro
-# acesso do bloco A: o formulário à esquerda e, à direita, o palco azul com as manchas desfocadas.
-# No código por e-mail e no convite inválido o palco mostra a marca: a logo, "Muriki Platform" e as
-# janelas dos dois produtos (Projects e Focus) em esqueleto, sem nome de funcionalidade nem número.
+# acesso do bloco A, do lado do login: o palco azul com as manchas desfocadas à esquerda e o
+# formulário à direita.
+# No código por e-mail e no convite inválido o palco mostra as janelas dos dois produtos (Projects e
+# Focus) em esqueleto, sem nome de funcionalidade nem número; a marca fica só na barra do topo.
 # Nos outros, o palco mostra a janela do workspace, como a prévia do bloco A.
 # As telas de entrada (entrar, passkey, segundo fator, criar conta, a senha) não são desenhadas aqui:
 # o app usa a tela de login compartilhada do DS (auth-page + login-page), só com a marca.
 # Sem CPF e sem plano. O token do convite nunca aparece na tela nem em link.
 from pecas import (K, T, I, svg, ic, FONTE, MONO, LOGO, PRODUTO, EMAIL, raiz, topo,  # noqa: F401
-                   manchas, cabecalho_passo, campo, caixa_marcar, botao_passo, cartoes_escolha, previa_workspace, esc,
+                   palco, cabecalho_passo, campo, caixa_marcar, botao_passo, cartoes_escolha, previa_workspace, esc,
                    PRODUTOS, _barra, _quadro, _lista, _moldura, _nome_produto, _azul, pagina_identidade)
 # depois de pecas, que põe o canvas do Code no caminho
 from base import botao_idioma, botao_tema  # noqa: E402
@@ -25,16 +26,15 @@ def topo_entrada(k):
             f'<span style="margin-left:auto;display:flex;align-items:center;gap:4px;">{botao_idioma(k)}{botao_tema(k)}</span></header>')
 
 
-def pagina_a2(k, formulario, palco, logado=False, largura=440):
-    # a grade do primeiro acesso (1fr / 1.2fr), a barra do topo por cima das duas colunas, o formulário
-    # numa coluna centrada na vertical e o palco azul à direita
+def pagina_a2(k, formulario, palco_, logado=False, largura=440):
+    # a grade do primeiro acesso (1.2fr / 1fr), a barra do topo por cima das duas colunas, o palco à
+    # esquerda e o formulário numa coluna centrada na vertical, à direita
     barra = topo(k, PRODUTO, EMAIL) if logado else topo_entrada(k)
-    return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);")}'
+    return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);")}'
             f'<div style="position:absolute;inset:0 0 auto 0;z-index:1;">{barra}</div>'
+            f'{palco(k, palco_)}'
             f'<main style="display:flex;flex-direction:column;justify-content:center;gap:28px;width:{largura}px;justify-self:center;'
-            f'padding:64px 0 27px;">{formulario}</main>'
-            f'<div style="position:relative;display:flex;align-items:center;justify-content:center;min-height:0;padding:64px 58px 45px;'
-            f'background-color:{k["prisub"]};background-image:{manchas(k)};">{palco}</div></div>')
+            f'padding:64px 0 27px;">{formulario}</main></div>')
 
 
 # ── O palco da marca ────────────────────────────────────────────────────
@@ -51,18 +51,16 @@ def _janela_produto(k, publico):
 
 
 def palco_marca(k):
-    escala = 0.62
+    escala = 0.66
     # cada janela numa camada própria: os cartões da de trás são position:relative e passariam por cima da da frente
     janela = lambda publico, estilo: (f'<div style="position:relative;grid-area:1/1;{estilo}">'
                                       f'<div style="width:864px;zoom:{escala};">{_janela_produto(k, publico)}</div></div>')
     janelas = (f'<div style="display:grid;">'
-               + janela('team', 'z-index:1;padding:0 128px 132px 0;')
-               + janela('personal', 'z-index:2;padding:132px 0 0 128px;') + '</div>')
-    marca = (f'<div style="display:flex;align-items:center;gap:14px;">'
-             f'<span style="display:flex;width:52px;height:52px;">{LOGO}</span>'
-             f'<span style="font-size:30px;line-height:1;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{PRODUTO}</span></div>')
-    return (f'<div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;gap:40px;pointer-events:none;user-select:none;">'
-            f'{marca}{janelas}</div>')
+               + janela('team', 'z-index:1;padding:0 96px 120px 0;')
+               + janela('personal', 'z-index:2;padding:120px 0 0 96px;') + '</div>')
+    # só as janelas: a marca já está na barra do topo, e repetir o nome no palco ecoava
+    return (f'<div aria-hidden="true" style="display:flex;flex-direction:column;align-items:center;pointer-events:none;user-select:none;">'
+            f'{janelas}</div>')
 
 
 # ── As peças do formulário ──────────────────────────────────────────────

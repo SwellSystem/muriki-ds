@@ -23,10 +23,11 @@
  *
  * Layout: as mesmas peças do OnboardingStep (a barra do topo, o cabeçalho de passo e a ação), mas
  * medidas pela altura da janela. A partir do `lg` a tela é uma grade da altura da viewport, sem
- * rolar de 1280×720 a 1920×1080: o formulário à esquerda e, à direita, um palco azul com a
- * WorkspacePreview da altura do conteúdo; espaços e tamanhos em `clamp()` com `vh`, o título também
- * (40px em 720 de altura, 52px de 930 para cima). Abaixo do `lg`
- * a prévia some e o passo é a coluna de formulário de sempre, que pode rolar.
+ * rolar de 1280×720 a 1920×1080, do mesmo lado do login (AuthPage): à esquerda um palco azul, com
+ * manchas desfocadas da marca no fundo e a WorkspacePreview da altura do conteúdo; à direita o
+ * formulário. Espaços e tamanhos em `clamp()` com `vh`, o título também (40px em 720 de altura, 52px
+ * de 930 para cima). Abaixo do `lg` o palco some e o passo é a coluna de formulário de sempre, que
+ * pode rolar.
  */
 import { useId, type FormEvent, type ReactNode } from "react"
 import { ArrowRightIcon, SpinnerGapIcon, UserIcon, UsersThreeIcon } from "@phosphor-icons/react"
@@ -53,10 +54,13 @@ const MOSTRA_NA_PREVIA: HandleStatus[] = ["available", "checking", "unchecked"]
 const ICONE_PUBLICO = { team: UsersThreeIcon, personal: UserIcon } as const
 
 // o fundo do palco: três manchas da cor da marca, largas e sem borda, como um desfoque
+// espelhadas para o palco à esquerda: o azul forte fica na borda de fora, e a borda que encosta no
+// formulário termina num degradê para o fundo da página, que apaga a divisa no claro e no escuro
 const MANCHAS = [
-  "radial-gradient(45% 55% at 18% 22%, color-mix(in oklch, var(--primary) 44%, transparent), transparent 70%)",
-  "radial-gradient(50% 60% at 88% 82%, color-mix(in oklch, var(--primary) 36%, transparent), transparent 70%)",
-  "radial-gradient(35% 40% at 78% 12%, color-mix(in oklch, var(--primary) 24%, transparent), transparent 70%)",
+  "linear-gradient(to right, transparent calc(100% - 11rem), var(--background))",
+  "radial-gradient(45% 55% at 72% 22%, color-mix(in oklch, var(--primary) 44%, transparent), transparent 70%)",
+  "radial-gradient(50% 60% at 12% 82%, color-mix(in oklch, var(--primary) 36%, transparent), transparent 70%)",
+  "radial-gradient(35% 40% at 22% 12%, color-mix(in oklch, var(--primary) 24%, transparent), transparent 70%)",
 ].join(", ")
 
 export interface PlatformOnboardingTerms {
@@ -129,7 +133,7 @@ export function PlatformOnboardingIdentity({
   )
 
   return (
-    <div className="relative flex min-h-svh flex-col bg-background lg:grid lg:h-dvh lg:min-h-[40rem] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+    <div className="relative flex min-h-svh flex-col bg-background lg:grid lg:h-dvh lg:min-h-[40rem] lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
       {brand || utilities ? (
         <header className="z-10 flex h-16 shrink-0 items-center gap-3 px-6 md:px-8 lg:absolute lg:inset-x-0 lg:top-0">
           {brand}
@@ -226,10 +230,10 @@ export function PlatformOnboardingIdentity({
         </div>
       </main>
 
-      {/* o palco da prévia: a faixa azul da altura da tela, com manchas desfocadas da marca no fundo e a
-          janela da altura do conteúdo, centrada */}
+      {/* o palco da prévia, primeiro na grade e depois do formulário no DOM: a faixa azul da altura da
+          tela, com manchas desfocadas da marca no fundo e a janela da altura do conteúdo, centrada */}
       <div
-        className="hidden min-h-0 items-center justify-center bg-primary-subtle px-[clamp(2rem,4vw,5rem)] pt-16 pb-[clamp(1.5rem,5vh,4rem)] lg:flex"
+        className="hidden min-h-0 items-center justify-center bg-primary-subtle px-[clamp(2rem,4vw,5rem)] pt-16 pb-[clamp(1.5rem,5vh,4rem)] lg:order-first lg:flex"
         style={{ backgroundImage: MANCHAS }}
       >
         <WorkspacePreview
