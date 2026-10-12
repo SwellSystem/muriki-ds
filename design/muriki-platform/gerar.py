@@ -32,7 +32,7 @@ JORNADA = [
     ('membros_owner', 'WorkspaceMembros', 'Membros', 'Membros · vista do owner (o único owner: "Sair" desligado, com o motivo)'),
     ('membros_maintainer', 'WorkspaceMembrosMaintainer', 'Membros', 'Membros · vista da maintainer (gere só member e guest)'),
     ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
-    ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free (3 pessoas)'),
+    ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free e do Pro (5 pessoas)'),
     # dentro do produto: planos e cobrança (bloco platform-billing)
     ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca)'),
     ('planos_anual', 'WorkspacePlanosAnual', 'Planos', 'Planos · anual, por pessoa/ano como vem da API; a moeda travada'),

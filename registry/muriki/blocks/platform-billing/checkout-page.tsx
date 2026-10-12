@@ -6,8 +6,12 @@
  * Pagamento no Stripe", o título, o período (Mensal / Anual −10%), os dados fiscais (o FiscalForm, no
  * slot `fiscal`), "Continuar para o pagamento" e a nota do Stripe. O resumo vem no slot `summary`.
  *
+ * O subtítulo e o resumo seguem o tipo do workspace (`kind`): no `team`, cada pessoa é um assento; no
+ * `personal`, o workspace é só da pessoa e paga 1 assento. O plano aparece pelo nome que vem por prop.
+ *
  * CheckoutSummary é o resumo da faixa da direita: o plano com o ícone e o período, as pessoas do
- * workspace (os avatares e "N pessoas no <workspace> · você + N"), as linhas "N pessoas × preço" e
+ * workspace (os avatares e "N pessoas no <workspace> · você + N"; no `personal`, "Só você" e o seu
+ * nome), as linhas "N pessoas × preço" e
  * "Muriki Code Pro … incluso" (na assinatura paga), o cupom (o CouponField do onboarding-pricing, só no
  * mensal: a API recusa cupom no anual) e o total.
  *
@@ -39,11 +43,12 @@ import {
   SummarySection,
 } from "./billing-page"
 import type { SeatPlanPeriod } from "./plans"
+import type { WorkspaceKind } from "./tax-id"
 
 export interface CheckoutPageProps {
-  /** A chave do plano na API, ex.: `platform_team`. O Solo tem a linha de contexto própria. */
-  plan: string
-  /** O nome do plano, no título "Assinar o Team". */
+  /** O tipo do workspace: a linha de contexto diz "cada pessoa ocupa um assento" (`team`) ou "um assento" (`personal`). */
+  kind: WorkspaceKind
+  /** O nome do plano, no título "Assinar o Pro". */
   planName: string
   period: SeatPlanPeriod
   onPeriodChange: (period: SeatPlanPeriod) => void
@@ -63,7 +68,7 @@ export interface CheckoutPageProps {
 }
 
 export function CheckoutPage({
-  plan,
+  kind,
   planName,
   period,
   onPeriodChange,
@@ -77,7 +82,6 @@ export function CheckoutPage({
 }: CheckoutPageProps) {
   const t = useTranslate()
   const titulo = t("platform.billing.checkout.title", { plan: planName })
-  const solo = plan.replace(/^platform_/, "") === "solo"
 
   return (
     <BillingPageLayout
@@ -93,7 +97,7 @@ export function CheckoutPage({
       aside={summary}
       className={className}
     >
-      <BillingFormHeader title={titulo} subtitle={t(`platform.billing.checkout.subtitle.${solo ? "solo" : "team"}`)} />
+      <BillingFormHeader title={titulo} subtitle={t(`platform.billing.checkout.subtitle.${kind}`)} />
       <form
         autoComplete="off"
         noValidate
@@ -164,17 +168,22 @@ export interface CheckoutCoupon {
 export interface CheckoutSummaryProps {
   /** A chave do plano (escolhe o ícone) e o nome. */
   plan: { key: string; name: string }
+  /**
+   * O tipo do workspace. Padrão: `team`, que cobra uma pessoa por assento. No `personal`, o resumo é
+   * "Só você", com 1 assento, mesmo que `people` traga mais alguém.
+   */
+  kind?: WorkspaceKind
   period: SeatPlanPeriod
   workspaceName: string
   /** Quem conta como assento, você primeiro (as iniciais saem do nome). */
   people: { name: string }[]
   /** O preço por pessoa no período, da API (F12): o anual por pessoa/ano. */
   pricePerSeat: { amountInCents: number; currency: string }
-  /** O mínimo de assentos do plano (o Enterprise, 10): a conta cobra max(pessoas, minSeats). */
+  /** O mínimo de assentos do plano, do admin (o Enterprise tem): a conta cobra max(pessoas, minSeats). */
   minSeats?: number | null
-  /** A linha "Muriki Code Pro … incluso", com "na assinatura paga" (Team e Enterprise). */
+  /** A linha "Muriki Code Pro … incluso", com "na assinatura paga" (Pro e Enterprise). */
   includesCodePro: boolean
-  /** A lista com o check no pé, do app, ex.: "Pessoas sem limite". */
+  /** A lista com o check no pé, do app, ex.: "Até 5 pessoas". */
   features?: string[]
   /**
    * O campo do cupom; sem ele, o resumo não tem cupom (o app só o liga quando a API aceitar). Só vale no
@@ -191,6 +200,7 @@ const AVATARES = 6
 
 export function CheckoutSummary({
   plan,
+  kind = "team",
   period,
   workspaceName,
   people,
@@ -203,17 +213,20 @@ export function CheckoutSummary({
   className,
 }: CheckoutSummaryProps) {
   const t = useTranslate()
-  const total = people.length
+  // o `personal` é só a pessoa: 1 assento, e só ela no resumo
+  const pessoal = kind === "personal"
+  const pessoas = pessoal ? people.slice(0, 1) : people
+  const total = pessoas.length
   const preco = (centavos: number) => formatSeatPrice(centavos, pricePerSeat.currency, locale)
   const noPeriodo = (centavos: number) => t(`platform.billing.checkout.amount.${period}`, { price: preco(centavos) })
   // a única conta, só exibição (F12): N × o preço por pessoa que a API mandou, com N nunca abaixo do
-  // mínimo do plano, como a API cobra (max(ativos, min_seats))
-  const cobradas = Math.max(total, minSeats ?? 1)
+  // mínimo do plano, como a API cobra (max(ativos, min_seats)); o `personal` paga sempre 1
+  const cobradas = pessoal ? 1 : Math.max(total, minSeats ?? 1)
   const totalCheio = pricePerSeat.amountInCents * cobradas
   // o cupom só vale no mensal (a API recusa no anual)
   const comCupom = coupon && period === "monthly" ? coupon : undefined
   const aplicado = comCupom?.applied ?? null
-  const desenhados = total > AVATARES ? people.slice(0, AVATARES - 1) : people
+  const desenhados = total > AVATARES ? pessoas.slice(0, AVATARES - 1) : pessoas
 
   return (
     <div data-slot="checkout-summary" className={cn("flex flex-col gap-5", className)}>
@@ -246,8 +259,8 @@ export function CheckoutSummary({
           ) : null}
         </span>
         <span className="flex min-w-0 flex-col">
-          {/* só você (o Solo): "Só você" e o seu nome; com mais gente, as pessoas do workspace e "você + N";
-              sem ninguém na lista, só o nome do workspace */}
+          {/* só você (o `personal`, ou um time de 1): "Só você" e o seu nome; com mais gente, as pessoas
+              do workspace e "você + N"; sem ninguém na lista, só o nome do workspace */}
           <span className="truncate text-sm leading-5 font-medium text-foreground-strong">
             {total === 0
               ? workspaceName
@@ -257,7 +270,7 @@ export function CheckoutSummary({
           </span>
           {total > 0 ? (
             <span className="truncate text-[12.5px] leading-[17px] text-muted-foreground">
-              {total === 1 ? people[0].name : t("platform.members.seats.count", { count: total - 1 })}
+              {total === 1 ? pessoas[0].name : t("platform.members.seats.count", { count: total - 1 })}
             </span>
           ) : null}
         </span>

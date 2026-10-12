@@ -16,8 +16,9 @@
  * junta as linhas e chama `onSubmit` com as que vão; o envio e o erro (MEMBER_LIMIT_REACHED vira
  * `limit`, 409 ALREADY_MEMBER vira `rowErrors`) são do app.
  *
- * `limit` só vem quando o plano limita, isto é, no Free sem trial; com `limit`, o cartão de pessoas
- * ignora `trialDays` para nunca mostrar o aviso de limite junto com a promessa de Team grátis.
+ * `limit` vem quando o plano limita: no workspace de empresa, o Free e o Pro (também no teste) vão até
+ * o mesmo número de pessoas, e o cartão de pessoas mostra os mesmos lugares na régua. O teste segue
+ * pelo `trialDays`, com ou sem `limit`.
  */
 import type { ReactNode } from "react"
 import { ArrowRightIcon } from "@phosphor-icons/react"
@@ -47,11 +48,12 @@ export interface PlatformOnboardingInviteProps {
   onSubmit: (rows: InviteRow[]) => void
   onSkip: () => void
   /**
-   * O cartão de pessoas no plano. Sem isto, o cartão não aparece. Sem `trialDays`, o workspace
-   * nasceu no Free (o trial é um por pessoa). A moeda do preço vem do app.
+   * O cartão de pessoas no plano. Sem isto, o cartão não aparece. `freeLimit` é o limite do plano,
+   * lido do admin, e `planName` o plano pago do teste ("Pro"). Sem `trialDays`, o workspace nasceu no
+   * Free (o trial é um por pessoa). A moeda do preço vem do app.
    */
-  seats?: Pick<SeatsPreviewProps, "freeLimit" | "pricePerSeat" | "trialDays">
-  /** O limite do plano, só quando ele limita (Free sem trial): `used` = ativos + convites pendentes, da API. */
+  seats?: Pick<SeatsPreviewProps, "freeLimit" | "planName" | "pricePerSeat" | "trialDays">
+  /** O limite do plano, quando ele limita: `used` = ativos + convites pendentes, da API. */
   limit?: { max: number; used: number }
   /** O erro da API em cada linha, pelo e-mail em minúsculas (ex.: 409 ALREADY_MEMBER). */
   rowErrors?: Record<string, ReactNode>
@@ -136,8 +138,6 @@ export function PlatformOnboardingInvite({
                   people={[{ name: viewer.name }, ...validas.map((r) => ({ name: r.email }))]}
                   locale={locale}
                   {...seats}
-                  // com o aviso de limite, nada de promessa de trial
-                  trialDays={limit ? undefined : seats.trialDays}
                 />
               ) : null}
               <div className="flex flex-col gap-1">

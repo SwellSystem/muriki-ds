@@ -353,8 +353,8 @@ def tela_convites(k):
 
 
 def tela_convidar_limite(k):
-    # o InviteForm dentro do produto, com o limite do Free: 3 pessoas no plano, 2 no workspace e 3 na
-    # lista; o aviso diz quantas tirar, e o envio desliga
+    # o InviteForm dentro do produto, com o limite do Free e do Pro: 5 pessoas no plano, 4 no workspace
+    # (ativos e convites pendentes) e 3 na lista; o aviso diz quantas tirar, e o envio desliga
     aviso = (f'<p role="status" style="margin:0;display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:10px;'
              f'background:{k["torange"]};color:{k["torangefg"]};font-size:13px;line-height:19px;">'
              f'<span style="display:flex;margin-top:2px;">{ic("aviso", 14)}</span><span>{T("mbLimite")}</span></p>')

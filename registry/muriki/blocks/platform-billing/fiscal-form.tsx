@@ -1,9 +1,10 @@
 "use client"
 
 /**
- * Os dados fiscais do checkout (CA12). Primeiro o país da empresa; o formulário fiscal só existe para
- * o Brasil, e fora dele fica só o país, com a nota de que o Stripe pede o número fiscal. No Brasil, o
- * Solo pede o CPF, e o Team e o Enterprise pedem o CNPJ e a razão social (F8–F10).
+ * Os dados fiscais do checkout (CA12). Primeiro o país; o formulário fiscal só existe para o Brasil, e
+ * fora dele fica só o país, com a nota de que o Stripe pede o número fiscal. No Brasil, o documento sai
+ * do tipo do workspace, e não do plano: o `personal` pede o CPF, e o `team` pede o CNPJ e a razão
+ * social (F8–F10).
  *
  * É controlado por fora: o app guarda `value` (o documento normalizado, sem máscara, como volta no
  * `onChange`) e passa os `errors`, os dele (`fiscalErrors`, ao mandar) ou os da API
@@ -35,16 +36,16 @@ import {
   sanitizeCnpj,
   sanitizeCpf,
   type FiscalErrors,
-  type FiscalPlan,
   type FiscalValue,
+  type WorkspaceKind,
 } from "./tax-id"
 
 // a frase embaixo do campo, a mesma do primeiro acesso (13px): explica a regra e precisa ser lida
 const DICA = "text-[13px] leading-[18px]"
 
 export interface FiscalFormProps {
-  /** O plano do checkout: o Solo pede o CPF; o Team e o Enterprise, o CNPJ e a razão social. */
-  plan: FiscalPlan
+  /** O tipo do workspace: `personal` pede o CPF; `team`, o CNPJ e a razão social. */
+  kind: WorkspaceKind
   value: FiscalValue
   /** Devolve o valor inteiro, com o documento já normalizado (sem máscara, em maiúsculas). */
   onChange: (value: FiscalValue) => void
@@ -59,7 +60,7 @@ export interface FiscalFormProps {
 }
 
 export function FiscalForm({
-  plan,
+  kind,
   value,
   onChange,
   errors = {},
@@ -71,7 +72,7 @@ export function FiscalForm({
   const t = useTranslate()
   const legenda = useId()
   const nomes = nomesDosPaises(countries, locale)
-  const documento = fiscalDocument(plan)
+  const documento = fiscalDocument(kind)
   const brasil = isBrazil(value.country)
   const mudar = (parte: Partial<FiscalValue>) => onChange({ ...value, ...parte })
   const limpar = documento === "cpf" ? sanitizeCpf : sanitizeCnpj

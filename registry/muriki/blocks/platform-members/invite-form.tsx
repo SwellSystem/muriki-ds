@@ -28,12 +28,15 @@
  * As linhas são do app (`rows` + `onRowsChange`): o passo do primeiro acesso as mostra também na
  * prévia e no cartão de pessoas. O que ainda está no campo é do componente.
  *
- * SeatsPreview: o cartão de pessoas no plano. "N pessoas no <workspace> · você + M", a régua com um
- * lugar por pessoa (a faixa "Free, até 3 pessoas" e a faixa "Team") e a conta. Com `trialDays`, o
- * teste do Team e a conta depois dele; sem (o workspace nasceu no Free, porque o trial é um por
- * pessoa), nada de Team grátis: até o limite cabe no Free, e acima dele a conta do Team. O preço
- * vem do app (F12): o componente só formata e multiplica pelo número de pessoas para mostrar o
- * total previsto. O assento só conta quem aceitar o convite.
+ * SeatsPreview: o cartão de pessoas no plano. "N pessoas no <workspace> · você + M", a régua com os
+ * lugares do limite (`freeLimit`, o mesmo do Free e do plano pago no workspace de empresa, lido do
+ * plano), um por pessoa e os vagos tracejados, e a frase. Com `trialDays`, "N dias de <plano> grátis",
+ * que depois do teste as pessoas cabem no Free e a conta para seguir no plano pago; sem (o workspace
+ * nasceu no Free, porque o trial é um por pessoa), nada de grátis: só que cabem no Free. Acima do
+ * limite, o time precisa do Enterprise. O preço vem do app (F12): o componente só formata e multiplica
+ * pelo número de pessoas para mostrar o total previsto. O assento só conta quem aceitar o convite.
+ * Sem ninguém em `people`, só a régua e a faixa, sem a frase. Com o limite acima dos 10 lugares da
+ * régua, quem não cabe vira "+N" e, enquanto houver vaga, o último lugar fica vago.
  */
 import {
   useEffect,
@@ -385,21 +388,26 @@ export interface SeatsPreviewProps {
   workspaceName: string
   /** Quem vai contar, você primeiro (as iniciais da régua saem do nome). */
   people: { name: string }[]
-  /** Até quantas pessoas o Free cobre. */
+  /**
+   * Até quantas pessoas o workspace cabe no Free e no plano pago (`platform.max_members`, do admin; 5
+   * hoje). É o número de lugares da régua.
+   */
   freeLimit: number
-  /** O preço do Team por pessoa por mês, do app (F12). */
+  /** O nome do plano pago do teste e da conta, ex.: "Pro". */
+  planName: string
+  /** O preço do plano pago por pessoa por mês, do app (F12). */
   pricePerSeat: { amountInCents: number; currency: string }
   /**
-   * Os dias de teste do Team. Sem (`undefined` ou `null`): o workspace nasceu no Free, sem trial (o
-   * trial é um por pessoa, R12), e o cartão não promete Team grátis.
+   * Os dias de teste do plano pago. Sem (`undefined` ou `null`): o workspace nasceu no Free, sem trial
+   * (o trial é um por pessoa, R12), e o cartão não promete nada grátis.
    */
   trialDays?: number | null
   locale: string
   className?: string
 }
 
-// quantos lugares a faixa do Team desenha antes do "+N"
-const LUGARES_TEAM = 6
+// quantos lugares a régua desenha no máximo; acima, o último vira "+N"
+const LUGARES_MAX = 10
 
 /** O valor em centavos na moeda, sem casas quando é inteiro ("R$ 29", "US$ 16,50"). Só formata (F12). */
 export function formatSeatPrice(amountInCents: number, currency: string, locale: string) {
@@ -412,16 +420,29 @@ export function formatSeatPrice(amountInCents: number, currency: string, locale:
   }).format(amountInCents / 100)
 }
 
-export function SeatsPreview({ workspaceName, people, freeLimit, pricePerSeat, trialDays, locale, className }: SeatsPreviewProps) {
+export function SeatsPreview({
+  workspaceName,
+  people,
+  freeLimit,
+  planName,
+  pricePerSeat,
+  trialDays,
+  locale,
+  className,
+}: SeatsPreviewProps) {
   const t = useTranslate()
   const total = people.length
   const passa = total > freeLimit
-  const noFree = people.slice(0, freeLimit)
-  const noTeam = people.slice(freeLimit)
-  const vaziosFree = Math.max(freeLimit - noFree.length, 0)
+  // a régua tem os lugares do limite (ou as pessoas, se passarem dele), até LUGARES_MAX; quem não cabe
+  // no desenho vira o "+N". Enquanto houver vaga no limite, o último lugar fica vago: com o limite
+  // acima de LUGARES_MAX, a régua nunca parece lotada com vaga sobrando
+  const lugares = Math.min(Math.max(freeLimit, total), LUGARES_MAX)
+  const espaco = total < freeLimit ? lugares - 1 : lugares
+  const transborda = total > espaco
+  const desenhadas = transborda ? people.slice(0, espaco - 1) : people
+  const vagos = lugares - desenhadas.length - (transborda ? 1 : 0)
   const preco = (centavos: number) => formatSeatPrice(centavos, pricePerSeat.currency, locale)
   const totalMes = t("platform.members.seats.per_month", { price: preco(pricePerSeat.amountInCents * total) })
-  const desenhaTeam = noTeam.length > LUGARES_TEAM ? noTeam.slice(0, LUGARES_TEAM - 1) : noTeam
 
   const lugar = (nome: string, i: number) => (
     <span key={i} className="flex h-8 flex-1 items-center justify-center">
@@ -460,44 +481,38 @@ export function SeatsPreview({ workspaceName, people, freeLimit, pricePerSeat, t
         ) : null}
       </div>
 
-      {/* a régua: um lugar por pessoa; os do Free numa faixa neutra e quem passa dele na faixa azul do Team */}
-      <div aria-hidden className="flex gap-1.5">
-        <div className="flex min-w-0 flex-col gap-[5px]" style={{ flex: freeLimit }}>
-          <div className="flex rounded-[9px] bg-foreground/5 shadow-[inset_0_0_0_1px_var(--border)]">
-            {noFree.map((p, i) => lugar(p.name, i))}
-            {Array.from({ length: vaziosFree }, (_, i) => vazio(i))}
-          </div>
-          <span className="text-[12px] leading-4 font-medium text-muted-foreground">
-            {t("platform.members.seats.free_zone", { max: freeLimit })}
-          </span>
+      {/* a régua: um lugar por pessoa, na faixa azul do plano, e os lugares vagos tracejados */}
+      <div aria-hidden className="flex min-w-0 flex-col gap-[5px]">
+        <div className="flex rounded-[9px] bg-primary/12 shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--primary)_45%,transparent)]">
+          {desenhadas.map((p, i) => lugar(p.name, i))}
+          {transborda ? (
+            <span className="flex h-8 flex-1 items-center justify-center text-[11px] font-semibold text-primary-subtle-foreground tabular-nums">
+              +{total - desenhadas.length}
+            </span>
+          ) : null}
+          {Array.from({ length: vagos }, (_, i) => vazio(i))}
         </div>
-        <div className="flex min-w-0 flex-col gap-[5px]" style={{ flex: Math.max(1.6, Math.min(noTeam.length, LUGARES_TEAM)) }}>
-          <div className="flex rounded-[9px] bg-primary/12 shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--primary)_45%,transparent)]">
-            {noTeam.length === 0 ? vazio(0) : desenhaTeam.map((p, i) => lugar(p.name, freeLimit + i))}
-            {noTeam.length > desenhaTeam.length ? (
-              <span className="flex h-8 flex-1 items-center justify-center text-[11px] font-semibold text-primary-subtle-foreground tabular-nums">
-                +{noTeam.length - desenhaTeam.length}
-              </span>
-            ) : null}
-          </div>
-          <span className="text-[12px] leading-4 font-medium text-primary-subtle-foreground">{t("platform.members.seats.team_zone")}</span>
-        </div>
+        <span className="text-[12px] leading-4 font-medium text-primary-subtle-foreground">
+          {t("platform.members.seats.zone", { max: freeLimit, plan: planName })}
+        </span>
       </div>
 
-      <p className="text-[13px] leading-[19px] text-foreground">
-        {trialDays
-          ? passa
-            ? t("platform.members.seats.price", { trial: trialDays, count: total, price: preco(pricePerSeat.amountInCents), total: totalMes })
-            : t("platform.members.seats.price_free", { trial: trialDays, max: freeLimit })
-          : passa
-            ? t("platform.members.seats.price_no_trial", {
-                max: freeLimit,
-                count: total,
-                price: preco(pricePerSeat.amountInCents),
-                total: totalMes,
-              })
-            : t("platform.members.seats.price_no_trial_free", { max: freeLimit })}
-      </p>
+      {/* sem ninguém, só a faixa: a frase de preço sairia "1 × R$ 29 = R$ 0" */}
+      {total < 1 ? null : (
+        <p className="text-[13px] leading-[19px] text-foreground">
+          {passa
+            ? t("platform.members.seats.over_limit", { max: freeLimit, count: total, plan: planName })
+            : trialDays
+              ? t("platform.members.seats.price", {
+                  trial: trialDays,
+                  plan: planName,
+                  count: total,
+                  price: preco(pricePerSeat.amountInCents),
+                  total: totalMes,
+                })
+              : t("platform.members.seats.price_no_trial", { max: freeLimit })}
+        </p>
+      )}
     </div>
   )
 }

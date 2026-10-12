@@ -2,7 +2,7 @@
 
 /**
  * A moldura das páginas de cobrança de dentro do workspace (o checkout e o "Falar com o comercial"),
- * no jeito do Linear e do Stripe: o caminho leve em cima ("← Planos / Assinar o Team / Pagamento no
+ * no jeito do Linear e do Stripe: o caminho leve em cima ("← Planos / Assinar o Pro / Pagamento no
  * Stripe"), o formulário à esquerda e o resumo à direita, numa faixa de superfície própria que vai até
  * o pé. Abaixo de `lg`, o resumo desce para baixo do formulário. Nada de Dialog nem Sheet: o desenho
  * aprovado é página.
@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils"
 import { SeatPlanIcon } from "./plan-cards"
 
 export interface BillingPageLayoutProps {
-  /** O passo de agora no caminho, ex.: "Assinar o Team". */
+  /** O passo de agora no caminho, ex.: "Assinar o Pro". */
   current: string
   /** O passo que vem depois, apagado, ex.: o cadeado com "Pagamento no Stripe". */
   next?: ReactNode

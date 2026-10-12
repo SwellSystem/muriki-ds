@@ -102,36 +102,35 @@ describe("CNPJ alfanumérico (F9, R33)", () => {
 describe("fiscalErrors", () => {
   const br = { country: "BR", taxId: "", legalName: "" }
 
-  test("o Solo pede o CPF; o Team e o Enterprise, o CNPJ", () => {
-    expect(fiscalDocument("platform_solo")).toBe("cpf")
-    expect(fiscalDocument("platform_team")).toBe("cnpj")
-    expect(fiscalDocument("platform_enterprise")).toBe("cnpj")
+  test("o documento sai do tipo do workspace: personal pede o CPF; team, o CNPJ", () => {
+    expect(fiscalDocument("personal")).toBe("cpf")
+    expect(fiscalDocument("team")).toBe("cnpj")
   })
 
   test("fora do Brasil não há o que pedir", () => {
-    expect(fiscalErrors("platform_team", { ...br, country: "US" })).toEqual({})
+    expect(fiscalErrors("team", { ...br, country: "US" })).toEqual({})
   })
 
   test("o país em minúsculas ainda é o Brasil", () => {
     expect(isBrazil("br")).toBe(true)
     expect(isBrazil("BR")).toBe(true)
     expect(isBrazil("BRA")).toBe(false)
-    expect(fiscalErrors("platform_solo", { ...br, country: "br" })).toEqual({ taxId: "required" })
+    expect(fiscalErrors("personal", { ...br, country: "br" })).toEqual({ taxId: "required" })
   })
 
   test("no Brasil, vazio é required e o DV errado é invalid", () => {
-    expect(fiscalErrors("platform_solo", br)).toEqual({ taxId: "required" })
-    expect(fiscalErrors("platform_solo", { ...br, taxId: "12345678908" })).toEqual({ taxId: "invalid" })
-    expect(fiscalErrors("platform_solo", { ...br, taxId: "12345678909" })).toEqual({})
-    expect(fiscalErrors("platform_team", br)).toEqual({ taxId: "required", legalName: "required" })
-    expect(fiscalErrors("platform_team", { ...br, taxId: "12ABC34501DE36", legalName: "Moura & Filhos" })).toEqual({ taxId: "invalid" })
+    expect(fiscalErrors("personal", br)).toEqual({ taxId: "required" })
+    expect(fiscalErrors("personal", { ...br, taxId: "12345678908" })).toEqual({ taxId: "invalid" })
+    expect(fiscalErrors("personal", { ...br, taxId: "12345678909" })).toEqual({})
+    expect(fiscalErrors("team", br)).toEqual({ taxId: "required", legalName: "required" })
+    expect(fiscalErrors("team", { ...br, taxId: "12ABC34501DE36", legalName: "Moura & Filhos" })).toEqual({ taxId: "invalid" })
   })
 
   test("a razão social vai de 1 a 150 depois do trim (F10)", () => {
     const cnpj = "12ABC34501DE35"
-    expect(fiscalErrors("platform_enterprise", { ...br, taxId: cnpj, legalName: "   " })).toEqual({ legalName: "required" })
-    expect(fiscalErrors("platform_enterprise", { ...br, taxId: cnpj, legalName: "a".repeat(150) })).toEqual({})
-    expect(fiscalErrors("platform_enterprise", { ...br, taxId: cnpj, legalName: "a".repeat(151) })).toEqual({ legalName: "required" })
+    expect(fiscalErrors("team", { ...br, taxId: cnpj, legalName: "   " })).toEqual({ legalName: "required" })
+    expect(fiscalErrors("team", { ...br, taxId: cnpj, legalName: "a".repeat(150) })).toEqual({})
+    expect(fiscalErrors("team", { ...br, taxId: cnpj, legalName: "a".repeat(151) })).toEqual({ legalName: "required" })
   })
 })
 

@@ -100,8 +100,11 @@ export function isValidCnpj(value: string): boolean {
 
 // ── O formulário fiscal (FiscalForm) ────────────────────────────────────
 
-/** Os planos que passam pelo checkout. O Free não paga, e o Enterprise pede o mesmo que o Team. */
-export type FiscalPlan = "platform_solo" | "platform_team" | "platform_enterprise"
+/**
+ * O tipo do workspace, que decide o documento (e não o plano): `personal` é só a pessoa, `team` é a
+ * empresa. É o `kind` gravado no workspace.
+ */
+export type WorkspaceKind = "personal" | "team"
 
 /** O que o FiscalForm guarda: o país (ISO 3166-1, ex.: `BR`), o documento normalizado e a razão social. */
 export interface FiscalValue {
@@ -135,20 +138,20 @@ export function countryName(code: string, locale: string): string {
   }
 }
 
-/** O documento que o plano pede no Brasil: o Solo, o CPF; o Team e o Enterprise, o CNPJ (com a razão social). */
-export function fiscalDocument(plan: FiscalPlan): "cpf" | "cnpj" {
-  return plan === "platform_solo" ? "cpf" : "cnpj"
+/** O documento que o tipo do workspace pede no Brasil: o `personal`, o CPF; o `team`, o CNPJ (com a razão social). */
+export function fiscalDocument(kind: WorkspaceKind): "cpf" | "cnpj" {
+  return kind === "personal" ? "cpf" : "cnpj"
 }
 
 /**
  * Os erros do formulário antes de mandar, com as mesmas regras da API: fora do Brasil não há o que
- * pedir (o Stripe coleta); no Brasil, o documento do plano (F8/F9) e, no CNPJ, a razão social de 1 a
+ * pedir (o Stripe coleta); no Brasil, o documento do tipo do workspace (F8/F9) e, no CNPJ, a razão social de 1 a
  * 150 caracteres depois do trim (F10). Sem erro, devolve `{}`.
  */
-export function fiscalErrors(plan: FiscalPlan, value: FiscalValue): FiscalErrors {
+export function fiscalErrors(kind: WorkspaceKind, value: FiscalValue): FiscalErrors {
   if (!isBrazil(value.country)) return {}
   const erros: FiscalErrors = {}
-  const documento = fiscalDocument(plan)
+  const documento = fiscalDocument(kind)
   if (!normalizeTaxId(value.taxId)) erros.taxId = "required"
   else if (!(documento === "cpf" ? isValidCpf(value.taxId) : isValidCnpj(value.taxId))) erros.taxId = "invalid"
   if (documento === "cnpj") {
