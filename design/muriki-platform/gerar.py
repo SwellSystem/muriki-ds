@@ -34,18 +34,19 @@ JORNADA = [
     ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
     ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free (3 pessoas)'),
     # dentro do produto: planos e cobrança (bloco platform-billing)
-    ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · mensal, no teste do Team (a moeda ainda troca)'),
+    ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca)'),
     ('planos_anual', 'WorkspacePlanosAnual', 'Planos', 'Planos · anual, por pessoa/ano como vem da API; a moeda travada'),
-    ('planos_carregando', 'WorkspacePlanosCarregando', 'Planos', 'Planos · carregando (o esqueleto, o Team já no destaque)'),
-    ('assinar_team', 'WorkspaceAssinarTeam', 'Assinar o Team', 'Assinar o Team · a página de checkout: o CNPJ e a razão social à esquerda, o resumo fixo à direita'),
-    ('assinar_cupom', 'WorkspaceAssinarCupom', 'Assinar o Team', 'Assinar o Team · o cupom aplicado (só percentual): o desconto e o total riscado'),
-    ('assinar_solo', 'WorkspaceAssinarSolo', 'Assinar o Solo', 'Assinar o Solo · no anual, o CPF'),
-    ('assinar_erro', 'WorkspaceAssinarErro', 'Assinar o Team', 'Assinar o Team · o CNPJ com o dígito verificador errado'),
-    ('assinar_eua', 'WorkspaceAssinarSemFiscal', 'Assinar o Team', 'Assinar o Team · empresa dos EUA: sem campo fiscal, em USD'),
+    ('planos_carregando', 'WorkspacePlanosCarregando', 'Planos', 'Planos · carregando (o esqueleto, o Pro já no destaque)'),
+    ('planos_pessoal', 'WorkspacePlanosPessoal', 'Planos', 'Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise'),
+    ('assinar_pro', 'WorkspaceAssinarPro', 'Assinar o Pro', 'Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado'),
+    ('assinar_cupom', 'WorkspaceAssinarCupom', 'Assinar o Pro', 'Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado'),
+    ('assinar_pessoal', 'WorkspaceAssinarProPessoal', 'Assinar o Pro', 'Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual'),
+    ('assinar_erro', 'WorkspaceAssinarErro', 'Assinar o Pro', 'Assinar o Pro · o CNPJ com o dígito verificador errado'),
+    ('assinar_eua', 'WorkspaceAssinarSemFiscal', 'Assinar o Pro', 'Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD'),
     ('comercial', 'WorkspaceComercial', 'Falar com o comercial', 'Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois'),
     ('comercial_enviado', 'WorkspaceComercialEnviado', 'Falar com o comercial', 'Falar com o comercial · enviado: a confirmação no lugar do formulário'),
     ('cobranca', 'WorkspaceCobranca', 'Cobrança', 'Cobrança · a próxima cobrança, os assentos e o que mudou no período'),
-    ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Team: a contagem até o fim, sem cobrança prevista'),
+    ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista'),
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
@@ -56,7 +57,7 @@ FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
                   'Quem ainda não tem o onboarding do Platform passa pelo passo do convidado antes do aceite'),
     ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
                    'ações que pode usar'),
-    ('cobranca', 12, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Team e '
+    ('cobranca', 13, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Pro e '
                      'no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)'),
 ]
 TELAS, _i = [], 0
@@ -88,7 +89,9 @@ REMOVIDAS = ['EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'Esque
              'OnboardingConvidarA', 'OnboardingConvidarB', 'OnboardingConvidarC',
              # o checkout da primeira rodada do C (as telas viraram WorkspaceAssinar*) e a variante B da
              # terceira, que virou o WorkspaceAssinarTeam
-             'CheckoutFiscalSolo', 'CheckoutFiscalTeam', 'CheckoutFiscalTeamErro', 'WorkspaceAssinarTeamPagina']
+             'CheckoutFiscalSolo', 'CheckoutFiscalTeam', 'CheckoutFiscalTeamErro', 'WorkspaceAssinarTeamPagina',
+             # o Solo e o Team saíram dos planos (F0): o checkout é sempre do Pro
+             'WorkspaceAssinarTeam', 'WorkspaceAssinarSolo']
 for base_nome in REMOVIDAS:
     for arquivo in (f'{base_nome}.dc.html', f'{base_nome}Escuro.dc.html'):
         boards.pop(arquivo, None)

@@ -288,7 +288,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "20 · Planos · mensal, no teste do Team (a moeda ainda troca)",
+      "title": "20 · Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca)",
       "is_interactive": true
     },
     "WorkspacePlanosEscuro.dc.html": {
@@ -296,7 +296,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "20 · Planos · mensal, no teste do Team (a moeda ainda troca) · escuro",
+      "title": "20 · Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca) · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosAnual.dc.html": {
@@ -316,51 +316,51 @@
       "is_interactive": true
     },
     "WorkspaceCobranca.dc.html": {
-      "x": 15200,
+      "x": 16720,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "30 · Cobrança · a próxima cobrança, os assentos e o que mudou no período",
+      "title": "31 · Cobrança · a próxima cobrança, os assentos e o que mudou no período",
       "is_interactive": true
     },
     "WorkspaceCobrancaEscuro.dc.html": {
+      "x": 16720,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "31 · Cobrança · a próxima cobrança, os assentos e o que mudou no período · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceComercial.dc.html": {
+      "x": 13680,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "29 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois",
+      "is_interactive": true
+    },
+    "WorkspaceComercialEscuro.dc.html": {
+      "x": 13680,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "29 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceComercialEnviado.dc.html": {
+      "x": 15200,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "30 · Falar com o comercial · enviado: a confirmação no lugar do formulário",
+      "is_interactive": true
+    },
+    "WorkspaceComercialEnviadoEscuro.dc.html": {
       "x": 15200,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "30 · Cobrança · a próxima cobrança, os assentos e o que mudou no período · escuro",
-      "is_interactive": true
-    },
-    "WorkspaceComercial.dc.html": {
-      "x": 12160,
-      "y": 10560,
-      "w": 1440,
-      "h": 900,
-      "title": "28 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois",
-      "is_interactive": true
-    },
-    "WorkspaceComercialEscuro.dc.html": {
-      "x": 12160,
-      "y": 11880,
-      "w": 1440,
-      "h": 900,
-      "title": "28 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois · escuro",
-      "is_interactive": true
-    },
-    "WorkspaceComercialEnviado.dc.html": {
-      "x": 13680,
-      "y": 10560,
-      "w": 1440,
-      "h": 900,
-      "title": "29 · Falar com o comercial · enviado: a confirmação no lugar do formulário",
-      "is_interactive": true
-    },
-    "WorkspaceComercialEnviadoEscuro.dc.html": {
-      "x": 13680,
-      "y": 11880,
-      "w": 1440,
-      "h": 900,
-      "title": "29 · Falar com o comercial · enviado: a confirmação no lugar do formulário · escuro",
+      "title": "30 · Falar com o comercial · enviado: a confirmação no lugar do formulário · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosCarregando.dc.html": {
@@ -368,7 +368,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "22 · Planos · carregando (o esqueleto, o Team já no destaque)",
+      "title": "22 · Planos · carregando (o esqueleto, o Pro já no destaque)",
       "is_interactive": true
     },
     "WorkspacePlanosCarregandoEscuro.dc.html": {
@@ -376,103 +376,71 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "22 · Planos · carregando (o esqueleto, o Team já no destaque) · escuro",
-      "is_interactive": true
-    },
-    "WorkspaceAssinarTeam.dc.html": {
-      "x": 4560,
-      "y": 10560,
-      "w": 1440,
-      "h": 900,
-      "title": "23 · Assinar o Team · a página de checkout: o CNPJ e a razão social à esquerda, o resumo fixo à direita",
-      "is_interactive": true
-    },
-    "WorkspaceAssinarTeamEscuro.dc.html": {
-      "x": 4560,
-      "y": 11880,
-      "w": 1440,
-      "h": 900,
-      "title": "23 · Assinar o Team · a página de checkout: o CNPJ e a razão social à esquerda, o resumo fixo à direita · escuro",
-      "is_interactive": true
-    },
-    "WorkspaceAssinarSolo.dc.html": {
-      "x": 7600,
-      "y": 10560,
-      "w": 1440,
-      "h": 900,
-      "title": "25 · Assinar o Solo · no anual, o CPF",
-      "is_interactive": true
-    },
-    "WorkspaceAssinarSoloEscuro.dc.html": {
-      "x": 7600,
-      "y": 11880,
-      "w": 1440,
-      "h": 900,
-      "title": "25 · Assinar o Solo · no anual, o CPF · escuro",
+      "title": "22 · Planos · carregando (o esqueleto, o Pro já no destaque) · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarErro.dc.html": {
-      "x": 9120,
+      "x": 10640,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "26 · Assinar o Team · o CNPJ com o dígito verificador errado",
+      "title": "27 · Assinar o Pro · o CNPJ com o dígito verificador errado",
       "is_interactive": true
     },
     "WorkspaceAssinarErroEscuro.dc.html": {
-      "x": 9120,
+      "x": 10640,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "26 · Assinar o Team · o CNPJ com o dígito verificador errado · escuro",
+      "title": "27 · Assinar o Pro · o CNPJ com o dígito verificador errado · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarSemFiscal.dc.html": {
-      "x": 10640,
+      "x": 12160,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "27 · Assinar o Team · empresa dos EUA: sem campo fiscal, em USD",
+      "title": "28 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD",
       "is_interactive": true
     },
     "WorkspaceAssinarSemFiscalEscuro.dc.html": {
-      "x": 10640,
+      "x": 12160,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "27 · Assinar o Team · empresa dos EUA: sem campo fiscal, em USD · escuro",
+      "title": "28 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaTeste.dc.html": {
-      "x": 16720,
+      "x": 18240,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "31 · Cobrança · no teste do Team: a contagem até o fim, sem cobrança prevista",
+      "title": "32 · Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista",
       "is_interactive": true
     },
     "WorkspaceCobrancaTesteEscuro.dc.html": {
-      "x": 16720,
+      "x": 18240,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "31 · Cobrança · no teste do Team: a contagem até o fim, sem cobrança prevista · escuro",
+      "title": "32 · Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarCupom.dc.html": {
-      "x": 6080,
+      "x": 7600,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "24 · Assinar o Team · o cupom aplicado (só percentual): o desconto e o total riscado",
+      "title": "25 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado",
       "is_interactive": true
     },
     "WorkspaceAssinarCupomEscuro.dc.html": {
-      "x": 6080,
+      "x": 7600,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "24 · Assinar o Team · o cupom aplicado (só percentual): o desconto e o total riscado · escuro",
+      "title": "25 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado · escuro",
       "is_interactive": true
     },
     "OnboardingConvidado.dc.html": {
@@ -505,6 +473,54 @@
       "w": 1440,
       "h": 900,
       "title": "14 · Convidado · o @usuário ocupado: fora da prévia, o botão desligado · escuro",
+      "is_interactive": true
+    },
+    "WorkspacePlanosPessoal.dc.html": {
+      "x": 4560,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "23 · Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise",
+      "is_interactive": true
+    },
+    "WorkspacePlanosPessoalEscuro.dc.html": {
+      "x": 4560,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "23 · Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceAssinarPro.dc.html": {
+      "x": 6080,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "24 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado",
+      "is_interactive": true
+    },
+    "WorkspaceAssinarProEscuro.dc.html": {
+      "x": 6080,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "24 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceAssinarProPessoal.dc.html": {
+      "x": 9120,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "26 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual",
+      "is_interactive": true
+    },
+    "WorkspaceAssinarProPessoalEscuro.dc.html": {
+      "x": 9120,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "26 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual · escuro",
       "is_interactive": true
     }
   },
@@ -553,12 +569,14 @@
     "WorkspacePlanosAnualEscuro.dc.html",
     "WorkspacePlanosCarregando.dc.html",
     "WorkspacePlanosCarregandoEscuro.dc.html",
-    "WorkspaceAssinarTeam.dc.html",
-    "WorkspaceAssinarTeamEscuro.dc.html",
+    "WorkspacePlanosPessoal.dc.html",
+    "WorkspacePlanosPessoalEscuro.dc.html",
+    "WorkspaceAssinarPro.dc.html",
+    "WorkspaceAssinarProEscuro.dc.html",
     "WorkspaceAssinarCupom.dc.html",
     "WorkspaceAssinarCupomEscuro.dc.html",
-    "WorkspaceAssinarSolo.dc.html",
-    "WorkspaceAssinarSoloEscuro.dc.html",
+    "WorkspaceAssinarProPessoal.dc.html",
+    "WorkspaceAssinarProPessoalEscuro.dc.html",
     "WorkspaceAssinarErro.dc.html",
     "WorkspaceAssinarErroEscuro.dc.html",
     "WorkspaceAssinarSemFiscal.dc.html",
@@ -640,7 +658,7 @@
     "cobranca": {
       "x": 0,
       "y": 10260,
-      "text": "Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Team e no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)",
+      "text": "Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Pro e no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)",
       "kind": "title1",
       "maxW": 8000,
       "w": 240
@@ -654,7 +672,7 @@
       "w": 240
     },
     "semFiscal": {
-      "x": 10640,
+      "x": 12160,
       "y": 10370,
       "text": "Fora do Brasil não há campo fiscal: o país declarado no checkout manda (aqui, EUA, em USD), e o número fiscal da empresa, se houver, é pedido no Stripe. Nos Planos, antes da compra, a moeda segue a região do navegador, só para exibir.",
       "w": 240

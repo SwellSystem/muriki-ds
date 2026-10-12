@@ -176,8 +176,8 @@ def _previa_time(k, frase, convidados, vazios):
 # espaço ou linha) e, logo abaixo, a lista de quem vai ser convidado, uma linha por pessoa: a inicial
 # com o anel tracejado de pendente, o e-mail, o papel (Member por padrão; Maintainer ou Guest, nunca
 # Owner) e o ×. O inválido fica na própria linha, em vermelho, sem papel. A lista rola por dentro
-# quando cresce, para a tela caber sem rolar. Embaixo, as pessoas no plano (Free até 3; depois do
-# teste de 14 dias, Team por pessoa) e o botão, que conta só os válidos. À direita, a janela do
+# quando cresce, para a tela caber sem rolar. Embaixo, as pessoas no plano (o Free e o Pro de empresa
+# vão até 5; o teste de 14 dias é de Pro, que cobra por pessoa) e o botão, que conta só os válidos. À direita, a janela do
 # workspace com você e quem está chegando, cada um com o papel.
 CONVIDADOS = [('ana@moura.dev', 'Maintainer'), ('joao@moura.dev', 'Member'), ('bia@moura.dev', 'Member')]
 INVALIDO = 'carlos@'
@@ -251,25 +251,23 @@ def _lista_convidados(k, convidados=CONVIDADOS, invalido_=INVALIDO):
 
 
 def _medidor(k):
-    # quantas pessoas, os lugares do Free (3) e o excedente, e a conta do Team depois do teste
+    # quantas pessoas, os 5 lugares do Free e do Pro de empresa (F0) e a conta do Pro depois do teste
     pessoas = [('R', True), ('A', False), ('J', False), ('B', False)]
-
-    # a régua: um lugar por pessoa, os três do Free numa faixa neutra e o excedente na faixa azul do Team
-    def zona(lugares, fundo, anel, rotulo_, cor, flex):
-        celulas = ''.join(f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:32px;">{_avatar(k, l, v, 22)}</span>'
-                          for l, v in lugares)
-        return (f'<div style="display:flex;flex-direction:column;gap:5px;flex:{flex};min-width:0;">'
-                f'<div style="display:flex;border-radius:9px;background:{fundo};box-shadow:inset 0 0 0 1px {anel};">{celulas}</div>'
-                f'<span style="font-size:12px;line-height:16px;font-weight:500;color:{cor};">{rotulo_}</span></div>')
-    free = zona(pessoas[:3], f'color-mix(in oklab, {k["fg"]} 5%, transparent)', k['border'], T('cvZonaFree'), k['mfg'], 3)
-    alem = zona(pessoas[3:], f'color-mix(in oklab, {k["pri"]} 12%, transparent)', f'color-mix(in oklab, {k["pri"]} 45%, transparent)',
-                T('cvZonaTeam'), k['prisubfg'], 1.6)
+    vazio = (f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:32px;">'
+             f'<span style="width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:1.5px dashed {k["input"]};"></span></span>')
+    celulas = ''.join(f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:32px;">{_avatar(k, l, v, 22)}</span>'
+                      for l, v in pessoas) + vazio * (5 - len(pessoas))
+    # a régua: um lugar por pessoa, na faixa azul do plano, e o lugar vago tracejado
+    regua = (f'<div style="display:flex;flex-direction:column;gap:5px;">'
+             f'<div style="display:flex;border-radius:9px;background:color-mix(in oklab, {k["pri"]} 12%, transparent);'
+             f'box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["pri"]} 45%, transparent);">{celulas}</div>'
+             f'<span style="font-size:12px;line-height:16px;font-weight:500;color:{k["prisubfg"]};">{T("cvZona")}</span></div>')
     return (f'<div role="status" style="display:flex;flex-direction:column;gap:10px;padding:12px 14px 14px;border-radius:12px;background:{k["card"]};'
             f'box-shadow:inset 0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);">'
             f'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">'
             f'<span style="font-size:14.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("cvMedidorA")} {esc(WORKSPACE)}</span>'
             f'<span style="font-size:13px;color:{k["mfg"]};">{T("cvMedidorConta")}</span></div>'
-            f'<div style="display:flex;gap:6px;">{free}{alem}</div>'
+            f'{regua}'
             f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["fg"]};">{T("cvMedidorPreco")}</p></div>')
 
 

@@ -84,8 +84,8 @@ CONVIDAR = {
         cvBotao='Convidar 3 pessoas', cvVoce='Você', cvOwner='Owner',
         cvFrase='Você e mais 3 pessoas a caminho. Cada uma entra quando aceitar o convite.',
         cvMedidorA='4 pessoas no', cvMedidorConta='você + 3',
-        cvZonaFree='Free, até 3 pessoas', cvZonaTeam='Team',
-        cvMedidorPreco='14 dias de Team grátis. Depois do teste, para continuar com 4 pessoas: Team, 4 × R$ 29 = R$ 116/mês. Só conta quem aceitar o convite.',
+        cvZona='Até 5 pessoas no Free e no Pro',
+        cvMedidorPreco='14 dias de Pro grátis. Depois do teste, as 4 pessoas cabem no Free; para seguir no Pro, 4 × R$ 29 = R$ 116/mês. Só conta quem aceitar o convite.',
     ),
     'en-US': dict(
         cvSub='Each person gets an invitation by email and joins when they accept.',
@@ -94,8 +94,8 @@ CONVIDAR = {
         cvBotao='Invite 3 people', cvVoce='You', cvOwner='Owner',
         cvFrase='You and 3 more people on the way. Each one joins when they accept.',
         cvMedidorA='4 people in', cvMedidorConta='you + 3',
-        cvZonaFree='Free, up to 3 people', cvZonaTeam='Team',
-        cvMedidorPreco='14 days of Team free. After the trial, to keep 4 people: Team, 4 × $16 = $64/month. Only people who accept count.',
+        cvZona='Up to 5 people on Free and Pro',
+        cvMedidorPreco='14 days of Pro free. After the trial, the 4 people fit in Free; to stay on Pro, 4 × $16 = $64/month. Only people who accept count.',
     ),
     'es-ES': dict(
         cvSub='Cada persona recibe una invitación por email y entra al aceptarla.',
@@ -104,7 +104,7 @@ CONVIDAR = {
         cvBotao='Invitar a 3 personas', cvVoce='Tú', cvOwner='Owner',
         cvFrase='Tú y 3 personas más en camino. Cada una entra cuando acepte la invitación.',
         cvMedidorA='4 personas en', cvMedidorConta='tú + 3',
-        cvZonaFree='Free, hasta 3 personas', cvZonaTeam='Team',
-        cvMedidorPreco='14 días de Team gratis. Después de la prueba, para seguir con 4 personas: Team, 4 × US$ 16 = US$ 64/mes. Solo cuenta quien acepte la invitación.',
+        cvZona='Hasta 5 personas en Free y en Pro',
+        cvMedidorPreco='14 días de Pro gratis. Después de la prueba, las 4 personas caben en Free; para seguir en Pro, 4 × US$ 16 = US$ 64/mes. Solo cuenta quien acepte la invitación.',
     ),
 }
