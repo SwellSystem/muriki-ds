@@ -54,8 +54,11 @@ export function OnboardingStepHeader({
       <div className="flex flex-col gap-3">
         <h1
           className={cn(
-            "leading-[1.02] font-semibold tracking-[-0.03em] text-foreground-strong",
-            centro ? "text-[clamp(2rem,6vw,2.5rem)]" : "text-[clamp(2rem,6vw,3.25rem)]"
+            "font-semibold tracking-[-0.03em] text-foreground-strong",
+            centro ? "text-[clamp(2rem,6vw,2.5rem)]" : "text-[clamp(2rem,6vw,3.25rem)]",
+            // o `leading` vem depois do tamanho: o tailwind-merge descarta a altura da linha que
+            // vem antes de um `text-[…]` (o tamanho leva junto a altura da linha)
+            "leading-[1.02]"
           )}
         >
           {title}
