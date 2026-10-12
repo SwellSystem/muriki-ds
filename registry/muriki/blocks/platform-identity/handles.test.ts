@@ -9,7 +9,10 @@ import {
   slugIssue,
   suggestSlug,
   usernameIssue,
+  workspaceInitials,
   workspaceNameIssue,
+  workspaceTone,
+  WORKSPACE_TONES,
   type HandleIssue,
 } from "./handles"
 
@@ -190,5 +193,29 @@ describe("suggestSlug (F4)", () => {
       const slug = suggestSlug(nome)
       if (slug) expect(slugIssue(slug)).toBeNull()
     }
+  })
+})
+
+describe("workspaceInitials", () => {
+  test("a primeira letra das duas primeiras palavras", () => {
+    expect(workspaceInitials("Moura & Filhos")).toBe("MF")
+    expect(workspaceInitials("  acme labs studio ")).toBe("AL")
+    expect(workspaceInitials("Muriki")).toBe("M")
+    expect(workspaceInitials("Órbita")).toBe("Ó")
+    expect(workspaceInitials("")).toBe("")
+  })
+})
+
+describe("workspaceTone", () => {
+  test("vazio não tem cor", () => {
+    expect(workspaceTone("   ")).toBeNull()
+  })
+  test("o mesmo nome dá a mesma cor, sem olhar caixa nem espaço nas pontas", () => {
+    expect(workspaceTone("Acme Labs")).toBe(workspaceTone(" acme labs "))
+    expect(WORKSPACE_TONES).toContain(workspaceTone("Acme Labs")!)
+  })
+  test("nomes diferentes espalham pelos tons", () => {
+    const tons = new Set(["Acme", "Muriki", "Moura & Filhos", "Nova Casa", "Órbita", "Lab 42", "Zeta", "Kappa"].map(workspaceTone))
+    expect(tons.size).toBeGreaterThan(3)
   })
 })

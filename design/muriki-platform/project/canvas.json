@@ -72,7 +72,7 @@
     "onboarding": {
       "x": 0,
       "y": -300,
-      "text": "Onboarding do Platform: o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; o formato é validado na hora, a disponibilidade vem do app",
+      "text": "Onboarding do Platform: o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; o formato é validado na hora, a disponibilidade vem do app; no desktop, a prévia ao vivo do workspace à direita",
       "kind": "title1",
       "maxW": 4480,
       "w": 240

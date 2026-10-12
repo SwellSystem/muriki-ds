@@ -46,7 +46,7 @@ largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
     ('onboarding', 0, 3, 'Onboarding do Platform: o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; '
-                         'o formato é validado na hora, a disponibilidade vem do app'),
+                         'o formato é validado na hora, a disponibilidade vem do app; no desktop, a prévia ao vivo do workspace à direita'),
     ('onboardingEscuro', 1, 3, 'Onboarding no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))

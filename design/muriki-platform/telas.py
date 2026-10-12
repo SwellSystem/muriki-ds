@@ -2,14 +2,15 @@
 # produto precisa ver; o estado é fixo por quadro (o canvas mostra um quadro por estado) e o
 # idioma e o tema trocam no próprio quadro.
 from pecas import (K, T, ic, pagina, pagina_passo, cabecalho_passo, grupo, campo, caixa_marcar, botao_passo,  # noqa: F401
-                   esc)
+                   esc, previa_workspace)
 from textos_identidade import IDENTIDADE
 
 
 # ── Onboarding · @usuário e workspace (bloco platform-identity) ─────────
 # PlatformOnboardingIdentity: o @usuário, o nome e o endereço do workspace e o aceite dos termos,
 # numa tela só e sem CPF nem plano. O formato é do componente; livre, ocupado e reservado vêm do
-# app. O botão só liga com tudo livre e os termos aceitos.
+# app. O botão só liga com tudo livre e os termos aceitos. A partir do lg, o formulário fica à
+# esquerda e a WorkspacePreview à direita, com os mesmos valores (CA4b); o passo abre para 1024px.
 IDENTIDADE_ESTADOS = {
     # usuário, status, nome, slug, status do slug, termos
     'vazio': ('', 'idle', '', '', 'idle', False),
@@ -27,6 +28,7 @@ def tela_identidade(k, estado):
     link = lambda txt: f'<a href="#" style="color:{k["fg"]};font-weight:500;">{txt}</a>'
     corpo = (
         cabecalho_passo(k, 1, 2, T('titulo'), T('sub'))
+        + '<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:56px;align-items:start;">'
         + '<form style="margin:0;display:flex;flex-direction:column;gap:32px;">'
         + grupo(k, T('secaoVoce'), campo(k, 'usuario', T('usuario'), usuario, st_usuario, frase_usuario, afixo='@', mono=True))
         + grupo(k, T('secaoWorkspace'),
@@ -34,9 +36,11 @@ def tela_identidade(k, estado):
                 + campo(k, 'endereco', T('endereco'), slug, st_slug, frase_slug, afixo='platform.muriki.app/', mono=True))
         + caixa_marcar(k, termos, f'{T("termosA")} {link(T("termos"))} {T("termosE")} {link(T("privacidade"))}.')
         + '</form>'
-        + botao_passo(k, T('continuar'), estado == 'livre')
+        + previa_workspace(k, nome, slug, usuario, T('previaNome'), T('previaEndereco'), T('previaOla'), T('previaOlaSo'))
+        + '</div>'
+        + botao_passo(k, T('criar'), estado == 'livre')
     )
-    return pagina_passo(k, corpo)
+    return pagina_passo(k, corpo, 1024)
 
 
 def montar(tela, tema):

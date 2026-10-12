@@ -16,6 +16,20 @@ from textos import COMUM, juntar  # noqa: E402
 TOKENS['claro']['field'] = TOKENS['claro']['card']
 TOKENS['escuro']['field'] = TOKENS['escuro']['sunken']
 K['field'] = 'var(--field)'
+# as linhas de esqueleto do rail na prévia: sunken no claro; no escuro o rail é quase o sunken e elas
+# sobem para o muted (o `bg-sunken dark:bg-muted` da WorkspacePreview)
+TOKENS['claro']['railLinha'] = TOKENS['claro']['sunken']
+TOKENS['escuro']['railLinha'] = TOKENS['escuro']['muted']
+K['railLinha'] = 'var(--railLinha)'
+# os tons do Badge que a base do Code não traz, para o avatar do workspace (os --tone-* do muriki.css)
+for tom, claro, claro_fg, escuro, escuro_fg in [
+    ('cyan', 'oklch(0.935 0.045 205)', 'oklch(0.42 0.09 205)', 'oklch(0.29 0.05 205)', 'oklch(0.85 0.065 205)'),
+    ('pink', 'oklch(0.935 0.04 350)', 'oklch(0.43 0.15 350)', 'oklch(0.29 0.055 350)', 'oklch(0.85 0.075 350)'),
+    ('purple', 'oklch(0.935 0.045 300)', 'oklch(0.43 0.15 300)', 'oklch(0.29 0.055 300)', 'oklch(0.85 0.075 300)'),
+]:
+    TOKENS['claro'][f't{tom}'], TOKENS['claro'][f't{tom}fg'] = claro, claro_fg
+    TOKENS['escuro'][f't{tom}'], TOKENS['escuro'][f't{tom}fg'] = escuro, escuro_fg
+    K[f't{tom}'], K[f't{tom}fg'] = f'var(--t{tom})', f'var(--t{tom}fg)'
 
 I.update(
     # os estados do campo de nome único: cheios, como os do Phosphor no bloco (weight="fill")
@@ -56,7 +70,8 @@ def cabecalho_passo(k, n, total, titulo, sub):
 
 
 def pagina_passo(k, corpo, largura=720):
-    # 672px de conteúdo + 24px de cada lado: o max-w-2xl do OnboardingStep `form`
+    # 672px de conteúdo + 24px de cada lado: o max-w-2xl do OnboardingStep `form`; 1024 é o max-w-5xl
+    # (o `wide`, que o passo de identidade abre a partir do lg)
     return (f'{raiz(k, "display:flex;flex-direction:column;")}{topo(k, PRODUTO, EMAIL)}'
             f'<main style="flex:1;min-height:0;display:flex;flex-direction:column;gap:36px;width:{largura}px;align-self:center;'
             f'padding:32px 24px 40px;">{corpo}</main></div>')
@@ -128,3 +143,70 @@ def botao_passo(k, txt, ligado):
             f'<button type="submit"{d} style="display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;'
             f'padding:0 18px;border:0;border-radius:11px;background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:15px;'
             f'font-weight:500;{op}">{txt}{ic("seta", 14)}</button></div>')
+
+
+# ── A prévia ao vivo (WorkspacePreview) ─────────────────────────────────
+# O app do Platform em miniatura: a barra de endereço, o rail com o avatar e o nome do workspace e
+# linhas de esqueleto sem nome, o palco com a saudação e blocos de esqueleto. Decorativa.
+TONS = ['blue', 'cyan', 'green', 'yellow', 'orange', 'red', 'pink', 'purple']
+
+
+def tom_workspace(nome):
+    # o workspaceTone de handles.ts: hash dos code points do nome aparado, em minúsculas
+    n = nome.strip().lower()
+    if not n:
+        return None
+    h = 0
+    for c in n:
+        h = (h * 31 + ord(c)) % 2**32
+    return TONS[h % len(TONS)]
+
+
+def sigla_workspace(nome):
+    # o workspaceInitials: a primeira letra das duas primeiras palavras
+    palavras = [p for p in nome.split() if p[0].isalnum()]
+    return ''.join(p[0] for p in palavras[:2]).upper()
+
+
+def _barra(k, largura, alt=8, cor=None, raio=999):
+    return f'<span style="display:block;height:{alt}px;width:{largura};border-radius:{raio}px;background:{cor or k["sunken"]};"></span>'
+
+
+def previa_workspace(k, nome, slug, usuario, ph_nome, ph_slug, ola, ola_so):
+    tom = tom_workspace(nome)
+    avatar = (f'<span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex:0 0 auto;'
+              + (f'border-radius:8px;background:{k["t" + tom]};color:{k["t" + tom + "fg"]};font-size:11.5px;font-weight:600;">'
+                 f'{esc(sigla_workspace(nome))}</span>' if tom else
+                 f'border-radius:8px;border:1px dashed {k["input"]};"></span>'))
+    nome_ = (f'<span style="font-size:13px;font-weight:600;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{esc(nome)}</span>'
+             if nome else f'<span style="font-size:13px;font-weight:500;color:{k["mfg"]};opacity:0.6;">{ph_nome}</span>')
+    slug_ = (f'<span style="color:{k["fgs"]};">{esc(slug)}</span>' if slug
+             else f'<span style="color:{k["mfg"]};opacity:0.6;">{ph_slug}</span>')
+    pontos = ''.join(f'<span style="width:10px;height:10px;border-radius:50%;background:{k["sunken"]};"></span>' for _ in range(3))
+    barra_janela = (f'<div style="display:flex;align-items:center;gap:12px;height:40px;padding:0 14px;'
+                    f'border-bottom:1px solid color-mix(in oklab, {k["fg"]} 7%, transparent);">'
+                    f'<div style="display:flex;gap:6px;width:48px;flex:0 0 auto;">{pontos}</div>'
+                    f'<div style="margin:0 auto;display:flex;align-items:center;height:24px;padding:0 12px;border-radius:8px;'
+                    f'background:{k["sunken"]};font-family:{MONO};font-size:11px;color:{k["mfg"]};white-space:nowrap;">'
+                    f'platform.muriki.app/{slug_}</div><div style="width:48px;flex:0 0 auto;"></div></div>')
+    linhas = ''.join(f'<div style="display:flex;align-items:center;gap:10px;">'
+                     f'<span style="width:14px;height:14px;border-radius:4px;background:{k["railLinha"]};flex:0 0 auto;"></span>'
+                     f'{_barra(k, w, cor=k["railLinha"])}</div>' for w in ('62%', '48%', '70%', '40%'))
+    rail_ = (f'<div style="display:flex;flex-direction:column;gap:20px;width:38%;flex:0 0 auto;padding:14px 12px;background:{k["rail"]};'
+             f'box-shadow:2px 0 10px -7px rgba(0,0,0,0.30);">'
+             f'<div style="display:flex;align-items:center;gap:10px;min-width:0;">{avatar}{nome_}</div>'
+             f'<div style="display:flex;flex-direction:column;gap:14px;padding:0 4px;">{linhas}</div></div>')
+    saudacao = f'{ola} @{esc(usuario)}' if usuario else ola_so
+    cartao_ = lambda filhos, extra='': (f'<div style="display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:10px;'
+                                        f'background:{k["card"]};box-shadow:{k["sombra"]};{extra}">{filhos}</div>')
+    palco = (f'<div style="display:flex;flex-direction:column;gap:16px;flex:1;min-width:0;padding:20px;background:{k["bg"]};">'
+             f'<p style="margin:0;font-size:17px;line-height:24px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};'
+             f'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{saudacao}</p>'
+             f'<div style="margin-top:-4px;">{_barra(k, "40%")}</div>'
+             f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
+             + cartao_(_barra(k, '60%') + _barra(k, '40%', 20, raio=6)) * 2 + '</div>'
+             + cartao_(_barra(k, '72%') + _barra(k, '54%') + _barra(k, '64%'), 'flex:1;gap:12px;')
+             + '</div>')
+    return (f'<div aria-hidden="true" style="overflow:hidden;border-radius:12px;background:{k["card"]};'
+            f'box-shadow:{k["sombraFlut"]}, 0 0 0 1px color-mix(in oklab, {k["fg"]} 8%, transparent);pointer-events:none;user-select:none;">'
+            f'{barra_janela}<div style="display:flex;height:352px;">{rail_}{palco}</div></div>')

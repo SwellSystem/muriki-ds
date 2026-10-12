@@ -1331,7 +1331,7 @@ const STRINGS: Record<string, unknown> = {
       subtitle: "Como o time vai te encontrar e onde vocês vão trabalhar juntos.",
       section_you: "Você",
       section_workspace: "Workspace",
-      submit: "Continuar",
+      submit: "Criar workspace",
       terms_prefix: "Li e aceito os",
       terms: "termos de uso",
       terms_and: "e a",
@@ -1366,6 +1366,13 @@ const STRINGS: Record<string, unknown> = {
         available: "Endereço livre.",
         taken: "Esse endereço já é de outro workspace.",
         reserved: "Esse endereço é reservado. Escolha outro.",
+      },
+      // a prévia ao vivo, ao lado do formulário (WorkspacePreview)
+      preview: {
+        name_placeholder: "Seu workspace",
+        slug_placeholder: "seu-workspace",
+        greeting: "Bem-vindo, {{username}}",
+        greeting_anonymous: "Bem-vindo",
       },
     },
   },

@@ -11,6 +11,10 @@
  * vem do Code), o campo não aparece e o botão não conta com ele. O componente só junta os campos e
  * chama `onSubmit`: a ordem das chamadas (o aceite, o @usuário, o workspace) é do app, e o erro
  * que voltar chega por `error`.
+ *
+ * No desktop (`lg`+) o formulário fica à esquerda e a WorkspacePreview à direita, com os mesmos
+ * valores (CA4b): a coluna do passo abre de `form` para a largura do `wide` só a partir do `lg`.
+ * Abaixo disso, a prévia some e o passo é o de formulário de sempre.
  */
 import { useId, type FormEvent, type ReactNode } from "react"
 
@@ -22,6 +26,7 @@ import { useTranslate } from "@/lib/i18n"
 import { handleReady, handleStatus, workspaceNameIssue } from "./handles"
 import { UsernameField, type UsernameFieldProps } from "./username-field"
 import { WorkspaceForm, type WorkspaceFormProps } from "./workspace-form"
+import { WorkspacePreview } from "./workspace-preview"
 
 export interface PlatformOnboardingTerms {
   checked: boolean
@@ -90,6 +95,7 @@ export function PlatformOnboardingIdentity({
       subtitle={t("platform.identity.subtitle")}
       brand={brand}
       utilities={utilities}
+      className="lg:max-w-5xl"
       action={{
         label: t("platform.identity.submit"),
         type: "submit",
@@ -98,35 +104,45 @@ export function PlatformOnboardingIdentity({
         disabled: !pronto,
       }}
     >
-      <form id={formId} onSubmit={enviar} noValidate data-slot="platform-onboarding-identity" className="flex flex-col gap-8">
-        {username ? (
+      <div className="grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <form id={formId} onSubmit={enviar} noValidate data-slot="platform-onboarding-identity" className="flex flex-col gap-8">
+          {username ? (
+            <fieldset className="m-0 flex flex-col gap-4 border-0 p-0">
+              <Legenda>{t("platform.identity.section_you")}</Legenda>
+              <UsernameField {...username} disabled={submitting} />
+            </fieldset>
+          ) : null}
+
           <fieldset className="m-0 flex flex-col gap-4 border-0 p-0">
-            <Legenda>{t("platform.identity.section_you")}</Legenda>
-            <UsernameField {...username} disabled={submitting} />
+            <Legenda>{t("platform.identity.section_workspace")}</Legenda>
+            <WorkspaceForm {...workspace} disabled={submitting} />
           </fieldset>
-        ) : null}
 
-        <fieldset className="m-0 flex flex-col gap-4 border-0 p-0">
-          <Legenda>{t("platform.identity.section_workspace")}</Legenda>
-          <WorkspaceForm {...workspace} disabled={submitting} />
-        </fieldset>
+          <Field className="flex-row items-start gap-2.5" disabled={submitting}>
+            <Checkbox checked={terms.checked} onCheckedChange={(checked) => terms.onChange(checked)} className="mt-0.5" />
+            <FieldLabel className="cursor-pointer text-sm leading-5 font-normal text-muted-foreground">
+              <span>
+                {t("platform.identity.terms_prefix")} {link(terms.links.terms, t("platform.identity.terms"))}{" "}
+                {t("platform.identity.terms_and")} {link(terms.links.privacy, t("platform.identity.privacy"))}.
+              </span>
+            </FieldLabel>
+          </Field>
 
-        <Field className="flex-row items-start gap-2.5" disabled={submitting}>
-          <Checkbox checked={terms.checked} onCheckedChange={(checked) => terms.onChange(checked)} className="mt-0.5" />
-          <FieldLabel className="cursor-pointer text-sm leading-5 font-normal text-muted-foreground">
-            <span>
-              {t("platform.identity.terms_prefix")} {link(terms.links.terms, t("platform.identity.terms"))}{" "}
-              {t("platform.identity.terms_and")} {link(terms.links.privacy, t("platform.identity.privacy"))}.
-            </span>
-          </FieldLabel>
-        </Field>
+          {error ? (
+            <p role="alert" className="text-[13px] leading-[19px] text-destructive">
+              {error}
+            </p>
+          ) : null}
+        </form>
 
-        {error ? (
-          <p role="alert" className="text-[13px] leading-[19px] text-destructive">
-            {error}
-          </p>
-        ) : null}
-      </form>
+        <WorkspacePreview
+          workspaceName={workspace.name}
+          slug={workspace.slug}
+          username={username?.value}
+          urlPrefix={workspace.urlPrefix}
+          className="sticky top-8 hidden lg:block"
+        />
+      </div>
     </OnboardingStep>
   )
 }

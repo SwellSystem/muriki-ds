@@ -23,7 +23,8 @@ IDENTIDADE = {
         enderecoFormato='Comece com uma letra. O hífen só entre letras ou números, um de cada vez.',
         enderecoOcupado='Esse endereço já é de outro workspace.',
         nomeInvalido='Use de 1 a 80 caracteres, sem caracteres invisíveis.',
-        continuar='Continuar',
+        criar='Criar workspace',
+        previaNome='Seu workspace', previaEndereco='seu-workspace', previaOla='Bem-vindo,', previaOlaSo='Bem-vindo',
     ),
     'en-US': dict(
         passoRotulo='Getting started', de='of', passosAria='Step',
@@ -46,7 +47,8 @@ IDENTIDADE = {
         enderecoFormato='Start with a letter. Hyphen only between letters or numbers, one at a time.',
         enderecoOcupado='That address already belongs to another workspace.',
         nomeInvalido='Use 1 to 80 characters, no invisible characters.',
-        continuar='Continue',
+        criar='Create workspace',
+        previaNome='Your workspace', previaEndereco='your-workspace', previaOla='Welcome,', previaOlaSo='Welcome',
     ),
     'es-ES': dict(
         passoRotulo='Primeros pasos', de='de', passosAria='Paso',
@@ -69,6 +71,7 @@ IDENTIDADE = {
         enderecoFormato='Empieza con una letra. El guion solo entre letras o números, uno cada vez.',
         enderecoOcupado='Esa dirección ya es de otro workspace.',
         nomeInvalido='Usa de 1 a 80 caracteres, sin caracteres invisibles.',
-        continuar='Continuar',
+        criar='Crear workspace',
+        previaNome='Tu workspace', previaEndereco='tu-workspace', previaOla='Bienvenido,', previaOlaSo='Bienvenido',
     ),
 }
