@@ -397,7 +397,8 @@ def _cupom(k, aplicado):
 def pagina_assinar(k, variante, cupom=None):
     # 'team' (CNPJ e razão social), 'solo' (CPF, no anual), 'erro' (o CNPJ com o DV errado) e 'eua'
     # (uma empresa dos EUA: sem campo fiscal, o resumo em USD). `cupom`: None (sem o campo, no quadro
-    # do erro do CNPJ, para não misturar), 'fechado' (o link) ou 'aplicado' (LANCAMENTO20, no Team)
+    # do erro do CNPJ, para não misturar, e no Solo anual: o cupom só vale no mensal), 'fechado' (o
+    # link) ou 'aplicado' (LANCAMENTO20, no Team)
     solo = variante == 'solo'
     titulo = T('cbAssinarSolo' if solo else 'cbAssinarTeam')
     f = FILETE.format(input=k['input'])
@@ -421,8 +422,11 @@ def pagina_assinar(k, variante, cupom=None):
             f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbResumoSoloQuem" if solo else "cbVoceMais5")}</span></span></div>')
     linhas = _linha(k, T(conta), T(total) + T(per))
     if not solo:
-        linhas += _linha(k, f'<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:flex;width:13px;height:13px;'
-                            f'color:{k["pri"]};">{FAISCA}</span>{T("cbCodeProCurto")}</span>', T('cbIncluso'))
+        # o Code Pro com a ressalva do cartão: quem assina no teste fica no teste até o fim, e o teste não dá o Code (R37)
+        linhas += _linha(k, f'<span style="display:inline-flex;flex-direction:column;">'
+                            f'<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:flex;width:13px;height:13px;'
+                            f'color:{k["pri"]};">{FAISCA}</span>{T("cbCodeProCurto")}</span>'
+                            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbNaPaga")}</span></span>', T('cbIncluso'))
     aplicado = cupom == 'aplicado'
     if aplicado:
         # o desconto e o total com cupom vêm da API (F12); aqui, só o desenho, com as 2 casas
@@ -734,7 +738,7 @@ TELAS_C = {
     'planos_carregando': lambda k: tela_planos(k, 'carregando'),
     'assinar_team': lambda k: pagina_assinar(k, 'team', 'fechado'),
     'assinar_cupom': lambda k: pagina_assinar(k, 'team', 'aplicado'),
-    'assinar_solo': lambda k: pagina_assinar(k, 'solo', 'fechado'),
+    'assinar_solo': lambda k: pagina_assinar(k, 'solo'),
     'assinar_erro': lambda k: pagina_assinar(k, 'erro'),
     'assinar_eua': lambda k: pagina_assinar(k, 'eua', 'fechado'),
     'comercial': lambda k: pagina_comercial(k, 'aberto'),

@@ -102,6 +102,12 @@ const ICONES: Record<string, ComponentType<IconProps>> = {
   enterprise: BuildingsIcon,
 }
 
+/** O ícone do plano pela chave, com ou sem o prefixo `platform_` (o mesmo do cartão, no resumo do checkout). */
+export function SeatPlanIcon({ planKey, className }: { planKey: string; className?: string }) {
+  const Icone = ICONES[planKey.replace(/^platform_/, "")] ?? UsersIcon
+  return <Icone aria-hidden className={className} />
+}
+
 // a fileira de quatro, do xl para cima; abaixo, duas colunas e depois uma
 const GRADE = "grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2 xl:grid-cols-4"
 

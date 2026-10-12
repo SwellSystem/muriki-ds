@@ -1,2 +1,7 @@
 export * from "./plans"
 export * from "./plan-cards"
+export * from "./tax-id"
+export * from "./fiscal-form"
+export { BillingPageLayout, type BillingPageLayoutProps } from "./billing-page"
+export * from "./checkout-page"
+export * from "./contact-sales"
