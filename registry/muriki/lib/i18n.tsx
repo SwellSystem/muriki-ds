@@ -1323,6 +1323,70 @@ const STRINGS: Record<string, unknown> = {
       use_password: "Usar email e senha",
     },
   },
+  platform: {
+    identity: {
+      stepper: "Primeiro acesso · {{step}} de {{total}}",
+      stepper_aria: "Passo {{step}} de {{total}}",
+      title: "Crie o seu workspace",
+      // para quem é: os dois cartões no topo; a descrição é o produto que a prévia mostra
+      audience: {
+        label: "Para quem é o workspace",
+        team: "Com o meu time",
+        personal: "Só para mim",
+      },
+      submit: "Criar workspace",
+      submit_personal: "Criar meu espaço",
+      terms_prefix: "Li e aceito os",
+      terms: "termos de uso",
+      terms_and: "e a",
+      privacy: "política de privacidade",
+      // os motivos de tamanho valem para o @usuário e para o endereço
+      handle: {
+        too_short: "Use pelo menos {{min}} caracteres.",
+        too_long: "Use no máximo {{max}} caracteres.",
+        unchecked: "Não deu para conferir agora. Confere no envio.",
+      },
+      username: {
+        label: "@usuário",
+        hint: "De {{min}} a {{max}} caracteres: letras, números, ponto e sublinhado.",
+        character: "“{{char}}” não pode. Use letras sem acento, números, ponto e sublinhado.",
+        format: "Comece com uma letra. Ponto e sublinhado só entre letras ou números, um de cada vez.",
+        checking: "Verificando se está livre…",
+        available: "@{{value}} está livre.",
+        taken: "Esse @usuário já é de outra pessoa.",
+        reserved: "Esse @usuário é reservado. Escolha outro.",
+      },
+      workspace: {
+        name_label: "Nome do workspace",
+        name_label_personal: "Nome do seu espaço",
+        // o exemplo do campo, que a prévia também mostra, apagado, enquanto o nome não chega
+        name_example: "Acme Labs",
+        name_example_personal: "Meu espaço",
+        name_placeholder: "Ex.: {{example}}",
+        name_invalid: "Use de 1 a {{max}} caracteres, sem caracteres invisíveis.",
+        slug_label: "Endereço",
+      },
+      slug: {
+        hint: "De {{min}} a {{max}} caracteres: letras, números e hífen.",
+        character: "“{{char}}” não pode. Use letras sem acento, números e hífen.",
+        format: "Comece com uma letra. O hífen só entre letras ou números, um de cada vez.",
+        checking: "Verificando se está livre…",
+        available: "Endereço livre.",
+        taken: "Esse endereço já é de outro workspace.",
+        reserved: "Esse endereço é reservado. Escolha outro.",
+      },
+      // a prévia ao vivo, ao lado do formulário (WorkspacePreview)
+      preview: {
+        // a frase embaixo do nome em destaque (por isso não o repete): o que está nascendo; sem nome, o
+        // convite a escrever
+        empty: "O nome que você escrever aparece aqui.",
+        team: "Começa com você. O time chega no próximo passo.",
+        team_user: "Começa com {{username}}. O time chega no próximo passo.",
+        personal: "Só seu. Ninguém entra sem você chamar.",
+        personal_user: "Só seu, {{username}}. Ninguém entra sem você chamar.",
+      },
+    },
+  },
 }
 
 function lookup(key: string): string | undefined {

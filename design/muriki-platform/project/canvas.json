@@ -1,0 +1,125 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-11T00:00:00Z"
+  },
+  "title": "Muriki Platform",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "designSystems": [],
+  "boards": {
+    "OnboardingIdentidade.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · vazio",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeEscuro.dc.html": {
+      "x": 0,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · vazio · escuro",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeOcupado.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeOcupadoEscuro.dc.html": {
+      "x": 1520,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado · escuro",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeLivre.dc.html": {
+      "x": 3040,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · tudo livre, o botão ligado",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeLivreEscuro.dc.html": {
+      "x": 3040,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · tudo livre, o botão ligado · escuro",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeFoco.dc.html": {
+      "x": 4560,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · só para mim (Muriki Focus)",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeFocoEscuro.dc.html": {
+      "x": 4560,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · @usuário e workspace · só para mim (Muriki Focus) · escuro",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeMovimento.dc.html": {
+      "x": 6080,
+      "y": 0,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · movimento (Play)",
+      "is_interactive": true
+    },
+    "OnboardingIdentidadeMovimentoEscuro.dc.html": {
+      "x": 6080,
+      "y": 1320,
+      "w": 1440,
+      "h": 900,
+      "title": "Onboarding · movimento (Play) · escuro",
+      "is_interactive": true
+    }
+  },
+  "order": [
+    "OnboardingIdentidade.dc.html",
+    "OnboardingIdentidadeEscuro.dc.html",
+    "OnboardingIdentidadeOcupado.dc.html",
+    "OnboardingIdentidadeOcupadoEscuro.dc.html",
+    "OnboardingIdentidadeLivre.dc.html",
+    "OnboardingIdentidadeLivreEscuro.dc.html",
+    "OnboardingIdentidadeFoco.dc.html",
+    "OnboardingIdentidadeFocoEscuro.dc.html",
+    "OnboardingIdentidadeMovimento.dc.html",
+    "OnboardingIdentidadeMovimentoEscuro.dc.html"
+  ],
+  "notes": {
+    "onboarding": {
+      "x": 0,
+      "y": -300,
+      "text": "Onboarding do Platform: para quem é, o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; cabe sem rolar; à direita, a prévia ao vivo: Muriki Projects (time) ou Muriki Focus (só para mim), no estado final",
+      "kind": "title1",
+      "maxW": 6000,
+      "w": 240
+    },
+    "onboardingEscuro": {
+      "x": 0,
+      "y": 1020,
+      "text": "Onboarding no tema escuro",
+      "kind": "title1",
+      "maxW": 6000,
+      "w": 240
+    }
+  }
+}

@@ -35,5 +35,7 @@
       "@/components/acrylic/*": ["./registry/muriki/acrylic/*"]
     }
   },
-  "include": ["registry/**/*.ts", "registry/**/*.tsx", "typecheck/**/*.ts", "typecheck/**/*.tsx"]
+  "include": ["registry/**/*.ts", "registry/**/*.tsx", "typecheck/**/*.ts", "typecheck/**/*.tsx"],
+  // os testes das funções puras rodam no bun test, que traz os próprios tipos; o tsc do DS não tem o bun:test
+  "exclude": ["**/*.test.ts"]
 }
