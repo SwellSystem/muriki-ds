@@ -1485,6 +1485,71 @@ const STRINGS: Record<string, unknown> = {
         price_no_trial: "O Free vai até {{max}} pessoas. Com {{count}}, o time precisa do Team: {{count}} × {{price}} = {{total}}.",
       },
     },
+    billing: {
+      // os cartões de plano (SeatPlanCards); os itens da lista, a nota do pé e o rótulo do botão vêm do
+      // app, por props: cta, features e footnote abaixo são os padrões que o app passa no t()
+      plans: {
+        period_label: "Período de cobrança",
+        monthly: "Mensal",
+        yearly: "Anual",
+        // só um selo de texto: o desconto já vem no preço da API
+        yearly_discount: "−10%",
+        currency_label: "Moeda",
+        // a moeda travada depois da primeira compra, no lugar da troca
+        currency_locked: {
+          BRL: "Em reais, a moeda da assinatura",
+          USD: "Em dólares, a moeda da assinatura",
+        },
+        per_seat: {
+          monthly: "por pessoa/mês",
+          yearly: "por pessoa/ano",
+        },
+        billed: {
+          monthly: "cobrado todo mês",
+          yearly: "cobrado uma vez por ano",
+        },
+        // o plano com mínimo de assentos: mínimo × preço, só exibição
+        from: {
+          monthly: "a partir de {{price}}/mês",
+          yearly: "a partir de {{price}}/ano",
+        },
+        free: "Grátis",
+        free_note: "sem cobrança",
+        recommended: "Recomendado",
+        status: {
+          trial: "No teste",
+          // dentro do selo, só para o leitor de tela: "No teste até 26 de out. de 2026"
+          trial_until: "até {{date}}",
+          current: "Plano atual",
+        },
+        code_pro: "inclui Muriki Code Pro",
+        code_pro_note: "na assinatura paga",
+        loading: "Carregando os planos",
+        cta: {
+          subscribe: "Assinar o {{plan}}",
+          switch: "Mudar para o {{plan}}",
+          switch_yearly: "Mudar para o anual",
+          contact_sales: "Falar com o comercial",
+        },
+        features: {
+          up_to_3: "Até 3 pessoas",
+          just_you: "1 pessoa: só você",
+          unlimited: "Pessoas sem limite",
+          // só no workspace que está no teste
+          trial: "14 dias de teste",
+          trial_ends: "termina em {{date}}",
+          accepted_invite: "Assento só com convite aceito",
+          yearly_discount: "10% a menos no anual",
+          min_10: "A partir de 10 pessoas",
+          contract: "Contrato com o comercial",
+        },
+        footnote: {
+          free: "Precisa de mais gente? O Team não tem limite.",
+          // o teste não inclui o Code: só a assinatura paga
+          solo: "Com um time? O Team inclui o Muriki Code Pro na assinatura paga.",
+        },
+      },
+    },
   },
 }
 

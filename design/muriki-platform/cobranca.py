@@ -163,7 +163,7 @@ def cartao_plano(k, plano, anual, teste, cta):
                  f'font-variant-numeric:tabular-nums;white-space:nowrap;">{valor}</span>'
                  f'<span style="font-size:14px;color:{k["mfg"]};white-space:nowrap;">{T("cbPorAno" if anual else "cbPorMes")}</span></p>'
                  f'<p style="margin:0;font-size:12.5px;line-height:17px;color:{k["mfg"]};">{nota}</p>')
-    itens = ''.join(_item(k, t, (T('cbTermina') if teste else None) if n == 'TESTE' else None) for t, n in ITENS[chave])
+    itens = ''.join(_item(k, t, (T('cbTermina') if teste else None) if n == 'TESTE' else None) for t, n in ITENS[chave] if teste or n != 'TESTE')
     if chave in ('team', 'enterprise'):
         itens += _item_code(k)
     pe = (f'<p style="margin:0;padding:10px 12px;border-radius:10px;background:{k["sunken"]};font-size:12.5px;line-height:17px;color:{k["mfg"]};">'
