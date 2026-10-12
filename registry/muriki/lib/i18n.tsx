@@ -1549,6 +1549,112 @@ const STRINGS: Record<string, unknown> = {
           solo: "Com um time? O Team inclui o Muriki Code Pro na assinatura paga.",
         },
       },
+      // a página do checkout (CheckoutPage e CheckoutSummary) e a moldura comum (BillingPageLayout)
+      checkout: {
+        back: "Planos",
+        trail_label: "Caminho",
+        trail_stripe: "Pagamento no Stripe",
+        title: "Assinar o {{plan}}",
+        subtitle: {
+          solo: "Para uma pessoa só: você.",
+          team: "Cada pessoa no workspace ocupa um assento.",
+        },
+        period: "Período",
+        submit: "Continuar para o pagamento",
+        stripe_note: "O pagamento é no Stripe.",
+        summary: "Resumo",
+        just_you: "Só você",
+        // a conta do resumo, só exibição (F12): N × o preço por pessoa da API
+        seats_line_one: "1 pessoa × {{price}}",
+        seats_line_other: "{{count}} pessoas × {{price}}",
+        amount: {
+          monthly: "{{price}}/mês",
+          yearly: "{{price}}/ano",
+        },
+        code_pro: "Muriki Code Pro",
+        // quem assina no teste fica no teste até o fim dele, e o teste não dá o Code (R37)
+        code_pro_note: "na assinatura paga",
+        included: "incluso",
+        total: {
+          monthly: "Total por mês",
+          yearly: "Total por ano",
+        },
+      },
+      // os dados fiscais (FiscalForm): só no Brasil; o Solo pede o CPF, o Team e o Enterprise o CNPJ
+      fiscal: {
+        title: "Dados fiscais",
+        country: "País da empresa",
+        outside_brazil: "Fora do Brasil, o número fiscal da empresa, se houver, é pedido no Stripe.",
+        cpf: {
+          label: "CPF",
+          placeholder: "000.000.000-00",
+          hint: "Só os números: a pontuação entra sozinha.",
+          required: "Informe o CPF.",
+          invalid: "CPF inválido: confira os dígitos.",
+        },
+        cnpj: {
+          label: "CNPJ",
+          placeholder: "00.000.000/0000-00",
+          hint: "Letras e números, como no cartão do CNPJ.",
+          required: "Informe o CNPJ.",
+          invalid: "CNPJ inválido: confira os dígitos.",
+        },
+        legal_name: {
+          label: "Razão social",
+          required: "Informe a razão social.",
+        },
+      },
+      // o cupom do resumo (o CouponField do onboarding-pricing); o desconto e o total vêm da API
+      coupon: {
+        trigger: "Tem um cupom?",
+        field: "Cupom",
+        placeholder: "Código do cupom",
+        apply: "Aplicar",
+        remove: "Remover",
+        line: "Cupom",
+        note_one: "no primeiro mês; depois, {{total}}",
+        note_other: "nos {{count}} primeiros meses; depois, {{total}}",
+      },
+      // falar com o comercial (ContactSalesForm e ContactSalesSummary)
+      sales: {
+        title: "Falar com o comercial",
+        subtitle: "O Enterprise vale a partir de {{min}} pessoas. O comercial responde no seu e-mail.",
+        seats: {
+          label: "Quantas pessoas",
+          hint: "De 1 a 100.000.",
+          less: "Uma pessoa a menos",
+          more: "Uma pessoa a mais",
+        },
+        message: "Mensagem",
+        optional: "opcional",
+        submit: "Enviar",
+        sent: {
+          title: "Pedido enviado",
+          text: "Obrigado! O comercial responde em {{email}}.",
+          request: "O seu pedido",
+          seats_one: "1 pessoa no Enterprise",
+          seats_other: "{{count}} pessoas no Enterprise",
+          note_trial: "Enquanto isso, o teste do Team segue até {{date}} e nada muda no workspace.",
+          note: "Enquanto isso, nada muda no workspace.",
+          back: "Voltar para os planos",
+        },
+        summary: {
+          price_per_seat: "Preço por pessoa",
+          minimum: "Mínimo",
+          people_one: "1 pessoa",
+          people_other: "{{count}} pessoas",
+          estimate: "Estimativa",
+          code_pro_one: "inclui Muriki Code Pro para 1 pessoa",
+          code_pro_other: "inclui Muriki Code Pro para as {{count}}",
+        },
+        steps: {
+          title: "O que acontece depois",
+          count: "Você conta quantas pessoas e, se quiser, deixa uma mensagem.",
+          reply: "O comercial responde em {{email}}.",
+          contract: "O contrato do Enterprise é combinado com o comercial.",
+          done: "Feito:",
+        },
+      },
     },
   },
 }
