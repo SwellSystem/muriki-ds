@@ -1827,11 +1827,11 @@ const STRINGS: Record<string, unknown> = {
         // quem já tem o @ (a conta do Code): sem o campo, só os termos
         title_existing: "Quase lá: aceite os termos do Platform",
         // "Depois disso, você entra no <workspace> como <papel>.", com os dois em negrito
-        subtitle_prefix: "Depois disso, você entra no",
+        subtitle_prefix: "Depois disso, você entra em",
         subtitle_role: "como",
         // com o @ da conta: "…como <papel>, com a sua conta <@usuario>."
         subtitle_existing: "com a sua conta",
-        submit: "Entrar no {{workspace}}",
+        submit: "Entrar em {{workspace}}",
         // a frase do palco com o @ livre; sem ele, a do convite (invitation.preview)
         preview: "Um lugar no time está esperando por {{username}}.",
       },

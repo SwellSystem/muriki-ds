@@ -27,8 +27,8 @@ ENTRADA = {
         invalidoTxt='Peça um convite novo a quem te chamou. Se você já faz parte do workspace, é só entrar.',
         irEntrar='Entrar no Muriki Platform',
         # o passo do convidado: só o @usuário e os termos, antes do aceite
-        convidadoTit='Quase lá: escolha seu @usuário', convidadoSubA='Depois disso, você entra no', convidadoSubB='como',
-        convidadoBotao='Entrar no', convidadoPreviaA='Um lugar no time está esperando por',
+        convidadoTit='Quase lá: escolha seu @usuário', convidadoSubA='Depois disso, você entra em', convidadoSubB='como',
+        convidadoBotao='Entrar em', convidadoPreviaA='Um lugar no time está esperando por',
     ),
     'en-US': dict(
         entrarBotao='Sign in', codigoAria='6-digit code', verificarBotao='Verify', criarBotao='Create account',

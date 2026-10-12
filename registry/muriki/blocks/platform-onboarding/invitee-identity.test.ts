@@ -84,7 +84,7 @@ describe("PlatformInviteeIdentity: existingUsername", () => {
     const t = texto(html)
     expect(t).toContain("Quase lá: aceite os termos do Platform")
     expect(t).not.toContain("escolha seu @usuário")
-    expect(t).toContain("Depois disso, você entra no Moura & Filhos como Member, com a sua conta @renata.")
+    expect(t).toContain("Depois disso, você entra em Moura & Filhos como Member, com a sua conta @renata.")
     expect(t).toContain("Um lugar no time está esperando por @renata.")
   })
   test("o botão só depende dos termos", () => {
@@ -104,7 +104,7 @@ describe("PlatformInviteeIdentity: existingUsername", () => {
     expect(html).toContain('data-slot="handle-field"')
     const t = texto(html)
     expect(t).toContain("Quase lá: escolha seu @usuário")
-    expect(t).toContain("Depois disso, você entra no Moura & Filhos como Member.")
+    expect(t).toContain("Depois disso, você entra em Moura & Filhos como Member.")
   })
 })
 
