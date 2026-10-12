@@ -59,10 +59,18 @@ export interface ContactSalesFormProps {
   sent?: boolean
   /** O e-mail em que o comercial responde, na confirmação. */
   email: string
-  /** O mínimo do Enterprise, na linha de contexto (10). */
-  minSeats?: number
-  /** O fim do teste do Team, se houver: a confirmação diz que ele segue até lá. */
+  /**
+   * O mínimo de assentos do Enterprise, lido do plano (`minSeats`, do admin): "cobra no mínimo N", na
+   * linha de contexto e na dica do campo.
+   */
+  minSeats: number
+  /** O fim do teste, se houver: com `trialPlanName`, a confirmação diz que ele segue até lá. */
   trialEndsAt?: string
+  /**
+   * O nome do plano do teste, ex.: "Pro", em "o teste do Pro segue até …". Obrigatório para a frase do
+   * teste: sem ele, mesmo com `trialEndsAt`, a confirmação não fala do teste.
+   */
+  trialPlanName?: string
   /** O idioma da data do teste, ex.: `pt-BR`. */
   locale: string
   /** "Voltar para os planos", na confirmação, como botão. */
@@ -79,8 +87,9 @@ export function ContactSalesForm({
   submitting = false,
   sent = false,
   email,
-  minSeats = 10,
+  minSeats,
   trialEndsAt,
+  trialPlanName,
   locale,
   onBack,
   backRender,
@@ -130,8 +139,8 @@ export function ContactSalesForm({
         </div>
         <p className="flex items-start gap-2 text-[13.5px] leading-5 text-muted-foreground">
           <ClockIcon aria-hidden className="mt-0.5 size-[15px] shrink-0" />
-          {trialEndsAt
-            ? t("platform.billing.sales.sent.note_trial", { date: dataCurta(trialEndsAt, locale) })
+          {trialEndsAt && trialPlanName
+            ? t("platform.billing.sales.sent.note_trial", { plan: trialPlanName, date: dataCurta(trialEndsAt, locale) })
             : t("platform.billing.sales.sent.note")}
         </p>
         <Button
@@ -201,7 +210,7 @@ export function ContactSalesForm({
               <PlusIcon />
             </Passo>
           </div>
-          <FieldDescription className="text-[13px] leading-[18px]">{t("platform.billing.sales.seats.hint")}</FieldDescription>
+          <FieldDescription className="text-[13px] leading-[18px]">{t("platform.billing.sales.seats.hint", { min: minSeats })}</FieldDescription>
         </Field>
 
         {/* o Textarea é nativo, fora do Field do Base UI: o rótulo vai ligado pelo id */}
@@ -283,7 +292,7 @@ export interface ContactSalesSummaryProps {
   plan: { key: string; name: string }
   /** O preço por pessoa por mês, da API (F12). */
   pricePerSeat: { amountInCents: number; currency: string }
-  /** O mínimo de assentos (10). */
+  /** O mínimo de assentos do plano, do admin (`minSeats`). */
   minSeats: number
   /** As pessoas do formulário: a estimativa usa o número, nunca abaixo do mínimo; o Code Pro, o número pedido. */
   seats: number | null

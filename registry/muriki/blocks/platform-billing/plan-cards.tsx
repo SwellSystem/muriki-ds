@@ -1,19 +1,21 @@
 "use client"
 
 /**
- * Os planos do workspace do Platform (CA9): os quatro cartões numa fileira, com as trocas de período
- * (Mensal / Anual, com o selo "−10%") e de moeda (BRL / USD) em cima. Sem `onCurrencyChange` a moeda
+ * Os planos do workspace do Platform (CA9): os cartões numa fileira, um por plano (Free, Pro e
+ * Enterprise no workspace `team`; Free e Pro no `personal`), com as trocas de período (Mensal / Anual,
+ * com o selo "−10%") e de moeda (BRL / USD) em cima. Sem `onCurrencyChange` a moeda
  * está travada (depois da primeira compra): no lugar da troca fica a moeda da assinatura, com o cadeado.
  *
  * O cartão é próprio, e não o PlanCard: este tem o brilho desfocado no canto, e a cobrança não tem
  * desfoque nem manchas (decisão de 2026-10-12). No cabeçalho, o ícone do plano num quadradinho e, ao
  * lado do nome, o selo de estado ("No teste" ou "Plano atual"). O recomendado tem o selo
- * "Recomendado", o contorno primary, o filete degradê no topo e a sombra funda, e na fileira de quatro
- * sobe e desce além dela. As linhas (cabeçalho, preço, lista e botão) se alinham por subgrid.
+ * "Recomendado", o contorno primary, o filete degradê no topo e a sombra funda, e na fileira sobe e
+ * desce além dela. As linhas (cabeçalho, preço, lista e botão) se alinham por subgrid. A grade segue o
+ * número de planos; com dois, o app estreita a página, para os cartões não esticarem.
  *
  * O componente só mostra: o preço por pessoa vem pronto da API, em centavos, e sai no
  * `formatSeatPrice` (sem casas quando é inteiro, F12). O anual aparece por pessoa/ano, como vem, sem
- * dividir por 12. A única conta é o "a partir de" do plano com mínimo de assentos, só exibição. Os
+ * dividir por 12; no workspace `personal` (1 assento, `perSeat={false}`), "por mês" e "por ano". A única conta é o "a partir de" do plano com mínimo de assentos, só exibição. Os
  * itens da lista, a nota do pé e o rótulo do botão vêm do app (os padrões ficam em
  * `platform.billing.plans.{cta,features,footnote}`, para o app passar no `t()`): nada de recurso inventado aqui. O
  * Code Pro é a linha à parte, abaixo do tracejado, nos planos com `includesCodePro`.
@@ -24,8 +26,8 @@ import {
   CheckIcon,
   LeafIcon,
   LockSimpleIcon,
+  SketchLogoIcon,
   SparkleIcon,
-  UserIcon,
   UsersIcon,
   type IconProps,
 } from "@phosphor-icons/react"
@@ -51,13 +53,13 @@ export interface SeatPlanFeature {
 }
 
 export interface SeatPlan {
-  /** A chave do plano na API, ex.: `platform_team`. Escolhe o ícone e volta no `onChoose`. */
+  /** A chave do plano na API, ex.: `platform_pro`. Escolhe o ícone e volta no `onChoose`. */
   key: string
   name: string
   description: string
   /** Por pessoa, em centavos, na `currency` escolhida, como a API manda. `null` é o grátis. */
   pricePerSeat: { monthly: number; yearly: number } | null
-  /** O mínimo de assentos (10 no Enterprise): acima de 1, o preço ganha o "a partir de". */
+  /** O mínimo de assentos do plano, do admin (o Enterprise tem): acima de 1, o preço ganha o "a partir de". */
   minSeats?: number | null
   /** A linha "inclui Muriki Code Pro · na assinatura paga", abaixo do tracejado. */
   includesCodePro: boolean
@@ -65,9 +67,9 @@ export interface SeatPlan {
   contactSales?: boolean
   /** A lista com o check, do app: só o que o produto sustenta. */
   features: SeatPlanFeature[]
-  /** A nota no pé da lista, ex.: "Precisa de mais gente? O Team não tem limite." */
+  /** A nota no pé da lista, ex.: "Mais de 5 pessoas? O Enterprise não tem limite." */
   footnote?: string
-  /** O rótulo do botão, do app, porque depende do estado ("Assinar o Team", "Mudar para o anual"). */
+  /** O rótulo do botão, do app, porque depende do estado ("Assinar o Pro", "Mudar para o anual"). */
   ctaLabel: string
 }
 
@@ -82,8 +84,13 @@ export interface SeatPlanCardsProps {
   currentPlan?: string
   /** O teste em curso: o plano ganha o selo "No teste", com a data de fim só para o leitor de tela. */
   trial?: { plan: string; endsAt: string }
-  /** A chave do plano em destaque (o Team). */
+  /** A chave do plano em destaque (o Pro). */
   recommendedPlan?: string
+  /**
+   * O preço é por pessoa ("por pessoa/mês"). Padrão: `true`, o workspace `team`. No `personal`, que
+   * paga 1 assento, `false`: "por mês". Carregando sem planos, também diz quantas silhuetas (3 ou 2).
+   */
+  perSeat?: boolean
   onChoose: (key: string) => void
   /** Chamado no botão dos planos com `contactSales`; sem ele, o botão desses planos fica desabilitado. */
   onContactSales?: () => void
@@ -94,22 +101,27 @@ export interface SeatPlanCardsProps {
   className?: string
 }
 
-// o ícone de cada plano, pela chave sem o prefixo
-const ICONES: Record<string, ComponentType<IconProps>> = {
-  free: LeafIcon,
-  solo: UserIcon,
-  team: UsersIcon,
-  enterprise: BuildingsIcon,
+// o ícone de cada plano, pela chave sem o prefixo; o Pro é o diamante preenchido, o mesmo do Pro do Code
+const ICONES: Record<string, { Icone: ComponentType<IconProps>; peso?: IconProps["weight"] }> = {
+  free: { Icone: LeafIcon },
+  pro: { Icone: SketchLogoIcon, peso: "fill" },
+  enterprise: { Icone: BuildingsIcon },
 }
 
 /** O ícone do plano pela chave, com ou sem o prefixo `platform_` (o mesmo do cartão, no resumo do checkout). */
 export function SeatPlanIcon({ planKey, className }: { planKey: string; className?: string }) {
-  const Icone = ICONES[planKey.replace(/^platform_/, "")] ?? UsersIcon
-  return <Icone aria-hidden className={className} />
+  const { Icone, peso } = ICONES[planKey.replace(/^platform_/, "")] ?? { Icone: UsersIcon }
+  return <Icone aria-hidden weight={peso} className={className} />
 }
 
-// a fileira de quatro, do xl para cima; abaixo, duas colunas e depois uma
-const GRADE = "grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2 xl:grid-cols-4"
+// uma coluna por plano: dois lado a lado desde o sm; três só do lg (abaixo, eles ficariam espremidos);
+// quatro ou mais, duas colunas e depois quatro
+function grade(planos: number) {
+  return cn(
+    "grid grid-cols-1 gap-x-6 gap-y-6",
+    planos === 2 ? "sm:grid-cols-2" : planos === 3 ? "lg:grid-cols-3" : planos > 3 && "sm:grid-cols-2 xl:grid-cols-4"
+  )
+}
 
 // com recomendado, a grade abre os 22px que o cartão erguido passa da fileira, em cima e embaixo
 const GRADE_ERGUIDA = "xl:mt-[22px] xl:mb-[22px]"
@@ -138,6 +150,7 @@ export function SeatPlanCards({
   currentPlan,
   trial,
   recommendedPlan,
+  perSeat = true,
   onChoose,
   onContactSales,
   locale,
@@ -146,8 +159,10 @@ export function SeatPlanCards({
 }: SeatPlanCardsProps) {
   const t = useTranslate()
   const destaque = plans.findIndex((p) => p.key === recommendedPlan)
-  // carregando, os planos podem não ter vindo: com recomendado, ele fica no lugar do Team (o 3º); sem, nenhum
-  const destaqueNoEsqueleto = recommendedPlan === undefined ? -1 : destaque >= 0 ? destaque : 2
+  // carregando, os planos podem não ter vindo: três silhuetas no time e duas no pessoal; com
+  // recomendado, ele fica no lugar do Pro (o 2º); sem, nenhum
+  const noEsqueleto = plans.length > 0 ? plans.length : perSeat ? 3 : 2
+  const destaqueNoEsqueleto = recommendedPlan === undefined ? -1 : destaque >= 0 ? destaque : 1
 
   return (
     <div className={cn("flex flex-col gap-6", className)}>
@@ -184,9 +199,9 @@ export function SeatPlanCards({
       </div>
 
       {loading ? (
-        <SeatPlanCardsSkeleton recommendedIndex={destaqueNoEsqueleto} />
+        <SeatPlanCardsSkeleton count={noEsqueleto} recommendedIndex={destaqueNoEsqueleto} />
       ) : (
-        <div className={cn(GRADE, destaque >= 0 && GRADE_ERGUIDA)}>
+        <div className={cn(grade(plans.length), destaque >= 0 && GRADE_ERGUIDA)}>
           {plans.map((plano) => (
             <CartaoPlano
               key={plano.key}
@@ -195,6 +210,7 @@ export function SeatPlanCards({
               currency={currency}
               locale={locale}
               destaque={plano.key === recommendedPlan}
+              porPessoa={perSeat}
               estado={seatPlanStatus(plano.key, { currentPlan, trialPlan: trial?.plan })}
               fimDoTeste={trial?.endsAt}
               onChoose={onChoose}
@@ -213,6 +229,7 @@ function CartaoPlano({
   currency,
   locale,
   destaque,
+  porPessoa,
   estado,
   fimDoTeste,
   onChoose,
@@ -223,13 +240,13 @@ function CartaoPlano({
   currency: SeatPlanCurrency
   locale: string
   destaque: boolean
+  porPessoa: boolean
   estado: ReturnType<typeof seatPlanStatus>
   fimDoTeste?: string
   onChoose: (key: string) => void
   onContactSales?: () => void
 }) {
   const t = useTranslate()
-  const Icone = ICONES[plano.key.replace(/^platform_/, "")] ?? UsersIcon
   const piso = seatPlanFloor(plano.pricePerSeat, plano.minSeats, period)
   // o plano comercial nunca vai para o checkout: sem onContactSales, o botão fica desabilitado
   const comercial = plano.contactSales === true
@@ -254,7 +271,7 @@ function CartaoPlano({
                 : "bg-sunken text-muted-foreground shadow-[inset_0_0_0_1px_var(--border)]"
             )}
           >
-            <Icone className="size-[18px]" />
+            <SeatPlanIcon planKey={plano.key} className="size-[18px]" />
           </span>
           {destaque ? (
             <span className="inline-flex h-[22px] items-center gap-[5px] rounded-full bg-primary-subtle px-[9px] text-[11.5px] font-semibold whitespace-nowrap text-primary-subtle-foreground shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--primary)_30%,transparent)]">
@@ -293,7 +310,7 @@ function CartaoPlano({
                 className="text-[32px] leading-[38px] font-semibold tracking-[-0.02em] whitespace-nowrap text-foreground-strong"
               />
               <span className="text-sm whitespace-nowrap text-muted-foreground">
-                {t(`platform.billing.plans.per_seat.${period}`)}
+                {t(`platform.billing.plans.${porPessoa ? "per_seat" : "per_period"}.${period}`)}
               </span>
             </p>
             <p className="text-[12.5px] leading-[17px] text-muted-foreground">
@@ -366,9 +383,9 @@ function formatarData(iso: string, locale: string) {
 }
 
 export interface SeatPlanCardsSkeletonProps {
-  /** Quantos cartões em silhueta (4). */
+  /** Quantos cartões em silhueta: um por plano (3 no `team`, 2 no `personal`). Padrão: 3. */
   count?: number
-  /** Qual deles é o recomendado, com o azul (2, o Team); -1 ou ausente, nenhum. */
+  /** Qual deles é o recomendado, com o azul (1, o Pro); -1 ou ausente, nenhum. */
   recommendedIndex?: number
   className?: string
 }
@@ -378,14 +395,14 @@ export interface SeatPlanCardsSkeletonProps {
  * primary/20, e o quadradinho, o selo e o botão em primary/25 (o azul do PlanCardSkeleton do platform
  * antigo). As silhuetas do nome e da descrição, do preço e de quatro linhas.
  */
-export function SeatPlanCardsSkeleton({ count = 4, recommendedIndex, className }: SeatPlanCardsSkeletonProps) {
+export function SeatPlanCardsSkeleton({ count = 3, recommendedIndex, className }: SeatPlanCardsSkeletonProps) {
   const t = useTranslate()
   const erguida = recommendedIndex !== undefined && recommendedIndex >= 0 && recommendedIndex < count
   return (
     <div
       role="status"
       aria-label={t("platform.billing.plans.loading")}
-      className={cn(GRADE, erguida && GRADE_ERGUIDA, className)}
+      className={cn(grade(count), erguida && GRADE_ERGUIDA, className)}
     >
       {Array.from({ length: count }, (_, i) => {
         const destaque = i === recommendedIndex

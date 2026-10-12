@@ -12,7 +12,11 @@ import {
   type NextInvoiceHeroProps,
   type SeatsSummaryProps,
 } from "./billing-overview"
+import { CheckoutPage, CheckoutSummary, type CheckoutSummaryProps } from "./checkout-page"
+import { ContactSalesForm } from "./contact-sales"
+import { FiscalForm } from "./fiscal-form"
 import { formatBillingDate, SEAT_BAR_MAX_SEGMENTS, seatBarSegments, seatGrid, trialProgress } from "./overview"
+import { SeatPlanCards, SeatPlanIcon, type SeatPlan, type SeatPlanCardsProps } from "./plan-cards"
 
 const tipos = (s: { kind: string }[]) => s.map((x) => x.kind)
 
@@ -151,7 +155,7 @@ const crua = /platform\.billing\./
 const PESSOAS = ["Rafael Moura", "Ana Lima"].map((name, i) => ({ id: String(i), name, you: i === 0 }))
 const heroi = (props: Partial<NextInvoiceHeroProps>) =>
   createElement(NextInvoiceHero, {
-    plan: { key: "platform_team", name: "Team" },
+    plan: { key: "platform_pro", name: "Pro" },
     status: "active",
     period: "monthly",
     nextInvoice: { amountInCents: 17400, currency: "BRL", date: "2026-11-12T12:00:00Z" },
@@ -169,7 +173,7 @@ const assentos = (props: Partial<SeatsSummaryProps>) =>
     people: PESSOAS,
     leaving: [{ name: "Carlos Souza" }],
     paidUntil: "2026-11-12T12:00:00Z",
-    planName: "Team",
+    planName: "Pro",
     codePro: "active",
     locale: "pt-BR",
     ...props,
@@ -197,6 +201,13 @@ describe("render", () => {
     expect(a).not.toContain("Quem entra")
     expect(a).not.toContain("Code Pro")
   })
+  test("no personal, sem os avisos de quem entra e quem sai (CA10)", () => {
+    const pessoal = html(assentos({ personal: true, seats: { active: 1, paid: 1 }, people: [PESSOAS[0]], leaving: [] }))
+    expect(pessoal).not.toContain("Quem entra")
+    expect(pessoal).not.toContain("Quem sai")
+    expect(pessoal).toContain('role="img"')
+    expect(html(assentos({ seats: { active: 1, paid: 1 }, people: [PESSOAS[0]], leaving: [] }))).toContain("Quem entra")
+  })
   test("1 pago no singular", () => {
     expect(html(assentos({ seats: { active: 1, paid: 1 }, leaving: [] }))).toContain("pago neste período<")
   })
@@ -217,7 +228,7 @@ describe("render", () => {
     expect(h).toContain("dias de teste")
     expect(h).toContain("A assinatura começa em 26 de out. de 2026.")
     expect(h).toContain("Gerenciar no Stripe")
-    expect(h).not.toContain("Assinar o Team")
+    expect(h).not.toContain("Assinar o Pro")
     expect(h).not.toContain("volta para o Free")
   })
   test("datas inválidas não derrubam a página e somem com o trecho", () => {
@@ -252,7 +263,7 @@ describe("render", () => {
   test("se assinar: a conta com o mínimo e o Code Pro na assinatura paga", () => {
     const c = html(
       createElement(TrialSubscribeCard, {
-        plan: { key: "platform_team", name: "Team" },
+        plan: { key: "platform_pro", name: "Pro" },
         people: 6,
         pricePerSeat: { amountInCents: 2900, currency: "BRL" },
         includesCodePro: true,
@@ -260,11 +271,11 @@ describe("render", () => {
         locale: "pt-BR",
       })
     )
-    expect(c).toContain("Se assinar o Team")
+    expect(c).toContain("Se assinar o Pro")
     expect(c).toContain("6 pessoas × R$")
     expect(c).toContain("174")
     expect(c).toContain("na assinatura paga")
-    expect(c).toContain("Assinar o Team")
+    expect(c).toContain("Assinar o Pro")
     const e = html(
       createElement(TrialSubscribeCard, {
         plan: { key: "platform_enterprise", name: "Enterprise" },
@@ -276,5 +287,141 @@ describe("render", () => {
     )
     expect(e).toContain("10 pessoas × R$")
     expect(e).toContain("490")
+  })
+})
+
+// os planos novos (F1): Free, Pro e Enterprise, com o comportamento pelo tipo do workspace
+describe("planos novos", () => {
+  const plano = (key: string, extra: Partial<SeatPlan> = {}): SeatPlan => ({
+    key,
+    name: key.replace("platform_", ""),
+    description: "",
+    pricePerSeat: key === "platform_free" ? null : { monthly: 2900, yearly: 31320 },
+    includesCodePro: key !== "platform_free",
+    features: [],
+    ctaLabel: "Escolher",
+    ...extra,
+  })
+  const cartoes = (props: Partial<SeatPlanCardsProps>) =>
+    html(
+      createElement(SeatPlanCards, {
+        plans: [plano("platform_free"), plano("platform_pro"), plano("platform_enterprise", { minSeats: 10 })],
+        period: "monthly",
+        onPeriodChange: () => {},
+        currency: "BRL",
+        onChoose: () => {},
+        locale: "pt-BR",
+        ...props,
+      })
+    )
+
+  test("a grade segue o número de planos: 3 no team, 2 no personal", () => {
+    expect(cartoes({})).toContain("lg:grid-cols-3")
+    const pessoal = cartoes({ plans: [plano("platform_free"), plano("platform_pro")], perSeat: false })
+    expect(pessoal).toContain("sm:grid-cols-2")
+    expect(pessoal).not.toContain("grid-cols-3")
+  })
+  test("o preço por pessoa no team; só por mês no personal", () => {
+    expect(cartoes({})).toContain("por pessoa/mês")
+    const pessoal = cartoes({ plans: [plano("platform_free"), plano("platform_pro")], perSeat: false })
+    expect(pessoal).toContain("por mês")
+    expect(pessoal).not.toContain("por pessoa")
+  })
+  test("o esqueleto acompanha: 3 silhuetas no team e 2 no personal, sem os planos", () => {
+    const silhuetas = (h: string) => h.split('aria-hidden="true" class="relative row-span-4').length - 1
+    expect(silhuetas(cartoes({ plans: [], loading: true }))).toBe(3)
+    expect(silhuetas(cartoes({ plans: [], loading: true, perSeat: false }))).toBe(2)
+  })
+  test("o ícone do Pro é o diamante, com ou sem o prefixo", () => {
+    const pro = html(createElement(SeatPlanIcon, { planKey: "platform_pro" }))
+    expect(pro).toBe(html(createElement(SeatPlanIcon, { planKey: "pro" })))
+    expect(pro).not.toBe(html(createElement(SeatPlanIcon, { planKey: "platform_free" })))
+    expect(pro).not.toBe(html(createElement(SeatPlanIcon, { planKey: "platform_enterprise" })))
+  })
+  test("o checkout pelo tipo: no personal, 1 assento e só você; no team, max(pessoas, mínimo)", () => {
+    const resumo = (props: Partial<CheckoutSummaryProps>) =>
+      html(
+        createElement(CheckoutSummary, {
+          plan: { key: "platform_pro", name: "Pro" },
+          period: "monthly",
+          workspaceName: "Moura & Filhos",
+          people: [{ name: "Rafael Moura" }, { name: "Ana Lima" }, { name: "João Pereira" }],
+          pricePerSeat: { amountInCents: 2900, currency: "BRL" },
+          includesCodePro: true,
+          locale: "pt-BR",
+          ...props,
+        })
+      )
+    const pessoal = resumo({ kind: "personal" })
+    expect(pessoal).toContain("Só você")
+    expect(pessoal).toContain("1 pessoa × R$")
+    expect(pessoal).not.toContain("Ana")
+    expect(resumo({})).toContain("3 pessoas × R$")
+    expect(resumo({ plan: { key: "platform_enterprise", name: "Enterprise" }, minSeats: 10 })).toContain("10 pessoas × R$")
+  })
+  test("o subtítulo do checkout pelo tipo, com o nome do plano no título", () => {
+    const pagina = (kind: "personal" | "team") =>
+      html(
+        createElement(CheckoutPage, {
+          kind,
+          planName: "Pro",
+          period: "monthly",
+          onPeriodChange: () => {},
+          fiscal: null,
+          onSubmit: () => {},
+          summary: null,
+        })
+      )
+    expect(pagina("personal")).toContain("Um assento: o workspace é só seu.")
+    expect(pagina("team")).toContain("Cada pessoa no workspace ocupa um assento.")
+    expect(pagina("team")).toContain("Assinar o Pro")
+  })
+  test("o FiscalForm pelo tipo: CPF no personal; CNPJ e razão social no team", () => {
+    const form = (kind: "personal" | "team") =>
+      html(
+        createElement(FiscalForm, {
+          kind,
+          value: { country: "BR", taxId: "", legalName: "" },
+          onChange: () => {},
+          countries: ["BR", "US"],
+          locale: "pt-BR",
+        })
+      )
+    expect(form("personal")).toContain("CPF")
+    expect(form("personal")).not.toContain("Razão social")
+    expect(form("team")).toContain("CNPJ")
+    expect(form("team")).toContain("Razão social")
+    expect(form("team")).toContain(">País<")
+  })
+  test("o comercial com o mínimo do plano, sem número fixo", () => {
+    const comercial = html(
+      createElement(ContactSalesForm, {
+        value: { seats: 12, message: "" },
+        onChange: () => {},
+        onSubmit: () => {},
+        email: "rafael@moura.dev",
+        minSeats: 15,
+        locale: "pt-BR",
+      })
+    )
+    expect(comercial).toContain("cobra no mínimo 15")
+    expect(comercial).toContain("não tem limite de pessoas")
+    expect(comercial).not.toContain("mínimo 10")
+    const enviado = (trialPlanName?: string) =>
+      html(
+        createElement(ContactSalesForm, {
+          value: { seats: 12, message: "" },
+          onChange: () => {},
+          onSubmit: () => {},
+          sent: true,
+          email: "rafael@moura.dev",
+          minSeats: 10,
+          trialEndsAt: "2026-10-26T12:00:00Z",
+          trialPlanName,
+          locale: "pt-BR",
+        })
+      )
+    expect(enviado("Pro")).toContain("o teste do Pro segue até 26 de out.")
+    expect(enviado()).toContain("Enquanto isso, nada muda no workspace.")
   })
 })

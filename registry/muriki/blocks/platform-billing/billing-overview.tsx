@@ -8,15 +8,15 @@
  *   aria-label), "Próxima cobrança", o valor e "N assentos × preço"; à direita, o plano, os selos de
  *   status e de período, "Gerenciar no Stripe" e "Ver planos". No Free, sem selo de status e "Nenhuma
  *   cobrança prevista.". No teste, a folhinha verde traz o fim do teste, e o herói vira a contagem dos
- *   dias com a barra e o "Assinar o Team" (ou, já assinado, "A assinatura começa em …").
+ *   dias com a barra e o "Assinar o Pro" (ou, já assinado, "A assinatura começa em …").
  * - SeatsSummary: "N ativos | M pagos neste período", a barra com um segmento por assento pago (o
  *   mínimo do plano à parte; quem sai, hachurado), os dois avisos (quem entra paga proporcional na
  *   hora; quem sai deixa de ser cobrado só na renovação), as pessoas com o Code Pro de cada uma (quem
  *   sai, tracejado, "pago até") e "Muriki Code Pro para os N ativos". No teste, ninguém paga; no Free,
- *   só os ativos. O Code Pro segue o direito (R37), que o app passa em `codePro`.
+ *   só os ativos; no `personal`, sem os avisos de quem entra e quem sai. O Code Pro segue o direito (R37), que o app passa em `codePro`.
  * - SeatChangesCard: "Neste período", as entradas e saídas (`seatChanges` do GET …/billing, no máximo
  *   10, só o nome de exibição). Sem o `seatChanges`, o app não renderiza o cartão.
- * - TrialSubscribeCard: no teste, "Se assinar o Team" com "N pessoas × preço = total/mês".
+ * - TrialSubscribeCard: no teste, "Se assinar o Pro" com "N pessoas × preço = total/mês".
  * - FiscalDataCard: o CPF ou o CNPJ como vem da API, já mascarado, e a razão social.
  * - BillingOverview: a composição da página (o título, o herói e a grade de duas colunas), por slots.
  *
@@ -65,7 +65,7 @@ export interface BillingAction {
 // ── Herói: a próxima cobrança ───────────────────────────────────────────
 
 export interface NextInvoiceHeroProps {
-  /** O plano assinado, ex.: `{ key: "platform_team", name: "Team" }`. */
+  /** O plano assinado, ex.: `{ key: "platform_pro", name: "Pro" }`. */
   plan: { key: string; name: string }
   status: BillingStatus
   /** O selo do período ("Mensal" / "Anual"). */
@@ -87,7 +87,7 @@ export interface NextInvoiceHeroProps {
   manage?: BillingAction
   /** "Ver planos". Fora do teste. */
   viewPlans?: BillingAction
-  /** "Assinar o Team", no teste. */
+  /** "Assinar o Pro", no teste. */
   subscribe?: BillingAction
   /** Agora, para contar os dias do teste (o padrão é o relógio da máquina). */
   now?: string | Date
@@ -379,7 +379,7 @@ export interface SeatsSummaryProps {
   leaving?: SeatPerson[]
   /** O fim do período pago (a data da próxima cobrança), no "pago até <data>". */
   paidUntil?: string
-  /** O nome do plano, em "incluso na assinatura do Team". */
+  /** O nome do plano, em "incluso na assinatura do Pro". */
   planName: string
   /**
    * O mínimo cobrado do plano (`platform.min_seats`, o Enterprise 10, R24): os assentos do mínimo que
@@ -390,13 +390,18 @@ export interface SeatsSummaryProps {
    * O Muriki Code Pro pelo direito (R37), não pela feature do plano: `'active'` (assinatura `active`, ou
    * `past_due` dentro da carência) põe o selo em cada pessoa e "para os N ativos"; `'pending'` (teste,
    * `unpaid` ou `canceled` num plano com o Code) fica apagado, "O Code Pro entra com a assinatura paga.";
-   * ausente (Free, Solo), o Code Pro não aparece.
+   * ausente (Free), o Code Pro não aparece.
    */
   codePro?: "active" | "pending"
   /** No teste: ninguém paga e as pessoas ficam "No teste". */
   trial?: boolean
   /** No Free: só "N ativos", sem os pagos, a barra e os avisos do CA10, que falam de cobrança. */
   free?: boolean
+  /**
+   * No workspace `personal` (1 assento, ninguém entra nem sai): sem os avisos do CA10 de quem entra e
+   * de quem sai.
+   */
+  personal?: boolean
   locale: string
   className?: string
 }
@@ -426,6 +431,7 @@ export function SeatsSummary({
   codePro,
   trial = false,
   free = false,
+  personal = false,
   locale,
   className,
 }: SeatsSummaryProps) {
@@ -505,7 +511,9 @@ export function SeatsSummary({
                   </span>
                 ) : null}
               </div>
-              <p className="text-[12.5px] leading-[17px] text-muted-foreground">{t("platform.billing.overview.seats.rules")}</p>
+              {personal ? null : (
+                <p className="text-[12.5px] leading-[17px] text-muted-foreground">{t("platform.billing.overview.seats.rules")}</p>
+              )}
             </>
           )}
         </div>
@@ -717,7 +725,7 @@ export function SeatChangesCard({ changes, period, paidUntil, locale, className 
 // ── Se assinar (no teste) ───────────────────────────────────────────────
 
 export interface TrialSubscribeCardProps {
-  /** O plano do teste, ex.: `{ key: "platform_team", name: "Team" }`. */
+  /** O plano do teste, ex.: `{ key: "platform_pro", name: "Pro" }`. */
   plan: { key: string; name: string }
   /** As pessoas ativas hoje (os ativos do GET …/billing). */
   people: number
@@ -729,14 +737,14 @@ export interface TrialSubscribeCardProps {
   minSeats?: number | null
   /** O plano inclui o Code Pro: a linha "inclui Muriki Code Pro · na assinatura paga". */
   includesCodePro?: boolean
-  /** "Assinar o Team". */
+  /** "Assinar o Pro". */
   subscribe?: BillingAction
   locale: string
   className?: string
 }
 
 /**
- * "Se assinar o Team", no teste: a conta com as pessoas de hoje, "N pessoas × preço = total/mês". É a
+ * "Se assinar o Pro", no teste: a conta com as pessoas de hoje, "N pessoas × preço = total/mês". É a
  * mesma exceção de exibição da F12 do CheckoutSummary (N × o preço que a API mandou, com N nunca abaixo
  * do mínimo); o valor cobrado de verdade sai da API no checkout.
  */

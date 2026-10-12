@@ -1474,15 +1474,16 @@ const STRINGS: Record<string, unknown> = {
         count_zero: "só você",
         count_one: "você + 1",
         count_other: "você + {{count}}",
-        free_zone: "Free, até {{max}} pessoas",
-        team_zone: "Team",
+        // a régua: o limite é o mesmo no Free e no plano pago do workspace de empresa
+        zone: "Até {{max}} pessoas no Free e no {{plan}}",
         per_month: "{{price}}/mês",
         // com trial: o teste e o que vem depois dele, sem soar como cobrança automática
-        price: "{{trial}} dias de Team grátis. Depois do teste, para continuar com {{count}} pessoas: Team, {{count}} × {{price}} = {{total}}. Só conta quem aceitar o convite.",
-        price_free: "{{trial}} dias de Team grátis; depois, até {{max}} pessoas cabem no Free. Só conta quem aceitar o convite.",
-        // sem trial (o workspace nasceu no Free): nada de Team grátis
-        price_no_trial_free: "Até {{max}} pessoas cabem no Free.",
-        price_no_trial: "O Free vai até {{max}} pessoas. Com {{count}}, o time precisa do Team: {{count}} × {{price}} = {{total}}.",
+        price_one: "{{trial}} dias de {{plan}} grátis. Depois do teste, você cabe no Free; para seguir no {{plan}}, 1 × {{price}} = {{total}}. Só conta quem aceitar o convite.",
+        price_other: "{{trial}} dias de {{plan}} grátis. Depois do teste, as {{count}} pessoas cabem no Free; para seguir no {{plan}}, {{count}} × {{price}} = {{total}}. Só conta quem aceitar o convite.",
+        // sem trial (o workspace nasceu no Free): nada de grátis
+        price_no_trial: "Até {{max}} pessoas cabem no Free.",
+        // acima do limite do Free e do plano pago, só o Enterprise (sem limite)
+        over_limit: "O Free e o {{plan}} vão até {{max}} pessoas. Com {{count}}, o time precisa do Enterprise.",
       },
     },
     billing: {
@@ -1503,6 +1504,11 @@ const STRINGS: Record<string, unknown> = {
         per_seat: {
           monthly: "por pessoa/mês",
           yearly: "por pessoa/ano",
+        },
+        // o workspace `personal` paga 1 assento: o preço é só da pessoa
+        per_period: {
+          monthly: "por mês",
+          yearly: "por ano",
         },
         billed: {
           monthly: "cobrado todo mês",
@@ -1531,22 +1537,38 @@ const STRINGS: Record<string, unknown> = {
           switch_yearly: "Mudar para o anual",
           contact_sales: "Falar com o comercial",
         },
+        // a descrição do cartão, pelo tipo do workspace; o limite vem do plano, do admin (o personal não tem Enterprise)
+        description: {
+          free: {
+            team: "Para começar com o time.",
+            personal: "Para começar, só você.",
+          },
+          pro: {
+            team: "Para times de até {{max}} pessoas.",
+            personal: "O plano pago, só para você.",
+          },
+          enterprise: {
+            team: "Para times de mais de {{max}} pessoas.",
+          },
+        },
+        // os números (limite e mínimo) vêm do plano, do admin
         features: {
-          up_to_3: "Até 3 pessoas",
-          just_you: "1 pessoa: só você",
+          up_to: "Até {{count}} pessoas",
+          just_you: "Só você",
           unlimited: "Pessoas sem limite",
-          // só no workspace que está no teste
-          trial: "14 dias de teste",
+          // só no workspace que está no teste; os dias vêm do app
+          trial: "{{count}} dias de teste",
           trial_ends: "termina em {{date}}",
           accepted_invite: "Assento só com convite aceito",
           yearly_discount: "10% a menos no anual",
-          min_10: "A partir de 10 pessoas",
+          min_seats: "Cobra no mínimo {{count}} pessoas",
           contract: "Contrato com o comercial",
         },
         footnote: {
-          free: "Precisa de mais gente? O Team não tem limite.",
-          // o teste não inclui o Code: só a assinatura paga
-          solo: "Com um time? O Team inclui o Muriki Code Pro na assinatura paga.",
+          // no workspace `team`: quem passa do limite vai para o Enterprise
+          team: "Mais de {{max}} pessoas? O {{plan}} não tem limite.",
+          // no `personal`; o teste não inclui o Code: só a assinatura paga
+          personal: "O {{plan}} inclui o Muriki Code Pro na assinatura paga.",
         },
       },
       // a página do checkout (CheckoutPage e CheckoutSummary) e a moldura comum (BillingPageLayout)
@@ -1555,8 +1577,9 @@ const STRINGS: Record<string, unknown> = {
         trail_label: "Caminho",
         trail_stripe: "Pagamento no Stripe",
         title: "Assinar o {{plan}}",
+        // pelo tipo do workspace
         subtitle: {
-          solo: "Para uma pessoa só: você.",
+          personal: "Um assento: o workspace é só seu.",
           team: "Cada pessoa no workspace ocupa um assento.",
         },
         period: "Período",
@@ -1580,10 +1603,10 @@ const STRINGS: Record<string, unknown> = {
           yearly: "Total por ano",
         },
       },
-      // os dados fiscais (FiscalForm): só no Brasil; o Solo pede o CPF, o Team e o Enterprise o CNPJ
+      // os dados fiscais (FiscalForm): só no Brasil; pelo tipo do workspace, o `personal` pede o CPF e o `team` o CNPJ
       fiscal: {
         title: "Dados fiscais",
-        country: "País da empresa",
+        country: "País",
         outside_brazil: "Fora do Brasil, o número fiscal da empresa, se houver, é pedido no Stripe.",
         cpf: {
           label: "CPF",
@@ -1618,10 +1641,10 @@ const STRINGS: Record<string, unknown> = {
       // falar com o comercial (ContactSalesForm e ContactSalesSummary)
       sales: {
         title: "Falar com o comercial",
-        subtitle: "O Enterprise vale a partir de {{min}} pessoas. O comercial responde no seu e-mail.",
+        subtitle: "O Enterprise não tem limite de pessoas e cobra no mínimo {{min}}. O comercial responde no seu e-mail.",
         seats: {
           label: "Quantas pessoas",
-          hint: "De 1 a 100.000.",
+          hint: "De 1 a 100.000. O Enterprise cobra no mínimo {{min}}.",
           less: "Uma pessoa a menos",
           more: "Uma pessoa a mais",
         },
@@ -1634,7 +1657,7 @@ const STRINGS: Record<string, unknown> = {
           request: "O seu pedido",
           seats_one: "1 pessoa no Enterprise",
           seats_other: "{{count}} pessoas no Enterprise",
-          note_trial: "Enquanto isso, o teste do Team segue até {{date}} e nada muda no workspace.",
+          note_trial: "Enquanto isso, o teste do {{plan}} segue até {{date}} e nada muda no workspace.",
           note: "Enquanto isso, nada muda no workspace.",
           back: "Voltar para os planos",
         },

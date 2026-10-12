@@ -5,7 +5,7 @@
 # ViewToggle, o checkout é uma página de dentro do workspace e os campos são os do onboarding (InputGroup touch). O DS só formata o que a API manda: o anual aparece por pessoa/ano,
 # como vem, e não dividido por 12 (F12); o "a partir de" do Enterprise é a única conta, só exibição.
 from pecas import K, T, ic, svg, I, campo, esc, raiz, topo, PRODUTO, EMAIL, FONTE, MONO, casca, logica, juntar, COMUM, PROPS_IDIOMA, props_tema
-from base import badge, CSS_DIVIDER_SKELETON
+from base import badge, diamante, CSS_DIVIDER_SKELETON
 
 I.update(
     # ArrowSquareOut (o link do portal) e UserPlus / UserMinus (os dois avisos dos assentos)
@@ -58,18 +58,18 @@ def troca(k, aria, opcoes, escolhida):
 
 
 # ── Planos (SeatPlanCards) ──────────────────────────────────────────────
-# Os quatro cartões numa fileira (a PlanGrid com quatro): Free, Solo, Team (o destacado) e Enterprise.
-# Em cima, as trocas de período (com o selo "−10%" no anual) e de moeda; com a moeda travada, no lugar
-# da troca fica a moeda da assinatura, com o cadeado.
+# Os planos são Free, Pro e Enterprise, os mesmos para todo workspace; o tipo decide o que aparece (F0):
+# no `team` são três cartões (Free e Pro até 5 pessoas; o Enterprise sem limite, cobrando no mínimo 10); no
+# `personal` são dois (Free e Pro, só a pessoa, sem o Enterprise). O Pro é o recomendado e o plano do
+# teste de 14 dias. Em cima, as trocas de período (com o selo "−10%" no anual) e de moeda; com a moeda
+# travada, no lugar da troca fica a moeda da assinatura, com o cadeado.
 # O cartão segue o PlanCard do platform antigo (o filete degradê de 1px no topo do destaque, o título
 # grande, o preço e a lista com o check; o CTA muted nos comuns e primary no destaque), sem manchas nem
-# desfoque. No cabeçalho, o ícone do plano num quadradinho (como os ícones de linha) e, no Team, o selo
-# "Recomendado"; o estado (No teste / Plano atual) é um selo discreto ao lado do nome. O Team, o
-# recomendado, sobe além da fileira e tem a sombra mais funda. As linhas se alinham pela grade
-# (subgrid: o cabeçalho, o preço, a lista e o botão). A lista só diz o que o produto sustenta (as
-# features ficam fora do FE1): o limite de pessoas, o teste de 14 dias, o assento só de quem aceitou o
-# convite, o −10% do anual, o contrato do Enterprise e o Code Pro. Free e Solo, com menos itens, fecham
-# a lista com a nota do próximo plano, no pé.
+# desfoque. No cabeçalho, o ícone do plano num quadradinho e, no Pro, o selo "Recomendado"; o estado
+# (No teste / Plano atual) é um selo discreto ao lado do nome. O Pro sobe além da fileira e tem a
+# sombra mais funda. As linhas se alinham pela grade (subgrid: o cabeçalho, o preço, a lista e o
+# botão). A lista só diz o que o produto sustenta: o limite de pessoas, o teste de 14 dias, o assento só
+# de quem aceitou o convite, o −10% do anual, o mínimo e o contrato do Enterprise e o Code Pro.
 I.update(
     # os ícones dos planos, no traço dos outros: a folha (Free), o prédio (Enterprise); a pessoa e as
     # pessoas já existem
@@ -78,21 +78,34 @@ I.update(
     predio=svg('<path d="M2.6 13.6h10.8"/><path d="M3.8 13.6V3a.8.8 0 0 1 .8-.8h4.8a.8.8 0 0 1 .8.8v10.6"/><path d="M10.2 6.4h1.4a.6.6 0 0 1 .6.6v6.6"/>'
                '<path d="M5.8 4.8h2.4M5.8 7.2h2.4M5.8 9.6h2.4"/>'),
 )
-PLANOS = [
+PLANOS = {
     # chave, nome, ícone, descrição, preço (mês, ano), nota do Enterprise (mês, ano)
-    ('free', 'Free', 'folha', 'cbDescFree', None, None),
-    ('solo', 'Solo', 'pessoa', 'cbDescSolo', ('cbPrecoSolo', 'cbAnoSolo'), None),
-    ('team', 'Team', 'pessoas', 'cbDescTeam', ('cbPrecoTeam', 'cbAnoTeam'), None),
-    ('enterprise', 'Enterprise', 'predio', 'cbDescEnt', ('cbPrecoEnt', 'cbAnoEnt'), ('cbEntMes', 'cbEntAno')),
-]
-# os itens de cada cartão: (texto, nota embaixo ou None); o Code Pro e a nota do pé vêm à parte
-ITENS = {
-    'free': [('cbItAte3', None)],
-    'solo': [('cbItSoVoce', None), ('cbItAnual', None)],
-    'team': [('cbItSemLimite', None), ('cbItTeste', 'TESTE'), ('cbItAceito', None), ('cbItAnual', None)],
-    'enterprise': [('cbItMin10', None), ('cbItContrato', None), ('cbItAceito', None), ('cbItAnual', None)],
+    'team': [
+        ('free', 'Free', 'folha', 'cbDescFree', None, None),
+        ('pro', 'Pro', 'diamante', 'cbDescPro', ('cbPrecoPro', 'cbAnoPro'), None),
+        ('enterprise', 'Enterprise', 'predio', 'cbDescEnt', ('cbPrecoEnt', 'cbAnoEnt'), ('cbEntMes', 'cbEntAno')),
+    ],
+    'personal': [
+        ('free', 'Free', 'folha', 'cbDescFreePessoal', None, None),
+        ('pro', 'Pro', 'diamante', 'cbDescProPessoal', ('cbPrecoPro', 'cbAnoPro'), None),
+    ],
 }
-PE = {'free': 'cbPeFree', 'solo': 'cbPeSolo'}
+# os itens de cada cartão: (texto, nota embaixo ou None; 'TESTE' é o teste, que só aparece no
+# estado de teste); o Code Pro e a nota do pé vêm à parte
+ITENS = {
+    'team': {
+        'free': [('cbItAte5', None)],
+        'pro': [('cbItAte5', None), ('cbItTeste', 'TESTE'), ('cbItAceito', None), ('cbItAnual', None)],
+        'enterprise': [('cbItSemLimite', None), ('cbItMin10', None), ('cbItContrato', None), ('cbItAnual', None)],
+    },
+    'personal': {
+        'free': [('cbItSoVoce', None)],
+        'pro': [('cbItSoVoce', None), ('cbItTeste', 'TESTE'), ('cbItAnual', None)],
+    },
+}
+CODE_PRO = {'pro', 'enterprise'}
+# a nota do pé: no `team`, quem passa de 5 vai para o Enterprise; no `personal`, o Code Pro do Pro
+PE = {'team': {'free': 'cbPeEnt'}, 'personal': {'free': 'cbPeFree'}}
 # o recomendado sobe e desce além da fileira
 ERGUE = 22
 
@@ -121,10 +134,12 @@ def _item_code(k, texto='cbCodePro', filete=True):
 
 
 def _icone_plano(k, icone, destaque):
+    # o Pro leva o diamante do Pro do Code (preenchido); os outros, os ícones de linha
+    g = diamante(17) if icone == 'diamante' else ic(icone, 18)
     cor = (f'background:{k["pri"]};color:{k["prifg"]};' if destaque
            else f'background:{k["sunken"]};color:{k["mfg"]};box-shadow:inset 0 0 0 1px {k["border"]};')
     return (f'<span aria-hidden="true" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 auto;'
-            f'border-radius:10px;{cor}"><span style="display:flex;width:18px;height:18px;">{ic(icone, 18)}</span></span>')
+            f'border-radius:10px;{cor}"><span style="display:flex;align-items:center;justify-content:center;width:18px;height:18px;">{g}</span></span>')
 
 
 def _selo_recomendado(k):
@@ -148,26 +163,28 @@ def _moldura_cartao(k, destaque, esqueleto=False):
     return base + f'border:1px solid color-mix(in oklab, {k["border"]} 70%, transparent);box-shadow:{k["sombra"]};'
 
 
-def cartao_plano(k, plano, anual, teste, cta):
+def cartao_plano(k, plano, anual, teste, cta, tipo='team'):
     chave, nome, icone, desc, precos, nota_ent = plano
-    destaque = chave == 'team'
+    destaque = chave == 'pro'
     filete = f'border-top:1px solid color-mix(in oklab, {k["border"]} 60%, transparent);'
     if precos is None:
         preco = (f'<p style="margin:0;font-size:32px;line-height:38px;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};">{T("cbGratis")}</p>'
                  f'<p style="margin:0;font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbNotaFree")}</p>')
     else:
         valor = T(precos[1] if anual else precos[0])
+        # no `personal` o preço é da pessoa só (1 assento): "por mês", sem o "por pessoa"
+        unidade = ('cbPorAno' if anual else 'cbPorMes') if tipo == 'team' else ('cbPorAnoSo' if anual else 'cbPorMesSo')
         nota = T(nota_ent[1] if anual else nota_ent[0]) if nota_ent else T('cbNotaAno' if anual else 'cbNotaMes')
         preco = (f'<p style="margin:0;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px;">'
                  f'<span style="font-size:32px;line-height:38px;font-weight:600;letter-spacing:-0.02em;color:{k["fgs"]};'
                  f'font-variant-numeric:tabular-nums;white-space:nowrap;">{valor}</span>'
-                 f'<span style="font-size:14px;color:{k["mfg"]};white-space:nowrap;">{T("cbPorAno" if anual else "cbPorMes")}</span></p>'
+                 f'<span style="font-size:14px;color:{k["mfg"]};white-space:nowrap;">{T(unidade)}</span></p>'
                  f'<p style="margin:0;font-size:12.5px;line-height:17px;color:{k["mfg"]};">{nota}</p>')
-    itens = ''.join(_item(k, t, (T('cbTermina') if teste else None) if n == 'TESTE' else None) for t, n in ITENS[chave] if teste or n != 'TESTE')
-    if chave in ('team', 'enterprise'):
+    itens = ''.join(_item(k, t, (T('cbTermina') if teste else None) if n == 'TESTE' else None) for t, n in ITENS[tipo][chave] if teste or n != 'TESTE')
+    if chave in CODE_PRO:
         itens += _item_code(k)
     pe = (f'<p style="margin:0;padding:10px 12px;border-radius:10px;background:{k["sunken"]};font-size:12.5px;line-height:17px;color:{k["mfg"]};">'
-          f'{T(PE[chave])}</p>') if chave in PE else ''
+          f'{T(PE[tipo][chave])}</p>') if chave in PE[tipo] else ''
     rotulo_cta, variante = cta
     botao_ = (f'<button type="button" style="display:flex;align-items:center;justify-content:center;width:100%;height:40px;padding:0 14px;'
               f'border:0;border-radius:10px;font-family:{FONTE};font-size:14px;font-weight:500;'
@@ -212,11 +229,13 @@ def _esqueleto_plano(k, destaque):
             f'<div style="display:flex;align-items:flex-end;">{sk("height:40px;width:100%;" + tinta)}</div></div>')
 
 
-def tela_planos(k, estado):
-    # 'teste': mensal, no teste do Team (o plano atual), a moeda ainda troca (antes da primeira compra)
-    # 'anual': anual, o workspace já assina o Team mensal, a moeda travada
+def tela_planos(k, estado, tipo='team'):
+    # 'teste': mensal, no teste do Pro (o plano atual), a moeda ainda troca (antes da primeira compra)
+    # 'anual': anual, o workspace já assina o Pro mensal, a moeda travada
     # 'carregando': o GET /plans ainda não voltou: as trocas já estão, os cartões em silhueta
+    # `tipo`: 'team' (três cartões) ou 'personal' (Free e Pro, só a pessoa)
     anual = estado == 'anual'
+    planos = PLANOS[tipo]
     periodo = troca(k, T('cbPeriodoAria'), [('mensal', T('cbMensal')),
                                             ('anual', T('cbAnual'), badge('−10%', k, 'green'))], 'anual' if anual else 'mensal')
     if anual:
@@ -224,26 +243,25 @@ def tela_planos(k, estado):
                  f'{ic("cadeado", 14)}{T("cbMoedaTravada")}</span>')
     else:
         moeda = troca(k, T('cbMoedaAria'), [('BRL', 'BRL'), ('USD', 'USD')], None)
-    if anual:
-        ctas = {'free': ('cbMudarFree', 'secondary'), 'solo': ('cbMudarSolo', 'secondary'),
-                'team': ('cbMudarAnual', 'solid'), 'enterprise': ('cbFalar', 'secondary')}
-    else:
-        ctas = {'free': ('cbMudarFree', 'secondary'), 'solo': ('cbAssinarSolo', 'secondary'),
-                'team': ('cbAssinarTeam', 'solid'), 'enterprise': ('cbFalar', 'secondary')}
-    grade = (f'display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:auto auto 1fr auto;column-gap:20px;'
-             f'margin-top:{ERGUE}px;')
+    ctas = {'free': ('cbMudarFree', 'secondary'), 'pro': ('cbMudarAnual' if anual else 'cbAssinarPro', 'solid'),
+            'enterprise': ('cbFalar', 'secondary')}
+    grade = (f'display:grid;grid-template-columns:repeat({len(planos)},minmax(0,1fr));grid-template-rows:auto auto 1fr auto;'
+             f'column-gap:24px;margin-top:{ERGUE}px;')
     if estado == 'carregando':
         cartoes = (f'<div role="status" aria-label="{T("cbCarregando")}" style="{grade}">'
-                   + ''.join(_esqueleto_plano(k, p[0] == 'team') for p in PLANOS) + '</div>')
+                   + ''.join(_esqueleto_plano(k, p[0] == 'pro') for p in planos) + '</div>')
     else:
         cartoes = (f'<div style="{grade}">'
-                   + ''.join(cartao_plano(k, p, anual, not anual, ctas[p[0]]) for p in PLANOS) + '</div>')
+                   + ''.join(cartao_plano(k, p, anual, not anual, ctas[p[0]], tipo) for p in planos) + '</div>')
     conteudo = f'<div style="display:flex;align-items:center;justify-content:space-between;">{periodo}{moeda}</div>{cartoes}'
-    return pagina_produto(k, T('cbPlanos'), T('cbPlanosSubPago' if anual else 'cbPlanosSubTeste'), conteudo, 1120)
+    # três cartões na largura da página; dois, numa coluna mais estreita, para não esticar
+    return pagina_produto(k, T('cbPlanos'), T('cbPlanosSubPago' if anual else 'cbPlanosSubTeste'), conteudo,
+                          1040 if tipo == 'team' else 760)
 
 
 # ── Peças comuns do checkout ────────────────────────────────────────────
-PESSOAS_WS = ['Rafael Moura', 'Ana Lima', 'João Pereira', 'Bia Costa', 'Duda Alves', 'Eva Rocha']
+# o Moura & Filhos no Pro: 4 pessoas, dentro do limite de 5 do Free e do Pro de empresa
+PESSOAS_WS = ['Rafael Moura', 'Ana Lima', 'João Pereira', 'Bia Costa']
 
 
 def _avatar(k, nome, i, tam=28, apagado=False):
@@ -300,8 +318,9 @@ def _nota_stripe(k):
 
 
 def _campos_fiscais(k, variante):
-    # o FiscalForm: só no Brasil. O Solo pede o CPF; o Team e o Enterprise, o CNPJ e a razão social
-    if variante == 'solo':
+    # o FiscalForm: só no Brasil. O documento sai do tipo do workspace, não do plano: `personal` pede o
+    # CPF; `team`, o CNPJ e a razão social
+    if variante == 'pessoal':
         return _seletor_pais(k, 'cbBrasil') + campo(k, 'cpf', T('cbCpf'), '123.456.789-09', frase=T('cbCpfDica'), mono=True)
     if variante == 'eua':
         return (_seletor_pais(k, 'cbEua')
@@ -314,11 +333,11 @@ def _campos_fiscais(k, variante):
 
 
 def _numero_conta(variante):
-    if variante == 'solo':
-        return 'cbContaSolo', 'cbTotalSolo', 'cbAno'
+    if variante == 'pessoal':
+        return 'cbContaPessoal', 'cbTotalPessoal', 'cbAno'
     if variante == 'eua':
         return 'cbContaEua', 'cbTotalEua', 'cbMes'
-    return 'cbContaTeam', 'cbTotalTeam', 'cbMes'
+    return 'cbContaPro', 'cbTotalPro', 'cbMes'
 
 
 I.update(
@@ -395,18 +414,18 @@ def _cupom(k, aplicado):
 
 
 def pagina_assinar(k, variante, cupom=None):
-    # 'team' (CNPJ e razão social), 'solo' (CPF, no anual), 'erro' (o CNPJ com o DV errado) e 'eua'
-    # (uma empresa dos EUA: sem campo fiscal, o resumo em USD). `cupom`: None (sem o campo, no quadro
-    # do erro do CNPJ, para não misturar, e no Solo anual: o cupom só vale no mensal), 'fechado' (o
-    # link) ou 'aplicado' (LANCAMENTO20, no Team)
-    solo = variante == 'solo'
-    titulo = T('cbAssinarSolo' if solo else 'cbAssinarTeam')
+    # sempre o Pro. 'team' (CNPJ e razão social, por assento), 'pessoal' (o workspace `personal`: CPF e
+    # 1 assento, no anual), 'erro' (o CNPJ com o DV errado) e 'eua' (uma empresa dos EUA: sem campo
+    # fiscal, o resumo em USD). `cupom`: None (sem o campo, no quadro do erro do CNPJ, para não
+    # misturar, e no pessoal anual: o cupom só vale no mensal), 'fechado' (o link) ou 'aplicado'
+    solo = variante == 'pessoal'
+    titulo = T('cbAssinarPro')
     f = FILETE.format(input=k['input'])
     periodo = troca(k, T('cbPeriodoAria'), [('mensal', T('cbMensal')),
                                             ('anual', T('cbAnual'), badge('−10%', k, 'green'))], 'anual' if solo else 'mensal')
     trilha = _trilha(k, [(titulo, True, None), (T('cbTrilhaStripe'), False, 'cadeado')])
     form = (f'<div style="display:flex;flex-direction:column;gap:26px;width:440px;">{trilha}'
-            f'{_cabeca_form(k, titulo, T("cbAssinarSubSolo" if solo else "cbAssinarSubTeam"))}'
+            f'{_cabeca_form(k, titulo, T("cbAssinarSubPessoal" if solo else "cbAssinarSubTeam"))}'
             f'<div style="display:flex;flex-direction:column;gap:10px;">'
             f'<span style="font-size:14px;line-height:14px;font-weight:500;color:{k["fgs"]};">{T("cbPeriodoRot")}</span>'
             f'<div style="display:flex;">{periodo}</div></div>'
@@ -418,15 +437,14 @@ def pagina_assinar(k, variante, cupom=None):
     nomes = PESSOAS_WS[:1] if solo else PESSOAS_WS
     quem = (f'<div style="display:flex;align-items:center;gap:12px;">{_pilha(k, nomes, 30)}'
             f'<span style="display:flex;flex-direction:column;">'
-            f'<span style="font-size:14px;line-height:20px;font-weight:500;color:{k["fgs"]};">{T("cbResumoSolo" if solo else "cbResumoTeam")}</span>'
-            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbResumoSoloQuem" if solo else "cbVoceMais5")}</span></span></div>')
+            f'<span style="font-size:14px;line-height:20px;font-weight:500;color:{k["fgs"]};">{T("cbResumoPessoal" if solo else "cbResumoTeam")}</span>'
+            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbResumoPessoalQuem" if solo else "cbVoceMais3")}</span></span></div>')
     linhas = _linha(k, T(conta), T(total) + T(per))
-    if not solo:
-        # o Code Pro com a ressalva do cartão: quem assina no teste fica no teste até o fim, e o teste não dá o Code (R37)
-        linhas += _linha(k, f'<span style="display:inline-flex;flex-direction:column;">'
-                            f'<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:flex;width:13px;height:13px;'
-                            f'color:{k["pri"]};">{FAISCA}</span>{T("cbCodeProCurto")}</span>'
-                            f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbNaPaga")}</span></span>', T('cbIncluso'))
+    # o Code Pro (nos dois tipos) com a ressalva do cartão: quem assina no teste fica no teste até o fim, e o teste não dá o Code (R37)
+    linhas += _linha(k, f'<span style="display:inline-flex;flex-direction:column;">'
+                        f'<span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:flex;width:13px;height:13px;'
+                        f'color:{k["pri"]};">{FAISCA}</span>{T("cbCodeProCurto")}</span>'
+                        f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbNaPaga")}</span></span>', T('cbIncluso'))
     aplicado = cupom == 'aplicado'
     if aplicado:
         # o desconto e o total com cupom vêm da API (F12); aqui, só o desenho, com as 2 casas
@@ -439,9 +457,9 @@ def pagina_assinar(k, variante, cupom=None):
     else:
         total_bloco = _linha(k, T('cbTotalPorAno' if solo else 'cbTotalPorMes'), T(total), True)
     campo_cupom = _cupom(k, aplicado) if cupom else ''
-    itens = (_item(k, 'cbItSoVoce') + _item(k, 'cbItAnual')) if solo else (_item(k, 'cbItSemLimite') + _item(k, 'cbItAceito'))
+    itens = (_item(k, 'cbItSoVoce') + _item(k, 'cbItAnual')) if solo else (_item(k, 'cbItAte5') + _item(k, 'cbItAceito'))
     resumo = (f'<div style="display:flex;flex-direction:column;gap:20px;width:380px;">'
-              f'{_cabeca_resumo(k, "pessoa" if solo else "pessoas", "Solo" if solo else "Team", badge(T("cbAnual" if solo else "cbMensal"), k))}'
+              f'{_cabeca_resumo(k, "diamante", "Pro", badge(T("cbAnual" if solo else "cbMensal"), k))}'
               f'{quem}{_bloco(k, linhas)}{campo_cupom}'
               f'{_bloco(k, total_bloco, gap=6)}'
               f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;">{itens}</ul></div>')
@@ -586,7 +604,7 @@ def _heroi(k, esquerda, direita):
 
 def _plano_status(k, selos):
     return (f'<div style="display:flex;align-items:center;gap:10px;">'
-            f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">Team</span>{selos}</div>')
+            f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">Pro</span>{selos}</div>')
 
 
 def _evento(k, icone, cor, titulo, nota):
@@ -620,13 +638,13 @@ def _assentos(k, teste):
     barra = (f'<div role="img" aria-label="{T("cbBarraAria" if not teste else "cbBarraTesteAria")}" style="display:flex;gap:4px;">'
              + ''.join(seg(p == 'Carlos Souza') for p in pessoas) + '</div>')
     if teste:
-        topo_ = (f'<div style="display:flex;align-items:flex-end;gap:28px;">{numero(6, "cbAtivos", k["fgs"])}'
+        topo_ = (f'<div style="display:flex;align-items:flex-end;gap:28px;">{numero(len(PESSOAS_WS), "cbAtivos", k["fgs"])}'
                  f'{numero(0, "cbPagosTeste", k["mfg"])}</div>')
         legenda = f'<span>{T("cbTesteAssentos")}</span>'
     else:
-        topo_ = (f'<div style="display:flex;align-items:flex-end;gap:28px;">{numero(6, "cbAtivos", k["fgs"])}'
+        topo_ = (f'<div style="display:flex;align-items:flex-end;gap:28px;">{numero(len(PESSOAS_WS), "cbAtivos", k["fgs"])}'
                  f'<span aria-hidden="true" style="width:1px;align-self:stretch;background:{k["muted"]};"></span>'
-                 f'{numero(7, "cbPagosPeriodo", k["fgs"])}</div>')
+                 f'{numero(n, "cbPagosPeriodo", k["fgs"])}</div>')
         pt = lambda est, txt: (f'<span style="display:inline-flex;align-items:center;gap:6px;">'
                                f'<span style="width:14px;height:8px;border-radius:2px;{est}"></span>{T(txt)}</span>')
         legenda = (pt(f'background:{k["pri"]};', 'cbLegAtivo')
@@ -707,10 +725,10 @@ def tela_cobranca(k, teste=False):
         direita = (f'{_plano_status(k, badge(T("cbNoTeste"), k, "green", ponto=True))}'
                    f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["fg"]};">{T("cbTesteSemCobranca")}</p>'
                    f'<button type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border:0;border-radius:10px;'
-                   f'background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:14px;font-weight:500;">{T("cbAssinarTeam")}</button>')
+                   f'background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:14px;font-weight:500;">{T("cbAssinarPro")}</button>')
         lado = _cartao(k, (
             f'{_h2(k, T("cbSeAssinar"))}'
-            f'{_conta(k, "cbContaTeam", "cbTotalTeam", "cbMes", grande=28)}'
+            f'{_conta(k, "cbContaPro", "cbTotalPro", "cbMes", grande=28)}'
             f'<p style="margin:0;font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbSeAssinarNota")}</p>'))
     else:
         esquerda = (f'{_folha(k, T("cbMesCurto"), "12", k["pri"], T("cbProxData"))}'
@@ -736,9 +754,10 @@ TELAS_C = {
     'planos_teste': lambda k: tela_planos(k, 'teste'),
     'planos_anual': lambda k: tela_planos(k, 'anual'),
     'planos_carregando': lambda k: tela_planos(k, 'carregando'),
-    'assinar_team': lambda k: pagina_assinar(k, 'team', 'fechado'),
+    'planos_pessoal': lambda k: tela_planos(k, 'teste', 'personal'),
+    'assinar_pro': lambda k: pagina_assinar(k, 'team', 'fechado'),
     'assinar_cupom': lambda k: pagina_assinar(k, 'team', 'aplicado'),
-    'assinar_solo': lambda k: pagina_assinar(k, 'solo'),
+    'assinar_pessoal': lambda k: pagina_assinar(k, 'pessoal'),
     'assinar_erro': lambda k: pagina_assinar(k, 'erro'),
     'assinar_eua': lambda k: pagina_assinar(k, 'eua', 'fechado'),
     'comercial': lambda k: pagina_comercial(k, 'aberto'),
