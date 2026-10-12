@@ -760,8 +760,9 @@ def tela_planos(k, carregando=False):
 # ── Entrar e criar conta: o bloco login-page do DS, com a mensagem do Code ──
 # Estrutura, medidas e hierarquia vêm de registry/muriki/blocks/login-page; o que é do Code
 # é o texto (o bloco lê tudo do i18n do app) e os provedores: GitHub na frente, sem SSO nem
-# Microsoft, porque o Code não tem organização.
-def tela_acesso(k, modo, sufixo):
+# Microsoft, porque o Code não tem organização. `marca` é a legenda do painel: o canvas do
+# Platform desenha a mesma tela com a dele.
+def tela_acesso(k, modo, sufixo, marca='muriki / code'):
     criar = modo == 'criar'
     h = lambda caminho: '{{' + caminho + '}}'
     linha = lambda cor, largura: f'<span style="height:1px;{largura}background:{cor};"></span>'
@@ -783,7 +784,7 @@ def tela_acesso(k, modo, sufixo):
         f'<div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">'
         f'<span style="display:flex;width:36px;height:36px;">'
         f'<span style="display:{{{{senha.olhoA}}}};width:100%;height:100%;">{LOGO}</span><span style="display:{{{{senha.olhoF}}}};width:100%;height:100%;">{LOGO_FECHADO}</span>'
-        f'</span>{legenda("muriki / code", k)}</div>'
+        f'</span>{legenda(marca, k)}</div>'
         f'<div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:24px;max-width:512px;">'
         f'<div style="display:flex;align-items:center;gap:12px;">{legenda(T("acesso"), k, "0.3em")}{linha(k["pri"], "width:64px;")}</div>'
         f'<h2 style="margin:0;font-size:72px;line-height:0.95;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">'

@@ -5,14 +5,18 @@ from pecas import (K, T, ic, pagina, pagina_identidade, cabecalho_passo, campo, 
                    cartoes_escolha, esc, previa_workspace, PRODUTOS, previa_movimento, CSS_MOVIMENTO, casca, logica,
                    juntar, COMUM, PROPS_IDIOMA, props_tema)
 from textos_identidade import IDENTIDADE, MOVIMENTO
+from textos_entrada import ENTRADA, CONVIDAR
+from entrada import TELAS_A2, COM_IDENTIDADE, COM_CONVIDAR
+from acesso import montar_acesso
 
 
 # ── Onboarding · @usuário e workspace (bloco platform-identity) ─────────
 # PlatformOnboardingIdentity: para quem é (Com o meu time / Só para mim), o @usuário, o nome e o
 # endereço do workspace e o aceite dos termos, numa tela só e sem CPF nem plano. O formato é do
 # componente; livre, ocupado e reservado vêm do app. O botão só liga com tudo livre e os termos
-# aceitos. A partir do lg, a tela tem a altura da janela, sem rolar: o formulário à esquerda e, no
-# palco azul à direita, a WorkspacePreview com os mesmos valores (CA4b, CA4c), no estado final.
+# aceitos. A partir do lg, a tela tem a altura da janela, sem rolar, do lado do login: no palco à
+# esquerda (o palco azul com as manchas desfocadas), a WorkspacePreview com os mesmos valores
+# (CA4b, CA4c), no estado final; o formulário à direita.
 IDENTIDADE_ESTADOS = {
     # para quem, usuário, status, nome, slug, status do slug, termos, a frase da prévia. O @ ocupado não
     # entra na prévia: a frase sai sem ele e o lugar "você" fica neutro
@@ -37,8 +41,8 @@ def tela_identidade(k, estado):
     formulario = (
         cabecalho_passo(k, 1, 2, T('titulo'))
         + '<form style="margin:0;display:flex;flex-direction:column;gap:23px;">'
-        + cartoes_escolha(k, T('paraQuem'), [('team', T('comTime'), PRODUTOS['team'], 'pessoas'),
-                                              ('personal', T('soMim'), PRODUTOS['personal'], 'pessoa')], publico)
+        + cartoes_escolha(k, T('paraQuem'), [('team', T('comTime'), 'pessoas'),
+                                              ('personal', T('soMim'), 'pessoa')], publico)
         + campo(k, 'usuario', T('usuario'), usuario, st_usuario, frase_usuario, afixo='@', mono=True)
         + campo(k, 'nome', T('nomeEspaco' if pessoal else 'nomeWorkspace'), nome, placeholder=f'{T("exemploPh")} {exemplo}')
         + campo(k, 'endereco', T('endereco'), slug, st_slug, frase_slug, afixo='platform.muriki.app/', mono=True)
@@ -71,7 +75,7 @@ def tela_movimento(k):
     link = lambda txt: f'<a href="#" style="color:{k["fg"]};font-weight:500;">{txt}</a>'
     termos = f'{T("termosA")} {link(T("termos"))} {T("termosE")} {link(T("privacidade"))}.'
     acoes = {'team': '{{escolherTime}}', 'personal': '{{escolherFoco}}'}
-    opcoes = [('team', T('comTime'), PRODUTOS['team'], 'pessoas'), ('personal', T('soMim'), PRODUTOS['personal'], 'pessoa')]
+    opcoes = [('team', T('comTime'), 'pessoas'), ('personal', T('soMim'), 'pessoa')]
     formulario = (
         cabecalho_passo(k, 1, 2, T('titulo'))
         + '<form style="margin:0;display:flex;flex-direction:column;gap:23px;">'
@@ -193,10 +197,17 @@ clearTimeout(this._troca);
 
 def montar(tela, tema):
     i = tela['id']
+    if i in ('entrar', 'criar_conta'):
+        return montar_acesso(tela, tema)
     if i == 'identidade_movimento':
         textos = juntar(COMUM, IDENTIDADE, MOVIMENTO)
         return casca(tela['titulo'], tela_movimento(K), logica(textos, tema, MOV_ANTES, MOV_VALORES) + MOV_METODOS,
                      {**PROPS_IDIOMA, **props_tema(tema)}, CSS_MOVIMENTO)
     if i.startswith('identidade_'):
         return pagina(tela['titulo'], tela_identidade(K, i.split('_', 1)[1]), tema, IDENTIDADE)
+    if i in TELAS_A2:
+        textos = juntar(IDENTIDADE, ENTRADA) if i in COM_IDENTIDADE else ENTRADA
+        if i in COM_CONVIDAR:
+            textos = juntar(IDENTIDADE, ENTRADA, CONVIDAR)
+        return pagina(tela['titulo'], TELAS_A2[i](K), tema, textos)
     raise ValueError(f'tela desconhecida: {i}')
