@@ -21,7 +21,7 @@ TELAS = [
     ('codigo', 'OnboardingCodigo', 'Primeiro acesso', 'Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa)', 0, 2, 3),
     ('ja_tem_conta', 'OnboardingContaMuriki', 'Primeiro acesso',
      'Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário)', 1, 2, 3),
-    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Primeiro acesso · passo final · convidar o time (o componente vem no bloco B)', 2, 2, 3),
+    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Primeiro acesso · 3 de 3 · convidar o time: adicionar, a lista e as pessoas no plano', 2, 2, 3),
     ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta', 3, 2, 3),
     ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite', 4, 2, 3),
     ('convite_invalido', 'ConviteInvalido', 'Convite', 'Convite · inválido ou vencido (o 422 uniforme, sem o motivo)', 5, 2, 3),
@@ -43,7 +43,9 @@ order = canvas.setdefault('order', [])
 
 # o que este gerador já criou e não gera mais: as telas de entrada do A2 (o app usa o login do DS)
 REMOVIDAS = ['Entrar', 'EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'EsqueciSenha', 'RedefinirSenha',
-             'CriarConta', 'ConfiraEmail', 'CriarSenha']
+             'CriarConta', 'ConfiraEmail', 'CriarSenha',
+             # as três variantes de convidar o time: a tela de cima ficou com a lista
+             'OnboardingConvidarA', 'OnboardingConvidarB', 'OnboardingConvidarC']
 for base_nome in REMOVIDAS:
     for arquivo in (f'{base_nome}.dc.html', f'{base_nome}Escuro.dc.html'):
         boards.pop(arquivo, None)
@@ -68,7 +70,7 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 # só as notas de título que este gerador criou; nota de outro tipo (posta à mão) fica
-for chave in ('entrada', 'entradaEscuro'):
+for chave in ('entrada', 'entradaEscuro', 'convidarPlano', 'convidarPlanoEscuro'):
     if notas.get(chave, {}).get('kind') == 'title1':
         del notas[chave]
 for chave, lin, n, texto in [

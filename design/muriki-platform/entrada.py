@@ -6,7 +6,7 @@
 # As telas de entrada (entrar, passkey, segundo fator, criar conta, a senha) não são desenhadas aqui:
 # o app usa a tela de login compartilhada do DS (auth-page + login-page), só com a marca.
 # Sem CPF e sem plano. O token do convite nunca aparece na tela nem em link.
-from pecas import (K, T, ic, FONTE, MONO, LOGO, PRODUTO, EMAIL, raiz, topo,  # noqa: F401
+from pecas import (K, T, I, svg, ic, FONTE, MONO, LOGO, PRODUTO, EMAIL, raiz, topo,  # noqa: F401
                    manchas, cabecalho_passo, campo, caixa_marcar, botao_passo, cartoes_escolha, previa_workspace, esc,
                    PRODUTOS, _barra, _quadro, _lista, _moldura, _nome_produto, _azul, pagina_identidade)
 # depois de pecas, que põe o canvas do Code no caminho
@@ -171,35 +171,143 @@ def _previa_time(k, frase, convidados, vazios):
     return _moldura(k, _nome_produto(k, PRODUTOS['team']), cabeca_ + _quadro(k, True))
 
 
-def tela_convidar(k):
-    # o passo final (o componente vem no bloco B): linhas de e-mail e papel, nunca Owner; pular não exige nada
-    seta = f'<span style="display:flex;margin-left:auto;opacity:0.6;">{ic("baixo", 12)}</span>'
+# ── Convidar o time ─────────────────────────────────────────────────────
+# O passo final do primeiro acesso, leve: um campo para adicionar (cola vários de uma vez: vírgula,
+# espaço ou linha) e, logo abaixo, a lista de quem vai ser convidado, uma linha por pessoa: a inicial
+# com o anel tracejado de pendente, o e-mail, o papel (Member por padrão; Maintainer ou Guest, nunca
+# Owner) e o ×. O inválido fica na própria linha, em vermelho, sem papel. A lista rola por dentro
+# quando cresce, para a tela caber sem rolar. Embaixo, as pessoas no plano (Free até 3; depois do
+# teste de 14 dias, Team por pessoa) e o botão, que conta só os válidos. À direita, a janela do
+# workspace com você e quem está chegando, cada um com o papel.
+CONVIDADOS = [('ana@moura.dev', 'Maintainer'), ('joao@moura.dev', 'Member'), ('bia@moura.dev', 'Member')]
+INVALIDO = 'carlos@'
+I['mais'] = svg('<path d="M8 3v10M3 8h10"/>')
+
+
+def _avatar(k, letra, voce=False, tam=28, pendente=False):
+    # você em azul cheio; quem foi convidado, azul claro com a inicial e, pendente, o anel tracejado
+    fundo = k['pri'] if voce else f'color-mix(in oklab, {k["pri"]} 16%, {k["card"]})'
+    cor = k['prifg'] if voce else k['prisubfg']
+    anel = f'outline:1.5px dashed color-mix(in oklab, {k["pri"]} 55%, transparent);outline-offset:2px;' if pendente else ''
+    return (f'<span style="display:flex;align-items:center;justify-content:center;width:{tam}px;height:{tam}px;flex:0 0 auto;'
+            f'border-radius:50%;background:{fundo};color:{cor};font-size:{round(tam * 0.43)}px;font-weight:600;{anel}">{letra}</span>')
+
+
+def _adicionar(k):
+    # o InputGroup touch com o envelope e o botão Adicionar ao lado; aceita colar vários de uma vez
+    entrada = (f'<span style="display:flex;color:{k["mfg"]};">{ic("envelope", 16)}</span>'
+               f'<input id="convidar-emails" type="text" inputmode="email" placeholder="{T("cvPh")}" aria-describedby="convidar-dica" '
+               f'style="flex:1;min-width:0;height:100%;padding:0;border:0;background:transparent;outline:0;'
+               f'font-family:{FONTE};font-size:15px;color:{k["fgs"]};">')
+    botao = (f'<button type="button" style="display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;'
+             f'padding:0 16px 0 14px;border:0;border-radius:11px;background:{k["card"]};'
+             f'box-shadow:inset 0 0 0 1px {k["input"]}, 0 1px 2px rgba(0,0,0,0.05);font-family:{FONTE};font-size:14.5px;'
+             f'font-weight:500;color:{k["fgs"]};cursor:pointer;">{ic("mais", 14)}{T("cvAdicionar")}</button>')
+    return (f'<div style="display:flex;flex-direction:column;gap:8px;">'
+            f'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">'
+            f'<label for="convidar-emails" style="font-size:14px;line-height:14px;font-weight:500;color:{k["fgs"]};">{T("cvCampo")}</label>'
+            f'<span id="convidar-dica" style="font-size:13px;line-height:14px;color:{k["mfg"]};">{T("cvDica")}</span></div>'
+            f'<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;">{caixa_campo(k, entrada)}{botao}</div></div>')
+
+
+def _papel(k, i, papel):
+    # o seletor de papel da linha: Maintainer, Member ou Guest (nunca Owner)
+    return (f'<button type="button" aria-label="{T("papel")} {i}" aria-haspopup="listbox" style="display:flex;align-items:center;gap:6px;'
+            f'width:100%;height:32px;padding:0 8px 0 10px;border:0;border-radius:8px;background:{k["field"]};'
+            f'box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["input"]} 45%, {k["field"]});font-family:{FONTE};font-size:13.5px;'
+            f'color:{k["fgs"]};cursor:pointer;">{T("papel" + papel)}'
+            f'<span style="display:flex;margin-left:auto;opacity:0.55;">{ic("baixo", 11)}</span></button>')
+
+
+def _lista_convidados(k):
+    # uma linha por pessoa, alinhadas em colunas (inicial, e-mail, papel, ×) e separadas por fio fino; a
+    # altura máxima acompanha a da janela e, passando dela, a lista rola por dentro
+    colunas = 'grid-template-columns:28px minmax(0,1fr) 128px 28px;gap:12px;'
+    filete = f'box-shadow:inset 0 1px 0 color-mix(in oklab, {k["fg"]} 8%, transparent);'
+
+    def remover(rotulo_, cor):
+        return (f'<button type="button" aria-label="{T("remover")} {rotulo_}" style="display:flex;align-items:center;justify-content:center;'
+                f'width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:{cor};cursor:pointer;">'
+                f'{ic("x", 13)}</button>')
 
     def linha(i, email, papel):
-        entrada = (f'<input aria-label="{T("emailPessoa")} {i}" type="email" value="{email}" placeholder="{T("emailPessoaPh")}" '
-                   f'style="flex:1;min-width:0;height:100%;padding:0;border:0;background:transparent;outline:0;'
-                   f'font-family:{FONTE};font-size:15px;color:{k["fgs"]};">')
-        seletor = (f'<button type="button" aria-label="{T("papel")} {i}" aria-haspopup="listbox" style="display:flex;align-items:center;gap:8px;'
-                   f'width:100%;height:100%;padding:0;border:0;background:transparent;font-family:{FONTE};font-size:14px;'
-                   f'color:{k["fgs"]};cursor:pointer;">{T("papel" + papel)}{seta}</button>')
-        remover = (f'<button type="button" aria-label="{T("remover")} {i}" style="display:flex;align-items:center;justify-content:center;'
-                   f'width:32px;height:44px;flex:0 0 auto;padding:0;border:0;background:transparent;color:{k["mfg"]};cursor:pointer;">'
-                   f'{ic("x", 14)}</button>')
-        return (f'<div style="display:grid;grid-template-columns:minmax(0,1fr) 148px 32px;gap:8px;align-items:center;">'
-                f'{caixa_campo(k, entrada)}{caixa_campo(k, seletor)}{remover}</div>')
+        return (f'<li style="display:grid;{colunas}align-items:center;height:48px;padding:0 8px 0 12px;{filete if i else ""}">'
+                f'{_avatar(k, email[0].upper(), tam=26, pendente=True)}'
+                f'<span style="font-size:14.5px;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{email}</span>'
+                f'{_papel(k, i + 1, papel)}{remover(email, k["mfg"])}</li>')
 
-    cabecalhos = (f'<div style="display:grid;grid-template-columns:minmax(0,1fr) 148px 32px;gap:8px;font-size:14px;line-height:14px;'
-                  f'font-weight:500;color:{k["fgs"]};"><span>{T("emailPessoa")}</span><span>{T("papel")}</span><span></span></div>')
-    linhas = (linha(1, 'ana@moura.dev', 'Maintainer') + linha(2, 'joao@moura.dev', 'Member') + linha(3, '', 'Member'))
-    adicionar = (f'<a href="#" style="display:inline-flex;align-items:center;gap:6px;align-self:flex-start;font-size:13px;font-weight:500;'
-                 f'color:{k["pri"]};"><span style="display:flex;font-size:16px;line-height:1;">+</span>{T("adicionarPessoa")}</a>')
-    acoes = (f'<div style="display:flex;flex-direction:column;gap:10px;">{botao_passo(k, T("convidarBotao"), True)}'
-             f'<a href="#" style="display:flex;align-items:center;justify-content:center;height:40px;border-radius:11px;'
+    invalido = (f'<li aria-invalid="true" aria-describedby="convidar-invalido" style="display:grid;{colunas}align-items:center;height:48px;'
+                f'padding:0 8px 0 12px;background:color-mix(in oklch, {k["bad"]} 8%, transparent);{filete}">'
+                f'<span style="display:flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;'
+                f'outline:1.5px dashed color-mix(in oklch, {k["bad"]} 60%, transparent);outline-offset:2px;color:{k["bad"]};">{ic("alerta", 13)}</span>'
+                f'<span style="font-size:14.5px;font-weight:500;color:{k["bad"]};">{INVALIDO}</span>'
+                f'<span id="convidar-invalido" style="font-size:13px;color:{k["bad"]};">{T("cvInvalido")}</span>'
+                f'{remover(INVALIDO, k["bad"])}</li>')
+    linhas = ''.join(linha(i, e, p) for i, (e, p) in enumerate(CONVIDADOS)) + invalido
+    return (f'<ul aria-label="{T("cvLista")}" style="margin:0;padding:0;list-style:none;max-height:clamp(96px, calc(100vh - 580px), 240px);'
+            f'overflow-y:auto;border-radius:12px;background:{k["card"]};'
+            f'box-shadow:inset 0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);">{linhas}</ul>')
+
+
+def _medidor(k):
+    # quantas pessoas, os lugares do Free (3) e o excedente, e a conta do Team depois do teste
+    pessoas = [('R', True), ('A', False), ('J', False), ('B', False)]
+
+    # a régua: um lugar por pessoa, os três do Free numa faixa neutra e o excedente na faixa azul do Team
+    def zona(lugares, fundo, anel, rotulo_, cor, flex):
+        celulas = ''.join(f'<span style="flex:1;display:flex;align-items:center;justify-content:center;height:32px;">{_avatar(k, l, v, 22)}</span>'
+                          for l, v in lugares)
+        return (f'<div style="display:flex;flex-direction:column;gap:5px;flex:{flex};min-width:0;">'
+                f'<div style="display:flex;border-radius:9px;background:{fundo};box-shadow:inset 0 0 0 1px {anel};">{celulas}</div>'
+                f'<span style="font-size:12px;line-height:16px;font-weight:500;color:{cor};">{rotulo_}</span></div>')
+    free = zona(pessoas[:3], f'color-mix(in oklab, {k["fg"]} 5%, transparent)', k['border'], T('cvZonaFree'), k['mfg'], 3)
+    alem = zona(pessoas[3:], f'color-mix(in oklab, {k["pri"]} 12%, transparent)', f'color-mix(in oklab, {k["pri"]} 45%, transparent)',
+                T('cvZonaTeam'), k['prisubfg'], 1.6)
+    return (f'<div role="status" style="display:flex;flex-direction:column;gap:10px;padding:12px 14px 14px;border-radius:12px;background:{k["card"]};'
+            f'box-shadow:inset 0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);">'
+            f'<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">'
+            f'<span style="font-size:14.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("cvMedidorA")} {esc(WORKSPACE)}</span>'
+            f'<span style="font-size:13px;color:{k["mfg"]};">{T("cvMedidorConta")}</span></div>'
+            f'<div style="display:flex;gap:6px;">{free}{alem}</div>'
+            f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["fg"]};">{T("cvMedidorPreco")}</p></div>')
+
+
+def _previa_chegando(k):
+    # a janela do workspace com quem está chegando: você (Owner) e os convidados, cada um com o papel
+    titulo = (f'<h2 style="margin:0;font-size:41px;line-height:1.05;font-weight:600;letter-spacing:-0.035em;color:{k["fgs"]};">'
+              f'{esc(WORKSPACE)}</h2>')
+    pilha = (f'<div style="display:flex;align-items:center;margin-top:8px;flex:0 0 auto;">'
+             + _avatar(k, 'R', True, 32)
+             + ''.join(f'<span style="display:flex;margin-left:8px;">{_avatar(k, e[0].upper(), tam=32, pendente=True)}</span>'
+                       for e, _ in CONVIDADOS) + '</div>')
+    cabeca_ = (f'<div style="display:flex;align-items:flex-start;gap:24px;">'
+               f'<div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:0;">{titulo}'
+               f'<p style="margin:0;max-width:52ch;font-size:15px;line-height:20px;color:{k["mfg"]};text-wrap:pretty;">{T("cvFrase")}</p></div>'
+               f'{pilha}</div>')
+    pessoa = lambda letra, nome, papel, voce=False: (
+        f'<div style="display:flex;align-items:center;gap:10px;min-width:0;padding:8px 10px;border-radius:10px;'
+        f'background:color-mix(in oklab, {k["sunken"]} {70 if voce else 45}%, transparent);">'
+        f'{_avatar(k, letra, voce, 26, pendente=not voce)}'
+        f'<span style="display:flex;flex-direction:column;min-width:0;">'
+        f'<span style="font-size:13px;line-height:17px;font-weight:500;color:{k["fgs"]};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{nome}</span>'
+        f'<span style="font-size:11.5px;line-height:15px;color:{k["mfg"]};">{papel}</span></span></div>')
+    time = (f'<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;">'
+            + pessoa('R', T('cvVoce'), T('cvOwner'), True)
+            + ''.join(pessoa(e[0].upper(), e.split('@')[0], T('papel' + p)) for e, p in CONVIDADOS) + '</div>')
+    return _moldura(k, _nome_produto(k, PRODUTOS['team']), cabeca_ + time + _quadro(k, True))
+
+
+def tela_convidar(k):
+    acoes = (f'<div style="display:flex;flex-direction:column;gap:4px;">{botao_passo(k, T("cvBotao"), True)}'
+             f'<a href="#" style="display:flex;align-items:center;justify-content:center;height:36px;border-radius:11px;'
              f'font-size:14px;font-weight:500;color:{k["mfg"]};">{T("pular")}</a></div>')
-    formulario = (cabecalho_passo(k, 3, 3, T('convidarTit'), T('convidarSub'))
-                  + f'<form style="margin:0;display:flex;flex-direction:column;gap:10px;">{cabecalhos}{linhas}{adicionar}</form>'
-                  + acoes)
-    return pagina_identidade(k, formulario, _previa_time(k, T('fraseConvites'), 2, 1))
+    # o espaço entre os blocos encolhe com a altura da janela (32px em 900, 16px em 720), como os clamp() do passo
+    formulario = (f'<div style="display:flex;flex-direction:column;gap:clamp(16px, calc(100vh - 868px), 32px);">'
+                  + cabecalho_passo(k, 3, 3, T('convidarTit'), T('cvSub'))
+                  + f'<form style="margin:0;display:flex;flex-direction:column;gap:12px;">{_adicionar(k)}{_lista_convidados(k)}'
+                  + f'<span style="height:4px;"></span>{_medidor(k)}</form>'
+                  + acoes + '</div>')
+    return pagina_identidade(k, formulario, _previa_chegando(k))
 
 
 # ── Convite ─────────────────────────────────────────────────────────────
@@ -247,3 +355,5 @@ TELAS_A2 = {
 }
 # as telas que usam os textos do passo de identidade (o contador de passos e a tela do bloco A)
 COM_IDENTIDADE = {'codigo', 'ja_tem_conta', 'convidar'}
+# convidar o time: também os textos de CONVIDAR
+COM_CONVIDAR = {'convidar'}

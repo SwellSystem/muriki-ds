@@ -5,8 +5,8 @@ from pecas import (K, T, ic, pagina, pagina_identidade, cabecalho_passo, campo, 
                    cartoes_escolha, esc, previa_workspace, PRODUTOS, previa_movimento, CSS_MOVIMENTO, casca, logica,
                    juntar, COMUM, PROPS_IDIOMA, props_tema)
 from textos_identidade import IDENTIDADE, MOVIMENTO
-from textos_entrada import ENTRADA
-from entrada import TELAS_A2, COM_IDENTIDADE
+from textos_entrada import ENTRADA, CONVIDAR
+from entrada import TELAS_A2, COM_IDENTIDADE, COM_CONVIDAR
 
 
 # ── Onboarding · @usuário e workspace (bloco platform-identity) ─────────
@@ -203,5 +203,7 @@ def montar(tela, tema):
         return pagina(tela['titulo'], tela_identidade(K, i.split('_', 1)[1]), tema, IDENTIDADE)
     if i in TELAS_A2:
         textos = juntar(IDENTIDADE, ENTRADA) if i in COM_IDENTIDADE else ENTRADA
+        if i in COM_CONVIDAR:
+            textos = juntar(IDENTIDADE, ENTRADA, CONVIDAR)
         return pagina(tela['titulo'], TELAS_A2[i](K), tema, textos)
     raise ValueError(f'tela desconhecida: {i}')
