@@ -62,21 +62,24 @@ def cabecalho_passo(k, n, total, titulo, sub=''):
             + '</div></header>')
 
 
+def manchas(k):
+    # as manchas desfocadas da marca no fundo do palco, as mesmas do componente (MANCHAS)
+    return (f'radial-gradient(45% 55% at 18% 22%, color-mix(in oklch, {k["pri"]} 44%, transparent), transparent 70%), '
+            f'radial-gradient(50% 60% at 88% 82%, color-mix(in oklch, {k["pri"]} 36%, transparent), transparent 70%), '
+            f'radial-gradient(35% 40% at 78% 12%, color-mix(in oklch, {k["pri"]} 24%, transparent), transparent 70%)')
+
+
 def pagina_identidade(k, formulario, previa):
     # o PlatformOnboardingIdentity a partir do lg, medido em 1440×900: a grade 1fr / 1.2fr da altura da
     # janela, a barra do topo por cima das duas colunas, o formulário numa coluna de 512px centrada na
     # vertical e, à direita, o palco azul (primary-subtle com as manchas desfocadas) com a janela da prévia.
     # Os clamp() do componente, resolvidos para 900 de altura
-    # as manchas desfocadas da marca no fundo do palco, as mesmas do componente (MANCHAS)
-    manchas = (f'radial-gradient(45% 55% at 18% 22%, color-mix(in oklch, {k["pri"]} 44%, transparent), transparent 70%), '
-               f'radial-gradient(50% 60% at 88% 82%, color-mix(in oklch, {k["pri"]} 36%, transparent), transparent 70%), '
-               f'radial-gradient(35% 40% at 78% 12%, color-mix(in oklch, {k["pri"]} 24%, transparent), transparent 70%)')
     return (f'{raiz(k, "display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);")}'
             f'<div style="position:absolute;inset:0 0 auto 0;z-index:1;">{topo(k, PRODUTO, EMAIL)}</div>'
             f'<main style="display:flex;flex-direction:column;justify-content:center;gap:32px;width:512px;justify-self:center;'
             f'padding:64px 0 27px;">{formulario}</main>'
             f'<div style="display:flex;align-items:center;justify-content:center;min-height:0;padding:64px 58px 45px;'
-            f'background-color:{k["prisub"]};background-image:{manchas};">{previa}</div></div>')
+            f'background-color:{k["prisub"]};background-image:{manchas(k)};">{previa}</div></div>')
 
 
 # o estado do campo: (ícone no fim, cor do ícone, a frase é erro?)
@@ -142,8 +145,8 @@ def botao_passo(k, txt, ligado):
 
 def cartoes_escolha(k, aria, opcoes, escolhida, acoes=None):
     # o ChoiceCardGroup single do registry: dois cartões lado a lado, o marcado com o anel da marca; o
-    # ícone de cada um no canto direito, azul no marcado. `acoes`: {valor: hole do clique} (a tela em movimento)
-    def cartao(valor, titulo, desc, icone):
+    # ícone de cada um no canto direito, azul no marcado; sem a linha do produto (quem o mostra é a prévia). `acoes`: {valor: hole do clique} (a tela em movimento)
+    def cartao(valor, titulo, icone):
         clique = f' onClick="{acoes[valor]}"' if acoes else ''
         marcado = valor == escolhida
         anel = (f'box-shadow:0 0 0 1.5px {k["pri"]}, 0 4px 10px -2px rgba(0,0,0,0.10);' if marcado
@@ -155,8 +158,7 @@ def cartoes_escolha(k, aria, opcoes, escolhida, acoes=None):
                 f'<span style="display:flex;align-items:center;gap:8px;">'
                 f'<span style="width:14px;height:14px;flex:0 0 auto;border-radius:50%;box-shadow:{bolinha};"></span>'
                 f'<span style="font-size:14.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{titulo}</span></span>'
-                f'<span style="font-size:12.5px;line-height:17px;color:{k["mfg"]};">{desc}</span>'
-                f'<span style="position:absolute;top:50%;right:16px;display:flex;transform:translateY(-50%);'
+                                f'<span style="position:absolute;top:50%;right:16px;display:flex;transform:translateY(-50%);'
                 f'color:{k["pri"] if marcado else k["mfg"]};">{ic(icone, 24)}</span></button>')
     return (f'<div role="radiogroup" aria-label="{aria}" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">'
             + ''.join(cartao(*o) for o in opcoes) + '</div>')

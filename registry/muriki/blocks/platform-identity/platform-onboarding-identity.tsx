@@ -42,7 +42,7 @@ import { useTranslate } from "@/lib/i18n"
 import { handleReady, handleStatus, workspaceNameIssue, type HandleStatus } from "./handles"
 import { UsernameField, type UsernameFieldProps } from "./username-field"
 import { WorkspaceForm, type WorkspaceFormProps } from "./workspace-form"
-import { AUDIENCE_PRODUCT, WorkspacePreview, type WorkspaceAudience } from "./workspace-preview"
+import { WorkspacePreview, type WorkspaceAudience } from "./workspace-preview"
 
 // o espaço vertical entre os campos: 19px em 720 de altura, 28px de 1080 para cima
 const ENTRE_CAMPOS = "gap-[clamp(1rem,2.6vh,1.75rem)]"
@@ -178,7 +178,6 @@ export function PlatformOnboardingIdentity({
                       />
                     </>
                   }
-                  description={AUDIENCE_PRODUCT[v]}
                   className="py-[clamp(0.625rem,1.6vh,1rem)] sm:pr-12"
                 />
               )

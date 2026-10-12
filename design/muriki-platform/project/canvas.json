@@ -90,6 +90,102 @@
       "h": 900,
       "title": "Onboarding · movimento (Play) · escuro",
       "is_interactive": true
+    },
+    "OnboardingCodigo.dc.html": {
+      "x": 0,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa)",
+      "is_interactive": true
+    },
+    "OnboardingCodigoEscuro.dc.html": {
+      "x": 0,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · 1 de 3 · código por e-mail (só sem a prova da caixa) · escuro",
+      "is_interactive": true
+    },
+    "OnboardingContaMuriki.dc.html": {
+      "x": 1520,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário)",
+      "is_interactive": true
+    },
+    "OnboardingContaMurikiEscuro.dc.html": {
+      "x": 1520,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · 2 de 3 · você já tem conta Muriki (vem do Code: sem o campo do @usuário) · escuro",
+      "is_interactive": true
+    },
+    "OnboardingConvidar.dc.html": {
+      "x": 3040,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · passo final · convidar o time (o componente vem no bloco B)",
+      "is_interactive": true
+    },
+    "OnboardingConvidarEscuro.dc.html": {
+      "x": 3040,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Primeiro acesso · passo final · convidar o time (o componente vem no bloco B) · escuro",
+      "is_interactive": true
+    },
+    "Convite.dc.html": {
+      "x": 4560,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · o aceite, sem sessão: entrar ou criar conta",
+      "is_interactive": true
+    },
+    "ConviteEscuro.dc.html": {
+      "x": 4560,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · o aceite, sem sessão: entrar ou criar conta · escuro",
+      "is_interactive": true
+    },
+    "ConviteLogado.dc.html": {
+      "x": 6080,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · o aceite, com sessão: aceitar convite",
+      "is_interactive": true
+    },
+    "ConviteLogadoEscuro.dc.html": {
+      "x": 6080,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · o aceite, com sessão: aceitar convite · escuro",
+      "is_interactive": true
+    },
+    "ConviteInvalido.dc.html": {
+      "x": 7600,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · inválido ou vencido (o 422 uniforme, sem o motivo)",
+      "is_interactive": true
+    },
+    "ConviteInvalidoEscuro.dc.html": {
+      "x": 7600,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "Convite · inválido ou vencido (o 422 uniforme, sem o motivo) · escuro",
+      "is_interactive": true
     }
   },
   "order": [
@@ -102,7 +198,19 @@
     "OnboardingIdentidadeFoco.dc.html",
     "OnboardingIdentidadeFocoEscuro.dc.html",
     "OnboardingIdentidadeMovimento.dc.html",
-    "OnboardingIdentidadeMovimentoEscuro.dc.html"
+    "OnboardingIdentidadeMovimentoEscuro.dc.html",
+    "OnboardingCodigo.dc.html",
+    "OnboardingCodigoEscuro.dc.html",
+    "OnboardingContaMuriki.dc.html",
+    "OnboardingContaMurikiEscuro.dc.html",
+    "OnboardingConvidar.dc.html",
+    "OnboardingConvidarEscuro.dc.html",
+    "Convite.dc.html",
+    "ConviteEscuro.dc.html",
+    "ConviteLogado.dc.html",
+    "ConviteLogadoEscuro.dc.html",
+    "ConviteInvalido.dc.html",
+    "ConviteInvalidoEscuro.dc.html"
   ],
   "notes": {
     "onboarding": {
@@ -119,6 +227,22 @@
       "text": "Onboarding no tema escuro",
       "kind": "title1",
       "maxW": 6000,
+      "w": 240
+    },
+    "primeiroConvite": {
+      "x": 0,
+      "y": 2340,
+      "text": "Primeiro acesso e convite: o código por e-mail, quem já tem conta Muriki e convidar o time; o aceite de convite mostra o workspace, o papel e o e-mail mascarado, e o token nunca aparece",
+      "kind": "title1",
+      "maxW": 8000,
+      "w": 240
+    },
+    "primeiroConviteEscuro": {
+      "x": 0,
+      "y": 3660,
+      "text": "Primeiro acesso e convite no tema escuro",
+      "kind": "title1",
+      "maxW": 8000,
       "w": 240
     }
   }
