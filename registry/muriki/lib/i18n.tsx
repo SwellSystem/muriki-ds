@@ -1327,10 +1327,13 @@ const STRINGS: Record<string, unknown> = {
     identity: {
       stepper: "Primeiro acesso · {{step}} de {{total}}",
       stepper_aria: "Passo {{step}} de {{total}}",
-      title: "Você e o seu workspace",
-      subtitle: "Como o time vai te encontrar e onde vocês vão trabalhar juntos.",
-      section_you: "Você",
-      section_workspace: "Workspace",
+      title: "Crie o seu workspace",
+      // para quem é: os dois cartões no topo; a descrição é o produto que a prévia mostra
+      audience: {
+        label: "Para quem é o workspace",
+        team: "Com o meu time",
+        personal: "Só para mim",
+      },
       submit: "Criar workspace",
       terms_prefix: "Li e aceito os",
       terms: "termos de uso",
@@ -1370,9 +1373,13 @@ const STRINGS: Record<string, unknown> = {
       // a prévia ao vivo, ao lado do formulário (WorkspacePreview)
       preview: {
         name_placeholder: "Seu workspace",
-        slug_placeholder: "seu-workspace",
-        greeting: "Bem-vindo, {{username}}",
-        greeting_anonymous: "Bem-vindo",
+        // a frase embaixo do nome em destaque (por isso não o repete): o que está nascendo; sem nome, o
+        // convite a escrever
+        empty: "O nome que você escrever aparece aqui.",
+        team: "Começa com você. O time chega no próximo passo.",
+        team_user: "Começa com {{username}}. O time chega no próximo passo.",
+        personal: "Só seu. Ninguém entra sem você chamar.",
+        personal_user: "Só seu, {{username}}. Ninguém entra sem você chamar.",
       },
     },
   },

@@ -121,29 +121,3 @@ export function suggestSlug(name: string): string {
     .replace(/-+$/, "")
   return slugIssue(slug) === null ? slug : ""
 }
-
-/** A sigla do workspace na prévia: a primeira letra das duas primeiras palavras, ou só a da única. */
-export function workspaceInitials(name: string): string {
-  const palavras = name.trim().split(/\s+/).filter((p) => /^[\p{L}\p{N}]/u.test(p))
-  return palavras
-    .slice(0, 2)
-    .map((p) => [...p][0])
-    .join("")
-    .toLocaleUpperCase()
-}
-
-/** Os tons do Badge que o avatar do workspace usa; o cinza fica de fora, é o tom de "nada ainda". */
-export const WORKSPACE_TONES = ["blue", "cyan", "green", "yellow", "orange", "red", "pink", "purple"] as const
-export type WorkspaceTone = (typeof WORKSPACE_TONES)[number]
-
-/**
- * A cor do avatar do workspace, estável para o mesmo nome: um hash dos code points do nome aparado
- * e em minúsculas escolhe um tom. O mesmo nome dá a mesma cor na prévia e no app. Vazio é `null`.
- */
-export function workspaceTone(name: string): WorkspaceTone | null {
-  const n = name.trim().toLowerCase()
-  if (!n) return null
-  let h = 0
-  for (const c of n) h = (h * 31 + c.codePointAt(0)!) >>> 0
-  return WORKSPACE_TONES[h % WORKSPACE_TONES.length]
-}

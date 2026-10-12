@@ -13,6 +13,8 @@ TELAS = [
      'Onboarding · @usuário e workspace · o @usuário ocupado e o endereço reservado', 1, 0, 1),
     ('identidade_livre', 'OnboardingIdentidadeLivre', 'Primeiro acesso',
      'Onboarding · @usuário e workspace · tudo livre, o botão ligado', 2, 0, 1),
+    ('identidade_foco', 'OnboardingIdentidadeFoco', 'Primeiro acesso',
+     'Onboarding · @usuário e workspace · só para mim (Muriki Focus)', 3, 0, 1),
 ]
 
 PASSO_X, LINHA_Y = W + 80, H + 420
@@ -45,9 +47,9 @@ for id_, base_nome, titulo, quadro, col, lin_claro, lin_escuro in TELAS:
 largura = lambda n: min(n * W + (n - 1) * 80, 8000)
 notas = canvas.setdefault('notes', {})
 for chave, lin, n, texto in [
-    ('onboarding', 0, 3, 'Onboarding do Platform: o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; '
-                         'o formato é validado na hora, a disponibilidade vem do app; no desktop, a prévia ao vivo do workspace à direita'),
-    ('onboardingEscuro', 1, 3, 'Onboarding no tema escuro'),
+    ('onboarding', 0, 4, 'Onboarding do Platform: para quem é, o @usuário, o workspace e os termos numa tela só, sem CPF e sem plano; '
+                         'cabe sem rolar; à direita, a prévia ao vivo: Muriki Projects (time) ou Muriki Focus (só para mim), no estado final'),
+    ('onboardingEscuro', 1, 4, 'Onboarding no tema escuro'),
 ]:
     notas.setdefault(chave, {}).update(x=0, y=lin * LINHA_Y - 300, text=texto, kind='title1', maxW=largura(n))
     notas[chave].setdefault('w', 240)
