@@ -218,6 +218,70 @@
       "h": 900,
       "title": "2 · Criar conta · a tela compartilhada (nome + e-mail, Turnstile) · escuro",
       "is_interactive": true
+    },
+    "WorkspaceMembros.dc.html": {
+      "x": 0,
+      "y": 7920,
+      "w": 1440,
+      "h": 900,
+      "title": "14 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo)",
+      "is_interactive": true
+    },
+    "WorkspaceMembrosEscuro.dc.html": {
+      "x": 0,
+      "y": 9240,
+      "w": 1440,
+      "h": 900,
+      "title": "14 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo) · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceMembrosMaintainer.dc.html": {
+      "x": 1520,
+      "y": 7920,
+      "w": 1440,
+      "h": 900,
+      "title": "15 · Membros · vista da maintainer (gere só member e guest)",
+      "is_interactive": true
+    },
+    "WorkspaceMembrosMaintainerEscuro.dc.html": {
+      "x": 1520,
+      "y": 9240,
+      "w": 1440,
+      "h": 900,
+      "title": "15 · Membros · vista da maintainer (gere só member e guest) · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceConvites.dc.html": {
+      "x": 3040,
+      "y": 7920,
+      "w": 1440,
+      "h": 900,
+      "title": "16 · Convites · pendente, vencido, aceito, revogado e substituído",
+      "is_interactive": true
+    },
+    "WorkspaceConvitesEscuro.dc.html": {
+      "x": 3040,
+      "y": 9240,
+      "w": 1440,
+      "h": 900,
+      "title": "16 · Convites · pendente, vencido, aceito, revogado e substituído · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceConvidarLimite.dc.html": {
+      "x": 4560,
+      "y": 7920,
+      "w": 1440,
+      "h": 900,
+      "title": "17 · Convidar · o aviso de limite do Free (3 pessoas)",
+      "is_interactive": true
+    },
+    "WorkspaceConvidarLimiteEscuro.dc.html": {
+      "x": 4560,
+      "y": 9240,
+      "w": 1440,
+      "h": 900,
+      "title": "17 · Convidar · o aviso de limite do Free (3 pessoas) · escuro",
+      "is_interactive": true
     }
   },
   "order": [
@@ -246,7 +310,15 @@
     "ConviteLogado.dc.html",
     "ConviteLogadoEscuro.dc.html",
     "ConviteInvalido.dc.html",
-    "ConviteInvalidoEscuro.dc.html"
+    "ConviteInvalidoEscuro.dc.html",
+    "WorkspaceMembros.dc.html",
+    "WorkspaceMembrosEscuro.dc.html",
+    "WorkspaceMembrosMaintainer.dc.html",
+    "WorkspaceMembrosMaintainerEscuro.dc.html",
+    "WorkspaceConvites.dc.html",
+    "WorkspaceConvitesEscuro.dc.html",
+    "WorkspaceConvidarLimite.dc.html",
+    "WorkspaceConvidarLimiteEscuro.dc.html"
   ],
   "notes": {
     "entrada": {
@@ -284,7 +356,7 @@
     "convite": {
       "x": 0,
       "y": 4980,
-      "text": "Convite: o aceite mostra o workspace, o papel e o e-mail mascarado; o token nunca aparece",
+      "text": "Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece",
       "kind": "title1",
       "maxW": 4480,
       "w": 240
@@ -295,6 +367,22 @@
       "text": "Convite no tema escuro",
       "kind": "title1",
       "maxW": 4480,
+      "w": 240
+    },
+    "membros": {
+      "x": 0,
+      "y": 7620,
+      "text": "Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as ações que pode usar",
+      "kind": "title1",
+      "maxW": 6000,
+      "w": 240
+    },
+    "membrosEscuro": {
+      "x": 0,
+      "y": 8940,
+      "text": "Workspace · membros e convites no tema escuro",
+      "kind": "title1",
+      "maxW": 6000,
       "w": 240
     }
   }

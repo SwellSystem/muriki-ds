@@ -25,6 +25,12 @@
  * termina, sem fundo vazio, e encolhem nas telas baixas. Para não passar do palco, o pai limita a
  * altura (`max-h-full`); o que sobrar some por baixo, sem rolar.
  * É decorativa: `aria-hidden`, nada focável, sem clique. O leitor de tela já tem os campos.
+ *
+ * Com `people` (o passo de convidar, só no Projects), os lugares vazios viram você e quem está
+ * chegando: as iniciais, com o anel tracejado de pendente, e embaixo do nome uma fileira com cada
+ * pessoa e o papel (o cartão "Você" com `youRole`, padrão Owner). Quem chega entra com o mesmo
+ * movimento; passando de três, as duas primeiras ficam e o resto vira "+N", igual nos lugares e na
+ * fileira.
  */
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, type Transition, type Variants } from "framer-motion"
 
@@ -45,22 +51,45 @@ export const AUDIENCE_PRODUCT: Record<WorkspaceAudience, string> = {
 // a curva de saída da casa (a do flyout e dos ícones do rail)
 const SUAVE: Transition = { duration: 0.32, ease: [0.16, 1, 0.3, 1] }
 
+/** Quem está chegando (o convidar): o nome de exibição e o papel, já traduzido. */
+export interface WorkspacePreviewPerson {
+  /** A chave estável (o e-mail, no convidar). Sem ela, vale o nome. */
+  id?: string
+  name: string
+  role: string
+}
+
+// quantas pessoas cabem na fileira e nos lugares antes do "+N"
+const VISIVEIS = 3
+
+// passando de VISIVEIS, a última casa vira "+N": as mesmas pessoas nos lugares e na fileira
+function visiveisDe(pessoas: WorkspacePreviewPerson[]) {
+  return pessoas.length > VISIVEIS ? pessoas.slice(0, VISIVEIS - 1) : pessoas
+}
+
 export interface WorkspacePreviewProps {
   /** Para quem é: Muriki Projects (`team`) ou Muriki Focus (`personal`). */
   audience: WorkspaceAudience
   workspaceName: string
   /** O @ que pode aparecer (quem usa decide). Sem ele, a frase fica sem @ e o lugar "você", neutro. */
   username?: string
+  /** Quem está chegando, no passo de convidar. Sem isto, os lugares do time ficam vazios. */
+  people?: WorkspacePreviewPerson[]
+  /** O papel de quem convida no cartão "Você", já traduzido. Padrão: Owner. */
+  youRole?: string
   className?: string
 }
 
-export function WorkspacePreview({ audience, workspaceName, username, className }: WorkspacePreviewProps) {
+export function WorkspacePreview({ audience, workspaceName, username, people, youRole, className }: WorkspacePreviewProps) {
   const t = useTranslate()
   const reduzir = useReducedMotion() ?? false
   const nome = workspaceName.trim()
   // o dado chegou: as partes azuis acendem
   const vivo = nome !== ""
   const frase = !vivo ? "empty" : `${audience}${username ? "_user" : ""}`
+  // no convidar a frase conta quem chega (sem nome não há convidar)
+  const chegando = audience === "team" && people ? people : undefined
+  const chaveFrase = chegando && vivo ? "team_people" : frase
 
   return (
     <MotionConfig transition={reduzir ? { duration: 0 } : SUAVE}>
@@ -114,21 +143,27 @@ export function WorkspacePreview({ audience, workspaceName, username, className 
               <div className="grid min-h-10 text-[clamp(0.8125rem,1.7vh,0.9375rem)] leading-5 text-muted-foreground">
                 <AnimatePresence initial={false} mode="popLayout">
                   <motion.p
-                    key={frase}
+                    key={chegando && vivo ? `people:${chegando.length}` : frase}
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     className="line-clamp-2 max-w-[52ch] text-pretty [grid-area:1/1]"
                   >
-                    {t(`platform.identity.preview.${frase}`, { username: `@${username}` })}
+                    {chegando && vivo
+                      ? t(`platform.identity.preview.${chaveFrase}`, { count: chegando.length })
+                      : t(`platform.identity.preview.${frase}`, { username: `@${username}` })}
                   </motion.p>
                 </AnimatePresence>
               </div>
             </div>
             <AnimatePresence initial={false}>
-              {audience === "team" ? <Lugares key="lugares" voce={!!username} /> : null}
+              {audience === "team" ? (
+                <Lugares key="lugares" voce={!!username} inicial={username?.[0]} chegando={chegando} />
+              ) : null}
             </AnimatePresence>
           </div>
+
+          {chegando ? <Time pessoas={chegando} inicial={username?.[0]} papel={youRole} /> : null}
 
           <AnimatePresence initial={false} mode="wait">
             {audience === "team" ? (
@@ -182,8 +217,10 @@ function azul(vivo: boolean, forte = false) {
 }
 
 /** Os lugares do time no canto: você (azul quando o @ aparece) e os lugares vazios de quem vem no
- * próximo passo. Só no Projects. */
-function Lugares({ voce }: { voce: boolean }) {
+ * próximo passo. Só no Projects. No convidar, os vazios viram as iniciais de quem chega. */
+function Lugares({ voce, inicial, chegando }: { voce: boolean; inicial?: string; chegando?: WorkspacePreviewPerson[] }) {
+  const visiveis = chegando ? visiveisDe(chegando) : []
+  const sobra = chegando ? chegando.length - visiveis.length : 0
   return (
     <motion.div
       initial={{ opacity: 0, x: -10 }}
@@ -191,11 +228,98 @@ function Lugares({ voce }: { voce: boolean }) {
       exit={{ opacity: 0, x: -10 }}
       className="mt-2 flex shrink-0 items-center"
     >
-      <span className={cn("size-8 rounded-full", azul(voce, true))} />
-      {[0, 1, 2].map((i) => (
-        <span key={i} className="ml-1.5 size-8 rounded-full border-[1.5px] border-dashed border-input" />
-      ))}
+      {chegando ? (
+        <>
+          <Inicial letra={inicial} voce className="size-8 text-[13px]" />
+          {/* ninguém ainda: os lugares vazios esperam quem você chamar */}
+          {chegando.length === 0
+            ? [0, 1, 2].map((i) => <span key={i} className="ml-2 size-8 rounded-full border-[1.5px] border-dashed border-input" />)
+            : null}
+          <AnimatePresence initial={false}>
+            {visiveis.map((p) => (
+              <motion.span key={p.id ?? p.name} initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} className="ml-2 flex">
+                <Inicial letra={p.name[0]} className="size-8 text-[13px]" />
+              </motion.span>
+            ))}
+          </AnimatePresence>
+          {sobra > 0 ? (
+            <span className="ml-2 flex size-8 items-center justify-center rounded-full bg-sunken text-[12px] font-semibold text-muted-foreground tabular-nums">
+              +{sobra}
+            </span>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <span className={cn("size-8 rounded-full", azul(voce, true))} />
+          {[0, 1, 2].map((i) => (
+            <span key={i} className="ml-1.5 size-8 rounded-full border-[1.5px] border-dashed border-input" />
+          ))}
+        </>
+      )}
     </motion.div>
+  )
+}
+
+/** A inicial de uma pessoa: você em azul cheio; quem foi convidado, azul claro com o anel tracejado de pendente. */
+function Inicial({ letra, voce = false, className }: { letra?: string; voce?: boolean; className?: string }) {
+  return (
+    <span
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full font-semibold uppercase",
+        voce
+          ? "bg-primary text-primary-foreground"
+          : "bg-[color-mix(in_oklab,var(--primary)_16%,var(--card))] text-primary-subtle-foreground outline-[1.5px] outline-offset-2 outline-primary/55 outline-dashed",
+        className
+      )}
+    >
+      {letra}
+    </span>
+  )
+}
+
+/** A fileira do time no convidar: você (com o seu papel) e quem chega, cada um com o papel; o resto vira "+N". */
+function Time({ pessoas, inicial, papel }: { pessoas: WorkspacePreviewPerson[]; inicial?: string; papel?: string }) {
+  const t = useTranslate()
+  // a fileira nunca ganha uma segunda linha
+  const visiveis = visiveisDe(pessoas)
+  const sobra = pessoas.length - visiveis.length
+  const cartao = "flex min-w-0 items-center gap-2.5 rounded-[10px] px-2.5 py-2"
+  return (
+    <div className="grid shrink-0 grid-cols-4 gap-2">
+      <div className={cn(cartao, "bg-sunken/70")}>
+        <Inicial letra={inicial} voce className="size-[26px] text-[11px]" />
+        <Pessoa nome={t("platform.identity.preview.you")} papel={papel ?? t("platform.identity.preview.you_role")} />
+      </div>
+      <AnimatePresence initial={false} mode="popLayout">
+        {visiveis.map((p) => (
+          <motion.div
+            key={p.id ?? p.name}
+            layout
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className={cn(cartao, "bg-sunken/45")}
+          >
+            <Inicial letra={p.name[0]} className="size-[26px] text-[11px]" />
+            <Pessoa nome={p.name} papel={p.role} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+      {sobra > 0 ? (
+        <div className={cn(cartao, "justify-center bg-sunken/45 text-[13px] font-medium text-muted-foreground")}>
+          {t("platform.identity.preview.more", { count: sobra })}
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function Pessoa({ nome, papel }: { nome: string; papel: string }) {
+  return (
+    <span className="flex min-w-0 flex-col">
+      <span className="truncate text-[13px] leading-[17px] font-medium text-foreground-strong">{nome}</span>
+      <span className="truncate text-[11.5px] leading-[15px] text-muted-foreground">{papel}</span>
+    </span>
   )
 }
 

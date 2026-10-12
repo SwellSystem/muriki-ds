@@ -26,13 +26,20 @@ JORNADA = [
     ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta'),
     ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite'),
     ('convite_invalido', 'ConviteInvalido', 'Convite', 'Convite · inválido ou vencido (o 422 uniforme, sem o motivo)'),
+    # dentro do produto: as configurações do workspace (bloco platform-members)
+    ('membros_owner', 'WorkspaceMembros', 'Membros', 'Membros · vista do owner (o único owner: "Sair" desligado, com o motivo)'),
+    ('membros_maintainer', 'WorkspaceMembrosMaintainer', 'Membros', 'Membros · vista da maintainer (gere só member e guest)'),
+    ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
+    ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free (3 pessoas)'),
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
     ('primeiroAcesso', 8, 'Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos '
                           'numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco '
                           'com a prévia ao vivo à esquerda, o formulário à direita'),
-    ('convite', 3, 'Convite: o aceite mostra o workspace, o papel e o e-mail mascarado; o token nunca aparece'),
+    ('convite', 3, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece'),
+    ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
+                   'ações que pode usar'),
 ]
 TELAS, _i = [], 0
 for fileira, (_, n, _) in enumerate(FILEIRAS):
