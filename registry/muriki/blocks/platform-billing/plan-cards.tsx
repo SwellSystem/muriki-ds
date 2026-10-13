@@ -2,7 +2,7 @@
 
 /**
  * Os planos do workspace do Platform (CA9): os cartões numa fileira, um por plano (Free, Pro e
- * Enterprise no workspace `team`; Free e Pro no `personal`), com as trocas de período (Mensal / Anual,
+ * Enterprise no workspace `team`; Free, Pro e Ultimate no `personal`), com as trocas de período (Mensal / Anual,
  * com o selo "−10%") e de moeda (BRL / USD) em cima. Sem `onCurrencyChange` a moeda
  * está travada (depois da primeira compra): no lugar da troca fica a moeda da assinatura, com o cadeado.
  *
@@ -24,6 +24,7 @@ import type { ComponentType } from "react"
 import {
   BuildingsIcon,
   CheckIcon,
+  CrownIcon,
   LeafIcon,
   LockSimpleIcon,
   SketchLogoIcon,
@@ -88,7 +89,7 @@ export interface SeatPlanCardsProps {
   recommendedPlan?: string
   /**
    * O preço é por pessoa ("por pessoa/mês"). Padrão: `true`, o workspace `team`. No `personal`, que
-   * paga 1 assento, `false`: "por mês". Carregando sem planos, também diz quantas silhuetas (3 ou 2).
+   * paga 1 assento, `false`: "por mês".
    */
   perSeat?: boolean
   onChoose: (key: string) => void
@@ -101,11 +102,13 @@ export interface SeatPlanCardsProps {
   className?: string
 }
 
-// o ícone de cada plano, pela chave sem o prefixo; o Pro é o diamante preenchido, o mesmo do Pro do Code
+// o ícone de cada plano, pela chave sem o prefixo; o Pro é o diamante preenchido, o mesmo do Pro do Code, e
+// o Ultimate (o plano de topo do `personal`) é a coroa
 const ICONES: Record<string, { Icone: ComponentType<IconProps>; peso?: IconProps["weight"] }> = {
   free: { Icone: LeafIcon },
   pro: { Icone: SketchLogoIcon, peso: "fill" },
   enterprise: { Icone: BuildingsIcon },
+  ultimate: { Icone: CrownIcon },
 }
 
 /** O ícone do plano pela chave, com ou sem o prefixo `platform_` (o mesmo do cartão, no resumo do checkout). */
@@ -159,9 +162,9 @@ export function SeatPlanCards({
 }: SeatPlanCardsProps) {
   const t = useTranslate()
   const destaque = plans.findIndex((p) => p.key === recommendedPlan)
-  // carregando, os planos podem não ter vindo: três silhuetas no time e duas no pessoal; com
+  // carregando, os planos podem não ter vindo: três silhuetas (o time e o pessoal têm três planos); com
   // recomendado, ele fica no lugar do Pro (o 2º); sem, nenhum
-  const noEsqueleto = plans.length > 0 ? plans.length : perSeat ? 3 : 2
+  const noEsqueleto = plans.length > 0 ? plans.length : 3
   const destaqueNoEsqueleto = recommendedPlan === undefined ? -1 : destaque >= 0 ? destaque : 1
 
   return (

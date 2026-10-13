@@ -4,7 +4,7 @@ import { renderToString } from "react-dom/server"
 
 import { SeatsPreview, type SeatsPreviewProps } from "./invite-form"
 
-// o cartão de pessoas no plano (F1): o limite vem do plano, o nome do plano pago vem por prop
+// o cartão de pessoas no plano (F1): o limite vem do plano, o plano pago e o de topo do teste vêm por prop
 const cartao = (props: Partial<SeatsPreviewProps>) =>
   renderToString(
     createElement(SeatsPreview, {
@@ -12,19 +12,19 @@ const cartao = (props: Partial<SeatsPreviewProps>) =>
       people: ["Rafael Moura", "ana@moura.dev", "joao@moura.dev", "bia@moura.dev"].map((name) => ({ name })),
       freeLimit: 5,
       planName: "Pro",
-      pricePerSeat: { amountInCents: 2900, currency: "BRL" },
+      trialPlanName: "Enterprise",
       trialDays: 14,
-      locale: "pt-BR",
       ...props,
     })
   )
 const vagos = (h: string) => h.split("border-dashed").length - 1
 
 describe("SeatsPreview", () => {
-  test("com trial: os dias do plano grátis, o Free depois e a conta para seguir no plano", () => {
+  test("com trial: os dias do plano de topo grátis e o Free depois, sem preço", () => {
     const h = cartao({})
-    expect(h).toContain("14 dias de Pro grátis. Depois do teste, as 4 pessoas cabem no Free; para seguir no Pro, 4 × R$")
+    expect(h).toContain("14 dias de Enterprise grátis. Depois do teste, até 5 pessoas cabem no Free.")
     expect(h).toContain("Até 5 pessoas no Free e no Pro")
+    expect(h).not.toContain("R$")
     expect(h).not.toContain("Team")
     expect(h).not.toMatch(/platform\.members\./)
   })
@@ -34,26 +34,39 @@ describe("SeatsPreview", () => {
     expect(cartao({ freeLimit: 8 })).toContain("Até 8 pessoas")
   })
   test("só você, com trial", () => {
-    expect(cartao({ people: [{ name: "Rafael Moura" }] })).toContain("Depois do teste, você cabe no Free; para seguir no Pro, 1 × R$")
+    const h = cartao({ people: [{ name: "Rafael Moura" }] })
+    expect(h).toContain("1 pessoa no")
+    expect(h).toContain("só você")
+    expect(h).toContain("14 dias de Enterprise grátis. Depois do teste, até 5 pessoas cabem no Free.")
+  })
+  test("com trial e sem o trialPlanName, o teste fala do planName, nunca do bloqueio", () => {
+    const seis = Array.from({ length: 6 }, (_, i) => ({ name: `Pessoa ${i}` }))
+    const h = cartao({ trialPlanName: undefined, people: seis })
+    expect(h).toContain("14 dias de Pro grátis")
+    expect(h).not.toContain("precisa do Enterprise")
   })
   test("sem trial, nada de grátis", () => {
     const h = cartao({ trialDays: null })
     expect(h).toContain("Até 5 pessoas cabem no Free.")
     expect(h).not.toContain("grátis")
   })
-  test("acima do limite, o Enterprise; a régua guarda o +N", () => {
+  test("acima do limite, no teste: sem bloqueio, só o depois do teste", () => {
     const pessoas = Array.from({ length: 12 }, (_, i) => ({ name: `p${i}@moura.dev` }))
     const h = cartao({ people: pessoas })
+    expect(h).toContain("14 dias de Enterprise grátis. Depois do teste, até 5 pessoas cabem no Free; com 12, o time precisa de um plano pago.")
+    expect(h).not.toContain("vão até")
+  })
+  test("acima do limite, sem trial, o Enterprise; a régua guarda o +N", () => {
+    const pessoas = Array.from({ length: 12 }, (_, i) => ({ name: `p${i}@moura.dev` }))
+    const h = cartao({ people: pessoas, trialDays: null })
     expect(h).toContain("O Free e o Pro vão até 5 pessoas. Com 12, o time precisa do Enterprise.")
     expect(h).toMatch(/>\+(<!-- -->)?3</)
     expect(vagos(h)).toBe(0)
   })
-  test("sem ninguém, só a faixa: nada de \"1 × R$ 29 = R$ 0\"", () => {
+  test("sem ninguém, só a faixa, sem a frase", () => {
     const h = cartao({ people: [] })
     expect(h).toContain("Até 5 pessoas no Free e no Pro")
-    expect(h).not.toContain("×")
     expect(h).not.toContain("grátis")
-    expect(h).not.toContain("R$")
     expect(vagos(h)).toBe(5)
   })
   test("limite acima dos 10 lugares: as pessoas, o +N e um vago enquanto houver vaga", () => {

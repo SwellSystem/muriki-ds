@@ -288,7 +288,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "20 · Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca)",
+      "title": "20 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca)",
       "is_interactive": true
     },
     "WorkspacePlanosEscuro.dc.html": {
@@ -296,7 +296,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "20 · Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca) · escuro",
+      "title": "20 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca) · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosAnual.dc.html": {
@@ -416,7 +416,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "32 · Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista",
+      "title": "32 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado",
       "is_interactive": true
     },
     "WorkspaceCobrancaTesteEscuro.dc.html": {
@@ -424,7 +424,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "32 · Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista · escuro",
+      "title": "32 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarCupom.dc.html": {
@@ -480,7 +480,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "23 · Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise",
+      "title": "23 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate",
       "is_interactive": true
     },
     "WorkspacePlanosPessoalEscuro.dc.html": {
@@ -488,7 +488,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "23 · Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise · escuro",
+      "title": "23 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarPro.dc.html": {

@@ -1476,10 +1476,10 @@ const STRINGS: Record<string, unknown> = {
         count_other: "você + {{count}}",
         // a régua: o limite é o mesmo no Free e no plano pago do workspace de empresa
         zone: "Até {{max}} pessoas no Free e no {{plan}}",
-        per_month: "{{price}}/mês",
-        // com trial: o teste e o que vem depois dele, sem soar como cobrança automática
-        price_one: "{{trial}} dias de {{plan}} grátis. Depois do teste, você cabe no Free; para seguir no {{plan}}, 1 × {{price}} = {{total}}. Só conta quem aceitar o convite.",
-        price_other: "{{trial}} dias de {{plan}} grátis. Depois do teste, as {{count}} pessoas cabem no Free; para seguir no {{plan}}, {{count}} × {{price}} = {{total}}. Só conta quem aceitar o convite.",
+        // com trial: o teste do plano de topo e o Free depois dele, sem preço e sem soar como cobrança automática
+        trial: "{{trial}} dias de {{plan}} grátis. Depois do teste, até {{max}} pessoas cabem no Free.",
+        // acima do limite, no teste: o plano de topo não tem limite, então nada de bloqueio, só o depois
+        trial_over_limit: "{{trial}} dias de {{plan}} grátis. Depois do teste, até {{max}} pessoas cabem no Free; com {{count}}, o time precisa de um plano pago.",
         // sem trial (o workspace nasceu no Free): nada de grátis
         price_no_trial: "Até {{max}} pessoas cabem no Free.",
         // acima do limite do Free e do plano pago, só o Enterprise (sem limite)
@@ -1537,7 +1537,8 @@ const STRINGS: Record<string, unknown> = {
           switch_yearly: "Mudar para o anual",
           contact_sales: "Falar com o comercial",
         },
-        // a descrição do cartão, pelo tipo do workspace; o limite vem do plano, do admin (o personal não tem Enterprise)
+        // a descrição do cartão, pelo tipo do workspace; o limite vem do plano, do admin (o personal não tem
+        // Enterprise, e o team não tem Ultimate)
         description: {
           free: {
             team: "Para começar com o time.",
@@ -1549,6 +1550,9 @@ const STRINGS: Record<string, unknown> = {
           },
           enterprise: {
             team: "Para times de mais de {{max}} pessoas.",
+          },
+          ultimate: {
+            personal: "O plano mais completo, só para você.",
           },
         },
         // os números (limite e mínimo) vêm do plano, do admin
@@ -1567,8 +1571,8 @@ const STRINGS: Record<string, unknown> = {
         footnote: {
           // no workspace `team`: quem passa do limite vai para o Enterprise
           team: "Mais de {{max}} pessoas? O {{plan}} não tem limite.",
-          // no `personal`; o teste não inclui o Code: só a assinatura paga
-          personal: "O {{plan}} inclui o Muriki Code Pro na assinatura paga.",
+          // no `personal`, os dois planos pagos (o Pro e o Ultimate); o teste não inclui o Code: só a assinatura paga
+          personal: "O {{plan}} e o {{top}} incluem o Muriki Code Pro na assinatura paga.",
         },
       },
       // a página do checkout (CheckoutPage e CheckoutSummary) e a moldura comum (BillingPageLayout)
@@ -1714,6 +1718,8 @@ const STRINGS: Record<string, unknown> = {
             // a barra dos dias, para o leitor de tela
             progress: "Faltam {{remaining}} de {{total}} dias de teste",
             note: "Sem cobrança prevista. Sem assinatura, o workspace volta para o Free no fim do teste.",
+            // o teste é do plano de topo: o botão leva aos planos, e o plano a assinar se escolhe lá
+            choose: "Escolher um plano",
             subscribe: "Assinar o {{plan}}",
             // assinou durante o teste: a assinatura paga começa no fim dele
             subscribed: "A assinatura começa em {{date}}.",

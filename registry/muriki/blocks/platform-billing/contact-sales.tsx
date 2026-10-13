@@ -67,7 +67,7 @@ export interface ContactSalesFormProps {
   /** O fim do teste, se houver: com `trialPlanName`, a confirmação diz que ele segue até lá. */
   trialEndsAt?: string
   /**
-   * O nome do plano do teste, ex.: "Pro", em "o teste do Pro segue até …". Obrigatório para a frase do
+   * O nome do plano do teste, ex.: "Enterprise", em "o teste do Enterprise segue até …". Obrigatório para a frase do
    * teste: sem ele, mesmo com `trialEndsAt`, a confirmação não fala do teste.
    */
   trialPlanName?: string

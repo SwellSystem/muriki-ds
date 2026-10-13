@@ -229,7 +229,14 @@ describe("render", () => {
     expect(h).toContain("A assinatura começa em 26 de out. de 2026.")
     expect(h).toContain("Gerenciar no Stripe")
     expect(h).not.toContain("Assinar o Pro")
+    expect(h).not.toContain("Escolher um plano")
     expect(h).not.toContain("volta para o Free")
+  })
+  test("no teste, sem assinatura: o teste do plano de topo e \"Escolher um plano\"", () => {
+    const h = html(heroi({ plan: { key: "platform_enterprise", name: "Enterprise" }, status: "trialing", trial: { endsAt: "2026-10-26T12:00:00Z" } }))
+    expect(h).toContain("Teste do Enterprise")
+    expect(h).toContain("Escolher um plano")
+    expect(h).not.toContain("Assinar o")
   })
   test("datas inválidas não derrubam a página e somem com o trecho", () => {
     const h = html(heroi({ nextInvoice: { amountInCents: 17400, currency: "BRL", date: "x" } }))
@@ -315,11 +322,13 @@ describe("planos novos", () => {
       })
     )
 
-  test("a grade segue o número de planos: 3 no team, 2 no personal", () => {
+  test("a grade segue o número de planos: 3 no team e 3 no personal; 2 em duas colunas", () => {
     expect(cartoes({})).toContain("lg:grid-cols-3")
-    const pessoal = cartoes({ plans: [plano("platform_free"), plano("platform_pro")], perSeat: false })
-    expect(pessoal).toContain("sm:grid-cols-2")
-    expect(pessoal).not.toContain("grid-cols-3")
+    const pessoal = cartoes({ plans: [plano("platform_free"), plano("platform_pro"), plano("platform_ultimate")], perSeat: false })
+    expect(pessoal).toContain("lg:grid-cols-3")
+    const dois = cartoes({ plans: [plano("platform_free"), plano("platform_pro")], perSeat: false })
+    expect(dois).toContain("sm:grid-cols-2")
+    expect(dois).not.toContain("grid-cols-3")
   })
   test("o preço por pessoa no team; só por mês no personal", () => {
     expect(cartoes({})).toContain("por pessoa/mês")
@@ -327,16 +336,21 @@ describe("planos novos", () => {
     expect(pessoal).toContain("por mês")
     expect(pessoal).not.toContain("por pessoa")
   })
-  test("o esqueleto acompanha: 3 silhuetas no team e 2 no personal, sem os planos", () => {
+  test("o esqueleto acompanha: 3 silhuetas no team e no personal (com o Ultimate), sem os planos", () => {
     const silhuetas = (h: string) => h.split('aria-hidden="true" class="relative row-span-4').length - 1
     expect(silhuetas(cartoes({ plans: [], loading: true }))).toBe(3)
-    expect(silhuetas(cartoes({ plans: [], loading: true, perSeat: false }))).toBe(2)
+    expect(silhuetas(cartoes({ plans: [], loading: true, perSeat: false }))).toBe(3)
   })
   test("o ícone do Pro é o diamante, com ou sem o prefixo", () => {
     const pro = html(createElement(SeatPlanIcon, { planKey: "platform_pro" }))
     expect(pro).toBe(html(createElement(SeatPlanIcon, { planKey: "pro" })))
     expect(pro).not.toBe(html(createElement(SeatPlanIcon, { planKey: "platform_free" })))
     expect(pro).not.toBe(html(createElement(SeatPlanIcon, { planKey: "platform_enterprise" })))
+    // o Ultimate tem ícone próprio (a coroa), não o genérico de pessoas
+    const ultimate = html(createElement(SeatPlanIcon, { planKey: "platform_ultimate" }))
+    expect(ultimate).not.toBe(html(createElement(SeatPlanIcon, { planKey: "desconhecido" })))
+    expect(ultimate).not.toBe(pro)
+    for (const outro of ["platform_free", "platform_enterprise"]) expect(ultimate).not.toBe(html(createElement(SeatPlanIcon, { planKey: outro })))
   })
   test("o checkout pelo tipo: no personal, 1 assento e só você; no team, max(pessoas, mínimo)", () => {
     const resumo = (props: Partial<CheckoutSummaryProps>) =>
@@ -421,7 +435,7 @@ describe("planos novos", () => {
           locale: "pt-BR",
         })
       )
-    expect(enviado("Pro")).toContain("o teste do Pro segue até 26 de out.")
+    expect(enviado("Enterprise")).toContain("o teste do Enterprise segue até 26 de out.")
     expect(enviado()).toContain("Enquanto isso, nada muda no workspace.")
   })
 })
