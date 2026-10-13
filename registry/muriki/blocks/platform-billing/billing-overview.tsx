@@ -8,7 +8,8 @@
  *   aria-label), "Próxima cobrança", o valor e "N assentos × preço"; à direita, o plano, os selos de
  *   status e de período, "Gerenciar no Stripe" e "Ver planos". No Free, sem selo de status e "Nenhuma
  *   cobrança prevista.". No teste, a folhinha verde traz o fim do teste, e o herói vira a contagem dos
- *   dias com a barra e o "Assinar o Pro" (ou, já assinado, "A assinatura começa em …").
+ *   dias com a barra e o "Escolher um plano", que leva aos planos (ou, já assinado, "A assinatura
+ *   começa em …").
  * - SeatsSummary: "N ativos | M pagos neste período", a barra com um segmento por assento pago (o
  *   mínimo do plano à parte; quem sai, hachurado), os dois avisos (quem entra paga proporcional na
  *   hora; quem sai deixa de ser cobrado só na renovação), as pessoas com o Code Pro de cada uma (quem
@@ -85,16 +86,19 @@ export interface NextInvoiceHeroProps {
    */
   breakdown?: { seats: number; pricePerSeatInCents: number }
   /**
-   * O teste em curso: o herói vira a contagem até `endsAt`, com a barra dos dias e o "Assinar".
+   * O teste em curso: o herói vira a contagem até `endsAt`, com a barra dos dias e o "Escolher um plano".
    * `subscribed`: já assinou durante o teste (a assinatura paga começa no fim dele); a contagem continua,
-   * e a direita troca a nota e o "Assinar" por "A assinatura começa em <fim>." e o "Gerenciar no Stripe".
+   * e a direita troca a nota e o "Escolher um plano" por "A assinatura começa em <fim>." e o "Gerenciar no Stripe".
    */
   trial?: { endsAt: string; days?: number; subscribed?: boolean }
   /** "Gerenciar no Stripe": o portal é do app (FE4). Fora do teste, ou no teste já assinado. */
   manage?: BillingAction
   /** "Ver planos". Fora do teste. */
   viewPlans?: BillingAction
-  /** "Assinar o Pro", no teste. */
+  /**
+   * "Escolher um plano", no teste ainda sem assinatura: o link para os planos. O teste é do plano de
+   * topo (o Enterprise no `team`, o Ultimate no `personal`), e o plano a assinar se escolhe lá.
+   */
   subscribe?: BillingAction
   /** Agora, para contar os dias do teste (o padrão é o relógio da máquina). */
   now?: string | Date
@@ -236,7 +240,7 @@ export function NextInvoiceHero({
           <>
             <p className="text-[13px] leading-[19px] text-foreground">{t("platform.billing.overview.hero.trial.note")}</p>
             <Acao acao={subscribe} variant="solid" className="h-10 w-full rounded-[10px]">
-              {t("platform.billing.overview.hero.trial.subscribe", { plan: plan.name })}
+              {t("platform.billing.overview.hero.trial.choose")}
             </Acao>
           </>
         ) : (

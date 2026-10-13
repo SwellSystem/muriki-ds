@@ -16,9 +16,9 @@
  * junta as linhas e chama `onSubmit` com as que vão; o envio e o erro (MEMBER_LIMIT_REACHED vira
  * `limit`, 409 ALREADY_MEMBER vira `rowErrors`) são do app.
  *
- * `limit` vem quando o plano limita: no workspace de empresa, o Free e o Pro (também no teste) vão até
- * o mesmo número de pessoas, e o cartão de pessoas mostra os mesmos lugares na régua. O teste segue
- * pelo `trialDays`, com ou sem `limit`.
+ * `limit` vem quando o plano limita: no workspace de empresa, o Free e o Pro vão até o mesmo número de
+ * pessoas, e o cartão de pessoas mostra os mesmos lugares na régua; o teste é do Enterprise, sem
+ * limite. O teste segue pelo `trialDays` e o `trialPlanName`, com ou sem `limit`.
  */
 import type { ReactNode } from "react"
 import { ArrowRightIcon } from "@phosphor-icons/react"
@@ -49,16 +49,14 @@ export interface PlatformOnboardingInviteProps {
   onSkip: () => void
   /**
    * O cartão de pessoas no plano. Sem isto, o cartão não aparece. `freeLimit` é o limite do plano,
-   * lido do admin, e `planName` o plano pago do teste ("Pro"). Sem `trialDays`, o workspace nasceu no
-   * Free (o trial é um por pessoa). A moeda do preço vem do app.
+   * lido do admin, `planName` o plano pago com limite ("Pro") e `trialPlanName` o plano de topo do
+   * teste ("Enterprise"). Sem `trialDays`, o workspace nasceu no Free (o trial é um por pessoa).
    */
-  seats?: Pick<SeatsPreviewProps, "freeLimit" | "planName" | "pricePerSeat" | "trialDays">
+  seats?: Pick<SeatsPreviewProps, "freeLimit" | "planName" | "trialPlanName" | "trialDays">
   /** O limite do plano, quando ele limita: `used` = ativos + convites pendentes, da API. */
   limit?: { max: number; used: number }
   /** O erro da API em cada linha, pelo e-mail em minúsculas (ex.: 409 ALREADY_MEMBER). */
   rowErrors?: Record<string, ReactNode>
-  /** O idioma dos valores, ex.: `pt-BR`. */
-  locale: string
   submitting?: boolean
   /** O erro do envio, já traduzido pelo app. */
   error?: ReactNode
@@ -82,7 +80,6 @@ export function PlatformOnboardingInvite({
   seats,
   limit,
   rowErrors,
-  locale,
   submitting = false,
   error,
   step = 3,
@@ -136,7 +133,6 @@ export function PlatformOnboardingInvite({
                 <SeatsPreview
                   workspaceName={workspaceName}
                   people={[{ name: viewer.name }, ...validas.map((r) => ({ name: r.email }))]}
-                  locale={locale}
                   {...seats}
                 />
               ) : null}

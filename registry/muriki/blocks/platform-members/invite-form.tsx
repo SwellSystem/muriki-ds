@@ -30,13 +30,13 @@
  *
  * SeatsPreview: o cartão de pessoas no plano. "N pessoas no <workspace> · você + M", a régua com os
  * lugares do limite (`freeLimit`, o mesmo do Free e do plano pago no workspace de empresa, lido do
- * plano), um por pessoa e os vagos tracejados, e a frase. Com `trialDays`, "N dias de <plano> grátis",
- * que depois do teste as pessoas cabem no Free e a conta para seguir no plano pago; sem (o workspace
- * nasceu no Free, porque o trial é um por pessoa), nada de grátis: só que cabem no Free. Acima do
- * limite, o time precisa do Enterprise. O preço vem do app (F12): o componente só formata e multiplica
- * pelo número de pessoas para mostrar o total previsto. O assento só conta quem aceitar o convite.
- * Sem ninguém em `people`, só a régua e a faixa, sem a frase. Com o limite acima dos 10 lugares da
- * régua, quem não cabe vira "+N" e, enquanto houver vaga, o último lugar fica vago.
+ * plano), um por pessoa e os vagos tracejados, e a frase. Com `trialDays`, "N dias de <topo> grátis"
+ * (o teste é do plano de topo, `trialPlanName`) e que depois do teste até o limite cabe no Free, sem
+ * preço; acima do limite, no teste, nada de bloqueio (o plano de topo não tem limite): só que, depois
+ * dele, o time precisa de um plano pago. Sem `trialDays` (o workspace nasceu no Free, porque o trial é
+ * um por pessoa), nada de grátis: só que cabem no Free, e acima do limite o time precisa do
+ * Enterprise. Sem ninguém em `people`, só a régua e a faixa, sem a frase. Com o limite acima dos 10
+ * lugares da régua, quem não cabe vira "+N" e, enquanto houver vaga, o último lugar fica vago.
  */
 import {
   useEffect,
@@ -393,16 +393,15 @@ export interface SeatsPreviewProps {
    * hoje). É o número de lugares da régua.
    */
   freeLimit: number
-  /** O nome do plano pago do teste e da conta, ex.: "Pro". */
+  /** O nome do plano pago com limite, ex.: "Pro": vai na régua e no aviso acima do limite. */
   planName: string
-  /** O preço do plano pago por pessoa por mês, do app (F12). */
-  pricePerSeat: { amountInCents: number; currency: string }
+  /** O nome do plano de topo do teste, ex.: "Enterprise" (no `personal`, o Ultimate). Sem ele, o teste fala do `planName`. */
+  trialPlanName?: string
   /**
-   * Os dias de teste do plano pago. Sem (`undefined` ou `null`): o workspace nasceu no Free, sem trial
+   * Os dias de teste do plano de topo. Sem (`undefined` ou `null`): o workspace nasceu no Free, sem trial
    * (o trial é um por pessoa, R12), e o cartão não promete nada grátis.
    */
   trialDays?: number | null
-  locale: string
   className?: string
 }
 
@@ -425,9 +424,8 @@ export function SeatsPreview({
   people,
   freeLimit,
   planName,
-  pricePerSeat,
+  trialPlanName,
   trialDays,
-  locale,
   className,
 }: SeatsPreviewProps) {
   const t = useTranslate()
@@ -441,8 +439,6 @@ export function SeatsPreview({
   const transborda = total > espaco
   const desenhadas = transborda ? people.slice(0, espaco - 1) : people
   const vagos = lugares - desenhadas.length - (transborda ? 1 : 0)
-  const preco = (centavos: number) => formatSeatPrice(centavos, pricePerSeat.currency, locale)
-  const totalMes = t("platform.members.seats.per_month", { price: preco(pricePerSeat.amountInCents * total) })
 
   const lugar = (nome: string, i: number) => (
     <span key={i} className="flex h-8 flex-1 items-center justify-center">
@@ -497,19 +493,18 @@ export function SeatsPreview({
         </span>
       </div>
 
-      {/* sem ninguém, só a faixa: a frase de preço sairia "1 × R$ 29 = R$ 0" */}
+      {/* sem ninguém, só a faixa: não há de quem falar */}
       {total < 1 ? null : (
         <p className="text-[13px] leading-[19px] text-foreground">
-          {passa
-            ? t("platform.members.seats.over_limit", { max: freeLimit, count: total, plan: planName })
-            : trialDays
-              ? t("platform.members.seats.price", {
-                  trial: trialDays,
-                  plan: planName,
-                  count: total,
-                  price: preco(pricePerSeat.amountInCents),
-                  total: totalMes,
-                })
+          {trialDays
+            ? t(passa ? "platform.members.seats.trial_over_limit" : "platform.members.seats.trial", {
+                trial: trialDays,
+                plan: trialPlanName ?? planName,
+                max: freeLimit,
+                count: total,
+              })
+            : passa
+              ? t("platform.members.seats.over_limit", { max: freeLimit, count: total, plan: planName })
               : t("platform.members.seats.price_no_trial", { max: freeLimit })}
         </p>
       )}

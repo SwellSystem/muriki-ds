@@ -85,7 +85,7 @@ CONVIDAR = {
         cvFrase='Você e mais 3 pessoas a caminho. Cada uma entra quando aceitar o convite.',
         cvMedidorA='4 pessoas no', cvMedidorConta='você + 3',
         cvZona='Até 5 pessoas no Free e no Pro',
-        cvMedidorPreco='14 dias de Pro grátis. Depois do teste, as 4 pessoas cabem no Free; para seguir no Pro, 4 × R$ 29 = R$ 116/mês. Só conta quem aceitar o convite.',
+        cvMedidorPreco='14 dias de Enterprise grátis. Depois do teste, até 5 pessoas cabem no Free.',
     ),
     'en-US': dict(
         cvSub='Each person gets an invitation by email and joins when they accept.',
@@ -95,7 +95,7 @@ CONVIDAR = {
         cvFrase='You and 3 more people on the way. Each one joins when they accept.',
         cvMedidorA='4 people in', cvMedidorConta='you + 3',
         cvZona='Up to 5 people on Free and Pro',
-        cvMedidorPreco='14 days of Pro free. After the trial, the 4 people fit in Free; to stay on Pro, 4 × $16 = $64/month. Only people who accept count.',
+        cvMedidorPreco='14 days of Enterprise free. After the trial, up to 5 people fit in Free.',
     ),
     'es-ES': dict(
         cvSub='Cada persona recibe una invitación por email y entra al aceptarla.',
@@ -105,6 +105,6 @@ CONVIDAR = {
         cvFrase='Tú y 3 personas más en camino. Cada una entra cuando acepte la invitación.',
         cvMedidorA='4 personas en', cvMedidorConta='tú + 3',
         cvZona='Hasta 5 personas en Free y en Pro',
-        cvMedidorPreco='14 días de Pro gratis. Después de la prueba, las 4 personas caben en Free; para seguir en Pro, 4 × US$ 16 = US$ 64/mes. Solo cuenta quien acepte la invitación.',
+        cvMedidorPreco='14 días de Enterprise gratis. Después de la prueba, hasta 5 personas caben en Free.',
     ),
 }

@@ -34,10 +34,10 @@ JORNADA = [
     ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
     ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free e do Pro (5 pessoas)'),
     # dentro do produto: planos e cobrança (bloco platform-billing)
-    ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · workspace de empresa, mensal, no teste do Pro (a moeda ainda troca)'),
+    ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca)'),
     ('planos_anual', 'WorkspacePlanosAnual', 'Planos', 'Planos · anual, por pessoa/ano como vem da API; a moeda travada'),
     ('planos_carregando', 'WorkspacePlanosCarregando', 'Planos', 'Planos · carregando (o esqueleto, o Pro já no destaque)'),
-    ('planos_pessoal', 'WorkspacePlanosPessoal', 'Planos', 'Planos · workspace pessoal: Free e Pro, só você, sem o Enterprise'),
+    ('planos_pessoal', 'WorkspacePlanosPessoal', 'Planos', 'Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate'),
     ('assinar_pro', 'WorkspaceAssinarPro', 'Assinar o Pro', 'Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado'),
     ('assinar_cupom', 'WorkspaceAssinarCupom', 'Assinar o Pro', 'Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado'),
     ('assinar_pessoal', 'WorkspaceAssinarProPessoal', 'Assinar o Pro', 'Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual'),
@@ -46,7 +46,7 @@ JORNADA = [
     ('comercial', 'WorkspaceComercial', 'Falar com o comercial', 'Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois'),
     ('comercial_enviado', 'WorkspaceComercialEnviado', 'Falar com o comercial', 'Falar com o comercial · enviado: a confirmação no lugar do formulário'),
     ('cobranca', 'WorkspaceCobranca', 'Cobrança', 'Cobrança · a próxima cobrança, os assentos e o que mudou no período'),
-    ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista'),
+    ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Enterprise: a contagem até o fim e "Escolher um plano"; a conta do Pro ao lado'),
     ('cobranca_sem_stripe', 'WorkspaceCobrancaSemStripe', 'Cobrança', 'Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível'),
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)

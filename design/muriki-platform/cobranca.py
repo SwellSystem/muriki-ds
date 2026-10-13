@@ -60,10 +60,9 @@ def troca(k, aria, opcoes, escolhida):
 
 
 # ── Planos (SeatPlanCards) ──────────────────────────────────────────────
-# Os planos são Free, Pro e Enterprise, os mesmos para todo workspace; o tipo decide o que aparece (F0):
-# no `team` são três cartões (Free e Pro até 5 pessoas; o Enterprise sem limite, cobrando no mínimo 10); no
-# `personal` são dois (Free e Pro, só a pessoa, sem o Enterprise). O Pro é o recomendado e o plano do
-# teste de 14 dias. Em cima, as trocas de período (com o selo "−10%" no anual) e de moeda; com a moeda
+# O tipo do workspace decide os planos (F0 e G0): no `team` são três cartões (Free e Pro até 5 pessoas; o
+# Enterprise sem limite, cobrando no mínimo 10); no `personal` também três (Free, Pro e Ultimate, só a
+# pessoa). O Pro é sempre o recomendado; o teste de 14 dias é do plano de topo (o Enterprise ou o Ultimate). Em cima, as trocas de período (com o selo "−10%" no anual) e de moeda; com a moeda
 # travada, no lugar da troca fica a moeda da assinatura, com o cadeado.
 # O cartão segue o PlanCard do platform antigo (o filete degradê de 1px no topo do destaque, o título
 # grande, o preço e a lista com o check; o CTA muted nos comuns e primary no destaque), sem manchas nem
@@ -77,6 +76,8 @@ I.update(
     # pessoas já existem
     folha=svg('<path d="M13.4 2.6C7.2 2.6 3.2 5.4 3.2 10c0 1.3.4 2.3 1 3"/><path d="M13.4 2.6c0 6.3-2.9 10.2-7.4 10.2-1 0-1.8-.2-2.4-.6"/>'
               '<path d="M3 13.4l6.2-6.2"/>'),
+    # Crown (o Ultimate, o plano de topo do workspace pessoal)
+    coroa=svg('<path d="M2.4 5l2.8 2.6L8 3.2l2.8 4.4L13.6 5l-1.2 7.2H3.6z"/><path d="M3.6 13.8h8.8"/>'),
     predio=svg('<path d="M2.6 13.6h10.8"/><path d="M3.8 13.6V3a.8.8 0 0 1 .8-.8h4.8a.8.8 0 0 1 .8.8v10.6"/><path d="M10.2 6.4h1.4a.6.6 0 0 1 .6.6v6.6"/>'
                '<path d="M5.8 4.8h2.4M5.8 7.2h2.4M5.8 9.6h2.4"/>'),
 )
@@ -90,6 +91,8 @@ PLANOS = {
     'personal': [
         ('free', 'Free', 'folha', 'cbDescFreePessoal', None, None),
         ('pro', 'Pro', 'diamante', 'cbDescProPessoal', ('cbPrecoPro', 'cbAnoPro'), None),
+        # o Ultimate tem o preço de dev do Enterprise (R$ 49 / US$ 25), só de exemplo
+        ('ultimate', 'Ultimate', 'coroa', 'cbDescUlt', ('cbPrecoEnt', 'cbAnoEnt'), None),
     ],
 }
 # os itens de cada cartão: (texto, nota embaixo ou None; 'TESTE' é o teste, que só aparece no
@@ -97,16 +100,19 @@ PLANOS = {
 ITENS = {
     'team': {
         'free': [('cbItAte5', None)],
-        'pro': [('cbItAte5', None), ('cbItTeste', 'TESTE'), ('cbItAceito', None), ('cbItAnual', None)],
-        'enterprise': [('cbItSemLimite', None), ('cbItMin10', None), ('cbItContrato', None), ('cbItAnual', None)],
+        'pro': [('cbItAte5', None), ('cbItAceito', None), ('cbItAnual', None)],
+        'enterprise': [('cbItSemLimite', None), ('cbItTeste', 'TESTE'), ('cbItMin10', None), ('cbItContrato', None), ('cbItAnual', None)],
     },
     'personal': {
         'free': [('cbItSoVoce', None)],
-        'pro': [('cbItSoVoce', None), ('cbItTeste', 'TESTE'), ('cbItAnual', None)],
+        'pro': [('cbItSoVoce', None), ('cbItAnual', None)],
+        'ultimate': [('cbItSoVoce', None), ('cbItTeste', 'TESTE'), ('cbItAnual', None)],
     },
 }
-CODE_PRO = {'pro', 'enterprise'}
-# a nota do pé: no `team`, quem passa de 5 vai para o Enterprise; no `personal`, o Code Pro do Pro
+# o teste de 14 dias é do plano de topo (B13b): o Enterprise no `team`, o Ultimate no `personal`
+TOPO = {'team': 'enterprise', 'personal': 'ultimate'}
+CODE_PRO = {'pro', 'enterprise', 'ultimate'}
+# a nota do pé: no `team`, quem passa de 5 vai para o Enterprise; no `personal`, o Code Pro do Pro e do Ultimate
 PE = {'team': {'free': 'cbPeEnt'}, 'personal': {'free': 'cbPeFree'}}
 # o recomendado sobe e desce além da fileira
 ERGUE = 22
@@ -194,10 +200,13 @@ def cartao_plano(k, plano, anual, teste, cta, tipo='team'):
               + f'">{T(rotulo_cta)}</button>')
     luz = (f'<span aria-hidden="true" style="position:absolute;inset:0 0 auto 0;height:1px;'
            f'background:linear-gradient(to right, transparent, color-mix(in oklab, {k["pri"]} 70%, transparent), transparent);"></span>') if destaque else ''
-    # o estado do plano atual: no teste (verde) ou a assinatura (neutro), ao lado do nome
+    # o estado do plano atual, ao lado do nome: no teste (verde), no plano de topo; a assinatura
+    # (neutro), no Pro. O destaque fica sempre no Pro, o recomendado
     estado = ''
-    if destaque:
-        estado = badge(T('cbNoTeste'), k, 'green', ponto=True) if teste else badge(T('cbPlanoAtual'), k)
+    if teste and chave == TOPO[tipo]:
+        estado = badge(T('cbNoTeste'), k, 'green', ponto=True)
+    elif destaque and not teste:
+        estado = badge(T('cbPlanoAtual'), k)
     return (f'<article aria-label="{nome}" style="{_moldura_cartao(k, destaque)}">{luz}'
             f'<header style="display:flex;flex-direction:column;gap:6px;padding-bottom:16px;">'
             f'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;">'
@@ -232,10 +241,10 @@ def _esqueleto_plano(k, destaque):
 
 
 def tela_planos(k, estado, tipo='team'):
-    # 'teste': mensal, no teste do Pro (o plano atual), a moeda ainda troca (antes da primeira compra)
+    # 'teste': mensal, no teste do plano de topo, a moeda ainda troca (antes da primeira compra)
     # 'anual': anual, o workspace já assina o Pro mensal, a moeda travada
     # 'carregando': o GET /plans ainda não voltou: as trocas já estão, os cartões em silhueta
-    # `tipo`: 'team' (três cartões) ou 'personal' (Free e Pro, só a pessoa)
+    # `tipo`: 'team' (Free, Pro e Enterprise) ou 'personal' (Free, Pro e Ultimate, só a pessoa)
     anual = estado == 'anual'
     planos = PLANOS[tipo]
     periodo = troca(k, T('cbPeriodoAria'), [('mensal', T('cbMensal')),
@@ -246,7 +255,7 @@ def tela_planos(k, estado, tipo='team'):
     else:
         moeda = troca(k, T('cbMoedaAria'), [('BRL', 'BRL'), ('USD', 'USD')], None)
     ctas = {'free': ('cbMudarFree', 'secondary'), 'pro': ('cbMudarAnual' if anual else 'cbAssinarPro', 'solid'),
-            'enterprise': ('cbFalar', 'secondary')}
+            'enterprise': ('cbFalar', 'secondary'), 'ultimate': ('cbAssinarUlt', 'secondary')}
     grade = (f'display:grid;grid-template-columns:repeat({len(planos)},minmax(0,1fr));grid-template-rows:auto auto 1fr auto;'
              f'column-gap:24px;margin-top:{ERGUE}px;')
     if estado == 'carregando':
@@ -256,9 +265,9 @@ def tela_planos(k, estado, tipo='team'):
         cartoes = (f'<div style="{grade}">'
                    + ''.join(cartao_plano(k, p, anual, not anual, ctas[p[0]], tipo) for p in planos) + '</div>')
     conteudo = f'<div style="display:flex;align-items:center;justify-content:space-between;">{periodo}{moeda}</div>{cartoes}'
-    # três cartões na largura da página; dois, numa coluna mais estreita, para não esticar
-    return pagina_produto(k, T('cbPlanos'), T('cbPlanosSubPago' if anual else 'cbPlanosSubTeste'), conteudo,
-                          1040 if tipo == 'team' else 760)
+    # três cartões na largura da página, nos dois tipos
+    sub = 'cbPlanosSubPago' if anual else ('cbPlanosSubTeste' if tipo == 'team' else 'cbPlanosSubTestePessoal')
+    return pagina_produto(k, T('cbPlanos'), T(sub), conteudo, 1040)
 
 
 # ── Peças comuns do checkout ────────────────────────────────────────────
@@ -604,9 +613,9 @@ def _heroi(k, esquerda, direita):
             f'box-shadow:inset 1px 0 0 {k["muted"]};">{direita}</div></section>')
 
 
-def _plano_status(k, selos):
+def _plano_status(k, selos, nome='Pro'):
     return (f'<div style="display:flex;align-items:center;gap:10px;">'
-            f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">Pro</span>{selos}</div>')
+            f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};">{nome}</span>{selos}</div>')
 
 
 def _evento(k, icone, cor, titulo, nota):
@@ -733,10 +742,11 @@ def tela_cobranca(k, teste=False, sem_stripe=False):
                     f'<div aria-hidden="true" style="display:flex;gap:4px;">{dias}</div>'
                     f'<div style="display:flex;justify-content:space-between;font-size:12px;line-height:16px;color:{k["mfg"]};">'
                     f'<span>{T("cbTesteHoje")}</span><span>{T("cbTesteFim")}</span></div></div></div>')
-        direita = (f'{_plano_status(k, badge(T("cbNoTeste"), k, "green", ponto=True))}'
+        # o teste é do Enterprise: o "Escolher um plano" leva aos planos (ficar no Enterprise ou descer para o Pro)
+        direita = (f'{_plano_status(k, badge(T("cbNoTeste"), k, "green", ponto=True), "Enterprise")}'
                    f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["fg"]};">{T("cbTesteSemCobranca")}</p>'
                    f'<button type="button" style="display:flex;align-items:center;justify-content:center;gap:8px;height:40px;border:0;border-radius:10px;'
-                   f'background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:14px;font-weight:500;">{T("cbAssinarPro")}</button>')
+                   f'background:{k["pri"]};color:{k["prifg"]};font-family:{FONTE};font-size:14px;font-weight:500;">{T("cbEscolherPlano")}</button>')
         lado = _cartao(k, (
             f'{_h2(k, T("cbSeAssinar"))}'
             f'{_conta(k, "cbContaPro", "cbTotalPro", "cbMes", grande=28)}'
