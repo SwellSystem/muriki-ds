@@ -11,6 +11,8 @@ I.update(
     # ArrowSquareOut (o link do portal) e UserPlus / UserMinus (os dois avisos dos assentos)
     externo=svg('<path d="M9.4 2.4h4.2v4.2"/><path d="M13.6 2.4L7.8 8.2"/><path d="M12 9.4v3a1.2 1.2 0 0 1-1.2 1.2H3.6a1.2 1.2 0 0 1-1.2-1.2V5.2A1.2 1.2 0 0 1 3.6 4h3"/>'),
     pessoa_mais=svg('<circle cx="6.4" cy="5.6" r="2.6"/><path d="M1.8 13.4c.5-2.5 2.4-3.9 4.6-3.9s4.1 1.4 4.6 3.9"/><path d="M12.8 5.6v3.6M11 7.4h3.6"/>'),
+    # CloudSlash (a folhinha sem data, com o Stripe fora); o tentar de novo usa o recarregar das peças
+    nuvem_off=svg('<path d="M2.4 2.4l11.2 11.2"/><path d="M5.2 5.4A3.6 3.6 0 0 0 4.6 12.4h6.6"/><path d="M7.4 4.5A4 4 0 0 1 12.6 7.9 2.3 2.3 0 0 1 13.6 11.6"/>'),
     pessoa_menos=svg('<circle cx="6.4" cy="5.6" r="2.6"/><path d="M1.8 13.4c.5-2.5 2.4-3.9 4.6-3.9s4.1 1.4 4.6 3.9"/><path d="M11 7.4h3.6"/>'),
 )
 
@@ -707,7 +709,16 @@ def _fiscal(k, teste):
     return _cartao(k, f'{cab}{dl}')
 
 
-def tela_cobranca(k, teste=False):
+def _folha_vazia(k):
+    # a folhinha sem data: o topo apagado e a nuvem cortada no lugar do dia (o Stripe não respondeu)
+    return (f'<span role="img" aria-label="{T("cbIndispAria")}" style="display:flex;flex-direction:column;width:84px;flex:0 0 auto;overflow:hidden;border-radius:14px;'
+            f'background:{k["card"]};box-shadow:0 0 0 1px {k["border"]}, 0 10px 24px -12px rgba(0,0,0,0.3);">'
+            f'<span style="height:26px;background:{k["sunken"]};box-shadow:inset 0 -1px 0 {k["border"]};"></span>'
+            f'<span style="display:flex;align-items:center;justify-content:center;height:60px;color:{k["mfg"]};">'
+            f'<span style="display:flex;width:28px;height:28px;">{ic("nuvem_off", 28)}</span></span></span>')
+
+
+def tela_cobranca(k, teste=False, sem_stripe=False):
     if teste:
         dias = ''.join(f'<span style="flex:1;height:8px;border-radius:3px;background:'
                        f'{k["pri"] if i == 0 else "color-mix(in oklab, " + k["pri"] + " 16%, " + k["card"] + ")"};"></span>' for i in range(14))
@@ -730,12 +741,22 @@ def tela_cobranca(k, teste=False):
             f'{_h2(k, T("cbSeAssinar"))}'
             f'{_conta(k, "cbContaPro", "cbTotalPro", "cbMes", grande=28)}'
             f'<p style="margin:0;font-size:12.5px;line-height:17px;color:{k["mfg"]};">{T("cbSeAssinarNota")}</p>'))
-    else:
-        esquerda = (f'{_folha(k, T("cbMesCurto"), "12", k["pri"], T("cbProxData"))}'
-                    f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
+    elif sem_stripe:
+        # nextInvoiceUnavailable: o resto do resumo responde; só o valor e a data da próxima cobrança faltam
+        esquerda = (f'{_folha_vazia(k)}'
+                    f'<div style="display:flex;flex-direction:column;align-items:flex-start;gap:10px;min-width:0;">'
+                    f'<div style="display:flex;flex-direction:column;gap:4px;">'
                     f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["mfg"]};">{T("cbProxima")}</span>'
-                    f'<span style="font-size:56px;line-height:1.05;font-weight:600;letter-spacing:-0.035em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{T("cbProxValor")}</span>'
-                    f'<span style="font-size:13.5px;line-height:19px;color:{k["mfg"]};">{T("cbProxConta")}</span></div>')
+                    f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};text-wrap:balance;">{T("cbIndisp")}</span>'
+                    f'<span style="font-size:13.5px;line-height:19px;color:{k["mfg"]};">{T("cbIndispNota")}</span></div>'
+                    f'{_botao(k, T("cbTentar"), "outline", "recarregar")}</div>')
+    if not teste:
+        if not sem_stripe:
+            esquerda = (f'{_folha(k, T("cbMesCurto"), "12", k["pri"], T("cbProxData"))}'
+                        f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
+                        f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["mfg"]};">{T("cbProxima")}</span>'
+                        f'<span style="font-size:56px;line-height:1.05;font-weight:600;letter-spacing:-0.035em;color:{k["fgs"]};font-variant-numeric:tabular-nums;">{T("cbProxValor")}</span>'
+                        f'<span style="font-size:13.5px;line-height:19px;color:{k["mfg"]};">{T("cbProxConta")}</span></div>')
         direita = (f'{_plano_status(k, badge(T("cbAtiva"), k, "green", ponto=True) + badge(T("cbMensal"), k))}'
                    f'<p style="margin:0;font-size:13px;line-height:19px;color:{k["mfg"]};">{T("cbStripeNota")}</p>'
                    f'<div style="display:flex;gap:8px;">{_botao(k, T("cbStripe"), "primary", "externo")}{_botao(k, T("cbVerPlanos"), "outline")}</div>')
@@ -764,4 +785,5 @@ TELAS_C = {
     'comercial_enviado': lambda k: pagina_comercial(k, 'enviado'),
     'cobranca': lambda k: tela_cobranca(k),
     'cobranca_teste': lambda k: tela_cobranca(k, teste=True),
+    'cobranca_sem_stripe': lambda k: tela_cobranca(k, sem_stripe=True),
 }
