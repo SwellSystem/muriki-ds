@@ -1690,6 +1690,11 @@ const STRINGS: Record<string, unknown> = {
           breakdown_one: "1 assento × {{price}}",
           breakdown_other: "{{count}} assentos × {{price}}",
           none: "Nenhuma cobrança prevista.",
+          // nextInvoiceUnavailable: o Stripe não respondeu; o resto do resumo aparece
+          unavailable: "Não deu para buscar a próxima cobrança agora.",
+          unavailable_note: "O Stripe não respondeu. A assinatura segue normal.",
+          unavailable_date: "Data da próxima cobrança indisponível",
+          retry: "Tentar de novo",
           status: {
             active: "Ativa",
             trialing: "No teste",

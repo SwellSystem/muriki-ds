@@ -522,6 +522,22 @@
       "h": 900,
       "title": "26 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual · escuro",
       "is_interactive": true
+    },
+    "WorkspaceCobrancaSemStripe.dc.html": {
+      "x": 19760,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "33 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaSemStripeEscuro.dc.html": {
+      "x": 19760,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "33 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível · escuro",
+      "is_interactive": true
     }
   },
   "order": [
@@ -588,7 +604,9 @@
     "WorkspaceCobranca.dc.html",
     "WorkspaceCobrancaEscuro.dc.html",
     "WorkspaceCobrancaTeste.dc.html",
-    "WorkspaceCobrancaTesteEscuro.dc.html"
+    "WorkspaceCobrancaTesteEscuro.dc.html",
+    "WorkspaceCobrancaSemStripe.dc.html",
+    "WorkspaceCobrancaSemStripeEscuro.dc.html"
   ],
   "notes": {
     "entrada": {

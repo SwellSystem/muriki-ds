@@ -27,7 +27,7 @@
  * portal do Stripe, os planos, a assinatura e a edição fiscal são callbacks ou links do app.
  */
 import type { ReactElement, ReactNode } from "react"
-import { ArrowSquareOutIcon, LockSimpleIcon, SparkleIcon, UserMinusIcon, UserPlusIcon } from "@phosphor-icons/react"
+import { ArrowClockwiseIcon, ArrowSquareOutIcon, CloudSlashIcon, LockSimpleIcon, SparkleIcon, UserMinusIcon, UserPlusIcon } from "@phosphor-icons/react"
 
 // Do arquivo, nunca do barril: o `shadcn add` reescreve o caminho para o alvo do item
 import { formatSeatPrice } from "@/components/blocks/platform-members/invite-form"
@@ -73,6 +73,13 @@ export interface NextInvoiceHeroProps {
   /** A fatura prevista; sem ela (e fora do teste), ou no Free, "Nenhuma cobrança prevista." no lugar do valor. */
   nextInvoice?: NextInvoice | null
   /**
+   * O Stripe não respondeu (`nextInvoiceUnavailable` do GET …/billing): no lugar do valor, a folhinha
+   * sem data e "Não deu para buscar a próxima cobrança agora.", com o `retry`. Fora do Free e do teste.
+   */
+  nextInvoiceUnavailable?: boolean
+  /** "Tentar de novo", com o Stripe fora: o app busca o resumo de novo. */
+  retry?: BillingAction
+  /**
    * O "6 assentos × R$ 29" embaixo do valor: os assentos da fatura e o preço por pessoa do período, em
    * centavos, como a API manda. É só texto: o valor de cima não sai desta conta.
    */
@@ -115,6 +122,8 @@ export function NextInvoiceHero({
   manage,
   viewPlans,
   subscribe,
+  nextInvoiceUnavailable = false,
+  retry,
   now,
   locale,
   className,
@@ -122,6 +131,7 @@ export function NextInvoiceHero({
   const t = useTranslate()
   const noTeste = trial !== undefined
   const fatura = status === "free" ? null : nextInvoice
+  const indisponivel = nextInvoiceUnavailable && status !== "free" && !fatura
   const dataDaFatura = fatura ? formatBillingDate(fatura.date, locale, { year: true }) : null
   const comecaEm = trial?.subscribed ? formatBillingDate(trial.endsAt, locale, { year: true }) : null
 
@@ -142,6 +152,27 @@ export function NextInvoiceHero({
       <div className="flex items-center gap-5 px-5 py-6 sm:gap-7 sm:px-8 sm:py-7">
         {noTeste ? (
           <ContagemDoTeste plano={plan.name} trial={trial} now={now} locale={locale} />
+        ) : indisponivel ? (
+          <>
+            <FolhinhaVazia aria={t("platform.billing.overview.hero.unavailable_date")} />
+            <div className="flex min-w-0 flex-col items-start gap-2.5">
+              <div className="flex flex-col gap-1">
+                <span className="text-[13px] leading-[18px] font-medium text-muted-foreground">
+                  {t("platform.billing.overview.hero.next")}
+                </span>
+                <span className="text-[20px] leading-[26px] font-semibold tracking-[-0.01em] text-balance text-foreground-strong sm:text-[22px] sm:leading-7">
+                  {t("platform.billing.overview.hero.unavailable")}
+                </span>
+                <span className="text-[13.5px] leading-[19px] text-muted-foreground">
+                  {t("platform.billing.overview.hero.unavailable_note")}
+                </span>
+              </div>
+              <Acao acao={retry} variant="outline">
+                {t("platform.billing.overview.hero.retry")}
+                <ArrowClockwiseIcon aria-hidden className="size-3.5" />
+              </Acao>
+            </div>
+          </>
         ) : fatura ? (
           <>
             {dataDaFatura ? (
@@ -325,6 +356,22 @@ function Folhinha({ data, locale, tom, aria }: { data: string; locale: string; t
         className="flex h-[52px] items-center justify-center text-[30px] font-semibold tracking-[-0.02em] text-foreground-strong tabular-nums sm:h-[60px] sm:text-[36px]"
       >
         {new Intl.DateTimeFormat(locale, { day: "numeric" }).format(d)}
+      </span>
+    </span>
+  )
+}
+
+// a folhinha sem data: o topo apagado e a nuvem cortada no lugar do dia (o Stripe não respondeu)
+function FolhinhaVazia({ aria }: { aria: string }) {
+  return (
+    <span
+      role="img"
+      aria-label={aria}
+      className="flex w-[72px] shrink-0 flex-col overflow-hidden rounded-[14px] bg-card shadow-[0_0_0_1px_var(--border),0_10px_24px_-12px_rgba(0,0,0,0.3)] sm:w-[84px]"
+    >
+      <span aria-hidden className="h-[26px] bg-sunken shadow-[inset_0_-1px_0_var(--border)]" />
+      <span aria-hidden className="flex h-[52px] items-center justify-center text-muted-foreground sm:h-[60px]">
+        <CloudSlashIcon className="size-7" />
       </span>
     </span>
   )

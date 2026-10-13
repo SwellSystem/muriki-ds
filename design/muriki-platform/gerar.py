@@ -47,6 +47,7 @@ JORNADA = [
     ('comercial_enviado', 'WorkspaceComercialEnviado', 'Falar com o comercial', 'Falar com o comercial · enviado: a confirmação no lugar do formulário'),
     ('cobranca', 'WorkspaceCobranca', 'Cobrança', 'Cobrança · a próxima cobrança, os assentos e o que mudou no período'),
     ('cobranca_teste', 'WorkspaceCobrancaTeste', 'Cobrança', 'Cobrança · no teste do Pro: a contagem até o fim, sem cobrança prevista'),
+    ('cobranca_sem_stripe', 'WorkspaceCobrancaSemStripe', 'Cobrança', 'Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível'),
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
@@ -57,7 +58,7 @@ FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
                   'Quem ainda não tem o onboarding do Platform passa pelo passo do convidado antes do aceite'),
     ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
                    'ações que pode usar'),
-    ('cobranca', 13, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Pro e '
+    ('cobranca', 14, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Pro e '
                      'no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)'),
 ]
 TELAS, _i = [], 0
