@@ -72,42 +72,8 @@ export function FiscalForm({
   const t = useTranslate()
   const legenda = useId()
   const nomes = nomesDosPaises(countries, locale)
-  const documento = fiscalDocument(kind)
   const brasil = isBrazil(value.country)
   const mudar = (parte: Partial<FiscalValue>) => onChange({ ...value, ...parte })
-  const limpar = documento === "cpf" ? sanitizeCpf : sanitizeCnpj
-  const formatar = documento === "cpf" ? formatCpf : formatCnpj
-
-  // o caret depois da máscara: quantos caracteres do documento ficam antes dele. O evento guarda, e o
-  // efeito o põe no lugar depois do commit (a máscara nova já está no campo)
-  const campo = useRef<HTMLInputElement>(null)
-  const caret = useRef<number | null>(null)
-  useLayoutEffect(() => {
-    const el = campo.current
-    if (caret.current === null || !el) return
-    const posicao = posicaoNaMascara(el.value, caret.current)
-    caret.current = null
-    el.setSelectionRange(posicao, posicao)
-  })
-
-  const digitar = (texto: string, fim: number | null) => {
-    const novo = limpar(texto)
-    caret.current = Math.min(limpar(texto.slice(0, fim ?? texto.length)).length, novo.length)
-    mudar({ taxId: novo })
-  }
-
-  // o Backspace logo depois de um separador apaga o caractere antes dele, e não fica parado no "."
-  const apagarSeparador = (e: KeyboardEvent<HTMLInputElement>) => {
-    const el = e.currentTarget
-    const i = el.selectionStart
-    if (e.key !== "Backspace" || i === null || i === 0 || i !== el.selectionEnd || /[0-9A-Z]/i.test(el.value[i - 1])) return
-    e.preventDefault()
-    const antes = normalizeTaxId(el.value.slice(0, i)).length
-    if (antes === 0) return
-    caret.current = antes - 1
-    const doc = normalizeTaxId(el.value)
-    mudar({ taxId: limpar(doc.slice(0, antes - 1) + doc.slice(antes)) })
-  }
 
   return (
     <fieldset
@@ -148,49 +114,116 @@ export function FiscalForm({
       {!brasil ? (
         <p className="text-[13px] leading-[19px] text-muted-foreground">{t("platform.billing.fiscal.outside_brazil")}</p>
       ) : (
-        <>
-          <Field invalid={errors.taxId !== undefined} disabled={disabled}>
-            <FieldLabel>{t(`platform.billing.fiscal.${documento}.label`)}</FieldLabel>
-            <InputGroup
-              size="touch"
-              ref={campo}
-              value={formatar(value.taxId)}
-              onChange={(e) => digitar(e.target.value, e.target.selectionStart)}
-              onKeyDown={apagarSeparador}
-              placeholder={t(`platform.billing.fiscal.${documento}.placeholder`)}
-              // o CPF só tem dígitos: o teclado numérico; o CNPJ tem letras
-              inputMode={documento === "cpf" ? "numeric" : "text"}
-              autoComplete="off"
-              autoCapitalize="characters"
-              autoCorrect="off"
-              spellCheck={false}
-              className="font-mono"
-            />
-            {errors.taxId ? (
-              <FieldError className={DICA}>{t(`platform.billing.fiscal.${documento}.${errors.taxId}`)}</FieldError>
-            ) : (
-              <FieldDescription className={DICA}>{t(`platform.billing.fiscal.${documento}.hint`)}</FieldDescription>
-            )}
-          </Field>
-
-          {documento === "cnpj" ? (
-            <Field invalid={errors.legalName !== undefined} disabled={disabled}>
-              <FieldLabel>{t("platform.billing.fiscal.legal_name.label")}</FieldLabel>
-              <Input
-                size="touch"
-                value={value.legalName}
-                onChange={(e) => mudar({ legalName: e.target.value })}
-                maxLength={LEGAL_NAME_MAX}
-                autoComplete="off"
-              />
-              {errors.legalName ? (
-                <FieldError className={DICA}>{t("platform.billing.fiscal.legal_name.required")}</FieldError>
-              ) : null}
-            </Field>
-          ) : null}
-        </>
+        <BrazilTaxIdFields kind={kind} value={value} onChange={mudar} errors={errors} disabled={disabled} />
       )}
     </fieldset>
+  )
+}
+
+export interface BrazilTaxIdFieldsProps {
+  /** O tipo do workspace: `personal` pede o CPF; `team`, o CNPJ e a razão social. */
+  kind: WorkspaceKind
+  value: Pick<FiscalValue, "taxId" | "legalName">
+  /** Devolve só a parte que mudou, com o documento já normalizado. */
+  onChange: (parte: Partial<Pick<FiscalValue, "taxId" | "legalName">>) => void
+  errors?: FiscalErrors
+  /**
+   * O CPF pode ficar em branco: o perfil já tem um, e a API usa o dele. O rótulo ganha o "opcional", e
+   * a dica diz que vale o do perfil. Só no `personal`.
+   */
+  optional?: boolean
+  disabled?: boolean
+}
+
+/**
+ * Os campos do documento no Brasil, os mesmos do FiscalForm: o CPF no `personal`; o CNPJ e a razão
+ * social no `team`. Servem também à revisão do país (CountryReviewForm), no "No Brasil".
+ */
+export function BrazilTaxIdFields({ kind, value, onChange, errors = {}, optional = false, disabled }: BrazilTaxIdFieldsProps) {
+  const t = useTranslate()
+  const documento = fiscalDocument(kind)
+  const opcional = optional && documento === "cpf"
+  const limpar = documento === "cpf" ? sanitizeCpf : sanitizeCnpj
+  const formatar = documento === "cpf" ? formatCpf : formatCnpj
+
+  // o caret depois da máscara: quantos caracteres do documento ficam antes dele. O evento guarda, e o
+  // efeito o põe no lugar depois do commit (a máscara nova já está no campo)
+  const campo = useRef<HTMLInputElement>(null)
+  const caret = useRef<number | null>(null)
+  useLayoutEffect(() => {
+    const el = campo.current
+    if (caret.current === null || !el) return
+    const posicao = posicaoNaMascara(el.value, caret.current)
+    caret.current = null
+    el.setSelectionRange(posicao, posicao)
+  })
+
+  const digitar = (texto: string, fim: number | null) => {
+    const novo = limpar(texto)
+    caret.current = Math.min(limpar(texto.slice(0, fim ?? texto.length)).length, novo.length)
+    onChange({ taxId: novo })
+  }
+
+  // o Backspace logo depois de um separador apaga o caractere antes dele, e não fica parado no "."
+  const apagarSeparador = (e: KeyboardEvent<HTMLInputElement>) => {
+    const el = e.currentTarget
+    const i = el.selectionStart
+    if (e.key !== "Backspace" || i === null || i === 0 || i !== el.selectionEnd || /[0-9A-Z]/i.test(el.value[i - 1])) return
+    e.preventDefault()
+    const antes = normalizeTaxId(el.value.slice(0, i)).length
+    if (antes === 0) return
+    caret.current = antes - 1
+    const doc = normalizeTaxId(el.value)
+    onChange({ taxId: limpar(doc.slice(0, antes - 1) + doc.slice(antes)) })
+  }
+
+  return (
+    <>
+      <Field invalid={errors.taxId !== undefined} disabled={disabled}>
+        <FieldLabel>
+          {t(`platform.billing.fiscal.${documento}.label`)}
+          {opcional ? <span className="font-normal text-muted-foreground">{t("platform.billing.fiscal.optional")}</span> : null}
+        </FieldLabel>
+        <InputGroup
+          size="touch"
+          ref={campo}
+          value={formatar(value.taxId)}
+          onChange={(e) => digitar(e.target.value, e.target.selectionStart)}
+          onKeyDown={apagarSeparador}
+          placeholder={t(`platform.billing.fiscal.${documento}.placeholder`)}
+          // o CPF só tem dígitos: o teclado numérico; o CNPJ tem letras
+          inputMode={documento === "cpf" ? "numeric" : "text"}
+          autoComplete="off"
+          autoCapitalize="characters"
+          autoCorrect="off"
+          spellCheck={false}
+          className="font-mono"
+        />
+        {errors.taxId ? (
+          <FieldError className={DICA}>{t(`platform.billing.fiscal.${documento}.${errors.taxId}`)}</FieldError>
+        ) : (
+          <FieldDescription className={DICA}>
+            {t(opcional ? "platform.billing.fiscal.cpf.hint_profile" : `platform.billing.fiscal.${documento}.hint`)}
+          </FieldDescription>
+        )}
+      </Field>
+
+      {documento === "cnpj" ? (
+        <Field invalid={errors.legalName !== undefined} disabled={disabled}>
+          <FieldLabel>{t("platform.billing.fiscal.legal_name.label")}</FieldLabel>
+          <Input
+            size="touch"
+            value={value.legalName}
+            onChange={(e) => onChange({ legalName: e.target.value })}
+            maxLength={LEGAL_NAME_MAX}
+            autoComplete="off"
+          />
+          {errors.legalName ? (
+            <FieldError className={DICA}>{t("platform.billing.fiscal.legal_name.required")}</FieldError>
+          ) : null}
+        </Field>
+      ) : null}
+    </>
   )
 }
 

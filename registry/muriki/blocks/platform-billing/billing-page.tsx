@@ -1,10 +1,10 @@
 "use client"
 
 /**
- * A moldura das páginas de cobrança de dentro do workspace (o checkout e o "Falar com o comercial"),
- * no jeito do Linear e do Stripe: o caminho leve em cima ("← Planos / Assinar o Pro / Pagamento no
- * Stripe"), o formulário à esquerda e o resumo à direita, numa faixa de superfície própria que vai até
- * o pé. Abaixo de `lg`, o resumo desce para baixo do formulário. Nada de Dialog nem Sheet: o desenho
+ * A moldura das páginas de cobrança de dentro do workspace (o checkout, o "Falar com o comercial" e
+ * a resposta à revisão do país), no jeito do Linear e do Stripe: o caminho leve em cima ("← Planos /
+ * Assinar o Pro / Pagamento no Stripe"), o formulário à esquerda e o resumo à direita, numa faixa de
+ * superfície própria que vai até o pé. Abaixo de `lg`, o resumo desce para baixo do formulário. Nada de Dialog nem Sheet: o desenho
  * aprovado é página.
  *
  * O DS não tem roteador: o "← Planos" chama `onBack`, ou vira o link do app com `backRender`.
@@ -26,6 +26,8 @@ export interface BillingPageLayoutProps {
   current: string
   /** O passo que vem depois, apagado, ex.: o cadeado com "Pagamento no Stripe". */
   next?: ReactNode
+  /** O rótulo da volta; o padrão é "Planos". A revisão do país volta para a "Cobrança". */
+  backLabel?: ReactNode
   /** O "← Planos" como botão. */
   onBack?: () => void
   /** O "← Planos" como o link do roteador do app (vence o `onBack`), ex.: `<Link to="../plans" />`. */
@@ -37,7 +39,16 @@ export interface BillingPageLayoutProps {
   className?: string
 }
 
-export function BillingPageLayout({ current, next, onBack, backRender, aside, children, className }: BillingPageLayoutProps) {
+export function BillingPageLayout({
+  current,
+  next,
+  backLabel,
+  onBack,
+  backRender,
+  aside,
+  children,
+  className,
+}: BillingPageLayoutProps) {
   const t = useTranslate()
   return (
     <div
@@ -54,7 +65,7 @@ export function BillingPageLayout({ current, next, onBack, backRender, aside, ch
               render={backRender ?? <button type="button" onClick={onBack} />}
               className="h-auto text-[13.5px]"
             >
-              {t("platform.billing.checkout.back")}
+              {backLabel ?? t("platform.billing.checkout.back")}
             </BackLink>
             <Separador />
             <span aria-current="page" className="font-medium text-foreground-strong">
