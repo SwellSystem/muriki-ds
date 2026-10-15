@@ -1611,11 +1611,14 @@ const STRINGS: Record<string, unknown> = {
       fiscal: {
         title: "Dados fiscais",
         country: "País",
+        optional: "opcional",
         outside_brazil: "Fora do Brasil, o número fiscal da empresa, se houver, é pedido no Stripe.",
         cpf: {
           label: "CPF",
           placeholder: "000.000.000-00",
           hint: "Só os números: a pontuação entra sozinha.",
+          // o perfil já tem um CPF (revisão do país, no personal): o campo é opcional
+          hint_profile: "Em branco, vale o CPF do seu perfil.",
           required: "Informe o CPF.",
           invalid: "CPF inválido: confira os dígitos.",
         },
@@ -1699,6 +1702,10 @@ const STRINGS: Record<string, unknown> = {
           unavailable_note: "O Stripe não respondeu. A assinatura segue normal.",
           unavailable_date: "Data da próxima cobrança indisponível",
           retry: "Tentar de novo",
+          // cancelAtPeriodEnd: a assinatura termina no fim do período (o portal ou a revisão do país)
+          ends: "A assinatura termina em",
+          ends_date: "A assinatura termina em {{date}}",
+          ends_note: "Depois disso, o workspace volta para o Free.",
           status: {
             active: "Ativa",
             trialing: "No teste",
@@ -1784,6 +1791,88 @@ const STRINGS: Record<string, unknown> = {
             yearly: "/ano",
           },
           note: "a conta, com as pessoas de hoje",
+        },
+      },
+      // a revisão do país da cobrança (B8b da API): o aviso na Cobrança e a página de resposta. Os países
+      // saem do Intl do idioma, sem artigo: por isso entre parênteses
+      country_review: {
+        confirm: "Confirmar o país",
+        notice: {
+          open: {
+            title: "Confirme o país da cobrança até {{date}}",
+            title_no_date: "Confirme o país da cobrança",
+            // o que não bateu com o país declarado (countryReviewMismatch)
+            text: {
+              address:
+                "O país informado ao assinar ({{declared}}) não bate com o do endereço de cobrança ({{address}}). Sem resposta, a assinatura termina no fim do período.",
+              card: "O país informado ao assinar ({{declared}}) não bate com o do cartão ({{card}}). Sem resposta, a assinatura termina no fim do período.",
+              both_same:
+                "O país informado ao assinar ({{declared}}) não bate com o do endereço de cobrança e o do cartão ({{address}}). Sem resposta, a assinatura termina no fim do período.",
+              both: "O país informado ao assinar ({{declared}}) não bate com o do endereço de cobrança ({{address}}) nem com o do cartão ({{card}}). Sem resposta, a assinatura termina no fim do período.",
+              unknown:
+                "O país informado ao assinar não bate com o do endereço de cobrança ou o do cartão. Sem resposta, a assinatura termina no fim do período.",
+            },
+          },
+          expired: {
+            title: "O prazo para confirmar o país acabou",
+            text: "A assinatura termina em {{date}}, e o workspace volta para o Free. Até lá, ainda dá para confirmar o país e manter a assinatura.",
+            text_no_date:
+              "A assinatura termina no fim do período, e o workspace volta para o Free. Até lá, ainda dá para confirmar o país e manter a assinatura.",
+          },
+          // a resposta trocou a moeda: o owner assina de novo na nova, que só cobra no fim do período
+          moving: {
+            title: {
+              usd: "A cobrança passa para dólar",
+              brl: "A cobrança passa para real",
+            },
+            text: "Assine de novo em {{currency}} até {{date}}. A cobrança nova só começa quando este período terminar, sem passar pelo Free.",
+            text_no_date: "Assine de novo em {{currency}}. A cobrança nova só começa quando este período terminar, sem passar pelo Free.",
+            action: "Assinar em {{currency}}",
+          },
+        },
+        title: "Onde o workspace é cobrado?",
+        subtitle:
+          "O país informado ao assinar não bate com o do endereço de cobrança ou o do cartão. Confirme até {{date}} para manter a assinatura.",
+        subtitle_no_date: "O país informado ao assinar não bate com o do endereço de cobrança ou o do cartão. Confirme para manter a assinatura.",
+        abroad: "Fora do Brasil",
+        brazil: "No Brasil",
+        // só quando a resposta muda de lado em relação ao país declarado
+        abroad_note:
+          "A cobrança passa para dólar (USD): você assina de novo em dólar, e a cobrança nova só começa quando este período terminar.",
+        brazil_note:
+          "A cobrança passa para real (BRL): você assina de novo em real, e a cobrança nova só começa quando este período terminar.",
+        tax_id: {
+          type: "Documento fiscal",
+          type_placeholder: "Escolha o tipo",
+          number: "Número do documento",
+          hint: "Aparece nas faturas. Dá para deixar em branco.",
+          type_required: "Escolha o tipo do documento.",
+          invalid: "Documento inválido para este tipo: confira o número.",
+        },
+        // os tipos do Stripe (COMMON_FOREIGN_TAX_ID_TYPES); um tipo sem chave aparece como o código em maiúsculas
+        tax_id_types: {
+          eu_vat: "IVA da UE",
+          gb_vat: "VAT do Reino Unido",
+          us_ein: "EIN dos EUA",
+          ca_bn: "BN do Canadá",
+          au_abn: "ABN da Austrália",
+          ar_cuit: "CUIT da Argentina",
+          mx_rfc: "RFC do México",
+          cl_tin: "RUT do Chile",
+          co_nit: "NIT da Colômbia",
+          ch_vat: "IVA da Suíça",
+          no_vat: "IVA da Noruega",
+          in_gst: "GST da Índia",
+          jp_cn: "Número corporativo do Japão",
+        },
+        submit: "Confirmar",
+        summary: {
+          title: "O que encontramos",
+          declared: "País informado ao assinar",
+          billing_address: "Endereço de cobrança",
+          card: "Cartão",
+          due: "Prazo para confirmar",
+          note: "Os países do endereço e do cartão vêm do Stripe. Se o endereço estiver errado, corrija em Gerenciar no Stripe.",
         },
       },
     },

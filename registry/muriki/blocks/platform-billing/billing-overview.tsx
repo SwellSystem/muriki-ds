@@ -10,6 +10,8 @@
  *   cobrança prevista.". No teste, a folhinha verde traz o fim do teste, e o herói vira a contagem dos
  *   dias com a barra e o "Escolher um plano", que leva aos planos (ou, já assinado, "A assinatura
  *   começa em …").
+ *   Com `endsAt` (a assinatura termina no fim do período), a folhinha cinza com o dia e "A assinatura
+ *   termina em" no lugar da próxima cobrança.
  * - SeatsSummary: "N ativos | M pagos neste período", a barra com um segmento por assento pago (o
  *   mínimo do plano à parte; quem sai, hachurado), os dois avisos (quem entra paga proporcional na
  *   hora; quem sai deixa de ser cobrado só na renovação), as pessoas com o Code Pro de cada uma (quem
@@ -19,7 +21,7 @@
  *   10, só o nome de exibição). Com a lista vazia, o app não renderiza o cartão.
  * - TrialSubscribeCard: no teste, "Se assinar o Pro" com "N pessoas × preço = total/mês".
  * - FiscalDataCard: o CPF ou o CNPJ como vem da API, já mascarado, e a razão social.
- * - BillingOverview: a composição da página (o título, o herói e a grade de duas colunas), por slots.
+ * - BillingOverview: a composição da página (o título, o aviso, o herói e a grade de duas colunas), por slots.
  *
  * O componente só mostra: o valor da próxima cobrança vem pronto da API (`nextInvoice.amountInCents`,
  * F12), e o "N assentos × preço" é texto do que a API manda, sem conta. As barras saem de
@@ -91,6 +93,12 @@ export interface NextInvoiceHeroProps {
    * e a direita troca a nota e o "Escolher um plano" por "A assinatura começa em <fim>." e o "Gerenciar no Stripe".
    */
   trial?: { endsAt: string; days?: number; subscribed?: boolean }
+  /**
+   * A assinatura termina no fim do período (`cancelAtPeriodEnd` com o `currentPeriodEnd`): o
+   * cancelamento pelo portal ou a revisão do país vencida ou com troca de moeda. Fora do teste, a
+   * esquerda vira a folhinha cinza com o dia, "A assinatura termina em", a data e a nota da volta ao Free.
+   */
+  endsAt?: string | null
   /** "Gerenciar no Stripe": o portal é do app (FE4). Fora do teste, ou no teste já assinado. */
   manage?: BillingAction
   /** "Ver planos". Fora do teste. */
@@ -123,6 +131,7 @@ export function NextInvoiceHero({
   nextInvoice,
   breakdown,
   trial,
+  endsAt,
   manage,
   viewPlans,
   subscribe,
@@ -138,6 +147,8 @@ export function NextInvoiceHero({
   const indisponivel = nextInvoiceUnavailable && status !== "free" && !fatura
   const dataDaFatura = fatura ? formatBillingDate(fatura.date, locale, { year: true }) : null
   const comecaEm = trial?.subscribed ? formatBillingDate(trial.endsAt, locale, { year: true }) : null
+  // o fim da assinatura vence a próxima cobrança; uma data inválida deixa o herói como seria sem ela
+  const terminaEm = !noTeste ? formatBillingDate(endsAt, locale) : null
 
   return (
     <section
@@ -156,6 +167,24 @@ export function NextInvoiceHero({
       <div className="flex items-center gap-5 px-5 py-6 sm:gap-7 sm:px-8 sm:py-7">
         {noTeste ? (
           <ContagemDoTeste plano={plan.name} trial={trial} now={now} locale={locale} />
+        ) : terminaEm && endsAt ? (
+          <>
+            <Folhinha
+              data={endsAt}
+              locale={locale}
+              tom="muted"
+              aria={t("platform.billing.overview.hero.ends_date", { date: formatBillingDate(endsAt, locale, { year: true }) })}
+            />
+            <div className="flex min-w-0 flex-col gap-1">
+              <span className="text-[13px] leading-[18px] font-medium text-muted-foreground">
+                {t("platform.billing.overview.hero.ends")}
+              </span>
+              <span className="text-[36px] leading-[1.05] font-semibold tracking-[-0.03em] text-foreground-strong sm:text-[44px]">
+                {terminaEm}
+              </span>
+              <span className="text-[13.5px] leading-[19px] text-muted-foreground">{t("platform.billing.overview.hero.ends_note")}</span>
+            </div>
+          </>
         ) : indisponivel ? (
           <>
             <FolhinhaVazia aria={t("platform.billing.overview.hero.unavailable_date")} />
@@ -336,9 +365,20 @@ function ContagemDoTeste({
 
 /**
  * A folhinha do calendário: o mês em cima, na cor do tom, e o dia grande. A data inteira vai no `aria`.
- * Só com data válida: quem chama confere antes (formatBillingDate).
+ * Só com data válida: quem chama confere antes (formatBillingDate). O `muted`, cinza, é o fim da
+ * assinatura: não é cobrança.
  */
-function Folhinha({ data, locale, tom, aria }: { data: string; locale: string; tom: "primary" | "success"; aria: string }) {
+function Folhinha({
+  data,
+  locale,
+  tom,
+  aria,
+}: {
+  data: string
+  locale: string
+  tom: "primary" | "success" | "muted"
+  aria: string
+}) {
   const d = new Date(data)
   return (
     <span
@@ -349,8 +389,12 @@ function Folhinha({ data, locale, tom, aria }: { data: string; locale: string; t
       <span
         aria-hidden
         className={cn(
-          "flex h-[26px] items-center justify-center text-[12.5px] font-semibold text-primary-foreground",
-          tom === "success" ? "bg-success" : "bg-primary"
+          "flex h-[26px] items-center justify-center text-[12.5px] font-semibold",
+          tom === "muted"
+            ? "bg-tone-gray text-tone-gray-foreground shadow-[inset_0_-1px_0_var(--border)]"
+            : tom === "success"
+              ? "bg-success text-primary-foreground"
+              : "bg-primary text-primary-foreground"
         )}
       >
         {new Intl.DateTimeFormat(locale, { month: "short" }).format(d)}
@@ -927,6 +971,8 @@ export function FiscalDataCard({ taxId, legalName, country, onEdit, trial = fals
 // ── A página ────────────────────────────────────────────────────────────
 
 export interface BillingOverviewProps {
+  /** O aviso acima do herói: o `<CountryReviewNotice />`, quando há revisão do país. */
+  notice?: ReactNode
   /** O `<NextInvoiceHero />`. */
   hero: ReactNode
   /** O `<SeatsSummary />`, na coluna larga. */
@@ -944,7 +990,7 @@ export interface BillingOverviewProps {
 }
 
 /** A composição da página: o título, o herói e a grade de duas colunas (abaixo de `lg`, uma só). */
-export function BillingOverview({ hero, seats, aside, title, subtitle, className }: BillingOverviewProps) {
+export function BillingOverview({ notice, hero, seats, aside, title, subtitle, className }: BillingOverviewProps) {
   const t = useTranslate()
   return (
     <div data-slot="billing-overview" className={cn("mx-auto flex w-full max-w-[1040px] flex-col gap-6", className)}>
@@ -954,6 +1000,7 @@ export function BillingOverview({ hero, seats, aside, title, subtitle, className
         </h1>
         <p className="text-sm leading-5 text-muted-foreground">{subtitle ?? t("platform.billing.overview.subtitle")}</p>
       </header>
+      {notice}
       {hero}
       <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         {seats}

@@ -4,7 +4,7 @@
 # preço é o do PlanPrice com o formatSeatPrice (sem casas quando o valor é inteiro), as trocas são o
 # ViewToggle, o checkout é uma página de dentro do workspace e os campos são os do onboarding (InputGroup touch). O DS só formata o que a API manda: o anual aparece por pessoa/ano,
 # como vem, e não dividido por 12 (F12); o "a partir de" do Enterprise é a única conta, só exibição.
-from pecas import K, T, ic, svg, I, campo, esc, raiz, topo, PRODUTO, EMAIL, FONTE, MONO, casca, logica, juntar, COMUM, PROPS_IDIOMA, props_tema
+from pecas import K, T, ic, svg, I, campo, cartoes_escolha, esc, raiz, topo, PRODUTO, EMAIL, FONTE, MONO, casca, logica, juntar, COMUM, PROPS_IDIOMA, props_tema
 from base import badge, diamante, CSS_DIVIDER_SKELETON
 
 I.update(
@@ -365,11 +365,11 @@ I.update(
 FILETE = 'color-mix(in oklab, {input} 60%, transparent)'
 
 
-def _trilha(k, passos):
+def _trilha(k, passos, volta='cbPlanos'):
     # o caminho: "← Planos" é o link de volta; o passo de agora em destaque; o que vem depois apagado
     sep = f'<span aria-hidden="true" style="color:{k["input"]};">/</span>'
     partes = [f'<a href="#" style="display:inline-flex;align-items:center;gap:6px;font-weight:500;color:{k["mfg"]};">'
-              f'<span style="display:flex;width:14px;height:14px;transform:scaleX(-1);">{ic("seta", 14)}</span>{T("cbPlanos")}</a>']
+              f'<span style="display:flex;width:14px;height:14px;transform:scaleX(-1);">{ic("seta", 14)}</span>{T(volta)}</a>']
     for txt, atual, icone in passos:
         cor = f'font-weight:500;color:{k["fgs"]};' if atual else f'color:{k["mfg"]};'
         g = f'<span style="display:flex;width:13px;height:13px;">{ic(icone, 13)}</span>' if icone else ''
@@ -727,7 +727,42 @@ def _folha_vazia(k):
             f'<span style="display:flex;width:28px;height:28px;">{ic("nuvem_off", 28)}</span></span></span>')
 
 
-def tela_cobranca(k, teste=False, sem_stripe=False):
+# ── A revisão do país (B8b da API) ──────────────────────────────────────
+# Quando o país declarado no checkout fica de um lado (Brasil ou exterior) e o do endereço de cobrança
+# ou o do cartão do outro, a API abre uma revisão de 7 dias. A Cobrança mostra o aviso acima do herói:
+# 'aberta' (amarelo, o prazo e o que não bateu), 'vencida' (vermelho: a assinatura termina no fim do
+# período, e ainda dá para responder) e 'moeda' (azul: a resposta trocou a moeda; o owner assina de
+# novo na moeda nova, que só cobra no fim do período). Nos dois últimos, o herói vira "A assinatura
+# termina em" (cancelAtPeriodEnd), o mesmo do cancelamento comum pelo portal.
+AVISOS = {
+    'aberta': ('tyellow', 'tyellowfg', 'globo', 'rpAbertaTit', 'rpAbertaTxt', 'rpConfirmar'),
+    'vencida': ('tred', 'tredfg', 'aviso', 'rpVencidaTit', 'rpVencidaTxt', 'rpConfirmar'),
+    'moeda': ('tblue', 'tbluefg', 'troca', 'rpMoedaTit', 'rpMoedaTxt', 'rpAssinarUsd'),
+}
+
+
+def _aviso_revisao(k, tipo):
+    fundo, cor, icone, tit, txt, acao = AVISOS[tipo]
+    return (f'<section role="status" style="display:flex;align-items:center;gap:16px;padding:16px 18px 16px 20px;border-radius:14px;'
+            f'background:{k[fundo]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k[cor]} 22%, transparent);">'
+            f'<span style="display:flex;width:20px;height:20px;flex:0 0 auto;align-self:flex-start;margin-top:1px;color:{k[cor]};">{ic(icone, 20)}</span>'
+            f'<div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">'
+            f'<span style="font-size:14.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T(tit)}</span>'
+            f'<span style="font-size:13.5px;line-height:19px;color:{k["fg"]};">{T(txt)}</span></div>'
+            f'{_botao(k, T(acao), "outline", "seta")}</section>')
+
+
+def _folha_fim(k):
+    # a folhinha do fim da assinatura: o topo apagado (não é cobrança), o dia em que termina
+    return (f'<span role="img" aria-label="{T("rpTerminaAria")}" style="display:flex;flex-direction:column;width:84px;flex:0 0 auto;overflow:hidden;border-radius:14px;'
+            f'background:{k["card"]};box-shadow:0 0 0 1px {k["border"]}, 0 10px 24px -12px rgba(0,0,0,0.3);">'
+            f'<span style="display:flex;align-items:center;justify-content:center;height:26px;background:{k["tgray"]};color:{k["tgrayfg"]};'
+            f'font-size:12.5px;font-weight:600;box-shadow:inset 0 -1px 0 {k["border"]};">{T("cbMesCurto")}</span>'
+            f'<span style="display:flex;align-items:center;justify-content:center;height:60px;font-size:36px;font-weight:600;letter-spacing:-0.02em;'
+            f'color:{k["fgs"]};font-variant-numeric:tabular-nums;">12</span></span>')
+
+
+def tela_cobranca(k, teste=False, sem_stripe=False, revisao=None):
     if teste:
         dias = ''.join(f'<span style="flex:1;height:8px;border-radius:3px;background:'
                        f'{k["pri"] if i == 0 else "color-mix(in oklab, " + k["pri"] + " 16%, " + k["card"] + ")"};"></span>' for i in range(14))
@@ -760,8 +795,16 @@ def tela_cobranca(k, teste=False, sem_stripe=False):
                     f'<span style="font-size:22px;line-height:28px;font-weight:600;letter-spacing:-0.01em;color:{k["fgs"]};text-wrap:balance;">{T("cbIndisp")}</span>'
                     f'<span style="font-size:13.5px;line-height:19px;color:{k["mfg"]};">{T("cbIndispNota")}</span></div>'
                     f'{_botao(k, T("cbTentar"), "outline", "recarregar")}</div>')
+    termina = revisao in ('vencida', 'moeda')
+    if termina:
+        # cancelAtPeriodEnd: no lugar da próxima cobrança, o dia em que a assinatura termina
+        esquerda = (f'{_folha_fim(k)}'
+                    f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
+                    f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["mfg"]};">{T("rpTermina")}</span>'
+                    f'<span style="font-size:44px;line-height:1.05;font-weight:600;letter-spacing:-0.03em;color:{k["fgs"]};">{T("rpTerminaData")}</span>'
+                    f'<span style="font-size:13.5px;line-height:19px;color:{k["mfg"]};">{T("rpTerminaNota")}</span></div>')
     if not teste:
-        if not sem_stripe:
+        if not sem_stripe and not termina:
             esquerda = (f'{_folha(k, T("cbMesCurto"), "12", k["pri"], T("cbProxData"))}'
                         f'<div style="display:flex;flex-direction:column;gap:4px;min-width:0;">'
                         f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["mfg"]};">{T("cbProxima")}</span>'
@@ -775,10 +818,42 @@ def tela_cobranca(k, teste=False, sem_stripe=False):
             f'<ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px;">'
             f'{_evento(k, "pessoa_mais", "background:" + k["tgreen"] + ";color:" + k["tgreenfg"] + ";", "cbEvEntrou", "cbEvEntrouNota")}'
             f'{_evento(k, "pessoa_menos", "background:" + k["sunken"] + ";color:" + k["mfg"] + ";", "cbEvSai", "cbEvSaiNota")}</ul>'))
-    conteudo = (f'{_heroi(k, esquerda, direita)}'
+    aviso = _aviso_revisao(k, revisao) if revisao else ''
+    conteudo = (f'{aviso}{_heroi(k, esquerda, direita)}'
                 f'<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;align-items:start;">'
                 f'{_assentos(k, teste)}<div style="display:flex;flex-direction:column;gap:20px;">{lado}{_fiscal(k, teste)}</div></div>')
     return pagina_produto(k, T('cbCobranca'), T('cbCobrancaSub'), conteudo, 1040)
+
+
+def pagina_revisao_pais(k):
+    # a resposta à revisão, em página (como o checkout): à esquerda, onde o workspace é cobrado, num
+    # ChoiceCardGroup (Fora do Brasil / No Brasil); marcado o "Fora do Brasil", o documento fiscal
+    # estrangeiro, opcional (o tipo do Stripe e o número). À direita, o que a API viu: o país informado,
+    # o do endereço de cobrança, o do cartão e o prazo
+    f = FILETE.format(input=k['input'])
+    trilha = _trilha(k, [(T('rpConfirmar'), True, None)], volta='cbCobranca')
+    escolha = cartoes_escolha(k, T('rpTitulo'), [('fora', T('rpFora'), 'globo'), ('brasil', T('rpNoBrasil'), 'predio')], 'fora')
+    tipo = (f'<div style="display:flex;flex-direction:column;gap:6px;">'
+            f'<label style="display:flex;gap:6px;font-size:14px;line-height:14px;font-weight:500;color:{k["fgs"]};">{T("rpDocTipo")}'
+            f'<span style="font-weight:400;color:{k["mfg"]};">{T("rpOpcional")}</span></label>'
+            f'<button type="button" aria-haspopup="listbox" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 12px 0 14px;'
+            f'border:0;border-radius:11px;background:{k["field"]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["input"]} 45%, {k["field"]});'
+            f'font-family:{FONTE};font-size:15px;color:{k["fgs"]};">{T("rpDocTipoValor")}'
+            f'<span style="display:flex;width:14px;height:14px;margin-left:auto;color:{k["mfg"]};">{ic("baixo", 14)}</span></button></div>')
+    form = (f'<div style="display:flex;flex-direction:column;gap:26px;width:440px;">{trilha}'
+            f'{_cabeca_form(k, T("rpTitulo"), T("rpSub"))}'
+            f'<form autocomplete="off" style="margin:0;display:flex;flex-direction:column;gap:18px;">{escolha}'
+            f'<p style="margin:0;font-size:13.5px;line-height:20px;color:{k["fg"]};">{T("rpForaNota")}</p>'
+            f'<div style="display:flex;flex-direction:column;gap:18px;padding-top:20px;border-top:1px solid {f};">'
+            f'{tipo}{campo(k, "taxid", T("rpDocNum"), "12-3456789", frase=T("rpDocDica"), mono=True)}</div></form>'
+            f'{_botao_largo(k, T("rpBotao"))}</div>')
+    linhas = (_linha(k, T('rpDeclarado'), T('cbBrasil')) + _linha(k, T('rpEndereco'), T('cbEua'))
+              + _linha(k, T('rpCartao'), T('cbEua')))
+    resumo = (f'<div style="display:flex;flex-direction:column;gap:20px;width:380px;">'
+              f'<span style="font-size:13px;line-height:18px;font-weight:500;color:{k["mfg"]};">{T("rpVistoRot")}</span>'
+              f'{_bloco(k, linhas)}{_bloco(k, _linha(k, T("rpPrazo"), T("rpPrazoData"), True), gap=6)}'
+              f'<p style="margin:0;font-size:12.5px;line-height:18px;color:{k["mfg"]};">{T("rpAsideNota")}</p></div>')
+    return _pagina_checkout(k, form, resumo)
 
 
 TELAS_C = {
@@ -796,4 +871,8 @@ TELAS_C = {
     'cobranca': lambda k: tela_cobranca(k),
     'cobranca_teste': lambda k: tela_cobranca(k, teste=True),
     'cobranca_sem_stripe': lambda k: tela_cobranca(k, sem_stripe=True),
+    'cobranca_revisao': lambda k: tela_cobranca(k, revisao='aberta'),
+    'revisao_pais': pagina_revisao_pais,
+    'cobranca_revisao_vencida': lambda k: tela_cobranca(k, revisao='vencida'),
+    'cobranca_moeda': lambda k: tela_cobranca(k, revisao='moeda'),
 }

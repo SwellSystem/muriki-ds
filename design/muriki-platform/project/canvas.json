@@ -524,19 +524,83 @@
       "is_interactive": true
     },
     "WorkspaceCobrancaSemStripe.dc.html": {
+      "x": 25840,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "37 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaSemStripeEscuro.dc.html": {
+      "x": 25840,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "37 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaRevisaoPais.dc.html": {
       "x": 19760,
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "33 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível",
+      "title": "33 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar",
       "is_interactive": true
     },
-    "WorkspaceCobrancaSemStripeEscuro.dc.html": {
+    "WorkspaceCobrancaRevisaoPaisEscuro.dc.html": {
       "x": 19760,
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "33 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível · escuro",
+      "title": "33 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceConfirmarPais.dc.html": {
+      "x": 21280,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "34 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado",
+      "is_interactive": true
+    },
+    "WorkspaceConfirmarPaisEscuro.dc.html": {
+      "x": 21280,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "34 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaRevisaoVencida.dc.html": {
+      "x": 22800,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "35 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaRevisaoVencidaEscuro.dc.html": {
+      "x": 22800,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "35 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar · escuro",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaTrocaMoeda.dc.html": {
+      "x": 24320,
+      "y": 10560,
+      "w": 1440,
+      "h": 900,
+      "title": "36 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período",
+      "is_interactive": true
+    },
+    "WorkspaceCobrancaTrocaMoedaEscuro.dc.html": {
+      "x": 24320,
+      "y": 11880,
+      "w": 1440,
+      "h": 900,
+      "title": "36 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período · escuro",
       "is_interactive": true
     }
   },
@@ -605,6 +669,14 @@
     "WorkspaceCobrancaEscuro.dc.html",
     "WorkspaceCobrancaTeste.dc.html",
     "WorkspaceCobrancaTesteEscuro.dc.html",
+    "WorkspaceCobrancaRevisaoPais.dc.html",
+    "WorkspaceCobrancaRevisaoPaisEscuro.dc.html",
+    "WorkspaceConfirmarPais.dc.html",
+    "WorkspaceConfirmarPaisEscuro.dc.html",
+    "WorkspaceCobrancaRevisaoVencida.dc.html",
+    "WorkspaceCobrancaRevisaoVencidaEscuro.dc.html",
+    "WorkspaceCobrancaTrocaMoeda.dc.html",
+    "WorkspaceCobrancaTrocaMoedaEscuro.dc.html",
     "WorkspaceCobrancaSemStripe.dc.html",
     "WorkspaceCobrancaSemStripeEscuro.dc.html"
   ],
