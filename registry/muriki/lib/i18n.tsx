@@ -1327,15 +1327,10 @@ const STRINGS: Record<string, unknown> = {
     identity: {
       stepper: "Primeiro acesso · {{step}} de {{total}}",
       stepper_aria: "Passo {{step}} de {{total}}",
-      title: "Crie o seu workspace",
-      // para quem é: os dois cartões no topo; a descrição é o produto que a prévia mostra
-      audience: {
-        label: "Para quem é o workspace",
-        team: "Com o meu time",
-        personal: "Só para mim",
-      },
-      submit: "Criar workspace",
-      submit_personal: "Criar meu espaço",
+      // o workspace pessoal nasce sozinho depois deste passo, com o nome da conta e o @usuário
+      title: "Crie o seu espaço",
+      subtitle: "Ele nasce com o seu nome e o seu @usuário. Um workspace de equipe vem depois, se você quiser.",
+      submit: "Criar meu espaço",
       terms_prefix: "Li e aceito os",
       terms: "termos de uso",
       terms_and: "e a",
@@ -1375,6 +1370,15 @@ const STRINGS: Record<string, unknown> = {
         taken: "Esse endereço já é de outro workspace.",
         reserved: "Esse endereço é reservado. Escolha outro.",
       },
+      // o passo opcional depois da identidade (PlatformOnboardingTeam)
+      team: {
+        title: "Crie um workspace de equipe",
+        subtitle: "Para trabalhar com outras pessoas. É opcional: o seu espaço pessoal já está pronto.",
+        submit: "Criar workspace",
+        skip: "Pular e ir para o meu espaço",
+        // o 409 FREE_WORKSPACE_LIMIT: a conta já é dona de um workspace de equipe que está no Free
+        free_limit: "Para criar outro workspace de equipe, os que você já tem precisam estar num plano pago.",
+      },
       // a prévia ao vivo, ao lado do formulário (WorkspacePreview)
       preview: {
         // a frase embaixo do nome em destaque (por isso não o repete): o que está nascendo; sem nome, o
@@ -1382,8 +1386,8 @@ const STRINGS: Record<string, unknown> = {
         empty: "O nome que você escrever aparece aqui.",
         team: "Começa com você. O time chega no próximo passo.",
         team_user: "Começa com {{username}}. O time chega no próximo passo.",
-        personal: "Só seu. Ninguém entra sem você chamar.",
-        personal_user: "Só seu, {{username}}. Ninguém entra sem você chamar.",
+        personal: "Só seu. Ninguém mais entra aqui.",
+        personal_user: "Só seu, {{username}}. Ninguém mais entra aqui.",
         // no convidar: quem chega, contado (o "você" e o seu papel na fileira do time)
         team_people_zero: "Começa com você. Quem você chamar aparece aqui.",
         team_people_one: "Você e mais 1 pessoa a caminho. Ela entra quando aceitar o convite.",
@@ -1929,7 +1933,7 @@ const STRINGS: Record<string, unknown> = {
       },
       existing_account: {
         title: "Você já tem conta Muriki",
-        text: "É a mesma do Muriki Code, e o seu @usuário vem junto. Aqui falta só aceitar os termos do Platform e criar o workspace.",
+        text: "É a mesma do Muriki Code, e o seu @usuário vem junto. Aqui falta só aceitar os termos do Platform.",
       },
       invitation: {
         // {{name}} é só o nome de exibição de quem convidou; sem ele, o título diz só o workspace

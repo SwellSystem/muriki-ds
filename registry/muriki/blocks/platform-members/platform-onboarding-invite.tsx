@@ -11,7 +11,7 @@
  *   (SeatsPreview, com `seats`), "Convidar N pessoas" (só os válidos) e "Pular por agora", que não
  *   exige nada.
  *
- * Com "Só para mim" no passo anterior, o app não mostra este passo. Quem cria o workspace é owner:
+ * Sem uma equipe criada no passo anterior (PlatformOnboardingTeam), o app não mostra este passo. Quem cria o workspace é owner:
  * o papel de quem convida é `owner` por padrão, e as linhas nunca oferecem owner. O componente só
  * junta as linhas e chama `onSubmit` com as que vão; o envio e o erro (MEMBER_LIMIT_REACHED vira
  * `limit`, 409 ALREADY_MEMBER vira `rowErrors`) são do app.

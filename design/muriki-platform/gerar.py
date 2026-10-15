@@ -13,15 +13,16 @@ JORNADA = [
     ('entrar', 'Entrar', 'Entrar', 'Entrar · a tela compartilhada (auth-page + login-page)'),
     ('criar_conta', 'CriarConta', 'Criar conta', 'Criar conta · a tela compartilhada (nome + e-mail, Turnstile)'),
     # o primeiro acesso: do lado do login (o palco à esquerda, o formulário à direita)
-    ('codigo', 'OnboardingCodigo', 'Primeiro acesso', 'Código por e-mail · 1 de 3 (só sem a prova da caixa)'),
-    ('identidade_vazio', 'OnboardingIdentidade', 'Primeiro acesso', 'Workspace · vazio'),
-    ('identidade_ocupado', 'OnboardingIdentidadeOcupado', 'Primeiro acesso', 'Workspace · o @usuário ocupado e o endereço reservado'),
-    ('identidade_livre', 'OnboardingIdentidadeLivre', 'Primeiro acesso', 'Workspace · tudo livre, o botão ligado'),
-    ('identidade_foco', 'OnboardingIdentidadeFoco', 'Primeiro acesso', 'Workspace · só para mim (Muriki Focus)'),
-    ('identidade_movimento', 'OnboardingIdentidadeMovimento', 'Primeiro acesso', 'Workspace · movimento (Play)'),
+    ('codigo', 'OnboardingCodigo', 'Primeiro acesso', 'Código por e-mail · 1 de 4 (só sem a prova da caixa)'),
+    ('identidade_vazio', 'OnboardingIdentidade', 'Primeiro acesso', 'Espaço pessoal · vazio (a prévia já com o nome da conta)'),
+    ('identidade_ocupado', 'OnboardingIdentidadeOcupado', 'Primeiro acesso', 'Espaço pessoal · o @usuário ocupado: fora da prévia'),
+    ('identidade_livre', 'OnboardingIdentidadeLivre', 'Primeiro acesso', 'Espaço pessoal · o @ livre e os termos, o botão ligado'),
     ('ja_tem_conta', 'OnboardingContaMuriki', 'Primeiro acesso',
-     'Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário)'),
-    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano'),
+     'Já tem conta Muriki · 2 de 4 (vem do Code: sem o campo do @usuário, só os termos)'),
+    ('equipe_nova', 'OnboardingEquipe', 'Primeiro acesso', 'Workspace de equipe · 2 de 3, opcional: criar ou pular para o espaço pessoal'),
+    ('equipe_limite', 'OnboardingEquipeLimite', 'Primeiro acesso', 'Workspace de equipe · o 409 FREE_WORKSPACE_LIMIT (já tem uma equipe no Free)'),
+    ('equipe_movimento', 'OnboardingEquipeMovimento', 'Primeiro acesso', 'Workspace de equipe · movimento (Play)'),
+    ('convidar', 'OnboardingConvidar', 'Primeiro acesso', 'Convidar o time · 3 de 3, só depois de criar a equipe: adicionar, a lista e as pessoas no plano'),
     # o convite
     ('convite', 'Convite', 'Convite', 'Convite · o aceite, sem sessão: entrar ou criar conta'),
     ('convite_logado', 'ConviteLogado', 'Convite', 'Convite · o aceite, com sessão: aceitar convite'),
@@ -58,9 +59,9 @@ JORNADA = [
 ]
 FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
     ('entrada', 2, 'Entrada: a tela de login compartilhada com o Code e o Backoffice'),
-    ('primeiroAcesso', 8, 'Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos '
-                          'numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco '
-                          'com a prévia ao vivo à esquerda, o formulário à direita'),
+    ('primeiroAcesso', 9, 'Primeiro acesso: o código por e-mail, o @usuário e os termos (sem CPF e sem plano; o espaço pessoal nasce '
+                          'sozinho, com o nome da conta e o @usuário), quem já tem conta Muriki, o workspace de equipe, opcional, e '
+                          'convidar o time (só se criou a equipe); do lado do login: o palco com a prévia ao vivo à esquerda, o formulário à direita'),
     ('convite', 5, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece. '
                   'Quem ainda não tem o onboarding do Platform passa pelo passo do convidado antes do aceite'),
     ('membros', 7, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
@@ -100,7 +101,9 @@ REMOVIDAS = ['EntrarPasskey', 'EntrarSegundoFator', 'EntrarCodigoBackup', 'Esque
              # terceira, que virou o WorkspaceAssinarTeam
              'CheckoutFiscalSolo', 'CheckoutFiscalTeam', 'CheckoutFiscalTeamErro', 'WorkspaceAssinarTeamPagina',
              # o Solo e o Team saíram dos planos (F0): o checkout é sempre do Pro
-             'WorkspaceAssinarTeam', 'WorkspaceAssinarSolo']
+             'WorkspaceAssinarTeam', 'WorkspaceAssinarSolo',
+             # a escolha pessoal/equipe saiu do primeiro acesso: o pessoal nasce sozinho, e o Play é o da equipe
+             'OnboardingIdentidadeFoco', 'OnboardingIdentidadeMovimento']
 for base_nome in REMOVIDAS:
     for arquivo in (f'{base_nome}.dc.html', f'{base_nome}Escuro.dc.html'):
         boards.pop(arquivo, None)
