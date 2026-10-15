@@ -18,6 +18,10 @@
  * A lista vem paginada por cursor da API: `pagination` vai direto para a ResourceTable, e o
  * `ownerCount` é o total de owners do workspace, da API, nunca contado na página. Trocar o papel e
  * remover devolvem o membro inteiro: o app manda o `version` dele no PATCH e no DELETE.
+ *
+ * O membro suspenso (B9b: passou do limite do plano no fim da carência) continua na lista, com o selo
+ * "Suspenso" e a linha apagada; quem gere o papel dele ainda o remove e troca o papel, menos para
+ * owner (409 MEMBER_SUSPENDED). Sem `status`, o membro é ativo.
  */
 import { SignOutIcon, UserMinusIcon } from "@phosphor-icons/react"
 
@@ -28,7 +32,9 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTranslate } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 
+import type { MemberStatus } from "./overflow"
 import { memberActions, type WorkspaceRole } from "./roles"
 
 export interface WorkspaceMember {
@@ -41,6 +47,8 @@ export interface WorkspaceMember {
   joinedAt: string
   /** A versão otimista do membro (R18): vai no PATCH e no DELETE; cópia velha responde 409 CONFLICT. */
   version: number
+  /** O `status` do GET …/members: `suspended` passou do limite do plano (B9b). Sem ele, `active`. */
+  status?: MemberStatus
 }
 
 export interface MembersTableProps {
@@ -88,7 +96,9 @@ export function MembersTable({
   const t = useTranslate()
   const data = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" })
   const papel = (r: WorkspaceRole) => t(`platform.members.role.${r}`)
-  const acoesDe = (m: WorkspaceMember) => memberActions(viewer.role, m.role, { isSelf: m.id === viewer.id, ownerCount })
+  const suspenso = (m: WorkspaceMember) => m.status === "suspended"
+  const acoesDe = (m: WorkspaceMember) =>
+    memberActions(viewer.role, m.role, { isSelf: m.id === viewer.id, ownerCount, suspended: suspenso(m) })
 
   const columns: ResourceColumn<WorkspaceMember>[] = [
     {
@@ -102,10 +112,15 @@ export function MembersTable({
           </Avatar>
           <div className="flex min-w-0 flex-col">
             <span className="flex min-w-0 items-center gap-1.5">
-              <span className="truncate font-medium text-foreground-strong">{m.name}</span>
+              <span className={cn("truncate font-medium", suspenso(m) ? "text-muted-foreground" : "text-foreground-strong")}>{m.name}</span>
               {m.id === viewer.id ? (
                 <Badge size="sm" variant="outline">
                   {t("platform.members.table.you")}
+                </Badge>
+              ) : null}
+              {suspenso(m) ? (
+                <Badge size="sm" tone="orange" dot>
+                  {t("platform.members.table.suspended")}
                 </Badge>
               ) : null}
             </span>
@@ -185,6 +200,7 @@ export function MembersTable({
       columns={columns}
       rows={members}
       getRowId={(m) => m.id}
+      isRowMuted={suspenso}
       rowActions={rowActions}
       // as duas ações são destrutivas: vão sempre para o "…"
       inlineActions={0}

@@ -33,6 +33,9 @@ JORNADA = [
     ('membros_maintainer', 'WorkspaceMembrosMaintainer', 'Membros', 'Membros · vista da maintainer (gere só member e guest)'),
     ('convites', 'WorkspaceConvites', 'Convites', 'Convites · pendente, vencido, aceito, revogado e substituído'),
     ('convidar_limite', 'WorkspaceConvidarLimite', 'Convidar', 'Convidar · o aviso de limite do Free e do Pro (5 pessoas)'),
+    ('membros_carencia', 'WorkspaceMembrosCarencia', 'Membros', 'Membros · acima do limite (B9b): o aviso da carência de 7 dias, com "Escolher quem fica" para o owner'),
+    ('membros_escolha', 'WorkspaceMembrosEscolha', 'Membros', 'Membros · quem fica: os owners fixos, o contador de lugares e a prévia do fim do prazo em cada linha'),
+    ('membros_suspensos', 'WorkspaceMembrosSuspensos', 'Membros', 'Membros · a carência fechou: os suspensos apagados, com o selo; o papel troca, nunca para Owner'),
     # dentro do produto: planos e cobrança (bloco platform-billing)
     ('planos_teste', 'WorkspacePlanos', 'Planos', 'Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca)'),
     ('planos_anual', 'WorkspacePlanosAnual', 'Planos', 'Planos · anual, por pessoa/ano como vem da API; a moeda travada'),
@@ -60,8 +63,9 @@ FILEIRAS = [  # (chave da nota, quantas telas, texto da nota)
                           'com a prévia ao vivo à esquerda, o formulário à direita'),
     ('convite', 5, 'Convite: o aceite mostra quem convidou, o workspace, o papel e o e-mail mascarado; o token nunca aparece. '
                   'Quem ainda não tem o onboarding do Platform passa pelo passo do convidado antes do aceite'),
-    ('membros', 4, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
-                   'ações que pode usar'),
+    ('membros', 7, 'Workspace · membros e convites: dentro do produto, nas configurações do workspace; cada papel só vê as '
+                   'ações que pode usar. Acima do limite do plano, 7 dias de carência; no fim, quem passa do limite fica suspenso, '
+                   'sem acesso e sem assento, e volta sozinho quando abre vaga'),
     ('cobranca', 18, 'Workspace · planos e cobrança: dentro do produto; o preço por pessoa, como vem da API; o Code Pro só no Pro e '
                      'no Enterprise, na assinatura paga. Assinar e falar com o comercial abrem uma página de dentro do workspace (não é etapa do onboarding)'),
 ]

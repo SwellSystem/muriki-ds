@@ -366,11 +366,131 @@ def tela_convidar_limite(k):
     return pagina_produto(k, T('mbConvidar'), T('cvSub'), form)
 
 
+# ── Workspace · acima do limite de pessoas (B9b) ────────────────────────
+# O plano passou a um limite menor que os membros ativos (aqui, o Free, 5 pessoas, com 7 no workspace):
+# a API abre 7 dias de carência. O aviso (MemberOverflowNotice) fica acima da tabela; o owner escolhe
+# quem tem prioridade (MemberPriorityDialog: os owners fixos, o contador e a prévia do fim do prazo em
+# cada linha); no fim, quem passa do limite fica suspenso, apagado e com o selo, e o owner ainda o
+# remove ou troca o papel, nunca para owner.
+PESSOAS_B9 = PESSOAS + [
+    ('u6', 'Duda Rocha', 'duda', 'member', 'mbD6'),
+    ('u7', 'Eva Martins', 'eva.m', 'member', 'mbD7'),
+]
+ESCOLHIDOS = {'u2', 'u4', 'u6'}   # Ana, Bia e Duda: 1 owner + 3 = 4 de 5; o lugar que sobra vai para o João
+SUSPENSOS = {'u5', 'u7'}          # Carlos e Eva, os mais novos fora da escolha
+
+
+def _aviso_carencia(k):
+    return (f'<section role="status" style="display:flex;align-items:center;gap:16px;padding:16px 18px 16px 20px;border-radius:14px;'
+            f'background:{k["tyellow"]};box-shadow:inset 0 0 0 1px color-mix(in oklab, {k["tyellowfg"]} 22%, transparent);">'
+            f'<span style="display:flex;width:20px;height:20px;flex:0 0 auto;align-self:flex-start;margin-top:1px;color:{k["tyellowfg"]};">{ic("pessoas", 20)}</span>'
+            f'<div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">'
+            f'<span style="font-size:14.5px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("mbCarTit")}</span>'
+            f'<span style="font-size:13.5px;line-height:19px;color:{k["fg"]};">{T("mbCarTxt")}</span></div>'
+            f'<button type="button" style="display:inline-flex;align-items:center;height:36px;padding:0 14px;border:0;border-radius:9px;flex:0 0 auto;'
+            f'background:{k["card"]};color:{k["fg"]};box-shadow:inset 0 0 0 1px {k["input"]};font-family:{FONTE};font-size:13.5px;font-weight:500;'
+            f'white-space:nowrap;">{T("mbEscolher")}</button></section>')
+
+
+def _pessoa_b9(k, nome, usuario, voce=False, suspenso=False, sub=None):
+    marca = (f'<span style="display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:4px;'
+             f'box-shadow:inset 0 0 0 1px {k["input"]};font-size:11px;font-weight:500;color:{k["mfg"]};">{T("mbVoce")}</span>' if voce else '')
+    selo = badge(T('mbSuspenso'), k, 'orange', ponto=True) if suspenso else ''
+    return (f'<span style="display:flex;align-items:center;gap:10px;min-width:0;flex:1;">'
+            f'{_iniciais(k, "".join(p[0] for p in nome.split()[:2]))}'
+            f'<span style="display:flex;flex-direction:column;min-width:0;">'
+            f'<span style="display:flex;align-items:center;gap:6px;"><span style="font-weight:500;color:{k["mfg"] if suspenso else k["fgs"]};">{nome}</span>{marca}{selo}</span>'
+            f'<span style="font-size:12px;color:{k["mfg"]};">{sub or "@" + usuario}</span></span></span>')
+
+
+def _tabela_b9(k, suspensos, aberto=None):
+    colunas = 'minmax(0,1fr) 148px 168px 28px'
+    linhas = []
+    for i, (id_, nome, usuario, papel, data) in enumerate(PESSOAS_B9):
+        susp = id_ in suspensos
+        papel_ = (_seletor(k, T(PAPEL[papel]), nome) if id_ != 'u1'
+                  else f'<span style="display:flex;">{badge(T(PAPEL[papel]), k)}</span>')
+        linhas.append(_linha(k, colunas, [_pessoa_b9(k, nome, usuario, voce=id_ == 'u1', suspenso=susp), papel_,
+                                          f'<span style="color:{k["mfg"]};">{T(data)}</span>',
+                                          _mais(k) if id_ == aberto else '<span></span>'],
+                             hover=id_ == aberto, apagada=susp, ultima=i == len(PESSOAS_B9) - 1))
+    return _tabela(k, T('mbTabelaMembros'), colunas, [T('mbPessoa'), T('papel'), T('mbEntrou'), ''], linhas)
+
+
+def _lista_papeis(k, topo_, escolhido):
+    # o SelectContent aberto na linha da suspensa: Maintainer, Member e Guest, sem Owner
+    def op(papel):
+        on = papel == escolhido
+        return (f'<div role="option" aria-selected="{"true" if on else "false"}" style="display:flex;align-items:center;justify-content:space-between;'
+                f'height:28px;padding:0 8px;border-radius:6px;font-size:13px;color:{k["fg"]};{"background:" + k["muted"] + ";" if on else ""}">'
+                f'{T(PAPEL[papel])}{ic("check", 13) if on else ""}</div>')
+    return (f'<div role="listbox" style="position:absolute;right:{16 + 28 + 20 + 168 + 20 + (148 - 132)}px;top:{topo_}px;z-index:3;width:132px;padding:4px;'
+            f'border-radius:10px;background:{k["card"]};box-shadow:{k["sombraFlut"]}, 0 0 0 1px {k["border"]};">'
+            + ''.join(op(p) for p in ('maintainer', 'member', 'guest')) + '</div>')
+
+
+def tela_membros_carencia(k):
+    return pagina_produto(k, T('mbMembros'), T('mbMembrosSub'), _aviso_carencia(k) + _tabela_b9(k, set()))
+
+
+def tela_membros_suspensos(k):
+    # a carência fechou: Carlos e Eva passaram do limite; o select da Eva aberto, sem Owner
+    tabela = (f'<div style="position:relative;">{_tabela_b9(k, SUSPENSOS, aberto="u7")}'
+              f'{_lista_papeis(k, 38 + 7 * 52 - 10, "member")}</div>')
+    return pagina_produto(k, T('mbMembros'), T('mbMembrosSub'), tabela)
+
+
+def _caixa(k, marcada, desligada=False):
+    op = 'opacity:0.5;' if desligada else ''
+    if marcada:
+        return (f'<span role="checkbox" aria-checked="true"{" aria-disabled=\"true\"" if desligada else ""} style="display:flex;align-items:center;'
+                f'justify-content:center;width:16px;height:16px;flex:0 0 auto;border-radius:4px;background:{k["pri"]};color:{k["prifg"]};{op}">{ic("check", 11)}</span>')
+    return (f'<span role="checkbox" aria-checked="false" style="display:flex;width:16px;height:16px;flex:0 0 auto;border-radius:4px;'
+            f'background:{k["sunken"]};box-shadow:inset 0 1px 2px rgba(0,0,0,0.12);{op}"></span>')
+
+
+def tela_membros_escolha(k):
+    # o MemberPriorityDialog sobre a página com o aviso: Rafael fixo; Ana, Bia e Duda marcados; o João fica
+    # pela antiguidade no lugar que sobra; Carlos e Eva ficariam suspensos
+    fundo = tela_membros_carencia(k)
+    linha = lambda caixa, pessoa, fim: (f'<li style="display:flex;align-items:center;gap:12px;padding:8px 0;font-size:13px;">{caixa}{pessoa}'
+                                        f'<span style="flex:0 0 auto;">{fim}</span></li>')
+    nota = lambda txt: f'<span style="font-size:12px;color:{k["mfg"]};">{txt}</span>'
+    owners = linha(_caixa(k, True, True), _pessoa_b9(k, 'Rafael Moura', 'rafael.moura', voce=True, sub=f'@rafael.moura · {T(PAPEL["owner"])}'),
+                   nota(T('mbFicaSempre')))
+    outros = []
+    for id_, nome, usuario, papel, _ in PESSOAS_B9[1:]:
+        marcado = id_ in ESCOLHIDOS
+        fim = '' if marcado else (badge(T('mbFicaSusp'), k, 'orange', ponto=True) if id_ in SUSPENSOS else nota(T('mbFicaAntig')))
+        outros.append(linha(_caixa(k, marcado), _pessoa_b9(k, nome, usuario, sub=f'@{usuario} · {T(PAPEL[papel])}'), fim))
+    botao = lambda txt, est: (f'<button type="button" style="display:inline-flex;align-items:center;height:36px;padding:0 14px;border:0;border-radius:9px;'
+                              f'{est}font-family:{FONTE};font-size:13.5px;font-weight:500;">{txt}</button>')
+    dialogo = (f'<div style="position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:{k["veu"]};">'
+               f'<div role="dialog" aria-modal="true" aria-label="{T("mbEscTit")}" style="position:relative;display:flex;flex-direction:column;width:520px;'
+               f'border-radius:14px;background:{k["card"]};box-shadow:{k["sombraFlut"]};overflow:hidden;">'
+               f'<header style="display:flex;flex-direction:column;gap:6px;padding:16px 52px 16px 20px;box-shadow:inset 0 -1px 0 {k["border"]};">'
+               f'<h2 style="margin:0;font-size:16px;line-height:20px;font-weight:600;color:{k["fgs"]};">{T("mbEscTit")}</h2>'
+               f'<p style="margin:0;font-size:13px;line-height:18px;color:{k["mfg"]};">{T("mbEscDesc")}</p>'
+               f'<button type="button" aria-label="{T("mbFechar")}" style="position:absolute;top:14px;right:14px;display:flex;align-items:center;justify-content:center;'
+               f'width:28px;height:28px;padding:0;border:0;border-radius:7px;background:transparent;color:{k["mfg"]};">{ic("x", 16)}</button></header>'
+               f'<div style="padding:16px 20px 8px;font-size:13px;font-weight:500;color:{k["fgs"]};">{T("mbEscConta")}</div>'
+               f'<ul aria-label="{T("mbEscOwners")}" style="margin:0;padding:4px 20px;list-style:none;">{owners}</ul>'
+               f'<ul aria-label="{T("mbEscCandidatos")}" style="margin:0;padding:4px 20px 12px;list-style:none;box-shadow:inset 0 1px 0 {k["border"]};">{"".join(outros)}</ul>'
+               f'<footer style="display:flex;justify-content:flex-end;gap:8px;padding:16px 20px;box-shadow:inset 0 1px 0 {k["border"]};">'
+               f'{botao(T("mbCancelar"), "background:" + k["card"] + ";color:" + k["fg"] + ";box-shadow:inset 0 0 0 1px " + k["input"] + ";")}'
+               f'{botao(T("mbSalvar"), "background:" + k["pri"] + ";color:" + k["prifg"] + ";")}</footer></div></div>')
+    # o diálogo vai dentro da raiz (posição relativa), por cima da página
+    return fundo[:-len('</div>')] + dialogo + '</div>'
+
+
 TELAS_B = {
     'membros_owner': lambda k: tela_membros(k, 'owner'),
     'membros_maintainer': lambda k: tela_membros(k, 'maintainer'),
     'convites': tela_convites,
     'convidar_limite': tela_convidar_limite,
+    'membros_carencia': tela_membros_carencia,
+    'membros_escolha': tela_membros_escolha,
+    'membros_suspensos': tela_membros_suspensos,
 }
 
 

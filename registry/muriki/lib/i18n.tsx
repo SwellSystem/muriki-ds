@@ -1408,6 +1408,8 @@ const STRINGS: Record<string, unknown> = {
         joined: "Entrou em",
         you: "você",
         role_aria: "Papel de {{name}}",
+        // B9b: passou do limite do plano no fim da carência; sem acesso, sem assento, continua na lista
+        suspended: "Suspenso",
       },
       actions: {
         remove: "Remover do workspace",
@@ -1460,6 +1462,39 @@ const STRINGS: Record<string, unknown> = {
         // o teto da lista: os convites por hora que a API aceita
         max_rows_one: "Cabem até {{max}} convites de uma vez: 1 e-mail ficou de fora.",
         max_rows_other: "Cabem até {{max}} convites de uma vez: {{count}} e-mails ficaram de fora.",
+      },
+      // B9b: a carência de 7 dias quando o plano passa a um limite menor que os membros ativos
+      overflow: {
+        choose: "Escolher quem fica",
+        notice: {
+          title_one: "1 pessoa acima do limite do plano",
+          title_other: "{{count}} pessoas acima do limite do plano",
+          // a escolha diz quem tem prioridade; sem ela, ficam os owners e os mais antigos
+          owner: "O plano vai até {{limit}} pessoas. Até {{date}}, escolha quem tem prioridade para ficar ou mude de plano; depois, quem passar do limite fica suspenso, sem acesso, até abrir vaga.",
+          owner_no_date: "O plano vai até {{limit}} pessoas. Escolha quem tem prioridade para ficar ou mude de plano; no fim do prazo, quem passar do limite fica suspenso, sem acesso, até abrir vaga.",
+          member: "O plano vai até {{limit}} pessoas. Até {{date}}, um owner escolhe quem fica; depois, quem passar do limite fica suspenso, sem acesso, até abrir vaga.",
+          member_no_date: "O plano vai até {{limit}} pessoas. Um owner escolhe quem fica; no fim do prazo, quem passar do limite fica suspenso, sem acesso, até abrir vaga.",
+        },
+        picker: {
+          title: "Quem fica no workspace",
+          description: "Marque quem tem prioridade. Em {{date}}, os lugares que sobrarem vão para quem entrou primeiro, e o resto fica suspenso até abrir vaga.",
+          description_no_date: "Marque quem tem prioridade. No fim do prazo, os lugares que sobrarem vão para quem entrou primeiro, e o resto fica suspenso até abrir vaga.",
+          // os owners contam nos lugares
+          count: "{{used}} de {{limit}} lugares",
+          owners_full: "Os owners já ocupam todos os lugares",
+          owners_label: "Owners, que ficam sempre",
+          candidates_label: "Quem pode ter prioridade",
+          owner_fixed: "{{name}} fica: é owner",
+          always: "fica sempre",
+          stays_by_seniority: "fica pela antiguidade",
+          will_be_suspended: "Fica suspenso",
+          // a escolha anterior passou dos lugares (o limite encolheu): a API responderia 422 ACTIVE_MEMBERS_INVALID
+          over_zero: "Os owners já ocupam todos os lugares: desmarque as outras pessoas.",
+          over_one: "Escolha no máximo 1 pessoa além dos owners.",
+          over_other: "Escolha no máximo {{count}} pessoas além dos owners.",
+          cancel: "Cancelar",
+          confirm: "Salvar a escolha",
+        },
       },
       // o passo de convidar do primeiro acesso
       onboarding: {
