@@ -42,12 +42,13 @@ export function invitableRoles(viewerRole: WorkspaceRole): WorkspaceRole[] {
 /**
  * O que a linha de `targetRole` mostra para quem tem `viewerRole` (F6). Na própria linha só existe
  * "Sair" (ninguém troca o próprio papel); sair sendo o último owner, ou remover o último owner,
- * aparece desligado com o motivo (`last_owner`).
+ * aparece desligado com o motivo (`last_owner`). O membro suspenso (B9b) segue a mesma matriz, menos
+ * a promoção a owner: um owner nunca é suspenso, e a API responde 409 MEMBER_SUSPENDED.
  */
 export function memberActions(
   viewerRole: WorkspaceRole,
   targetRole: WorkspaceRole,
-  { isSelf, ownerCount }: { isSelf: boolean; ownerCount: number }
+  { isSelf, ownerCount, suspended = false }: { isSelf: boolean; ownerCount: number; suspended?: boolean }
 ): MemberActions {
   const ultimoOwner = targetRole === "owner" && ownerCount <= 1
 
@@ -60,7 +61,7 @@ export function memberActions(
 
   return {
     // rebaixar o último owner é o mesmo que tirá-lo: o select some e a remoção fica desligada
-    roleOptions: ultimoOwner ? [] : gere,
+    roleOptions: ultimoOwner ? [] : suspended ? gere.filter((papel) => papel !== "owner") : gere,
     remove: ultimoOwner ? "last_owner" : "allowed",
     leave: "hidden",
   }
