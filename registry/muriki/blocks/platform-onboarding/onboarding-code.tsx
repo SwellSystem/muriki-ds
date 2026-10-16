@@ -6,7 +6,7 @@
  * Quem acabou de criar a senha pelo link já tem a prova e pula este passo.
  *
  * Na moldura do primeiro acesso (PlatformOnboardingFrame): o palco da marca à esquerda (as janelas
- * do Projects e do Focus em esqueleto) e, à direita, o passo (1 de 3 por padrão), "Confirme seu
+ * do Projects e do Focus em esqueleto) e, à direita, o passo (1 de 4 por padrão), "Confirme seu
  * e-mail" com o e-mail da sessão (inteiro, como no canvas: é o da própria pessoa), os seis
  * quadrados do OtpInput (com o `autocomplete="one-time-code"` dele), "Verificar" e o reenviar.
  *
@@ -57,7 +57,7 @@ export interface PlatformOnboardingCodeProps {
   verifying?: boolean
   /** O erro da conferência ou do reenvio, já traduzido pelo app. Pinta os quadrados de vermelho. */
   error?: ReactNode
-  /** O passo no onboarding. Padrão: 1 de 3. */
+  /** O passo no onboarding. Padrão: 1 de 4. */
   step?: number
   total?: number
   /** A marca, no canto de cima à esquerda. */
@@ -77,7 +77,7 @@ export function PlatformOnboardingCode({
   verifying = false,
   error,
   step = 1,
-  total = 3,
+  total = 4,
   brand,
   utilities,
 }: PlatformOnboardingCodeProps) {

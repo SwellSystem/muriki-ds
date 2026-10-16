@@ -1,57 +1,51 @@
 "use client"
 
 /**
- * O passo de identidade do onboarding do Platform, numa tela só: para quem é o workspace, o
- * @usuário, o workspace (nome e endereço) e o aceite dos termos. Não pede CPF nem plano: o
- * documento só aparece no checkout de um plano pago.
+ * O passo de identidade do onboarding do Platform: o @usuário e o aceite dos termos. Não pede CPF
+ * nem plano: o documento só aparece no checkout de um plano pago.
  *
- * Para quem é (CA4c): dois cartões no topo, "Com o meu time" (`team`, o padrão do app) e "Só para
- * mim" (`personal`). A escolha troca o produto da prévia (Muriki Projects ou Muriki Focus) e o app
- * a manda no envio como `kind`; não mexe no plano. Com `personal`, o nome é o "do seu espaço" e o
- * botão diz "Criar meu espaço". Cada cartão tem o seu ícone: um grupo no time, uma pessoa no pessoal.
+ * O workspace pessoal nasce sozinho na API depois deste passo (nome = o nome da conta, endereço =
+ * o @usuário), então a tela não pergunta para quem é nem pede nome e endereço: a prévia à esquerda
+ * mostra esse espaço pessoal (o Muriki Focus) com o `accountName` e o @usuário. O workspace de
+ * equipe é o passo seguinte, opcional (PlatformOnboardingTeam).
  *
  * A prévia mostra o @usuário só quando ele pode aparecer: o status vale para o valor da tela e é
  * livre, verificando ou não conferido. Ocupado, reservado ou com o formato errado, a frase sai sem
  * @ (a prévia não repete o que o campo já diz que não serve).
  *
- * O botão só liga com os três campos no formato, o @usuário e o endereço livres (`available`) ou
- * não conferidos (`unchecked`, a API confere no envio), cada status valendo para o valor da tela
- * (`statusFor`), e os termos aceitos. Sem `username`, o campo não aparece e o botão não conta com
- * ele; quem vem do Code e já tem @usuário usa o PlatformExistingAccount (`platform-onboarding`),
- * com o aviso da conta Muriki e o @ na prévia. O componente só junta os campos e
- * chama `onSubmit`: a ordem das chamadas (o aceite, o @usuário, o workspace) é do app, e o erro
- * que voltar chega por `error`.
+ * O botão só liga com o @usuário no formato e livre (`available`) ou não conferido (`unchecked`, a
+ * API confere no envio), valendo para o valor da tela (`statusFor`), e os termos aceitos. Sem
+ * `username`, o campo não aparece e o botão só espera os termos; quem vem do Code e já tem
+ * @usuário usa o PlatformExistingAccount (`platform-onboarding`), com o aviso da conta Muriki e o
+ * @ na prévia. O componente só junta os campos e chama `onSubmit`: a ordem das chamadas (o aceite,
+ * o @usuário) é do app, e o erro que voltar chega por `error`.
  *
  * Layout: as mesmas peças do OnboardingStep (a barra do topo, o cabeçalho de passo e a ação), mas
- * medidas pela altura da janela, dentro da PlatformOnboardingFrame (a moldura que o convidar também
- * usa): a partir do `lg`, sem rolar de 1280×720 a 1920×1080, do mesmo lado do login, com o palco
- * azul e a WorkspacePreview da altura do conteúdo à esquerda e o formulário à direita. Abaixo do
- * `lg` o palco some e o passo é a coluna de formulário de sempre, que pode rolar.
+ * medidas pela altura da janela, dentro da PlatformOnboardingFrame (a moldura que os outros passos
+ * também usam): a partir do `lg`, sem rolar de 1280×720 a 1920×1080, do mesmo lado do login, com o
+ * palco azul e a WorkspacePreview da altura do conteúdo à esquerda e o formulário à direita. Abaixo
+ * do `lg` o palco some e o passo é a coluna de formulário de sempre, que pode rolar.
  */
 import { useId, type FormEvent, type ReactNode } from "react"
-import { ArrowRightIcon, SpinnerGapIcon, UserIcon, UsersThreeIcon } from "@phosphor-icons/react"
+import { ArrowRightIcon, SpinnerGapIcon } from "@phosphor-icons/react"
 
 // Do arquivo, nunca do barril: o `shadcn add` reescreve o caminho para o alvo do item
 import { OnboardingStepHeader } from "@/components/blocks/onboarding-pricing/onboarding-step-header"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { ChoiceCard, ChoiceCardGroup } from "@/components/ui/choice-card"
 import { Field, FieldLabel } from "@/components/ui/field"
 import { useTranslate } from "@/lib/i18n"
 
-import { handleReady, handleStatus, workspaceNameIssue, type HandleStatus } from "./handles"
+import { handleReady, handleStatus, type HandleStatus } from "./handles"
 import { PlatformOnboardingFrame } from "./platform-onboarding-frame"
 import { UsernameField, type UsernameFieldProps } from "./username-field"
-import { WorkspaceForm, type WorkspaceFormProps } from "./workspace-form"
-import { WorkspacePreview, type WorkspaceAudience } from "./workspace-preview"
+import { WorkspacePreview } from "./workspace-preview"
 
 // o espaço vertical entre os campos: 19px em 720 de altura, 28px de 1080 para cima
 const ENTRE_CAMPOS = "gap-[clamp(1rem,2.6vh,1.75rem)]"
 
 // o @ entra na prévia com estes estados: os que não dizem que o @ não serve
 const MOSTRA_NA_PREVIA: HandleStatus[] = ["available", "checking", "unchecked"]
-
-const ICONE_PUBLICO = { team: UsersThreeIcon, personal: UserIcon } as const
 
 export interface PlatformOnboardingTerms {
   checked: boolean
@@ -60,24 +54,17 @@ export interface PlatformOnboardingTerms {
   links: { terms: string; privacy: string }
 }
 
-export interface PlatformOnboardingAudience {
-  /** `team` (padrão do app): Muriki Projects. `personal`: Muriki Focus. */
-  value: WorkspaceAudience
-  onChange: (value: WorkspaceAudience) => void
-}
-
 export interface PlatformOnboardingIdentityProps {
   /** Sem isto, o campo do @usuário não aparece: a pessoa já tem um. */
   username?: Pick<UsernameFieldProps, "value" | "onChange" | "status" | "statusFor">
-  /** Para quem é o workspace: os dois cartões no topo. O app manda o valor no envio. */
-  audience: PlatformOnboardingAudience
-  workspace: Omit<WorkspaceFormProps, "disabled" | "className" | "audience">
+  /** O nome da conta: o nome do workspace pessoal que vai nascer, na prévia. */
+  accountName: string
   terms: PlatformOnboardingTerms
   onSubmit: () => void
   submitting?: boolean
   /** O erro do envio, já traduzido pelo app. */
   error?: ReactNode
-  /** O passo no onboarding. Padrão: 1 de 2 (depois vem convidar). */
+  /** O passo no onboarding. Padrão: 1 de 3 (depois vêm a equipe e o convite). */
   step?: number
   total?: number
   /** A marca, no canto de cima à esquerda. */
@@ -88,14 +75,13 @@ export interface PlatformOnboardingIdentityProps {
 
 export function PlatformOnboardingIdentity({
   username,
-  audience,
-  workspace,
+  accountName,
   terms,
   onSubmit,
   submitting = false,
   error,
   step = 1,
-  total = 2,
+  total = 3,
   brand,
   utilities,
 }: PlatformOnboardingIdentityProps) {
@@ -103,13 +89,7 @@ export function PlatformOnboardingIdentity({
   const formId = useId()
 
   const statusUsuario = username && handleStatus("username", username.value, username.status, username.statusFor)
-  const pessoal = audience.value === "personal"
-
-  const pronto =
-    (!statusUsuario || handleReady(statusUsuario)) &&
-    workspaceNameIssue(workspace.name) === null &&
-    handleReady(handleStatus("slug", workspace.slug, workspace.slugStatus, workspace.slugStatusFor)) &&
-    terms.checked
+  const pronto = (!statusUsuario || handleReady(statusUsuario)) && terms.checked
 
   function enviar(event: FormEvent) {
     event.preventDefault()
@@ -128,8 +108,8 @@ export function PlatformOnboardingIdentity({
       utilities={utilities}
       stage={
         <WorkspacePreview
-          audience={audience.value}
-          workspaceName={workspace.name}
+          audience="personal"
+          workspaceName={accountName}
           username={statusUsuario && MOSTRA_NA_PREVIA.includes(statusUsuario) ? username?.value : undefined}
           className="max-h-full w-full max-w-[54rem]"
         />
@@ -141,6 +121,7 @@ export function PlatformOnboardingIdentity({
         stepperLabel={t("platform.identity.stepper", { step, total })}
         stepperAriaLabel={t("platform.identity.stepper_aria", { step, total })}
         title={t("platform.identity.title")}
+        subtitle={t("platform.identity.subtitle")}
       />
 
       <form
@@ -150,41 +131,7 @@ export function PlatformOnboardingIdentity({
         data-slot="platform-onboarding-identity"
         className={`flex flex-col ${ENTRE_CAMPOS}`}
       >
-        <ChoiceCardGroup
-          aria-label={t("platform.identity.audience.label")}
-          value={audience.value}
-          onValueChange={(v) => audience.onChange(v as WorkspaceAudience)}
-          className="[grid-template-columns:1fr_1fr]"
-        >
-          {(["team", "personal"] as const).map((v) => {
-            const Icone = ICONE_PUBLICO[v]
-            return (
-              <ChoiceCard
-                key={v}
-                value={v}
-                disabled={submitting}
-                title={
-                  <>
-                    {t(`platform.identity.audience.${v}`)}
-                    {/* no canto do cartão (o cartão é relative); acende com a escolha. No celular não cabe ao
-                        lado do título e sai */}
-                    <Icone
-                      aria-hidden
-                      weight="duotone"
-                      className="absolute top-1/2 right-4 hidden size-6 -translate-y-1/2 text-muted-foreground transition-colors sm:block group-data-[checked]/choice:text-primary"
-                    />
-                  </>
-                }
-                className="py-[clamp(0.625rem,1.6vh,1rem)] sm:pr-12"
-              />
-            )
-          })}
-        </ChoiceCardGroup>
-
         {username ? <UsernameField {...username} disabled={submitting} /> : null}
-
-        <WorkspaceForm {...workspace} audience={audience.value} disabled={submitting} className={ENTRE_CAMPOS} />
-
         <Field className="flex-row items-start gap-2.5" disabled={submitting}>
           <Checkbox checked={terms.checked} onCheckedChange={(checked) => terms.onChange(checked)} className="mt-0.5" />
           <FieldLabel className="cursor-pointer text-sm leading-5 font-normal text-muted-foreground">
@@ -213,7 +160,7 @@ export function PlatformOnboardingIdentity({
           disabled={!pronto || submitting}
           aria-disabled={!pronto || submitting}
         >
-          <span>{t(pessoal ? "platform.identity.submit_personal" : "platform.identity.submit")}</span>
+          <span>{t("platform.identity.submit")}</span>
           {submitting ? (
             <SpinnerGapIcon aria-hidden className="size-4 animate-spin" />
           ) : (

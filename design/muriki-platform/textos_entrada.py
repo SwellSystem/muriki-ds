@@ -12,7 +12,7 @@ ENTRADA = {
         spam='Olhe também o spam e as promoções.',
         # quem já tem conta Muriki
         jaContaTit='Você já tem conta Muriki',
-        jaContaTxt='É a mesma do Muriki Code, e o seu @usuário vem junto. Aqui falta só aceitar os termos do Platform e criar o workspace.',
+        jaContaTxt='É a mesma do Muriki Code, e o seu @usuário vem junto. Aqui falta só aceitar os termos do Platform.',
         # convidar o time
         convidarTit='Chame o seu time',
         papel='Papel', remover='Remover', pular='Pular por agora',
@@ -36,7 +36,7 @@ ENTRADA = {
         expira='The code is valid for 10 minutes.', naoChegou='Didn’t get it?', reenviarEm='Resend in 0:48',
         spam='Also check spam and promotions.',
         jaContaTit='You already have a Muriki account',
-        jaContaTxt='It’s the same one as Muriki Code, and your @username comes along. All that’s left is accepting the Platform terms and creating the workspace.',
+        jaContaTxt='It’s the same one as Muriki Code, and your @username comes along. All that’s left is accepting the Platform terms.',
         convidarTit='Bring in your team',
         papel='Role', remover='Remove', pular='Skip for now',
         papelMaintainer='Maintainer', papelMember='Member', papelGuest='Guest',
@@ -57,7 +57,7 @@ ENTRADA = {
         expira='El código vale 10 minutos.', naoChegou='¿No te llegó?', reenviarEm='Reenviar en 0:48',
         spam='Mira también en spam y promociones.',
         jaContaTit='Ya tienes cuenta Muriki',
-        jaContaTxt='Es la misma de Muriki Code, y tu @usuario viene con ella. Solo falta aceptar los términos de Platform y crear el workspace.',
+        jaContaTxt='Es la misma de Muriki Code, y tu @usuario viene con ella. Solo falta aceptar los términos de Platform.',
         convidarTit='Trae a tu equipo',
         papel='Rol', remover='Quitar', pular='Saltar por ahora',
         papelMaintainer='Maintainer', papelMember='Member', papelGuest='Guest',

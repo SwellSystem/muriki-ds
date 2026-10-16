@@ -16,7 +16,7 @@
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "4 · Workspace · vazio",
+      "title": "4 · Espaço pessoal · vazio (a prévia já com o nome da conta)",
       "is_interactive": true
     },
     "OnboardingIdentidadeEscuro.dc.html": {
@@ -24,7 +24,7 @@
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "4 · Workspace · vazio · escuro",
+      "title": "4 · Espaço pessoal · vazio (a prévia já com o nome da conta) · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeOcupado.dc.html": {
@@ -32,7 +32,7 @@
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "5 · Workspace · o @usuário ocupado e o endereço reservado",
+      "title": "5 · Espaço pessoal · o @usuário ocupado: fora da prévia",
       "is_interactive": true
     },
     "OnboardingIdentidadeOcupadoEscuro.dc.html": {
@@ -40,7 +40,7 @@
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "5 · Workspace · o @usuário ocupado e o endereço reservado · escuro",
+      "title": "5 · Espaço pessoal · o @usuário ocupado: fora da prévia · escuro",
       "is_interactive": true
     },
     "OnboardingIdentidadeLivre.dc.html": {
@@ -48,7 +48,7 @@
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "6 · Workspace · tudo livre, o botão ligado",
+      "title": "6 · Espaço pessoal · o @ livre e os termos, o botão ligado",
       "is_interactive": true
     },
     "OnboardingIdentidadeLivreEscuro.dc.html": {
@@ -56,39 +56,7 @@
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "6 · Workspace · tudo livre, o botão ligado · escuro",
-      "is_interactive": true
-    },
-    "OnboardingIdentidadeFoco.dc.html": {
-      "x": 6080,
-      "y": 2640,
-      "w": 1440,
-      "h": 900,
-      "title": "7 · Workspace · só para mim (Muriki Focus)",
-      "is_interactive": true
-    },
-    "OnboardingIdentidadeFocoEscuro.dc.html": {
-      "x": 6080,
-      "y": 3960,
-      "w": 1440,
-      "h": 900,
-      "title": "7 · Workspace · só para mim (Muriki Focus) · escuro",
-      "is_interactive": true
-    },
-    "OnboardingIdentidadeMovimento.dc.html": {
-      "x": 7600,
-      "y": 2640,
-      "w": 1440,
-      "h": 900,
-      "title": "8 · Workspace · movimento (Play)",
-      "is_interactive": true
-    },
-    "OnboardingIdentidadeMovimentoEscuro.dc.html": {
-      "x": 7600,
-      "y": 3960,
-      "w": 1440,
-      "h": 900,
-      "title": "8 · Workspace · movimento (Play) · escuro",
+      "title": "6 · Espaço pessoal · o @ livre e os termos, o botão ligado · escuro",
       "is_interactive": true
     },
     "OnboardingCodigo.dc.html": {
@@ -96,7 +64,7 @@
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "3 · Código por e-mail · 1 de 3 (só sem a prova da caixa)",
+      "title": "3 · Código por e-mail · 1 de 4 (só sem a prova da caixa)",
       "is_interactive": true
     },
     "OnboardingCodigoEscuro.dc.html": {
@@ -104,39 +72,39 @@
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "3 · Código por e-mail · 1 de 3 (só sem a prova da caixa) · escuro",
+      "title": "3 · Código por e-mail · 1 de 4 (só sem a prova da caixa) · escuro",
       "is_interactive": true
     },
     "OnboardingContaMuriki.dc.html": {
-      "x": 9120,
+      "x": 6080,
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "9 · Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário)",
+      "title": "7 · Já tem conta Muriki · 2 de 4 (vem do Code: sem o campo do @usuário, só os termos)",
       "is_interactive": true
     },
     "OnboardingContaMurikiEscuro.dc.html": {
-      "x": 9120,
+      "x": 6080,
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "9 · Já tem conta Muriki · 2 de 3 (vem do Code: sem o campo do @usuário) · escuro",
+      "title": "7 · Já tem conta Muriki · 2 de 4 (vem do Code: sem o campo do @usuário, só os termos) · escuro",
       "is_interactive": true
     },
     "OnboardingConvidar.dc.html": {
-      "x": 10640,
+      "x": 12160,
       "y": 2640,
       "w": 1440,
       "h": 900,
-      "title": "10 · Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano",
+      "title": "11 · Convidar o time · 3 de 3, só depois de criar a equipe: adicionar, a lista e as pessoas no plano",
       "is_interactive": true
     },
     "OnboardingConvidarEscuro.dc.html": {
-      "x": 10640,
+      "x": 12160,
       "y": 3960,
       "w": 1440,
       "h": 900,
-      "title": "10 · Convidar o time · 3 de 3: adicionar, a lista e as pessoas no plano · escuro",
+      "title": "11 · Convidar o time · 3 de 3, só depois de criar a equipe: adicionar, a lista e as pessoas no plano · escuro",
       "is_interactive": true
     },
     "Convite.dc.html": {
@@ -144,7 +112,7 @@
       "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "11 · Convite · o aceite, sem sessão: entrar ou criar conta",
+      "title": "12 · Convite · o aceite, sem sessão: entrar ou criar conta",
       "is_interactive": true
     },
     "ConviteEscuro.dc.html": {
@@ -152,7 +120,7 @@
       "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "11 · Convite · o aceite, sem sessão: entrar ou criar conta · escuro",
+      "title": "12 · Convite · o aceite, sem sessão: entrar ou criar conta · escuro",
       "is_interactive": true
     },
     "ConviteLogado.dc.html": {
@@ -160,7 +128,7 @@
       "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "12 · Convite · o aceite, com sessão: aceitar convite",
+      "title": "13 · Convite · o aceite, com sessão: aceitar convite",
       "is_interactive": true
     },
     "ConviteLogadoEscuro.dc.html": {
@@ -168,7 +136,7 @@
       "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "12 · Convite · o aceite, com sessão: aceitar convite · escuro",
+      "title": "13 · Convite · o aceite, com sessão: aceitar convite · escuro",
       "is_interactive": true
     },
     "ConviteInvalido.dc.html": {
@@ -176,7 +144,7 @@
       "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "15 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo)",
+      "title": "16 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo)",
       "is_interactive": true
     },
     "ConviteInvalidoEscuro.dc.html": {
@@ -184,7 +152,7 @@
       "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "15 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo) · escuro",
+      "title": "16 · Convite · inválido ou vencido (o 422 uniforme, sem o motivo) · escuro",
       "is_interactive": true
     },
     "Entrar.dc.html": {
@@ -224,7 +192,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "16 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo)",
+      "title": "17 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo)",
       "is_interactive": true
     },
     "WorkspaceMembrosEscuro.dc.html": {
@@ -232,7 +200,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "16 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo) · escuro",
+      "title": "17 · Membros · vista do owner (o único owner: \"Sair\" desligado, com o motivo) · escuro",
       "is_interactive": true
     },
     "WorkspaceMembrosMaintainer.dc.html": {
@@ -240,7 +208,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "17 · Membros · vista da maintainer (gere só member e guest)",
+      "title": "18 · Membros · vista da maintainer (gere só member e guest)",
       "is_interactive": true
     },
     "WorkspaceMembrosMaintainerEscuro.dc.html": {
@@ -248,7 +216,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "17 · Membros · vista da maintainer (gere só member e guest) · escuro",
+      "title": "18 · Membros · vista da maintainer (gere só member e guest) · escuro",
       "is_interactive": true
     },
     "WorkspaceConvites.dc.html": {
@@ -256,7 +224,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "18 · Convites · pendente, vencido, aceito, revogado e substituído",
+      "title": "19 · Convites · pendente, vencido, aceito, revogado e substituído",
       "is_interactive": true
     },
     "WorkspaceConvitesEscuro.dc.html": {
@@ -264,7 +232,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "18 · Convites · pendente, vencido, aceito, revogado e substituído · escuro",
+      "title": "19 · Convites · pendente, vencido, aceito, revogado e substituído · escuro",
       "is_interactive": true
     },
     "WorkspaceConvidarLimite.dc.html": {
@@ -272,7 +240,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "19 · Convidar · o aviso de limite do Free e do Pro (5 pessoas)",
+      "title": "20 · Convidar · o aviso de limite do Free e do Pro (5 pessoas)",
       "is_interactive": true
     },
     "WorkspaceConvidarLimiteEscuro.dc.html": {
@@ -280,7 +248,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "19 · Convidar · o aviso de limite do Free e do Pro (5 pessoas) · escuro",
+      "title": "20 · Convidar · o aviso de limite do Free e do Pro (5 pessoas) · escuro",
       "is_interactive": true
     },
     "WorkspacePlanos.dc.html": {
@@ -288,7 +256,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "23 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca)",
+      "title": "24 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca)",
       "is_interactive": true
     },
     "WorkspacePlanosEscuro.dc.html": {
@@ -296,7 +264,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "23 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca) · escuro",
+      "title": "24 · Planos · workspace de empresa, mensal, no teste do Enterprise; o Pro segue recomendado (a moeda ainda troca) · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosAnual.dc.html": {
@@ -304,7 +272,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "24 · Planos · anual, por pessoa/ano como vem da API; a moeda travada",
+      "title": "25 · Planos · anual, por pessoa/ano como vem da API; a moeda travada",
       "is_interactive": true
     },
     "WorkspacePlanosAnualEscuro.dc.html": {
@@ -312,7 +280,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "24 · Planos · anual, por pessoa/ano como vem da API; a moeda travada · escuro",
+      "title": "25 · Planos · anual, por pessoa/ano como vem da API; a moeda travada · escuro",
       "is_interactive": true
     },
     "WorkspaceCobranca.dc.html": {
@@ -320,7 +288,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "34 · Cobrança · a próxima cobrança, os assentos e o que mudou no período",
+      "title": "35 · Cobrança · a próxima cobrança, os assentos e o que mudou no período",
       "is_interactive": true
     },
     "WorkspaceCobrancaEscuro.dc.html": {
@@ -328,7 +296,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "34 · Cobrança · a próxima cobrança, os assentos e o que mudou no período · escuro",
+      "title": "35 · Cobrança · a próxima cobrança, os assentos e o que mudou no período · escuro",
       "is_interactive": true
     },
     "WorkspaceComercial.dc.html": {
@@ -336,7 +304,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "32 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois",
+      "title": "33 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois",
       "is_interactive": true
     },
     "WorkspaceComercialEscuro.dc.html": {
@@ -344,7 +312,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "32 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois · escuro",
+      "title": "33 · Falar com o comercial · a página: quantas pessoas e a mensagem; o resumo do Enterprise e o que acontece depois · escuro",
       "is_interactive": true
     },
     "WorkspaceComercialEnviado.dc.html": {
@@ -352,7 +320,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "33 · Falar com o comercial · enviado: a confirmação no lugar do formulário",
+      "title": "34 · Falar com o comercial · enviado: a confirmação no lugar do formulário",
       "is_interactive": true
     },
     "WorkspaceComercialEnviadoEscuro.dc.html": {
@@ -360,7 +328,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "33 · Falar com o comercial · enviado: a confirmação no lugar do formulário · escuro",
+      "title": "34 · Falar com o comercial · enviado: a confirmação no lugar do formulário · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosCarregando.dc.html": {
@@ -368,7 +336,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "25 · Planos · carregando (o esqueleto, o Pro já no destaque)",
+      "title": "26 · Planos · carregando (o esqueleto, o Pro já no destaque)",
       "is_interactive": true
     },
     "WorkspacePlanosCarregandoEscuro.dc.html": {
@@ -376,7 +344,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "25 · Planos · carregando (o esqueleto, o Pro já no destaque) · escuro",
+      "title": "26 · Planos · carregando (o esqueleto, o Pro já no destaque) · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarErro.dc.html": {
@@ -384,7 +352,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "30 · Assinar o Pro · o CNPJ com o dígito verificador errado",
+      "title": "31 · Assinar o Pro · o CNPJ com o dígito verificador errado",
       "is_interactive": true
     },
     "WorkspaceAssinarErroEscuro.dc.html": {
@@ -392,7 +360,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "30 · Assinar o Pro · o CNPJ com o dígito verificador errado · escuro",
+      "title": "31 · Assinar o Pro · o CNPJ com o dígito verificador errado · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarSemFiscal.dc.html": {
@@ -400,7 +368,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "31 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD",
+      "title": "32 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD",
       "is_interactive": true
     },
     "WorkspaceAssinarSemFiscalEscuro.dc.html": {
@@ -408,7 +376,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "31 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD · escuro",
+      "title": "32 · Assinar o Pro · empresa dos EUA: sem campo fiscal, em USD · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaTeste.dc.html": {
@@ -416,7 +384,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "35 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado",
+      "title": "36 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado",
       "is_interactive": true
     },
     "WorkspaceCobrancaTesteEscuro.dc.html": {
@@ -424,7 +392,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "35 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado · escuro",
+      "title": "36 · Cobrança · no teste do Enterprise: a contagem até o fim e \"Escolher um plano\"; a conta do Pro ao lado · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarCupom.dc.html": {
@@ -432,7 +400,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "28 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado",
+      "title": "29 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado",
       "is_interactive": true
     },
     "WorkspaceAssinarCupomEscuro.dc.html": {
@@ -440,7 +408,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "28 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado · escuro",
+      "title": "29 · Assinar o Pro · o cupom aplicado (só percentual): o desconto e o total riscado · escuro",
       "is_interactive": true
     },
     "OnboardingConvidado.dc.html": {
@@ -448,7 +416,7 @@
       "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "13 · Convidado · 1 de 1: o @usuário e os termos, antes do aceite (2 de 2 depois do código)",
+      "title": "14 · Convidado · 1 de 1: o @usuário e os termos, antes do aceite (2 de 2 depois do código)",
       "is_interactive": true
     },
     "OnboardingConvidadoEscuro.dc.html": {
@@ -456,7 +424,7 @@
       "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "13 · Convidado · 1 de 1: o @usuário e os termos, antes do aceite (2 de 2 depois do código) · escuro",
+      "title": "14 · Convidado · 1 de 1: o @usuário e os termos, antes do aceite (2 de 2 depois do código) · escuro",
       "is_interactive": true
     },
     "OnboardingConvidadoOcupado.dc.html": {
@@ -464,7 +432,7 @@
       "y": 5280,
       "w": 1440,
       "h": 900,
-      "title": "14 · Convidado · o @usuário ocupado: fora da prévia, o botão desligado",
+      "title": "15 · Convidado · o @usuário ocupado: fora da prévia, o botão desligado",
       "is_interactive": true
     },
     "OnboardingConvidadoOcupadoEscuro.dc.html": {
@@ -472,7 +440,7 @@
       "y": 6600,
       "w": 1440,
       "h": 900,
-      "title": "14 · Convidado · o @usuário ocupado: fora da prévia, o botão desligado · escuro",
+      "title": "15 · Convidado · o @usuário ocupado: fora da prévia, o botão desligado · escuro",
       "is_interactive": true
     },
     "WorkspacePlanosPessoal.dc.html": {
@@ -480,7 +448,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "26 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate",
+      "title": "27 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate",
       "is_interactive": true
     },
     "WorkspacePlanosPessoalEscuro.dc.html": {
@@ -488,7 +456,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "26 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate · escuro",
+      "title": "27 · Planos · workspace pessoal: Free, Pro e Ultimate, só você, no teste do Ultimate · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarPro.dc.html": {
@@ -496,7 +464,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "27 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado",
+      "title": "28 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado",
       "is_interactive": true
     },
     "WorkspaceAssinarProEscuro.dc.html": {
@@ -504,7 +472,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "27 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado · escuro",
+      "title": "28 · Assinar o Pro · empresa: o CNPJ e a razão social, por assento; o cupom fechado · escuro",
       "is_interactive": true
     },
     "WorkspaceAssinarProPessoal.dc.html": {
@@ -512,7 +480,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "29 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual",
+      "title": "30 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual",
       "is_interactive": true
     },
     "WorkspaceAssinarProPessoalEscuro.dc.html": {
@@ -520,7 +488,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "29 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual · escuro",
+      "title": "30 · Assinar o Pro · workspace pessoal: o CPF e 1 assento, no anual · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaSemStripe.dc.html": {
@@ -528,7 +496,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "40 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível",
+      "title": "41 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível",
       "is_interactive": true
     },
     "WorkspaceCobrancaSemStripeEscuro.dc.html": {
@@ -536,7 +504,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "40 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível · escuro",
+      "title": "41 · Cobrança · o Stripe não respondeu: o resto do resumo aparece, só a próxima cobrança fica indisponível · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaRevisaoPais.dc.html": {
@@ -544,7 +512,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "36 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar",
+      "title": "37 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar",
       "is_interactive": true
     },
     "WorkspaceCobrancaRevisaoPaisEscuro.dc.html": {
@@ -552,7 +520,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "36 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar · escuro",
+      "title": "37 · Cobrança · a revisão do país aberta: o país informado não bate com o do endereço e o do cartão; 7 dias para confirmar · escuro",
       "is_interactive": true
     },
     "WorkspaceConfirmarPais.dc.html": {
@@ -560,7 +528,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "37 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado",
+      "title": "38 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado",
       "is_interactive": true
     },
     "WorkspaceConfirmarPaisEscuro.dc.html": {
@@ -568,7 +536,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "37 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado · escuro",
+      "title": "38 · Confirmar o país · a resposta à revisão: fora do Brasil (com o documento estrangeiro, opcional) ou no Brasil; o que a API viu ao lado · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaRevisaoVencida.dc.html": {
@@ -576,7 +544,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "38 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar",
+      "title": "39 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar",
       "is_interactive": true
     },
     "WorkspaceCobrancaRevisaoVencidaEscuro.dc.html": {
@@ -584,7 +552,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "38 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar · escuro",
+      "title": "39 · Cobrança · a revisão venceu: a assinatura termina no fim do período, e ainda dá para confirmar · escuro",
       "is_interactive": true
     },
     "WorkspaceCobrancaTrocaMoeda.dc.html": {
@@ -592,7 +560,7 @@
       "y": 10560,
       "w": 1440,
       "h": 900,
-      "title": "39 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período",
+      "title": "40 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período",
       "is_interactive": true
     },
     "WorkspaceCobrancaTrocaMoedaEscuro.dc.html": {
@@ -600,7 +568,7 @@
       "y": 11880,
       "w": 1440,
       "h": 900,
-      "title": "39 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período · escuro",
+      "title": "40 · Cobrança · a resposta trocou a moeda: assinar de novo em USD, que só cobra no fim do período · escuro",
       "is_interactive": true
     },
     "WorkspaceMembrosCarencia.dc.html": {
@@ -608,7 +576,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "20 · Membros · acima do limite (B9b): o aviso da carência de 7 dias, com \"Escolher quem fica\" para o owner",
+      "title": "21 · Membros · acima do limite (B9b): o aviso da carência de 7 dias, com \"Escolher quem fica\" para o owner",
       "is_interactive": true
     },
     "WorkspaceMembrosCarenciaEscuro.dc.html": {
@@ -616,7 +584,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "20 · Membros · acima do limite (B9b): o aviso da carência de 7 dias, com \"Escolher quem fica\" para o owner · escuro",
+      "title": "21 · Membros · acima do limite (B9b): o aviso da carência de 7 dias, com \"Escolher quem fica\" para o owner · escuro",
       "is_interactive": true
     },
     "WorkspaceMembrosEscolha.dc.html": {
@@ -624,7 +592,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "21 · Membros · quem fica: os owners fixos, o contador de lugares e a prévia do fim do prazo em cada linha",
+      "title": "22 · Membros · quem fica: os owners fixos, o contador de lugares e a prévia do fim do prazo em cada linha",
       "is_interactive": true
     },
     "WorkspaceMembrosEscolhaEscuro.dc.html": {
@@ -632,7 +600,7 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "21 · Membros · quem fica: os owners fixos, o contador de lugares e a prévia do fim do prazo em cada linha · escuro",
+      "title": "22 · Membros · quem fica: os owners fixos, o contador de lugares e a prévia do fim do prazo em cada linha · escuro",
       "is_interactive": true
     },
     "WorkspaceMembrosSuspensos.dc.html": {
@@ -640,7 +608,7 @@
       "y": 7920,
       "w": 1440,
       "h": 900,
-      "title": "22 · Membros · a carência fechou: os suspensos apagados, com o selo; o papel troca, nunca para Owner",
+      "title": "23 · Membros · a carência fechou: os suspensos apagados, com o selo; o papel troca, nunca para Owner",
       "is_interactive": true
     },
     "WorkspaceMembrosSuspensosEscuro.dc.html": {
@@ -648,7 +616,55 @@
       "y": 9240,
       "w": 1440,
       "h": 900,
-      "title": "22 · Membros · a carência fechou: os suspensos apagados, com o selo; o papel troca, nunca para Owner · escuro",
+      "title": "23 · Membros · a carência fechou: os suspensos apagados, com o selo; o papel troca, nunca para Owner · escuro",
+      "is_interactive": true
+    },
+    "OnboardingEquipe.dc.html": {
+      "x": 7600,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "8 · Workspace de equipe · 2 de 3, opcional: criar ou pular para o espaço pessoal",
+      "is_interactive": true
+    },
+    "OnboardingEquipeEscuro.dc.html": {
+      "x": 7600,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "8 · Workspace de equipe · 2 de 3, opcional: criar ou pular para o espaço pessoal · escuro",
+      "is_interactive": true
+    },
+    "OnboardingEquipeLimite.dc.html": {
+      "x": 9120,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "9 · Workspace de equipe · o 409 FREE_WORKSPACE_LIMIT (já tem uma equipe no Free)",
+      "is_interactive": true
+    },
+    "OnboardingEquipeLimiteEscuro.dc.html": {
+      "x": 9120,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "9 · Workspace de equipe · o 409 FREE_WORKSPACE_LIMIT (já tem uma equipe no Free) · escuro",
+      "is_interactive": true
+    },
+    "OnboardingEquipeMovimento.dc.html": {
+      "x": 10640,
+      "y": 2640,
+      "w": 1440,
+      "h": 900,
+      "title": "10 · Workspace de equipe · movimento (Play)",
+      "is_interactive": true
+    },
+    "OnboardingEquipeMovimentoEscuro.dc.html": {
+      "x": 10640,
+      "y": 3960,
+      "w": 1440,
+      "h": 900,
+      "title": "10 · Workspace de equipe · movimento (Play) · escuro",
       "is_interactive": true
     }
   },
@@ -665,12 +681,14 @@
     "OnboardingIdentidadeOcupadoEscuro.dc.html",
     "OnboardingIdentidadeLivre.dc.html",
     "OnboardingIdentidadeLivreEscuro.dc.html",
-    "OnboardingIdentidadeFoco.dc.html",
-    "OnboardingIdentidadeFocoEscuro.dc.html",
-    "OnboardingIdentidadeMovimento.dc.html",
-    "OnboardingIdentidadeMovimentoEscuro.dc.html",
     "OnboardingContaMuriki.dc.html",
     "OnboardingContaMurikiEscuro.dc.html",
+    "OnboardingEquipe.dc.html",
+    "OnboardingEquipeEscuro.dc.html",
+    "OnboardingEquipeLimite.dc.html",
+    "OnboardingEquipeLimiteEscuro.dc.html",
+    "OnboardingEquipeMovimento.dc.html",
+    "OnboardingEquipeMovimentoEscuro.dc.html",
     "OnboardingConvidar.dc.html",
     "OnboardingConvidarEscuro.dc.html",
     "Convite.dc.html",
@@ -754,7 +772,7 @@
     "primeiroAcesso": {
       "x": 0,
       "y": 2340,
-      "text": "Primeiro acesso: o código por e-mail, o workspace (para quem é, o @usuário, o nome, o endereço e os termos numa tela só, sem CPF e sem plano), quem já tem conta Muriki e convidar o time; do lado do login: o palco com a prévia ao vivo à esquerda, o formulário à direita",
+      "text": "Primeiro acesso: o código por e-mail, o @usuário e os termos (sem CPF e sem plano; o espaço pessoal nasce sozinho, com o nome da conta e o @usuário), quem já tem conta Muriki, o workspace de equipe, opcional, e convidar o time (só se criou a equipe); do lado do login: o palco com a prévia ao vivo à esquerda, o formulário à direita",
       "kind": "title1",
       "maxW": 8000,
       "w": 240

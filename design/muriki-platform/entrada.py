@@ -8,7 +8,7 @@
 # o app usa a tela de login compartilhada do DS (auth-page + login-page), só com a marca.
 # Sem CPF e sem plano. O token do convite nunca aparece na tela nem em link.
 from pecas import (K, T, I, svg, ic, FONTE, MONO, LOGO, PRODUTO, EMAIL, raiz, topo,  # noqa: F401
-                   palco, cabecalho_passo, campo, caixa_marcar, botao_passo, cartoes_escolha, previa_workspace, esc,
+                   palco, cabecalho_passo, campo, caixa_marcar, botao_passo, previa_workspace, esc,
                    PRODUTOS, _barra, _quadro, _lista, _moldura, _nome_produto, _azul, pagina_identidade)
 # depois de pecas, que põe o canvas do Code no caminho
 from base import botao_idioma, botao_tema  # noqa: E402
@@ -17,6 +17,8 @@ WORKSPACE = 'Moura & Filhos'
 EMAIL_MASCARADO = 'r•••@moura.dev'
 # o invitedBy.name da prévia do convite
 CONVIDOU = 'Rafael Moura'
+# o nome da conta: o nome do espaço pessoal que nasce no primeiro acesso
+CONTA = 'Rafael Moura'
 
 
 # ── A moldura ───────────────────────────────────────────────────────────
@@ -118,10 +120,10 @@ def caixas_codigo(k, digitos, foco=None, aria=''):
 
 # ── Primeiro acesso ─────────────────────────────────────────────────────
 def tela_codigo(k):
-    # passo 1 de 3, só quando falta a prova da caixa (o GET /onboarding devolve challengeRequired)
+    # passo 1 de 4, só quando falta a prova da caixa (o GET /onboarding devolve challengeRequired)
     ajuda = (f'<p style="margin:0;font-size:13px;line-height:20px;color:{k["mfg"]};">{T("naoChegou")} '
              f'<span aria-disabled="true" style="font-weight:500;">{T("reenviarEm")}</span><br>{T("spam")}</p>')
-    form = (cabecalho_passo(k, 1, 3, T('codigoTit'), f'{T("codigoSubA")} {forte(k, EMAIL)}.')
+    form = (cabecalho_passo(k, 1, 4, T('codigoTit'), f'{T("codigoSubA")} {forte(k, EMAIL)}.')
             + f'<form style="margin:0;display:flex;flex-direction:column;gap:16px;">'
             + caixas_codigo(k, ['4', '8', '2', '9', '1', ''], foco=5, aria=T('codigoAria'))
             + nota(k, T('expira')) + '<span style="height:4px;"></span>'
@@ -130,8 +132,8 @@ def tela_codigo(k):
 
 
 def tela_ja_tem_conta(k):
-    # quem vem do Code: o @usuário já existe, então o campo some; o resto é a tela do bloco A (2 de 3,
-    # depois do código por e-mail)
+    # quem vem do Code: o @usuário já existe, então o campo some e fica só o aceite dos termos (2 de 4,
+    # depois do código por e-mail); o espaço pessoal nasce sozinho, e a prévia o mostra
     aviso = (f'<div role="note" style="display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:12px;'
              f'background:{k["card"]};box-shadow:inset 0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);">'
              f'<span style="display:flex;width:32px;height:32px;flex:0 0 auto;">{LOGO}</span>'
@@ -140,17 +142,14 @@ def tela_ja_tem_conta(k):
              f'<span style="font-size:13px;line-height:19px;color:{k["mfg"]};">{T("jaContaTxt")}</span></span></div>')
     link = lambda txt: f'<a href="#" style="color:{k["fg"]};font-weight:500;">{txt}</a>'
     formulario = (
-        cabecalho_passo(k, 2, 3, T('titulo'))
+        cabecalho_passo(k, 2, 4, T('titulo'), T('subtitulo'))
         + aviso
         + '<form style="margin:0;display:flex;flex-direction:column;gap:23px;">'
-        + cartoes_escolha(k, T('paraQuem'), [('team', T('comTime'), 'pessoas'), ('personal', T('soMim'), 'pessoa')], 'team')
-        + campo(k, 'nome', T('nomeWorkspace'), WORKSPACE)
-        + campo(k, 'endereco', T('endereco'), 'moura-filhos', 'available', T('enderecoLivre'), afixo='platform.muriki.app/', mono=True)
         + caixa_marcar(k, False, f'{T("termosA")} {link(T("termos"))} {T("termosE")} {link(T("privacidade"))}.')
         + '</form>'
-        + botao_passo(k, T('criar'), False)
+        + botao_passo(k, T('criarEspaco'), False)
     )
-    return pagina_identidade(k, formulario, previa_workspace(k, 'team', WORKSPACE, T('exemploTime'), T('fraseLivre'), True))
+    return pagina_identidade(k, formulario, previa_workspace(k, 'personal', CONTA, '', T('fraseFoco'), True))
 
 
 # a janela do workspace com os lugares do time: você e os convidados que se preenchem

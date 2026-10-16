@@ -152,16 +152,15 @@ def botao_passo(k, txt, ligado):
 
 
 
-def cartoes_escolha(k, aria, opcoes, escolhida, acoes=None):
+def cartoes_escolha(k, aria, opcoes, escolhida):
     # o ChoiceCardGroup single do registry: dois cartões lado a lado, o marcado com o anel da marca; o
-    # ícone de cada um no canto direito, azul no marcado; sem a linha do produto (quem o mostra é a prévia). `acoes`: {valor: hole do clique} (a tela em movimento)
+    # ícone de cada um no canto direito, azul no marcado; sem a linha do produto (quem o mostra é a prévia)
     def cartao(valor, titulo, icone):
-        clique = f' onClick="{acoes[valor]}"' if acoes else ''
         marcado = valor == escolhida
         anel = (f'box-shadow:0 0 0 1.5px {k["pri"]}, 0 4px 10px -2px rgba(0,0,0,0.10);' if marcado
                 else f'box-shadow:0 0 0 1px {k["border"]}, 0 1px 2px rgba(0,0,0,0.05);')
         bolinha = f'inset 0 0 0 4px {k["pri"]}' if marcado else f'inset 0 0 0 1.5px {k["input"]}'
-        return (f'<button type="button" role="radio" aria-checked="{"true" if marcado else "false"}"{clique} '
+        return (f'<button type="button" role="radio" aria-checked="{"true" if marcado else "false"}" '
                 f'style="position:relative;display:flex;flex-direction:column;gap:4px;padding:14px 48px 14px 16px;border:0;border-radius:12px;background:{k["card"]};'
                 f'{anel}text-align:left;font-family:{FONTE};cursor:pointer;">'
                 f'<span style="display:flex;align-items:center;gap:8px;">'
