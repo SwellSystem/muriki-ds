@@ -13,10 +13,10 @@ import {
   CircleDashed,
   CircleHalf,
   CircleHalfTilt,
-  ArrowDown,
-  ArrowUp,
   ExclamationMark,
-  Warning,
+  Minus,
+  TrendDown,
+  TrendUp,
   Prohibit,
   Check,
   CircleNotch,
@@ -736,14 +736,14 @@ function StatusBotao({ status, salvando, onClick, progresso, semDono }: { status
 /** Prioridade é badge: a pílula com a cor. Com os dois em ícone (status e
     prioridade) a linha ficava sem nenhum ponto de cor para o olho bater; o
     status ficou ícone porque ele também é o botão de concluir. */
-const TOM_PRIO: Record<string, string> = { urgent: "red", high: "orange", medium: "blue", low: "gray" }
+const TOM_PRIO: Record<string, string> = { urgent: "red", high: "orange", medium: "yellow", low: "gray" }
 function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
   if (!p || p === "none") return <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>—</span>
   const tom = TOM_PRIO[p]
   return (
     <span className={`inline-flex w-fit items-center gap-1.5 rounded-[7px] ${pequena ? "h-6 px-2 text-[11.5px]" : "h-7 px-2.5 text-[12.5px]"}`} style={{ background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` }}>
-      {/* um ícone por nível: urgente !, alta seta para cima, média aviso, baixa seta para baixo */}
-      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : p === "high" ? <ArrowUp size={12} weight="bold" /> : p === "medium" ? <Warning size={12} weight="bold" /> : <ArrowDown size={12} weight="bold" />}
+      {/* um ícone por nível: urgente !, alta trend-up, média -, baixa trend-down */}
+      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : p === "high" ? <TrendUp size={13} weight="bold" /> : p === "medium" ? <Minus size={12} weight="bold" /> : <TrendDown size={13} weight="bold" />}
       {PRIO_F[p]}
     </span>
   )
