@@ -26,6 +26,7 @@ import {
 
 import { MurikiLogo } from "@/components/ui/muriki-logo"
 import type { TaskTableStatus, TaskTableTask } from "@/components/blocks/task-table"
+import { KanbanBoard, type KanbanTask } from "@/components/blocks/kanban"
 
 /* Estudo livre do DS novo, na linguagem que nasceu da rivio.com.br:
    camadas, atmosfera, calma, e o desfoque nas trocas. Duas telas do mesmo
@@ -881,46 +882,29 @@ function ArvoreFamilia({
   )
 }
 
-/** O quadro da família: as tarefas (sem os épicos) por status. */
+/** O quadro é o KanbanBoard do registry, o mesmo do Platform: arrastar
+    entre colunas, "Solte aqui.", coluna vazia, concluir no card. Aqui só
+    os dados da família viram KanbanTask; nada redesenhado. */
+const COLUNAS_KANBAN = (["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((st) => ({ id: st, name: ST_F[st].rotulo, color: `var(--tone-${ST_F[st].tom}-dot)` }))
+const PRIO_KANBAN = { urgent: "urgent", high: "high", medium: "medium", low: "low", none: "none" } as const
+
 function QuadroFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void }) {
-  const ts = FAMILIA.filter((t) => t.depth > 0).map((t) => ({ ...t, status: (feitas.has(t.id) ? "done" : t.status) as TaskTableStatus }))
+  const [cards, setCards] = React.useState<KanbanTask[]>(() =>
+    FAMILIA.filter((t) => t.depth > 0).map((t) => {
+      const st = feitas.has(t.id) ? "done" : t.status
+      return { slug: t.code, title: t.title, priority: PRIO_KANBAN[t.priority ?? "none"], progress: st === "done" ? 100 : Math.round((t.progressRatio ?? 0) * 100), timeLabel: t.due, statusId: st }
+    })
+  )
   return (
-    <div className="grid grid-cols-4 gap-4">
-      {(["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((c) => (
-        <div key={c} className="flex flex-col gap-3 rounded-[12px] p-3" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-          <div className="flex h-9 items-center justify-between px-2">
-            <Etiqueta cor={`var(--tone-${ST_F[c].tom}-dot)`}>{ST_F[c].rotulo}</Etiqueta>
-            <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {ts.filter((t) => t.status === c).length}
-            </span>
-          </div>
-          {ts
-            .filter((t) => t.status === c)
-            .map((t) => (
-              <button key={t.id} type="button" onClick={() => abrir(t)} className="flex flex-col gap-3 rounded-[10px] p-4 text-left transition-transform duration-300 hover:-translate-y-0.5" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)" }}>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-                    {t.code}
-                    {t.depth === 2 ? " · sub" : ""}
-                  </span>
-                  {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : null}
-                </div>
-                <span className="text-[14.5px] leading-snug" style={{ color: "var(--ds-tinta-forte)" }}>
-                  {t.title}
-                </span>
-                <span className="flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
-                  {PRIO_F[t.priority ?? "none"]} · {t.due}
-                  {t.deps?.length ? (
-                    <span className="flex items-center gap-1">
-                      · <LinkSimple size={11} /> {t.deps.length}
-                    </span>
-                  ) : null}
-                </span>
-              </button>
-            ))}
-        </div>
-      ))}
-    </div>
+    <KanbanBoard
+      columns={COLUNAS_KANBAN}
+      tasks={cards}
+      onTasksChange={setCards}
+      onCardClick={(c) => {
+        const t = FAMILIA.find((x) => x.code === c.slug)
+        if (t) abrir(t)
+      }}
+    />
   )
 }
 
