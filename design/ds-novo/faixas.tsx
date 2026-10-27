@@ -624,7 +624,15 @@ const FAMILIA: TaskTableTask[] = [
   tk({ id: "t5", code: "MUR-11", title: "Convite expira em 7 dias", depth: 1, kind: "task", status: "progress", parentId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "18 nov", start: "2026-11-12", end: "2026-11-18", progressRatio: 0.2 }),
   tk({ id: "t6", code: "MUR-12", title: "Carência de quem passa do limite", depth: 1, kind: "task", status: "blocked", parentId: "e2", owner: { initials: "GT", tone: "a1" }, priority: "high", due: "24 nov", start: "2026-11-18", end: "2026-11-24", progressRatio: 0, deps: ["t5", "t2"] }),
   tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
+  // sem épico: tarefas soltas no projeto, uma delas com subtarefas
+  tk({ id: "t8", code: "MUR-20", title: "Responder o suporte sobre a nota fiscal", depth: 1, kind: "task", status: "progress", owner: { initials: "AM", tone: "a2" }, priority: "high", due: "11 nov", start: "2026-11-09", end: "2026-11-11", progressRatio: 0.5 }),
+  tk({ id: "t9", code: "MUR-21", title: "Atualizar a página de preços", depth: 1, kind: "task", status: "active", childGroupId: "t9", owner: { initials: "LP", tone: "a4" }, priority: "medium", due: "19 nov", start: "2026-11-13", end: "2026-11-19", progressRatio: 0, progress: { done: 0, total: 2 } }),
+  tk({ id: "s3", code: "MUR-22", title: "Texto novo do plano Team", depth: 2, kind: "sub", status: "active", parentId: "t9", owner: { initials: "LP", tone: "a4" }, priority: "medium", due: "15 nov", start: "2026-11-13", end: "2026-11-15", progressRatio: 0 }),
+  tk({ id: "s4", code: "MUR-23", title: "Print do quadro para o topo", depth: 2, kind: "sub", status: "active", parentId: "t9", lastChild: true, priority: "low", due: "19 nov", start: "2026-11-16", end: "2026-11-19", progressRatio: 0 }),
+  tk({ id: "t10", code: "MUR-24", title: "Renovar o certificado do domínio", depth: 1, kind: "task", status: "done", owner: { initials: "GT", tone: "a1" }, priority: "urgent", due: "6 nov", start: "2026-11-04", end: "2026-11-06", progressRatio: 1 }),
 ]
+/** As tarefas sem épico: o primeiro nível sem pai. */
+const SOLTAS = FAMILIA.filter((t) => t.depth === 1 && !t.parentId)
 const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
 // data local: new Date("2026-11-01") é meia-noite UTC, e no Brasil vira 31 out
 const INICIO_MES = new Date(2026, 10, 1)
@@ -948,6 +956,42 @@ function ArvoreFamilia({
             </section>
           )
         })}
+        {SOLTAS.length ? (
+          <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+            {/* sem épico: o mesmo grupo, sem bandeira nem andamento — é um lugar, não uma entrega */}
+            <header className="flex h-12 items-center justify-between px-5">
+              <button type="button" onClick={() => alternar("sem-epico")} className="flex items-center gap-3">
+                <motion.span animate={{ rotate: fechados.has("sem-epico") ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
+                  <CaretRight size={13} weight="bold" />
+                </motion.span>
+                <Etiqueta cor="var(--ds-tinta-2)">Sem épico</Etiqueta>
+              </button>
+              <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                {SOLTAS.length} tarefas
+              </span>
+            </header>
+            <AnimatePresence initial={false}>
+              {!fechados.has("sem-epico") ? (
+                <motion.div key="cab" initial={{ opacity: 0, height: 0, filter: "blur(6px)" }} animate={{ opacity: 1, height: "auto", filter: "blur(0px)" }} exit={{ opacity: 0, height: 0, filter: "blur(6px)" }} transition={{ duration: 0.4, ease: CURVA }} className="overflow-hidden">
+                  <CabecalhoColunas
+                    grade={GRADE_ARVORE}
+                    ordem={ordem}
+                    ordenar={setOrdem}
+                    colunas={[
+                      { k: "tarefa", r: "Tarefa" },
+                      { k: "status", r: "Status" },
+                      { k: "prioridade", r: "Prioridade" },
+                      { k: "dono", r: "" },
+                      { k: "prazo", r: "Prazo", direita: true },
+                      { k: "atalhos", r: "" },
+                    ]}
+                  />
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+            <AnimatePresence initial={false}>{!fechados.has("sem-epico") ? ordena(SOLTAS).map((f, i, a) => linha(f, i === a.length - 1)) : null}</AnimatePresence>
+          </section>
+        ) : null}
       </div>
     </div>
   )
@@ -1170,7 +1214,10 @@ function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskT
   const HG = 40
   const largTempo = DIAS_LINHA * DIA_PX
   // as linhas, na ordem da árvore: o épico vira faixa de grupo
-  const linhas = FAMILIA
+  // a ordem da árvore, com a faixa "Sem épico" antes das tarefas soltas
+  const SEM: TaskTableTask = { id: "sem-epico", code: "", title: "Sem épico", depth: 0, kind: "epic", status: "active" }
+  const comEpico = FAMILIA.filter((t) => !SOLTAS.includes(t) && !SOLTAS.some((x) => x.id === t.parentId))
+  const linhas = [...comEpico, SEM, ...SOLTAS.flatMap((t) => [t, ...filhosDe(t.id)])]
   let y = 0
   const posY = new Map<string, number>()
   linhas.forEach((t) => {
@@ -1236,12 +1283,12 @@ function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskT
                 return (
                   <div key={t.id} className="absolute inset-x-0 flex" style={{ top, height: HG, borderTop: i ? "1px solid var(--ds-fio)" : undefined, borderBottom: "1px solid var(--ds-fio)", background: "color-mix(in oklab, var(--ds-trilho) 60%, transparent)" }}>
                     <div className="sticky left-0 z-10 -mb-px flex shrink-0 items-center gap-2.5 px-5" style={{ width: NOME_LARG, background: "var(--ds-placa-solida)", boxShadow: "1px 0 0 var(--ds-fio), inset 0 -1px 0 var(--ds-fio)" }}>
-                      <Flag size={13} weight="fill" style={{ color: "var(--primary)" }} />
-                      <Etiqueta cor="var(--primary)">{t.title}</Etiqueta>
+                      {t.start ? <Flag size={13} weight="fill" style={{ color: "var(--primary)" }} /> : null}
+                      <Etiqueta cor={t.start ? "var(--primary)" : "var(--ds-tinta-2)"}>{t.title}</Etiqueta>
                     </div>
-                    <span className="absolute z-[1] h-1.5 overflow-hidden rounded-full" style={{ left: NOME_LARG + diaDe(t.start) * DIA_PX, width: (diaDe(t.end) - diaDe(t.start) + 1) * DIA_PX, top: HG / 2 - 3, background: "var(--ds-trilho-forte)" }}>
+                    {t.start ? <span className="absolute z-[1] h-1.5 overflow-hidden rounded-full" style={{ left: NOME_LARG + diaDe(t.start) * DIA_PX, width: (diaDe(t.end) - diaDe(t.start) + 1) * DIA_PX, top: HG / 2 - 3, background: "var(--ds-trilho-forte)" }}>
                       <motion.span className="absolute inset-y-0 left-0 rounded-full" initial={{ width: 0 }} animate={{ width: `${(t.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1.1, ease: CURVA }} style={{ background: "var(--primary)" }} />
-                    </span>
+                    </span> : null}
                   </div>
                 )
               }
@@ -1264,7 +1311,7 @@ function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskT
                     <motion.span className="absolute inset-y-0 left-0" initial={{ width: 0 }} animate={{ width: `${prog * 100}%` }} transition={{ duration: 1.1, ease: CURVA, delay: 0.15 + 0.05 * i }} style={{ background: `color-mix(in oklab, var(--tone-${tom}-dot) 35%, transparent)` }} />
                     {(fim - ini) * DIA_PX > 90 ? (
                       <span className="relative flex h-full items-center px-2.5 font-mono text-[10.5px]" style={{ color: `var(--tone-${tom}-foreground)` }}>
-                        {t.owner?.initials} · {t.due}
+                        {[t.owner?.initials, t.due].filter(Boolean).join(" · ")}
                       </span>
                     ) : null}
                   </motion.span>
