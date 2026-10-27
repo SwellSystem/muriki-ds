@@ -26,7 +26,11 @@ import {
 
 import { MurikiLogo } from "@/components/ui/muriki-logo"
 import type { TaskTableStatus, TaskTableTask } from "@/components/blocks/task-table"
-import { KanbanBoard, type KanbanTask } from "@/components/blocks/kanban"
+import type { KanbanColumnSpec, KanbanTask } from "@/components/blocks/kanban"
+import { flattenColumns, moveTaskLocally, type KanbanColumnState } from "@/components/blocks/kanban/kanban-drop"
+import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useDroppable, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent } from "@dnd-kit/core"
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 /* Estudo livre do DS novo, na linguagem que nasceu da rivio.com.br:
    camadas, atmosfera, calma, e o desfoque nas trocas. Duas telas do mesmo
@@ -611,10 +615,14 @@ const FAMILIA: TaskTableTask[] = [
   tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, owner: { initials: "LP", tone: "a4" }, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
 ]
 const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
-const INICIO_MES = new Date("2026-11-01")
-const DIAS_MES = 30
+// data local: new Date("2026-11-01") é meia-noite UTC, e no Brasil vira 31 out
+const INICIO_MES = new Date(2026, 10, 1)
 const HOJE_DIA = 9
-const diaDe = (iso?: string) => (iso ? Math.round((new Date(iso).getTime() - INICIO_MES.getTime()) / 86400000) : 0)
+const diaDe = (iso?: string) => {
+  if (!iso) return 0
+  const [a, m, d] = iso.split("-").map(Number)
+  return Math.round((new Date(a, m - 1, d).getTime() - INICIO_MES.getTime()) / 86400000)
+}
 const filhosDe = (id: string) => FAMILIA.filter((x) => x.parentId === id)
 
 /** Tooltip que chega desfocado: o nome do atalho, já que o atalho é só ícone. */
@@ -888,24 +896,194 @@ function ArvoreFamilia({
   )
 }
 
-/** O quadro é o KanbanBoard do registry, o mesmo do Platform: arrastar
-    entre colunas, "Solte aqui.", coluna vazia, concluir no card. Aqui só
-    os dados da família viram KanbanTask; nada redesenhado. */
-const COLUNAS_KANBAN = (["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((st) => ({ id: st, name: ST_F[st].rotulo, color: `var(--tone-${ST_F[st].tom}-dot)` }))
-const PRIO_KANBAN = { urgent: "urgent", high: "high", medium: "medium", low: "low", none: "none" } as const
+// ── o quadro: a versão nova do kanban, mesma API ─────────────────────────
 
-function QuadroFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void }) {
-  const [cards, setCards] = React.useState<KanbanTask[]>(() =>
+/** O card do quadro, com a cara aprovada: código e avatar em cima, título,
+    e prioridade · prazo em mono embaixo. `assignee` é o único campo a mais
+    que o KanbanTask do registry: opcional, quem não manda não ganha avatar. */
+type CardQuadro = KanbanTask & { assignee?: { initials: string; tone: string } }
+const PRIO_ROTULO: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "" }
+const VAZIAS = ["Um respiro.", "Vazio por enquanto.", "Silêncio."]
+
+function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle }: { c: CardQuadro; fantasma?: boolean; solto?: boolean; onClick?: () => void; onToggle?: () => void }) {
+  const feito = c.progress === 100
+  return (
+    <div
+      onClick={onClick}
+      className="flex cursor-grab flex-col gap-3 rounded-[10px] p-4 text-left transition-[opacity,box-shadow] duration-300 active:cursor-grabbing"
+      style={{
+        background: "var(--ds-placa-solida)",
+        boxShadow: solto ? "inset 0 0 0 1.5px var(--primary), 0 30px 60px -20px var(--ds-sombra)" : "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)",
+        opacity: fantasma ? 0.35 : 1,
+        filter: fantasma ? "blur(1px)" : undefined,
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-2">
+          <button type="button" aria-label={feito ? "Reabrir" : "Concluir"} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onToggle?.())} className="grid size-[18px] place-items-center rounded-full transition-[background-color,box-shadow] duration-300" style={{ background: feito ? "var(--success)" : "transparent", boxShadow: feito ? "0 0 0 1px var(--success)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "white" }}>
+            <AnimatePresence>{feito ? <motion.span initial={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.3, ease: CURVA }}><Check size={10} weight="bold" /></motion.span> : null}</AnimatePresence>
+          </button>
+          <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {c.slug}
+          </span>
+        </span>
+        {c.assignee ? <Avatar iniciais={c.assignee.initials} tom={c.assignee.tone} /> : null}
+      </div>
+      <span className="text-[14.5px] leading-snug transition-colors duration-300" style={{ color: feito ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+        {c.title}
+      </span>
+      <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+        {[PRIO_ROTULO[c.priority], c.timeLabel].filter(Boolean).join(" · ")}
+      </span>
+    </div>
+  )
+}
+
+function CardArrastavel({ c, onClick, onToggle }: { c: CardQuadro; onClick: () => void; onToggle: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: c.slug })
+  return (
+    <motion.div layout="position" transition={{ duration: 0.4, ease: CURVA }} ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} {...attributes} {...listeners}>
+      <CardQuadroView c={c} fantasma={isDragging} onClick={onClick} onToggle={onToggle} />
+    </motion.div>
+  )
+}
+
+function ColunaQuadro({ col, alvo, arrastando, onCard, onToggle, onAdd }: { col: KanbanColumnState; alvo: boolean; arrastando: boolean; onCard: (c: CardQuadro) => void; onToggle: (c: CardQuadro) => void; onAdd?: () => void }) {
+  const { setNodeRef } = useDroppable({ id: col.id })
+  const vazia = col.tasks.length === 0
+  return (
+    <motion.div
+      ref={setNodeRef}
+      animate={{ opacity: arrastando && !alvo ? 0.55 : 1 }}
+      transition={{ duration: 0.3 }}
+      className="flex w-[272px] shrink-0 flex-col gap-3 rounded-[12px] p-3 transition-[box-shadow,background-color] duration-300"
+      style={{ background: alvo ? "color-mix(in oklab, var(--primary) 7%, var(--ds-trilho))" : "var(--ds-trilho)", boxShadow: alvo ? "inset 0 0 0 1.5px var(--primary)" : "inset 0 0 0 1px var(--ds-fio)" }}
+    >
+      <div className="flex h-9 items-center justify-between px-2">
+        <Etiqueta cor={col.color ?? "var(--ds-tinta-2)"}>{col.name}</Etiqueta>
+        <span className="flex items-center gap-2">
+          <AnimatePresence mode="wait">
+            <motion.span key={col.tasks.length} initial={{ opacity: 0.2, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={CHEGADA} className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {col.tasks.length}
+            </motion.span>
+          </AnimatePresence>
+          {onAdd ? (
+            <button type="button" onClick={onAdd} aria-label={`Novo card em ${col.name}`} className="grid size-6 place-items-center rounded-[6px] hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta-2)" }}>
+              <Plus size={13} />
+            </button>
+          ) : null}
+        </span>
+      </div>
+      <SortableContext items={col.tasks.map((t) => t.slug)} strategy={verticalListSortingStrategy}>
+        {(col.tasks as CardQuadro[]).map((c) => (
+          <CardArrastavel key={c.slug} c={c} onClick={() => onCard(c)} onToggle={() => onToggle(c)} />
+        ))}
+      </SortableContext>
+      {vazia ? (
+        <div className="grid min-h-[96px] place-items-center rounded-[10px] text-[13px] italic" style={{ color: "var(--ds-tinta-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)", borderStyle: "dashed" }}>
+          <AnimatePresence mode="wait">
+            <motion.span key={alvo ? "solte" : "vazia"} initial={{ opacity: 0, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={CHEGADA}>
+              {alvo ? "Solte aqui." : VAZIAS[col.id.length % VAZIAS.length]}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+      ) : null}
+    </motion.div>
+  )
+}
+
+/** A versão nova do KanbanBoard: a MESMA API (columns, tasks, onTasksChange,
+    onMoved, onToggleDone, onAddCard, onCardClick) e a mesma lógica de soltar
+    (kanban-drop do registry), com o desenho da linguagem. Ao soltar numa
+    coluna nova, o card chega desfocado no lugar. */
+function QuadroFaixas({ columns, tasks, onTasksChange, onMoved, onToggleDone, onAddCard, onCardClick }: { columns: KanbanColumnSpec[]; tasks: CardQuadro[]; onTasksChange?: (t: CardQuadro[]) => void; onMoved?: (t: CardQuadro, coluna: string) => void; onToggleDone?: (slug: string, next: boolean) => void; onAddCard?: (colunaId: string) => void; onCardClick?: (t: CardQuadro) => void }) {
+  const base = React.useMemo<KanbanColumnState[]>(() => columns.map((c) => ({ ...c, tasks: tasks.filter((t) => t.statusId === c.id) })), [columns, tasks])
+  const [local, setLocal] = React.useState<KanbanColumnState[] | null>(null)
+  const [ativo, setAtivo] = React.useState<CardQuadro | null>(null)
+  const [alvo, setAlvo] = React.useState<string | null>(null)
+  const [aviso, setAviso] = React.useState("")
+  const cols = local ?? base
+  const sensores = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor))
+  const colunaDe = (id: string) => cols.find((c) => c.id === id || c.tasks.some((t) => t.slug === id))?.id ?? null
+
+  const inicio = (e: DragStartEvent) => {
+    setAtivo(tasks.find((t) => t.slug === e.active.id) ?? null)
+    setLocal(base)
+  }
+  const sobre = (e: DragOverEvent) => {
+    if (!e.over) return
+    setAlvo(colunaDe(String(e.over.id)))
+    setLocal((c) => moveTaskLocally(c ?? base, String(e.active.id), String(e.over!.id)))
+  }
+  const fim = (e: DragEndEvent) => {
+    const final = local ?? base
+    const plano = flattenColumns(final) as CardQuadro[]
+    const movido = plano.find((t) => t.slug === e.active.id)
+    if (movido && ativo && movido.statusId !== ativo.statusId) {
+      const nome = columns.find((c) => c.id === movido.statusId)?.name ?? ""
+      onMoved?.(movido, nome)
+      setAviso(`${movido.title} movida para ${nome}`)
+    }
+    onTasksChange?.(plano)
+    setLocal(null)
+    setAtivo(null)
+    setAlvo(null)
+  }
+
+  return (
+    <DndContext sensors={sensores} collisionDetection={closestCorners} onDragStart={inicio} onDragOver={sobre} onDragEnd={fim} onDragCancel={() => (setLocal(null), setAtivo(null), setAlvo(null))}>
+      <div className="muriki-scroll -mx-8 flex gap-4 overflow-x-auto px-8 pb-2">
+        {cols.map((col) => (
+          <ColunaQuadro
+            key={col.id}
+            col={col}
+            alvo={alvo === col.id}
+            arrastando={ativo !== null}
+            onCard={(c) => onCardClick?.(c)}
+            onToggle={(c) => onToggleDone?.(c.slug, c.progress !== 100)}
+            onAdd={onAddCard ? () => onAddCard(col.id) : undefined}
+          />
+        ))}
+      </div>
+      <DragOverlay dropAnimation={{ duration: 300, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
+        {ativo ? (
+          <div style={{ rotate: "-2deg", scale: "1.03" }}>
+            <CardQuadroView c={ativo} solto />
+          </div>
+        ) : null}
+      </DragOverlay>
+      <div role="status" aria-live="polite" className="sr-only">
+        {aviso}
+      </div>
+    </DndContext>
+  )
+}
+
+const COLUNAS_QUADRO: KanbanColumnSpec[] = (["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((st) => ({ id: st, name: ST_F[st].rotulo, color: `var(--tone-${ST_F[st].tom}-dot)` }))
+
+function QuadroFamilia({ feitas, abrir, avisar }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void; avisar: (t: string) => void }) {
+  const [cards, setCards] = React.useState<CardQuadro[]>(() =>
     FAMILIA.filter((t) => t.depth > 0).map((t) => {
       const st = feitas.has(t.id) ? "done" : t.status
-      return { slug: t.code, title: t.title, priority: PRIO_KANBAN[t.priority ?? "none"], progress: st === "done" ? 100 : Math.round((t.progressRatio ?? 0) * 100), timeLabel: t.due, statusId: st }
+      return {
+        slug: t.code,
+        title: t.title,
+        priority: (t.priority ?? "none") as KanbanTask["priority"],
+        progress: st === "done" ? 100 : Math.round((t.progressRatio ?? 0) * 100),
+        timeLabel: t.due,
+        statusId: st,
+        assignee: t.owner ? { initials: t.owner.initials, tone: TOM_DONO[t.owner.tone ?? "a4"] } : undefined,
+      }
     })
   )
   return (
-    <KanbanBoard
-      columns={COLUNAS_KANBAN}
+    <QuadroFaixas
+      columns={COLUNAS_QUADRO}
       tasks={cards}
       onTasksChange={setCards}
+      onMoved={(c, col) => avisar(`${c.slug} foi para ${col}`)}
+      onToggleDone={(slug, next) => setCards((cs) => cs.map((c) => (c.slug === slug ? { ...c, progress: next ? 100 : 0 } : c)))}
+      onAddCard={(col) => avisar(`Novo card em ${COLUNAS_QUADRO.find((c) => c.id === col)?.name}`)}
       onCardClick={(c) => {
         const t = FAMILIA.find((x) => x.code === c.slug)
         if (t) abrir(t)
@@ -914,103 +1092,132 @@ function QuadroFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: Task
   )
 }
 
-/** A linha do tempo da família, no tom das faixas: por épico, uma placa;
-    à esquerda o nome, à direita a barra enchendo; vínculos tracejados; o
-    hoje em azul. Hover numa tarefa acende ela e os vínculos. */
+// ── a linha do tempo: a lista fica, o tempo rola ─────────────────────────
+
+const DIA_PX = 44
+const DIAS_LINHA = 45 // 1 nov a 15 dez
+const NOME_LARG = 300
+
+/** Uma placa só, com uma rolagem lateral: a coluna dos nomes fica presa na
+    esquerda (sticky), e a régua de datas e as barras rolam. A régua é o
+    cabeçalho da placa, presa em cima. Abre com o hoje no meio. */
 function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void }) {
   const ref = React.useRef<HTMLDivElement>(null)
-  const [larg, setLarg] = React.useState(700)
   const [foco, setFoco] = React.useState<string | null>(null)
   React.useLayoutEffect(() => {
     const el = ref.current
-    if (!el) return
-    const ro = new ResizeObserver(() => setLarg(el.clientWidth - 260))
-    ro.observe(el)
-    return () => ro.disconnect()
+    if (el) el.scrollLeft = Math.max(0, HOJE_DIA * DIA_PX - (el.clientWidth - NOME_LARG) / 2)
   }, [])
-  const px = Math.max(larg, 200) / DIAS_MES
   const ligados = foco ? new Set([foco, ...(FAMILIA.find((x) => x.id === foco)?.deps ?? []), ...FAMILIA.filter((x) => x.deps?.includes(foco)).map((x) => x.id)]) : null
-  const ordemLinhas = FAMILIA
   const H = 44
+  const HG = 40
+  const largTempo = DIAS_LINHA * DIA_PX
+  // as linhas, na ordem da árvore: o épico vira faixa de grupo
+  const linhas = FAMILIA
+  let y = 0
   const posY = new Map<string, number>()
+  linhas.forEach((t) => {
+    posY.set(t.id, y)
+    y += t.depth === 0 ? HG : H
+  })
+  const total = y
+  const nomesDia = (d: number) => {
+    const dt = new Date(INICIO_MES.getTime() + d * 86400000)
+    return { n: dt.getDate(), mes: dt.toLocaleDateString("pt-BR", { month: "short" }).replace(".", ""), fds: dt.getDay() === 0 || dt.getDay() === 6 }
+  }
+
   return (
-    <div ref={ref} className="flex flex-col gap-5">
-      <div className="sticky top-0 z-10 -mx-8 px-8" style={{ isolation: "isolate" }}>
-        <span aria-hidden className="absolute inset-x-0 top-0 -bottom-5 -z-10" style={{ background: "linear-gradient(to bottom, var(--ds-placa-1) 35%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", maskImage: "linear-gradient(to bottom, black 50%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent)" }} />
-        <div className="relative ml-[260px] h-10">
-          {[0, 7, 14, 21, 28].map((d) => (
-            <span key={d} className="absolute top-1/2 -translate-y-1/2 font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ left: d * px, color: "var(--ds-tinta-2)" }}>
-              {d + 1} nov
-            </span>
-          ))}
-          <span className="absolute top-1/2 flex -translate-y-1/2 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ left: HOJE_DIA * px - 3, color: "var(--primary)" }}>
-            <span className="size-1.5" style={{ background: "var(--primary)" }} /> hoje
-          </span>
-        </div>
-      </div>
-      {FAMILIA.filter((e) => e.depth === 0).map((e) => {
-        const linhas = ordemLinhas.filter((x) => x.depth > 0 && (x.parentId === e.id || FAMILIA.find((p) => p.id === x.parentId)?.parentId === e.id))
-        linhas.forEach((x, i) => posY.set(x.id, i))
-        return (
-          <section key={e.id} className="relative overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-            <header className="flex h-12 items-center gap-3 px-5" style={{ borderBottom: "1px solid var(--ds-fio)" }}>
-              <Flag size={14} weight="fill" style={{ color: "var(--primary)" }} />
-              <Etiqueta cor="var(--primary)">{e.title}</Etiqueta>
-            </header>
-            <div className="relative">
-              {/* o hoje atravessa a placa */}
-              <span className="pointer-events-none absolute top-0 bottom-0 z-10 w-0.5" style={{ left: 260 + HOJE_DIA * px, background: "var(--primary)", boxShadow: "0 0 10px color-mix(in oklab, var(--primary) 60%, transparent)" }} />
-              <svg className="pointer-events-none absolute top-0 left-[260px] z-0 overflow-visible" width={larg} height={linhas.length * H}>
-                {linhas.flatMap((t) =>
-                  (t.deps ?? []).map((d) => {
-                    const de = FAMILIA.find((x) => x.id === d)
-                    const a = posY.get(d)
-                    const b = posY.get(t.id)
-                    if (!de || a === undefined || b === undefined) return null
-                    const x1 = (diaDe(de.end) + 1) * px
-                    const x2 = diaDe(t.start) * px
-                    const y1 = a * H + H / 2
-                    const y2 = b * H + H / 2
-                    const meio = Math.max(x1 + 10, (x1 + x2) / 2)
-                    const aceso = ligados ? ligados.has(t.id) && ligados.has(d) : false
-                    return (
-                      <motion.path key={`${d}-${t.id}`} d={`M ${x1} ${y1} H ${meio} V ${y2} H ${x2 - 3}`} fill="none" strokeDasharray="4 4" animate={{ opacity: ligados && !aceso ? 0.15 : 1, stroke: aceso ? "var(--primary)" : "var(--ds-fio-forte)" }} transition={{ duration: 0.3 }} />
-                    )
-                  })
-                )}
-              </svg>
-              {linhas.map((t, i) => {
-                const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
-                const tom = ST_F[st].tom
-                const ini = diaDe(t.start)
-                const fim = diaDe(t.end) + 1
-                const recua = ligados && !ligados.has(t.id)
-                const prog = feitas.has(t.id) ? 1 : (t.progressRatio ?? 0)
+    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      <div ref={ref} className="muriki-scroll relative overflow-x-auto">
+        <div className="relative" style={{ width: NOME_LARG + largTempo }}>
+          {/* cabeçalho: o canto fixo e a régua que rola */}
+          <div className="sticky top-0 z-20 flex h-12" style={{ borderBottom: "1px solid var(--ds-fio)" }}>
+            <div className="sticky left-0 z-10 flex shrink-0 items-center px-5 font-mono text-[10px] tracking-[0.12em] uppercase" style={{ width: NOME_LARG, background: "var(--ds-placa-solida)", color: "var(--ds-tinta-2)", boxShadow: "1px 0 0 var(--ds-fio)" }}>
+              Tarefa
+            </div>
+            <div className="relative" style={{ width: largTempo }}>
+              {Array.from({ length: DIAS_LINHA }, (_, d) => {
+                const { n, mes, fds } = nomesDia(d)
+                const hoje = d === HOJE_DIA
                 return (
-                  <motion.div key={t.id} onClick={() => abrir(t)} onMouseEnter={() => setFoco(t.id)} onMouseLeave={() => setFoco(null)} animate={{ opacity: recua ? 0.35 : 1 }} transition={{ duration: 0.3 }} className="relative flex cursor-pointer items-center" style={{ height: H, borderTop: i ? "1px solid var(--ds-fio)" : undefined }}>
-                    <span className="flex w-[260px] shrink-0 items-center gap-2 truncate px-5 text-[13.5px]" style={{ paddingLeft: t.depth === 2 ? 44 : 20, color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-                      <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-                        {t.code}
-                      </span>
-                      <span className="truncate">{t.title}</span>
-                    </span>
-                    <motion.span
-                      className="absolute z-[1] overflow-hidden rounded-[8px]"
-                      initial={{ opacity: 0, filter: "blur(10px)" }}
-                      animate={{ opacity: 1, filter: "blur(0px)" }}
-                      transition={{ duration: 0.5, ease: CURVA, delay: 0.05 * i }}
-                      style={{ left: 260 + ini * px, width: (fim - ini) * px - 3, top: 10, height: 24, background: `var(--tone-${tom})`, boxShadow: foco === t.id ? `0 0 0 1.5px var(--tone-${tom}-dot), 0 8px 20px -8px var(--tone-${tom}-dot)` : `inset 0 0 0 1px color-mix(in oklab, var(--tone-${tom}-dot) 28%, transparent)` }}
-                    >
-                      <motion.span className="absolute inset-y-0 left-0" initial={{ width: 0 }} animate={{ width: `${prog * 100}%` }} transition={{ duration: 1.1, ease: CURVA, delay: 0.15 + 0.06 * i }} style={{ background: `color-mix(in oklab, var(--tone-${tom}-dot) 35%, transparent)` }} />
-                    </motion.span>
-                  </motion.div>
+                  <span key={d} className="absolute inset-y-0 flex flex-col items-center justify-center gap-0.5 font-mono" style={{ left: d * DIA_PX, width: DIA_PX, color: hoje ? "var(--primary)" : fds ? "color-mix(in oklab, var(--ds-tinta-2) 60%, transparent)" : "var(--ds-tinta-2)" }}>
+                    <span className="text-[9.5px] tracking-[0.1em] uppercase">{n === 1 || d === 0 ? mes : hoje ? "hoje" : ""}</span>
+                    <span className="text-[12px]" style={{ fontWeight: hoje ? 600 : 400 }}>{n}</span>
+                  </span>
                 )
               })}
             </div>
-          </section>
-        )
-      })}
-    </div>
+          </div>
+
+          {/* o corpo */}
+          <div className="relative" style={{ height: total }}>
+            {/* fins de semana, o hoje, os vínculos e as barras moram na área do tempo */}
+            <div className="absolute top-0 bottom-0" style={{ left: NOME_LARG, width: largTempo }}>
+              {Array.from({ length: DIAS_LINHA }, (_, d) => (nomesDia(d).fds ? <span key={d} className="absolute top-0 bottom-0" style={{ left: d * DIA_PX, width: DIA_PX, background: "var(--ds-trilho)" }} /> : null))}
+              <span className="absolute top-0 bottom-0 z-[2] w-0.5" style={{ left: HOJE_DIA * DIA_PX + DIA_PX / 2, background: "var(--primary)", boxShadow: "0 0 10px color-mix(in oklab, var(--primary) 60%, transparent)" }} />
+              <svg className="pointer-events-none absolute inset-0 z-[1] overflow-visible" width={largTempo} height={total}>
+                {linhas.flatMap((t) =>
+                  (t.deps ?? []).map((d) => {
+                    const de = FAMILIA.find((x) => x.id === d)
+                    if (!de) return null
+                    const x1 = (diaDe(de.end) + 1) * DIA_PX
+                    const x2 = diaDe(t.start) * DIA_PX
+                    const y1 = posY.get(d)! + H / 2
+                    const y2 = posY.get(t.id)! + H / 2
+                    const meio = Math.max(x1 + 10, (x1 + x2) / 2)
+                    const aceso = ligados ? ligados.has(t.id) && ligados.has(d) : false
+                    return <motion.path key={`${d}-${t.id}`} d={`M ${x1} ${y1} H ${meio} V ${y2} H ${x2 - 3}`} fill="none" strokeDasharray="4 4" animate={{ opacity: ligados && !aceso ? 0.15 : 1, stroke: aceso ? "var(--primary)" : "var(--ds-fio-forte)" }} transition={{ duration: 0.3 }} />
+                  })
+                )}
+              </svg>
+            </div>
+
+            {linhas.map((t, i) => {
+              const top = posY.get(t.id)!
+              if (t.depth === 0) {
+                // o épico: faixa de grupo atravessando, com a barra do épico fina
+                return (
+                  <div key={t.id} className="absolute inset-x-0 flex" style={{ top, height: HG, borderTop: i ? "1px solid var(--ds-fio)" : undefined, borderBottom: "1px solid var(--ds-fio)", background: "color-mix(in oklab, var(--ds-trilho) 60%, transparent)" }}>
+                    <div className="sticky left-0 z-10 -mb-px flex shrink-0 items-center gap-2.5 px-5" style={{ width: NOME_LARG, background: "var(--ds-placa-solida)", boxShadow: "1px 0 0 var(--ds-fio), inset 0 -1px 0 var(--ds-fio)" }}>
+                      <Flag size={13} weight="fill" style={{ color: "var(--primary)" }} />
+                      <Etiqueta cor="var(--primary)">{t.title}</Etiqueta>
+                    </div>
+                    <span className="absolute z-[1] h-1.5 overflow-hidden rounded-full" style={{ left: NOME_LARG + diaDe(t.start) * DIA_PX, width: (diaDe(t.end) - diaDe(t.start) + 1) * DIA_PX, top: HG / 2 - 3, background: "var(--ds-trilho-forte)" }}>
+                      <motion.span className="absolute inset-y-0 left-0 rounded-full" initial={{ width: 0 }} animate={{ width: `${(t.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1.1, ease: CURVA }} style={{ background: "var(--primary)" }} />
+                    </span>
+                  </div>
+                )
+              }
+              const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+              const tom = ST_F[st].tom
+              const ini = diaDe(t.start)
+              const fim = diaDe(t.end) + 1
+              const recua = ligados && !ligados.has(t.id)
+              const prog = feitas.has(t.id) ? 1 : (t.progressRatio ?? 0)
+              return (
+                <motion.div key={t.id} onClick={() => abrir(t)} onMouseEnter={() => setFoco(t.id)} onMouseLeave={() => setFoco(null)} animate={{ opacity: recua ? 0.35 : 1 }} transition={{ duration: 0.3 }} className="absolute inset-x-0 flex cursor-pointer" style={{ top, height: H, borderBottom: "1px solid var(--ds-fio)" }}>
+                  <div className="sticky left-0 z-10 -mb-px flex shrink-0 items-center gap-2 truncate pr-4 text-[13.5px]" style={{ width: NOME_LARG, paddingLeft: t.depth === 2 ? 46 : 22, background: "var(--ds-placa-solida)", boxShadow: "1px 0 0 var(--ds-fio), inset 0 -1px 0 var(--ds-fio)", color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+                    <span className="size-1.5 shrink-0 rounded-full" style={{ background: `var(--tone-${tom}-dot)` }} />
+                    <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                      {t.code}
+                    </span>
+                    <span className="truncate">{t.title}</span>
+                  </div>
+                  <motion.span className="absolute z-[3] overflow-hidden rounded-[8px]" initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={{ duration: 0.5, ease: CURVA, delay: 0.04 * i }} style={{ left: NOME_LARG + ini * DIA_PX + 3, width: (fim - ini) * DIA_PX - 6, top: 9, height: 26, background: `var(--tone-${tom})`, boxShadow: foco === t.id ? `0 0 0 1.5px var(--tone-${tom}-dot), 0 8px 20px -8px var(--tone-${tom}-dot)` : `inset 0 0 0 1px color-mix(in oklab, var(--tone-${tom}-dot) 28%, transparent)` }}>
+                    <motion.span className="absolute inset-y-0 left-0" initial={{ width: 0 }} animate={{ width: `${prog * 100}%` }} transition={{ duration: 1.1, ease: CURVA, delay: 0.15 + 0.05 * i }} style={{ background: `color-mix(in oklab, var(--tone-${tom}-dot) 35%, transparent)` }} />
+                    {(fim - ini) * DIA_PX > 90 ? (
+                      <span className="relative flex h-full items-center px-2.5 font-mono text-[10.5px]" style={{ color: `var(--tone-${tom}-foreground)` }}>
+                        {t.owner?.initials} · {t.due}
+                      </span>
+                    ) : null}
+                  </motion.span>
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -1127,7 +1334,7 @@ function TelaTarefas() {
               ) : vista === "lista" ? (
                 <ArvoreFamilia fechados={fechados} alternar={alternar} feitas={feitas} salvando={salvando} concluir={concluir} abrir={setAberta} acao={acao} />
               ) : vista === "quadro" ? (
-                <QuadroFamilia feitas={feitas} abrir={setAberta} />
+                <QuadroFamilia feitas={feitas} abrir={setAberta} avisar={avisar} />
               ) : (
                 <LinhaFamilia feitas={feitas} abrir={setAberta} />
               )}
