@@ -25,6 +25,10 @@ import { MurikiLogo } from "@/components/ui/muriki-logo"
    ui/ de propósito: primeiro a forma, depois os componentes. */
 
 const CURVA = [0.16, 1, 0.3, 1] as [number, number, number, number]
+/* A troca de um item pequeno (o nome no nav, a opção escolhida): mais
+   longa e suave que a CURVA, que resolve quase tudo no começo — com ela o
+   desfoque de um texto curto sumia em ~60ms e ninguém via. */
+const CHEGADA = { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] }
 
 /* O desfoque das trocas: o que sai desfoca e sobe, o que entra chega
    desfocado e assenta. */
@@ -276,9 +280,9 @@ function Escolha<V extends string>({ id, opcoes, valor, onChange }: { id: string
             {/* a opção que acaba de ser escolhida chega desfocada: a troca é sempre pelo desfoque */}
             <motion.span
               key={ativo ? "ativo" : "inativo"}
-              initial={ativo ? { opacity: 0, filter: "blur(6px)" } : false}
+              initial={ativo ? { opacity: 0.2, filter: "blur(8px)" } : false}
               animate={{ opacity: 1, filter: "blur(0px)" }}
-              transition={{ duration: 0.35, ease: CURVA }}
+              transition={CHEGADA}
               className="relative flex items-center gap-2"
             >
               {o.tom ? <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${o.tom}-dot)` }} /> : null}
@@ -1269,10 +1273,17 @@ function App() {
               {ativo ? (
                 <motion.span layoutId="nav" className="absolute inset-0 rounded-[9px]" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 4px 14px -8px var(--ds-sombra)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} />
               ) : null}
-              <span className="relative flex items-center gap-3">
+              {/* o item que acaba de ser escolhido chega desfocado, junto com a pílula que desliza */}
+              <motion.span
+                key={ativo ? "ativo" : "inativo"}
+                initial={ativo ? { opacity: 0.2, filter: "blur(8px)", x: -4 } : false}
+                animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
+                transition={CHEGADA}
+                className="relative flex items-center gap-3"
+              >
                 {n.i}
                 {n.r}
-              </span>
+              </motion.span>
             </button>
           )
         })}
