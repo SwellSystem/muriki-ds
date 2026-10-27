@@ -1,0 +1,879 @@
+import * as React from "react"
+import { createRoot } from "react-dom/client"
+import { AnimatePresence, motion } from "framer-motion"
+import {
+  AddressBook,
+  CalendarBlank,
+  CaretDown,
+  ChartBar,
+  Check,
+  House,
+  Kanban,
+  ListChecks,
+  MagnifyingGlass,
+  Plus,
+  Users,
+  X,
+} from "@phosphor-icons/react"
+
+import { MurikiLogo } from "@/components/ui/muriki-logo"
+
+/* Estudo livre do DS novo, na linguagem que nasceu da rivio.com.br:
+   camadas, atmosfera, calma, e o desfoque nas trocas. Duas telas do mesmo
+   padrão — as tarefas do Platform e os clientes do Backoffice — para ver se
+   as faixas deitadas servem de molde de cadastro. Não usa os componentes do
+   ui/ de propósito: primeiro a forma, depois os componentes. */
+
+const CURVA = [0.16, 1, 0.3, 1] as [number, number, number, number]
+
+/* O desfoque das trocas: o que sai desfoca e sobe, o que entra chega
+   desfocado e assenta. */
+const troca = {
+  initial: { opacity: 0, filter: "blur(14px)", y: 10 },
+  animate: { opacity: 1, filter: "blur(0px)", y: 0 },
+  exit: { opacity: 0, filter: "blur(14px)", y: -10 },
+  transition: { duration: 0.42, ease: CURVA },
+}
+
+const placa = (fundo = "var(--ds-placa-1)") => ({
+  background: fundo,
+  backdropFilter: "blur(30px) saturate(1.3)",
+  WebkitBackdropFilter: "blur(30px) saturate(1.3)",
+  boxShadow: "inset 0 0 0 1px var(--ds-fio)",
+})
+
+/** Carregando por um instante sempre que a chave muda: abrir a tela,
+    trocar de faixa, trocar de vista. Simula a ida ao servidor. */
+function useCarregando(chave: string, ms = 750) {
+  const [carregando, setCarregando] = React.useState(true)
+  React.useEffect(() => {
+    setCarregando(true)
+    const t = setTimeout(() => setCarregando(false), ms)
+    return () => clearTimeout(t)
+  }, [chave, ms])
+  return carregando
+}
+
+// ── peças ────────────────────────────────────────────────────────────────
+
+/** A atmosfera: luz quente entrando em faixas, como sol por persiana. */
+function Atmosfera() {
+  return (
+    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[var(--ds-chao)]">
+      <div
+        className="absolute -inset-[10%] blur-[48px]"
+        style={{
+          background:
+            "repeating-linear-gradient(104deg, transparent 0 7vw, var(--ds-luz) 7vw 12vw, transparent 12vw 19vw, var(--ds-madeira) 19vw 21vw, transparent 21vw 30vw)",
+          opacity: 0.9,
+        }}
+      />
+      <div className="absolute inset-0" style={{ background: "radial-gradient(120% 80% at 70% -10%, var(--ds-luz-forte), transparent 60%)" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(to top, var(--ds-chao), transparent 45%)" }} />
+    </div>
+  )
+}
+
+function Etiqueta({ children, cor = "var(--ds-tinta-2)" }: { children: React.ReactNode; cor?: string }) {
+  return (
+    <span className="inline-flex items-center gap-2 font-mono text-[11px] tracking-[0.1em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+      <span className="size-1.5" style={{ background: cor }} />
+      {children}
+    </span>
+  )
+}
+
+function Selo({ rotulo, tom }: { rotulo: string; tom: string }) {
+  return (
+    <span
+      className="inline-flex h-7 w-fit items-center gap-2 rounded-[7px] px-2.5 text-[12.5px]"
+      style={{ background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` }}
+    >
+      <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${tom}-dot)` }} />
+      {rotulo}
+    </span>
+  )
+}
+
+function Avatar({ iniciais, tom }: { iniciais: string; tom?: string }) {
+  return (
+    <span
+      className="grid size-8 shrink-0 place-items-center rounded-full font-mono text-[10.5px] ring-1 ring-[var(--ds-fio)]"
+      style={tom ? { background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` } : { background: "var(--ds-placa-2)", color: "var(--ds-tinta)" }}
+    >
+      {iniciais}
+    </span>
+  )
+}
+
+function Caixa({ marcada, onChange }: { marcada: boolean; onChange: () => void }) {
+  return (
+    <button
+      role="checkbox"
+      aria-checked={marcada}
+      onClick={(e) => {
+        e.stopPropagation()
+        onChange()
+      }}
+      className="grid size-[18px] shrink-0 place-items-center rounded-[5px] transition-colors"
+      style={{
+        background: marcada ? "var(--primary)" : "transparent",
+        boxShadow: marcada ? "0 0 0 1px var(--primary)" : "inset 0 0 0 1.5px var(--ds-fio-forte)",
+        color: "var(--primary-foreground)",
+      }}
+    >
+      {marcada ? <Check size={12} weight="bold" /> : null}
+    </button>
+  )
+}
+
+function Botao({ children, solido = false, onClick }: { children: React.ReactNode; solido?: boolean; onClick?: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="inline-flex h-10 items-center gap-2 rounded-[10px] px-4 text-[14px] whitespace-nowrap transition-[background-color,box-shadow,transform] active:scale-[0.98]"
+      style={
+        solido
+          ? { background: "var(--primary)", color: "var(--primary-foreground)", boxShadow: "0 8px 22px -8px color-mix(in oklab, var(--primary) 60%, transparent)" }
+          : { background: "var(--ds-placa-2)", color: "var(--ds-tinta)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }
+      }
+    >
+      {children}
+    </button>
+  )
+}
+
+function Busca({ texto }: { texto: string }) {
+  return (
+    <div className="flex h-10 w-64 items-center gap-2 rounded-[10px] px-3.5 text-[14px] whitespace-nowrap" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)", color: "var(--ds-tinta-2)" }}>
+      <MagnifyingGlass size={16} /> {texto}
+    </div>
+  )
+}
+
+/** A troca de vista: pílula que desliza num trilho, 40px de altura. */
+function Vistas({ valor, onChange }: { valor: string; onChange: (v: string) => void }) {
+  const opcoes = [
+    { v: "lista", rotulo: "Lista", icone: <ListChecks size={16} /> },
+    { v: "quadro", rotulo: "Quadro", icone: <Kanban size={16} /> },
+  ]
+  return (
+    <div className="flex h-10 items-center rounded-[10px] p-1" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      {opcoes.map((o) => (
+        <button key={o.v} onClick={() => onChange(o.v)} className="relative flex h-8 items-center gap-2 px-3.5 text-[13.5px]" style={{ color: valor === o.v ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+          {valor === o.v ? (
+            <motion.span layoutId="vista" className="absolute inset-0 rounded-[7px]" style={{ background: "var(--ds-placa-forte)", boxShadow: "0 2px 8px -2px var(--ds-sombra), inset 0 0 0 1px var(--ds-fio)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} />
+          ) : null}
+          <span className="relative flex items-center gap-2">
+            {o.icone}
+            {o.rotulo}
+          </span>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ── o skeleton ───────────────────────────────────────────────────────────
+
+/** Um osso: a forma do que vai chegar, desfocada, com um brilho passando
+    da esquerda para a direita — a mesma direção da faixa carregando. */
+function Osso({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <span className={`relative block overflow-hidden rounded-[6px] ${className}`} style={{ background: "var(--ds-osso)", filter: "blur(1.5px)", ...style }}>
+      <motion.span
+        aria-hidden
+        className="absolute inset-y-0 w-1/2"
+        style={{ background: "linear-gradient(90deg, transparent, var(--ds-osso-brilho), transparent)" }}
+        initial={{ x: "-100%" }}
+        animate={{ x: "300%" }}
+        transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity }}
+      />
+    </span>
+  )
+}
+
+/** O esqueleto da lista: o mesmo contorno das placas e das linhas, com
+    ossos no lugar do texto. Quando o conteúdo chega, ele assenta por cima
+    com o desfoque da troca. */
+function EsqueletoLista({ grupos = 2, linhas = 5, colunas }: { grupos?: number; linhas?: number; colunas: string }) {
+  return (
+    <div className="flex flex-col gap-5" aria-busy="true" aria-label="Carregando">
+      {Array.from({ length: grupos }, (_, g) => (
+        <section key={g} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+          <header className="flex h-12 items-center justify-between px-5">
+            <Osso className="h-2.5 w-40" />
+            <Osso className="h-1.5 w-24" />
+          </header>
+          {Array.from({ length: linhas }, (_, l) => (
+            <div key={l} className={`grid h-[52px] items-center gap-4 px-5 ${colunas}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
+              <Osso className="size-[18px]" />
+              <Osso className="h-2.5 w-14" />
+              <Osso className="h-3" style={{ width: `${55 + ((l * 17 + g * 11) % 35)}%` }} />
+              <Osso className="h-7 w-24 rounded-[7px]" />
+              <Osso className="h-2.5 w-14" />
+              <Osso className="size-7 rounded-full" />
+              <Osso className="ml-auto h-2.5 w-12" />
+            </div>
+          ))}
+        </section>
+      ))}
+    </div>
+  )
+}
+
+// ── as faixas deitadas ───────────────────────────────────────────────────
+
+interface ItemFaixa {
+  id: string
+  nome: string
+  tom: string
+  /** O que a faixa fechada diz em mono, ao lado do nome. */
+  resumo: string
+  /** O quanto a faixa enche, de 0 a 1. */
+  fracao: number
+  /** O número da ponta direita. */
+  valor: string
+}
+
+/** O item recolhido: faixa deitada com o número, o nome e a fração
+    carregando da esquerda para a direita. Clicada, cresce até virar a área. */
+function Faixa({ item, n, abrir }: { item: ItemFaixa; n: number; abrir: () => void }) {
+  return (
+    <motion.button
+      layoutId={`faixa-${item.id}`}
+      onClick={abrir}
+      transition={{ duration: 0.55, ease: CURVA }}
+      whileHover={{ scale: 1.005 }}
+      className="relative flex h-16 shrink-0 items-center gap-5 overflow-hidden rounded-[14px] px-8 text-left"
+      style={{ ...placa(), color: "var(--ds-tinta-forte)" }}
+    >
+      <motion.span
+        aria-hidden
+        className="absolute inset-y-0 left-0"
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.max(item.fracao, 0.02) * 100}%` }}
+        transition={{ duration: 1.1, ease: CURVA, delay: 0.2 + n * 0.08 }}
+        style={{ background: `color-mix(in oklab, var(--tone-${item.tom}) 70%, transparent)` }}
+      />
+      <motion.span className="relative flex flex-1 items-center gap-5" initial={{ opacity: 0, filter: "blur(10px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={{ duration: 0.5, delay: 0.1 + n * 0.05 }}>
+        <span className="w-6 text-[22px] font-light tabular-nums" style={{ color: "var(--ds-tinta-2)" }}>
+          {n}
+        </span>
+        <span className="flex items-center gap-2 font-mono text-[12px] tracking-[0.14em] uppercase">
+          <span className="size-1.5" style={{ background: `var(--tone-${item.tom}-dot)` }} />
+          {item.nome}
+        </span>
+        <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+          {item.resumo}
+        </span>
+        <span className="ml-auto font-mono text-[12px] tabular-nums" style={{ color: "var(--ds-tinta)" }}>
+          {item.valor}
+        </span>
+      </motion.span>
+    </motion.button>
+  )
+}
+
+/** A pilha: o item em foco cresce na vertical e abre o corpo; os outros
+    ficam em faixas finas acima e abaixo. Faixa e área são a mesma peça
+    (layoutId). Recua e desfoca quando algo abre na frente. */
+function Faixas({
+  itens,
+  focoId,
+  onFoco,
+  recua,
+  onFundo,
+  acoes,
+  corpo,
+}: {
+  itens: ItemFaixa[]
+  focoId: string
+  onFoco: (id: string) => void
+  recua: boolean
+  onFundo: () => void
+  acoes: React.ReactNode
+  corpo: (item: ItemFaixa) => React.ReactNode
+}) {
+  return (
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5">
+      {itens.map((item, i) =>
+        item.id === focoId ? (
+          <motion.main
+            key={item.id}
+            layoutId={`faixa-${item.id}`}
+            animate={recua ? { filter: "blur(3px)", scale: 0.985, opacity: 0.7 } : { filter: "blur(0px)", scale: 1, opacity: 1 }}
+            transition={{ duration: 0.55, ease: CURVA }}
+            onClick={() => recua && onFundo()}
+            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]"
+            style={placa()}
+          >
+            <motion.header {...troca} className="flex items-end justify-between gap-6 px-8 pt-6 pb-5">
+              <div className="flex items-baseline gap-4">
+                <span className="text-[22px] font-light tabular-nums" style={{ color: "var(--ds-tinta-2)" }}>
+                  {i + 1}
+                </span>
+                <div className="flex flex-col gap-2">
+                  <Etiqueta cor={`var(--tone-${item.tom}-dot)`}>
+                    {item.resumo} · {item.valor}
+                  </Etiqueta>
+                  <h1 className="text-[38px] leading-none font-light tracking-[-0.035em]" style={{ color: "var(--ds-tinta-forte)" }}>
+                    {item.nome}
+                  </h1>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">{acoes}</div>
+            </motion.header>
+            <div className="min-h-0 flex-1 overflow-auto px-8 pb-8">{corpo(item)}</div>
+          </motion.main>
+        ) : (
+          <Faixa key={item.id} item={item} n={i + 1} abrir={() => onFoco(item.id)} />
+        )
+      )}
+    </div>
+  )
+}
+
+/** A camada da frente: o que foi aberto, sobre a área que recuou. */
+function Frente({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.aside
+      initial={{ opacity: 0, x: 40, filter: "blur(16px)" }}
+      animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+      exit={{ opacity: 0, x: 40, filter: "blur(16px)" }}
+      transition={{ duration: 0.45, ease: CURVA }}
+      className="absolute inset-y-4 right-4 z-20 flex w-[440px] flex-col gap-6 rounded-[14px] p-7"
+      style={{ ...placa("var(--ds-placa-forte)"), boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 40px 80px -30px var(--ds-sombra)" }}
+    >
+      {children}
+    </motion.aside>
+  )
+}
+
+function CabecalhoFrente({ etiqueta, tom, titulo, fechar }: { etiqueta: string; tom: string; titulo: string; fechar: () => void }) {
+  return (
+    <>
+      <div className="flex items-center justify-between">
+        <Etiqueta cor={`var(--tone-${tom}-dot)`}>{etiqueta}</Etiqueta>
+        <button onClick={fechar} className="grid size-9 place-items-center rounded-[9px]" style={{ background: "var(--ds-trilho)", color: "var(--ds-tinta)" }} aria-label="Fechar">
+          <X size={16} />
+        </button>
+      </div>
+      <h2 className="text-[28px] leading-[1.15] font-light tracking-[-0.02em]" style={{ color: "var(--ds-tinta-forte)" }}>
+        {titulo}
+      </h2>
+    </>
+  )
+}
+
+function Ficha({ linhas }: { linhas: [string, React.ReactNode][] }) {
+  return (
+    <dl className="grid grid-cols-[120px_1fr] items-center gap-y-4 text-[14px]">
+      {linhas.map(([r, v]) => (
+        <React.Fragment key={r}>
+          <dt style={{ color: "var(--ds-tinta-2)" }}>{r}</dt>
+          <dd className="flex items-center gap-2" style={{ color: "var(--ds-tinta-forte)" }}>
+            {v}
+          </dd>
+        </React.Fragment>
+      ))}
+    </dl>
+  )
+}
+
+// ── tela 1: tarefas ──────────────────────────────────────────────────────
+
+type Status = "aberta" | "fazendo" | "bloqueada" | "feita"
+interface Tarefa {
+  id: string
+  codigo: string
+  titulo: string
+  status: Status
+  dono: string
+  prazo: string
+  prioridade: "urgente" | "alta" | "media" | "baixa"
+}
+const TITULOS = ["Revisar o fluxo de cobrança", "Migrar webhooks do Stripe", "Ajustar o onboarding do time", "Tela de membros com carência", "Corrigir o filtro por prazo", "Exportar relatório em PDF"]
+const STATUS: Status[] = ["fazendo", "aberta", "bloqueada", "feita", "aberta", "fazendo"]
+const DONOS = ["GT", "AM", "RS", "LP"]
+const PRIORIDADES = ["urgente", "alta", "media", "baixa"] as const
+const GRUPOS = ["Cobrança recorrente", "Membros e convites", "Relatórios"].map((titulo, g) => ({
+  id: `g${g}`,
+  titulo,
+  feitas: 2 + g,
+  total: 6,
+  tarefas: TITULOS.map(
+    (_, i): Tarefa => ({
+      id: `g${g}-${i}`,
+      codigo: `MUR-${g * 10 + i + 1}`,
+      titulo: TITULOS[(i + g) % TITULOS.length],
+      status: STATUS[(i + g) % STATUS.length],
+      dono: DONOS[(i + g) % DONOS.length],
+      prazo: `${10 + i} nov`,
+      prioridade: PRIORIDADES[(i * 3 + g) % 4],
+    })
+  ),
+}))
+const TOM: Record<Status, { rotulo: string; tom: string }> = {
+  aberta: { rotulo: "Aberta", tom: "green" },
+  fazendo: { rotulo: "Fazendo", tom: "blue" },
+  bloqueada: { rotulo: "Bloqueada", tom: "red" },
+  feita: { rotulo: "Feita", tom: "gray" },
+}
+const PRIO = { urgente: "Urgente", alta: "Alta", media: "Média", baixa: "Baixa" }
+const COLS_TAREFA = "grid-cols-[18px_88px_1fr_140px_110px_60px_70px]"
+
+const PROJETOS: ItemFaixa[] = [
+  { id: "cobranca", nome: "Cobrança", tom: "blue", resumo: "18 tarefas · 3 bloqueadas", fracao: 0.42, valor: "42%" },
+  { id: "onboarding", nome: "Onboarding", tom: "purple", resumo: "12 tarefas · 1 bloqueada", fracao: 0.68, valor: "68%" },
+  { id: "relatorios", nome: "Relatórios", tom: "yellow", resumo: "9 tarefas · 0 bloqueadas", fracao: 0.25, valor: "25%" },
+  { id: "integracoes", nome: "Integrações", tom: "green", resumo: "15 tarefas · 2 bloqueadas", fracao: 0.8, valor: "80%" },
+  { id: "site", nome: "Site", tom: "orange", resumo: "7 tarefas · 0 bloqueadas", fracao: 0.12, valor: "12%" },
+]
+
+function ListaTarefas({ marcadas, alternar, abrir }: { marcadas: Set<string>; alternar: (id: string) => void; abrir: (t: Tarefa) => void }) {
+  return (
+    <div className="flex flex-col gap-5">
+      {GRUPOS.map((g) => (
+        <section key={g.id} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+          <header className="flex h-12 items-center justify-between px-5">
+            <div className="flex items-center gap-3">
+              <CaretDown size={13} style={{ color: "var(--ds-tinta-2)" }} />
+              <Etiqueta cor="var(--primary)">{g.titulo}</Etiqueta>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="h-1 w-24 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho)" }}>
+                <div className="h-full rounded-full" style={{ width: `${(g.feitas / g.total) * 100}%`, background: "var(--primary)" }} />
+              </div>
+              <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                {g.feitas}/{g.total}
+              </span>
+            </div>
+          </header>
+          {g.tarefas.map((t) => {
+            const marcada = marcadas.has(t.id)
+            return (
+              <div
+                key={t.id}
+                onClick={() => abrir(t)}
+                className={`grid h-[52px] cursor-pointer items-center gap-4 px-5 transition-[background-color,opacity] duration-300 ${COLS_TAREFA}`}
+                style={{ borderTop: "1px solid var(--ds-fio)", background: marcada ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined, opacity: t.status === "feita" ? 0.55 : 1 }}
+              >
+                <Caixa marcada={marcada} onChange={() => alternar(t.id)} />
+                <span className="font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {t.codigo}
+                </span>
+                <span className="truncate text-[14.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
+                  {t.titulo}
+                </span>
+                <Selo {...TOM[t.status]} />
+                <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {PRIO[t.prioridade]}
+                </span>
+                <Avatar iniciais={t.dono} />
+                <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {t.prazo}
+                </span>
+              </div>
+            )
+          })}
+        </section>
+      ))}
+    </div>
+  )
+}
+
+function QuadroTarefas({ abrir }: { abrir: (t: Tarefa) => void }) {
+  const todas = GRUPOS.flatMap((g) => g.tarefas)
+  const colunas: Status[] = ["aberta", "fazendo", "bloqueada", "feita"]
+  return (
+    <div className="grid grid-cols-4 gap-4">
+      {colunas.map((c) => (
+        <div key={c} className="flex flex-col gap-3 rounded-[12px] p-3" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+          <div className="flex h-9 items-center justify-between px-2">
+            <Etiqueta cor={`var(--tone-${TOM[c].tom}-dot)`}>{TOM[c].rotulo}</Etiqueta>
+            <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {todas.filter((t) => t.status === c).length}
+            </span>
+          </div>
+          {todas
+            .filter((t) => t.status === c)
+            .map((t) => (
+              <button
+                key={t.id}
+                onClick={() => abrir(t)}
+                className="flex flex-col gap-3 rounded-[10px] p-4 text-left transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5"
+                style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)" }}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                    {t.codigo}
+                  </span>
+                  <Avatar iniciais={t.dono} />
+                </div>
+                <span className="text-[14.5px] leading-snug" style={{ color: "var(--ds-tinta-forte)" }}>
+                  {t.titulo}
+                </span>
+                <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+                  {PRIO[t.prioridade]} · {t.prazo}
+                </span>
+              </button>
+            ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function TelaTarefas() {
+  const [foco, setFoco] = React.useState("cobranca")
+  const [vista, setVista] = React.useState(() => (location.hash.includes("quadro") ? "quadro" : "lista"))
+  const [aberta, setAberta] = React.useState<Tarefa | null>(() => (location.hash.includes("aberta") ? GRUPOS[0].tarefas[0] : null))
+  const [marcadas, setMarcadas] = React.useState<Set<string>>(() => new Set(["g0-1", "g0-2"]))
+  const carregando = useCarregando(`${foco}-${vista}`)
+  const alternar = (id: string) =>
+    setMarcadas((m) => {
+      const n = new Set(m)
+      if (n.has(id)) n.delete(id)
+      else n.add(id)
+      return n
+    })
+  return (
+    <>
+      <Faixas
+        itens={PROJETOS}
+        focoId={foco}
+        onFoco={setFoco}
+        recua={aberta !== null}
+        onFundo={() => setAberta(null)}
+        acoes={
+          <>
+            <Busca texto="Buscar tarefa" />
+            <Vistas valor={vista} onChange={setVista} />
+            <Botao solido>
+              <Plus size={16} /> Nova tarefa
+            </Botao>
+          </>
+        }
+        corpo={() => (
+          <AnimatePresence mode="wait">
+            <motion.div key={carregando ? "carregando" : `${foco}-${vista}`} {...troca}>
+              {carregando ? (
+                <EsqueletoLista colunas={COLS_TAREFA} />
+              ) : vista === "lista" ? (
+                <ListaTarefas marcadas={marcadas} alternar={alternar} abrir={setAberta} />
+              ) : (
+                <QuadroTarefas abrir={setAberta} />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        )}
+      />
+      <AnimatePresence>
+        {aberta ? (
+          <Frente key={aberta.id}>
+            <CabecalhoFrente etiqueta={aberta.codigo} tom={TOM[aberta.status].tom} titulo={aberta.titulo} fechar={() => setAberta(null)} />
+            <Ficha
+              linhas={[
+                ["Status", <Selo key="s" {...TOM[aberta.status]} />],
+                ["Responsável", <><Avatar iniciais={aberta.dono} /> {aberta.dono === "GT" ? "Guilherme T." : "Ana M."}</>],
+                ["Prazo", <><CalendarBlank size={16} /> {aberta.prazo}</>],
+                ["Prioridade", PRIO[aberta.prioridade]],
+              ]}
+            />
+            <p className="text-[14.5px] leading-relaxed" style={{ color: "var(--ds-tinta)" }}>
+              Revisar com o time de produto antes da sprint. O fluxo atual cobra duas vezes quem troca de plano no meio do mês.
+            </p>
+            <div className="mt-auto flex gap-2">
+              <Botao solido>Concluir tarefa</Botao>
+              <Botao>Comentar</Botao>
+            </div>
+          </Frente>
+        ) : null}
+      </AnimatePresence>
+    </>
+  )
+}
+
+// ── tela 2: clientes (o molde do CRUD do Backoffice) ─────────────────────
+
+interface Cliente {
+  id: string
+  iniciais: string
+  tom: string
+  nome: string
+  email: string
+  plano: string
+  acesso: string
+  desde: string
+  pago: number
+}
+const TOTAL_CLIENTES = 1284
+const ESTADOS: (ItemFaixa & { qtd: number; seloTom: string; rotulo: string })[] = [
+  { id: "pagantes", nome: "Pagantes", rotulo: "Pagante", tom: "green", seloTom: "green", qtd: 771, resumo: "R$ 41.920 por mês", fracao: 771 / TOTAL_CLIENTES, valor: "771" },
+  { id: "teste", nome: "Em teste", rotulo: "Em teste", tom: "blue", seloTom: "blue", qtd: 58, resumo: "12 terminam esta semana", fracao: 58 / TOTAL_CLIENTES, valor: "58" },
+  { id: "cartao", nome: "Teste com cartão", rotulo: "Teste com cartão", tom: "cyan", seloTom: "cyan", qtd: 38, resumo: "viram pagantes sozinhos", fracao: 38 / TOTAL_CLIENTES, valor: "38" },
+  { id: "atraso", nome: "Em atraso", rotulo: "Em atraso", tom: "orange", seloTom: "orange", qtd: 41, resumo: "R$ 3.927 em aberto", fracao: 41 / TOTAL_CLIENTES, valor: "41" },
+  { id: "gratis", nome: "Grátis", rotulo: "Grátis", tom: "gray", seloTom: "gray", qtd: 338, resumo: "plano Starter", fracao: 338 / TOTAL_CLIENTES, valor: "338" },
+  { id: "cancelados", nome: "Cancelados", rotulo: "Cancelado", tom: "red", seloTom: "red", qtd: 38, resumo: "7 este mês", fracao: 38 / TOTAL_CLIENTES, valor: "38" },
+]
+const PESSOAS = [
+  ["MC", "Marina Costa", "marina@costa.dev"],
+  ["RM", "Rafael Moura", "rafael@moura.dev"],
+  ["BN", "Beatriz Nunes", "bia@nunes.io"],
+  ["TA", "Tiago Albuquerque", "tiago@albuquerque.com"],
+  ["LF", "Lucas Ferraz", "lucas.ferraz@gmail.com"],
+  ["CR", "Camila Rocha", "camila@rocha.design"],
+  ["HD", "Helena Duarte", "helena@duarte.app"],
+  ["OP", "Otávio Prado", "otavio.prado@outlook.com"],
+  ["SM", "Sofia Martins", "sofia@martins.co"],
+]
+const TONS_AVATAR = ["blue", "green", "orange", "yellow", "purple", "cyan"]
+const ACESSOS = ["agora", "há 12 min", "há 2 h", "ontem", "há 3 dias", "há 6 dias", "há 2 meses"]
+function clientesDe(estado: string): Cliente[] {
+  const desloca = ESTADOS.findIndex((e) => e.id === estado) * 2
+  const pagos = estado === "pagantes" || estado === "atraso" || estado === "cancelados"
+  return Array.from({ length: 7 }, (_, i) => {
+    const [iniciais, nome, email] = PESSOAS[(i + desloca) % PESSOAS.length]
+    return {
+      id: `${estado}-${i}`,
+      iniciais,
+      tom: TONS_AVATAR[(i + desloca) % TONS_AVATAR.length],
+      nome,
+      email,
+      plano: ["Pro", "Team", "Pro", "Starter"][(i + desloca) % 4],
+      acesso: ACESSOS[(i + desloca) % ACESSOS.length],
+      desde: ["mar 2026", "jan 2026", "nov 2025", "set 2026", "jul 2026"][(i + desloca) % 5],
+      pago: pagos ? [343, 470, 1341, 1788, 196][(i + desloca) % 5] : 0,
+    }
+  })
+}
+const COLS_CLIENTE = "grid-cols-[18px_minmax(0,2.4fr)_90px_120px_110px_110px]"
+const reais = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`
+
+function ListaClientes({ estado, abrir }: { estado: string; abrir: (c: Cliente) => void }) {
+  const [marcados, setMarcados] = React.useState<Set<string>>(new Set())
+  return (
+    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      <header className={`grid h-11 items-center gap-4 px-5 font-mono text-[10.5px] tracking-[0.1em] uppercase ${COLS_CLIENTE}`} style={{ color: "var(--ds-tinta-2)" }}>
+        <span />
+        <span>Cliente</span>
+        <span>Plano</span>
+        <span>Último acesso</span>
+        <span>Desde</span>
+        <span className="text-right">Total pago</span>
+      </header>
+      {clientesDe(estado).map((c) => {
+        const marcado = marcados.has(c.id)
+        return (
+          <div
+            key={c.id}
+            onClick={() => abrir(c)}
+            className={`grid h-[60px] cursor-pointer items-center gap-4 px-5 transition-colors duration-300 ${COLS_CLIENTE}`}
+            style={{ borderTop: "1px solid var(--ds-fio)", background: marcado ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined }}
+          >
+            <Caixa
+              marcada={marcado}
+              onChange={() =>
+                setMarcados((m) => {
+                  const n = new Set(m)
+                  if (n.has(c.id)) n.delete(c.id)
+                  else n.add(c.id)
+                  return n
+                })
+              }
+            />
+            <span className="flex min-w-0 items-center gap-3">
+              <Avatar iniciais={c.iniciais} tom={c.tom} />
+              <span className="flex min-w-0 flex-col">
+                <span className="truncate text-[14.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
+                  {c.nome}
+                </span>
+                <span className="truncate text-[12.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {c.email}
+                </span>
+              </span>
+            </span>
+            <span className="text-[13.5px]" style={{ color: "var(--ds-tinta)" }}>
+              {c.plano}
+            </span>
+            <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {c.acesso}
+            </span>
+            <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {c.desde}
+            </span>
+            <span className="text-right font-mono text-[12.5px]" style={{ color: c.pago ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+              {c.pago ? reais(c.pago) : "—"}
+            </span>
+          </div>
+        )
+      })}
+    </section>
+  )
+}
+
+function EsqueletoClientes() {
+  return (
+    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
+      <header className={`grid h-11 items-center gap-4 px-5 ${COLS_CLIENTE}`}>
+        <span />
+        {[16, 10, 18, 10, 16].map((w, i) => (
+          <Osso key={i} className="h-2" style={{ width: `${w * 4}px` }} />
+        ))}
+      </header>
+      {Array.from({ length: 7 }, (_, l) => (
+        <div key={l} className={`grid h-[60px] items-center gap-4 px-5 ${COLS_CLIENTE}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
+          <Osso className="size-[18px]" />
+          <span className="flex items-center gap-3">
+            <Osso className="size-8 rounded-full" />
+            <span className="flex flex-1 flex-col gap-2">
+              <Osso className="h-3" style={{ width: `${40 + ((l * 13) % 30)}%` }} />
+              <Osso className="h-2" style={{ width: `${30 + ((l * 7) % 25)}%` }} />
+            </span>
+          </span>
+          <Osso className="h-2.5 w-12" />
+          <Osso className="h-2.5 w-16" />
+          <Osso className="h-2.5 w-14" />
+          <Osso className="ml-auto h-2.5 w-14" />
+        </div>
+      ))}
+    </section>
+  )
+}
+
+function TelaClientes() {
+  const [foco, setFoco] = React.useState("pagantes")
+  const [aberto, setAberto] = React.useState<Cliente | null>(null)
+  const carregando = useCarregando(foco)
+  const estado = ESTADOS.find((e) => e.id === foco)!
+  return (
+    <>
+      <Faixas
+        itens={ESTADOS}
+        focoId={foco}
+        onFoco={setFoco}
+        recua={aberto !== null}
+        onFundo={() => setAberto(null)}
+        acoes={
+          <>
+            <Busca texto="Buscar por nome ou e-mail" />
+            <Botao>Exportar</Botao>
+          </>
+        }
+        corpo={() => (
+          <AnimatePresence mode="wait">
+            <motion.div key={carregando ? "carregando" : foco} {...troca}>
+              {carregando ? <EsqueletoClientes /> : <ListaClientes estado={foco} abrir={setAberto} />}
+            </motion.div>
+          </AnimatePresence>
+        )}
+      />
+      <AnimatePresence>
+        {aberto ? (
+          <Frente key={aberto.id}>
+            <CabecalhoFrente etiqueta={`Cliente desde ${aberto.desde}`} tom={estado.tom} titulo={aberto.nome} fechar={() => setAberto(null)} />
+            <Ficha
+              linhas={[
+                ["E-mail", aberto.email],
+                ["Status", <Selo key="s" rotulo={estado.rotulo} tom={estado.seloTom} />],
+                ["Plano", aberto.plano],
+                ["Último acesso", aberto.acesso],
+                ["Total pago", aberto.pago ? reais(aberto.pago) : "—"],
+              ]}
+            />
+            <div className="flex flex-col gap-3 rounded-[12px] p-4" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+              <Etiqueta cor="var(--primary)">Últimos pagamentos</Etiqueta>
+              {["out 2026", "set 2026", "ago 2026"].map((m) => (
+                <div key={m} className="flex items-center justify-between text-[13.5px]">
+                  <span style={{ color: "var(--ds-tinta)" }}>{m}</span>
+                  <span className="font-mono text-[12.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
+                    {aberto.pago ? reais(Math.round(aberto.pago / 6)) : "—"}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-auto flex gap-2">
+              <Botao solido>Ver pagamentos</Botao>
+              <Botao>Inativar</Botao>
+            </div>
+          </Frente>
+        ) : null}
+      </AnimatePresence>
+    </>
+  )
+}
+
+// ── o app ────────────────────────────────────────────────────────────────
+
+function App() {
+  const [escuro, setEscuro] = React.useState(() => location.hash.includes("escuro"))
+  const [tela, setTela] = React.useState(() => (location.hash.includes("clientes") ? "clientes" : "tarefas"))
+  React.useLayoutEffect(() => {
+    document.documentElement.classList.toggle("dark", escuro)
+  }, [escuro])
+
+  const nav = [
+    { id: "inicio", i: <House size={18} />, r: "Início" },
+    { id: "tarefas", i: <ListChecks size={18} />, r: "Tarefas" },
+    { id: "quadros", i: <Kanban size={18} />, r: "Quadros" },
+    { id: "clientes", i: <AddressBook size={18} />, r: "Clientes" },
+    { id: "membros", i: <Users size={18} />, r: "Membros" },
+    { id: "relatorios", i: <ChartBar size={18} />, r: "Relatórios" },
+  ]
+
+  return (
+    <div className="flex h-dvh gap-4 p-4 text-[var(--ds-tinta)]">
+      <Atmosfera />
+
+      {/* Camada 1: a sidebar, placa fosca sobre a luz. */}
+      <nav className="flex w-[232px] shrink-0 flex-col gap-1 rounded-[14px] p-3" style={placa()}>
+        <div className="flex h-12 items-center gap-2.5 px-2 text-[15px]" style={{ color: "var(--ds-tinta-forte)" }}>
+          <MurikiLogo className="size-7" /> muriki
+        </div>
+        <div className="px-2 pt-3 pb-2">
+          <Etiqueta>Trabalho</Etiqueta>
+        </div>
+        {nav.map((n) => {
+          const ativo = n.id === tela
+          const vivo = n.id === "tarefas" || n.id === "clientes"
+          return (
+            <button
+              key={n.id}
+              onClick={() => vivo && setTela(n.id)}
+              className="relative flex h-10 items-center gap-3 rounded-[9px] px-3 text-left text-[14px] transition-colors"
+              style={{ color: ativo ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}
+            >
+              {ativo ? (
+                <motion.span layoutId="nav" className="absolute inset-0 rounded-[9px]" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 4px 14px -8px var(--ds-sombra)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} />
+              ) : null}
+              <span className="relative flex items-center gap-3">
+                {n.i}
+                {n.r}
+              </span>
+            </button>
+          )
+        })}
+        <div className="mt-auto flex items-center justify-between rounded-[10px] p-2" style={{ background: "var(--ds-trilho)" }}>
+          <span className="flex items-center gap-2 text-[13px]" style={{ color: "var(--ds-tinta-forte)" }}>
+            <Avatar iniciais="GT" /> Guilherme T.
+          </span>
+          <button onClick={() => setEscuro(!escuro)} className="h-8 rounded-[8px] px-2.5 font-mono text-[10.5px] tracking-[0.08em] uppercase" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio)", color: "var(--ds-tinta)" }}>
+            {escuro ? "Claro" : "Escuro"}
+          </button>
+        </div>
+      </nav>
+
+      {/* Camada 2 e 3: a tela da vez, trocando com o desfoque. */}
+      <div className="relative flex min-w-0 flex-1">
+        <AnimatePresence mode="wait">
+          <motion.div key={tela} {...troca} className="relative flex min-w-0 flex-1">
+            {tela === "tarefas" ? <TelaTarefas /> : <TelaClientes />}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+createRoot(document.getElementById("root")!).render(<App />)

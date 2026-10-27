@@ -1,0 +1,37 @@
+/* Tokens do estudo das faixas (design/ds-novo/faixas.tsx). Paleta do Muriki: papel quente, tinta fria, azul 262.6. */
+:root {
+  --ds-chao: oklch(0.925 0.022 80);
+  --ds-luz: oklch(0.995 0.035 90 / 0.75);
+  --ds-luz-forte: oklch(0.98 0.06 88 / 0.55);
+  --ds-madeira: oklch(0.7 0.07 62 / 0.32);
+  --ds-placa-1: oklch(0.985 0.006 85 / 0.55);
+  --ds-placa-2: oklch(0.995 0.004 85 / 0.72);
+  --ds-placa-forte: oklch(0.995 0.003 85 / 0.93);
+  --ds-trilho: oklch(0.45 0.035 85 / 0.07);
+  --ds-fio: oklch(0.45 0.035 85 / 0.13);
+  --ds-fio-forte: oklch(0.45 0.035 85 / 0.38);
+  --ds-tinta: oklch(0.38 0.02 250);
+  --ds-tinta-2: oklch(0.53 0.02 250);
+  --ds-tinta-forte: oklch(0.24 0.022 250);
+  --ds-sombra: oklch(0.32 0.02 248.5 / 0.35);
+  --ds-osso: oklch(0.45 0.035 85 / 0.1);
+  --ds-osso-brilho: oklch(1 0 0 / 0.6);
+}
+.dark {
+  --ds-chao: oklch(0.15 0.006 107);
+  --ds-luz: oklch(0.42 0.07 262.6 / 0.4);
+  --ds-luz-forte: oklch(0.42 0.11 262.6 / 0.35);
+  --ds-madeira: oklch(0.42 0.06 60 / 0.3);
+  --ds-placa-1: oklch(0.2 0.005 107 / 0.55);
+  --ds-placa-2: oklch(0.24 0.005 107 / 0.6);
+  --ds-placa-forte: oklch(0.25 0.005 107 / 0.93);
+  --ds-trilho: oklch(1 0 0 / 0.05);
+  --ds-fio: oklch(1 0 0 / 0.08);
+  --ds-fio-forte: oklch(1 0 0 / 0.28);
+  --ds-tinta: oklch(0.86 0.005 100);
+  --ds-tinta-2: oklch(0.66 0.006 100);
+  --ds-tinta-forte: oklch(0.97 0.003 100);
+  --ds-sombra: oklch(0 0 0 / 0.6);
+  --ds-osso: oklch(1 0 0 / 0.07);
+  --ds-osso-brilho: oklch(1 0 0 / 0.12);
+}

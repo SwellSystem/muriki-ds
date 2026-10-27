@@ -4587,6 +4587,40 @@
         }
       ],
       "docs": "Importe o CSS uma vez: @import \"@/components/acrylic/acrylic-hud/acrylic-hud.css\" (além do acrylic.css). Monte <AcrylicScope className=\"min-h-dvh\"><AcrylicHud open={ready}><AcrylicOrbit logo={<Logo/>} items={…}/><AcrylicCornerMenu items={…}/></AcrylicHud></AcrylicScope>. O logo entra por prop — com as cores próprias, ou fill=\"currentColor\" se for monocromático. Cinco itens é o número que a ideia pediu e o que cabe; seis ainda cabe. O modo ouvindo do reator aceita uma fonte de nível (core.level, 0..1 por quadro) para a onda responder a um microfone de verdade; sem ela, a onda vibra sozinha."
+    },
+    {
+      "name": "vidro",
+      "type": "registry:block",
+      "title": "Vidro",
+      "description": "Vidro na moldura, papel no conteúdo: camada sobre o theme para o produto de trabalho diário. Sidebar, barra, cabeçalho fixo (data-vidro), diálogo, painel, popover, menu, select e toast ficam translúcidos, com blur, saturação, grão e fio de luz na aresta de cima; cartão, linha, card do kanban e campo continuam o papel opaco, para a leitura e para a rolagem. A luz da marca desce do topo da página; a grade de pontos é opcional (muriki-vidro-grade), para entrada e estado vazio. Canto mais seco (10 e 8px). Nenhum componente novo. Só vale com a classe muriki-vidro no <html>. Claro e escuro. Volta a opaco sem backdrop-filter e com prefers-reduced-transparency.",
+      "registryDependencies": [
+        "theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/vidro/vidro.css",
+          "type": "registry:file",
+          "target": "components/vidro/vidro.css"
+        }
+      ],
+      "docs": "Importe o CSS uma vez no globals, DEPOIS do tema: @import \"@/components/vidro/vidro.css\". Ligue com a classe muriki-vidro no <html>, ao lado do dark (no body ou num wrapper não chega aos portais de diálogo, popover e menu). Cabeçalho fixo que deve ser vidro: data-vidro no elemento. Tela de entrada, onboarding ou estado vazio: a classe muriki-vidro-grade no <html> liga a grade de pontos. O body ganha a luz de cima e o grão: se você pinta outro fundo no body, troque --vidro-luz em vez de apagar."
+    },
+    {
+      "name": "blur",
+      "type": "registry:block",
+      "title": "Blur",
+      "description": "O papel de sempre, com desfoque nos momentos certos, para a ferramenta de oito horas por dia. Nada fica translúcido: o conteúdo é o papel opaco e nítido. O desfoque aparece em quatro lugares: no movimento (diálogo, painel, popover, menu, select, tooltip e toast entram desfocados e ficam nítidos; o painel da aba e o que tiver data-blur-in também), atrás do que abre (a página sai de foco atrás do diálogo e do painel), no que fica por cima (o cabeçalho fixo com data-blur desfoca a lista que rola por baixo) e de foco (data-foco no contêiner e data-em-foco no filho: os outros filhos saem de foco). Nenhum componente novo. Só vale com a classe muriki-blur no <html>. Sem movimento com prefers-reduced-motion; cabeçalho opaco com prefers-reduced-transparency.",
+      "registryDependencies": [
+        "theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/blur/blur.css",
+          "type": "registry:file",
+          "target": "components/blur/blur.css"
+        }
+      ],
+      "docs": "Importe o CSS uma vez no globals, DEPOIS do tema: @import \"@/components/blur/blur.css\". Ligue com a classe muriki-blur no <html>, ao lado do dark. Cabeçalho fixo: data-blur. Conteúdo que chega (lista depois do skeleton, troca de vista): data-blur-in. Foco: data-foco no contêiner e data-em-foco no filho em destaque; os irmãos desfocam e deixam de receber clique."
     }
   ]
 }
