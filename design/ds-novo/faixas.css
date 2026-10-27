@@ -14,8 +14,11 @@
   --ds-tinta-2: oklch(0.53 0.02 250);
   --ds-tinta-forte: oklch(0.24 0.022 250);
   --ds-sombra: oklch(0.32 0.02 248.5 / 0.35);
+  /* O skeleton: o osso tem a cor do que vai chegar. Texto é papel neutro;
+     o que chega com cor (status, avatar, andamento) é o azul da marca. */
   --ds-osso: oklch(0.45 0.035 85 / 0.1);
   --ds-osso-brilho: oklch(1 0 0 / 0.6);
+  --ds-osso-azul: oklch(0.47 0.185 262.6 / 0.14);
 }
 .dark {
   --ds-chao: oklch(0.15 0.006 107);
@@ -34,4 +37,5 @@
   --ds-sombra: oklch(0 0 0 / 0.6);
   --ds-osso: oklch(1 0 0 / 0.07);
   --ds-osso-brilho: oklch(1 0 0 / 0.12);
+  --ds-osso-azul: oklch(0.7 0.145 262.6 / 0.22);
 }

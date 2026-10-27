@@ -177,10 +177,12 @@ function Vistas({ valor, onChange }: { valor: string; onChange: (v: string) => v
 // ── o skeleton ───────────────────────────────────────────────────────────
 
 /** Um osso: a forma do que vai chegar, desfocada, com um brilho passando
-    da esquerda para a direita — a mesma direção da faixa carregando. */
-function Osso({ className = "", style }: { className?: string; style?: React.CSSProperties }) {
+    da esquerda para a direita — a mesma direção da faixa carregando.
+    `azul` para o que chega com cor (status, avatar, andamento); o texto
+    fica no papel neutro. */
+function Osso({ className = "", style, azul = false }: { className?: string; style?: React.CSSProperties; azul?: boolean }) {
   return (
-    <span className={`relative block overflow-hidden rounded-[6px] ${className}`} style={{ background: "var(--ds-osso)", filter: "blur(1.5px)", ...style }}>
+    <span className={`relative block overflow-hidden rounded-[6px] ${className}`} style={{ background: azul ? "var(--ds-osso-azul)" : "var(--ds-osso)", filter: "blur(1.5px)", ...style }}>
       <motion.span
         aria-hidden
         className="absolute inset-y-0 w-1/2"
@@ -203,16 +205,16 @@ function EsqueletoLista({ grupos = 2, linhas = 5, colunas }: { grupos?: number; 
         <section key={g} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
           <header className="flex h-12 items-center justify-between px-5">
             <Osso className="h-2.5 w-40" />
-            <Osso className="h-1.5 w-24" />
+            <Osso azul className="h-1.5 w-24" />
           </header>
           {Array.from({ length: linhas }, (_, l) => (
             <div key={l} className={`grid h-[52px] items-center gap-4 px-5 ${colunas}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
               <Osso className="size-[18px]" />
               <Osso className="h-2.5 w-14" />
               <Osso className="h-3" style={{ width: `${55 + ((l * 17 + g * 11) % 35)}%` }} />
-              <Osso className="h-7 w-24 rounded-[7px]" />
+              <Osso azul className="h-7 w-24 rounded-[7px]" />
               <Osso className="h-2.5 w-14" />
-              <Osso className="size-7 rounded-full" />
+              <Osso azul className="size-7 rounded-full" />
               <Osso className="ml-auto h-2.5 w-12" />
             </div>
           ))}
@@ -726,7 +728,7 @@ function EsqueletoClientes() {
         <div key={l} className={`grid h-[60px] items-center gap-4 px-5 ${COLS_CLIENTE}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
           <Osso className="size-[18px]" />
           <span className="flex items-center gap-3">
-            <Osso className="size-8 rounded-full" />
+            <Osso azul className="size-8 rounded-full" />
             <span className="flex flex-1 flex-col gap-2">
               <Osso className="h-3" style={{ width: `${40 + ((l * 13) % 30)}%` }} />
               <Osso className="h-2" style={{ width: `${30 + ((l * 7) % 25)}%` }} />
