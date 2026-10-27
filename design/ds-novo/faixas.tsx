@@ -691,8 +691,9 @@ function Atalhos({ t, acao }: { t: TaskTableTask; acao: (o: string, t: TaskTable
     - aberta: círculo vazio
     - fazendo: os ícones do Phosphor pelo andamento — chart-pie-slice
       começando (até 40%), circle-half na metade, circle-half-tilt quase lá
-      (acima de 70%). Já foi uma pizza desenhada à mão: os ícones pedidos são
-      os do Phosphor, no mesmo traço do resto.
+      (acima de 70%), no peso regular (escolhido entre fill, duotone, bold e
+      regular). Já foi uma pizza desenhada à mão: os ícones são os do
+      Phosphor, no traço do resto.
     - bloqueada: proibido · feita: check
     Trocar de estado troca o ícone pelo desfoque. */
 type Visual = TaskTableStatus | "backlog"
@@ -705,7 +706,7 @@ function StatusIcone({ status, tamanho = 18, progresso = 0, semDono = false }: {
   const icone =
     v === "backlog" ? <CircleDashed size={tamanho} weight="bold" /> :
     v === "active" ? <Circle size={tamanho} weight="bold" /> :
-    v === "progress" ? (progresso < 0.4 ? <ChartPieSlice size={tamanho} weight="fill" /> : progresso <= 0.7 ? <CircleHalf size={tamanho} weight="fill" /> : <CircleHalfTilt size={tamanho} weight="fill" />) :
+    v === "progress" ? (progresso < 0.4 ? <ChartPieSlice size={tamanho} weight="regular" /> : progresso <= 0.7 ? <CircleHalf size={tamanho} weight="regular" /> : <CircleHalfTilt size={tamanho} weight="regular" />) :
     v === "blocked" ? <Prohibit size={tamanho} weight="bold" /> :
     <CheckCircle size={tamanho} weight="fill" />
   return (
