@@ -9,7 +9,7 @@ import {
   ChartBar,
   CheckCircle,
   Circle,
-  CircleHalf,
+  CircleDashed,
   ExclamationMark,
   Prohibit,
   Check,
@@ -610,14 +610,14 @@ const FAMILIA: TaskTableTask[] = [
   tk({ id: "e1", code: "MUR-1", title: "Cobrança recorrente", depth: 0, kind: "epic", status: "progress", childGroupId: "e1", progress: { done: 2, total: 5 }, start: "2026-11-02", end: "2026-11-24", progressRatio: 0.4 }),
   tk({ id: "t1", code: "MUR-2", title: "Revisar o fluxo de cobrança", depth: 1, kind: "task", status: "progress", parentId: "e1", childGroupId: "t1", owner: { initials: "GT", tone: "a1" }, priority: "urgent", due: "10 nov", start: "2026-11-02", end: "2026-11-10", progressRatio: 0.6, progress: { done: 1, total: 2 } }),
   tk({ id: "s1", code: "MUR-3", title: "Mapear quem é cobrado duas vezes", depth: 2, kind: "sub", status: "done", parentId: "t1", owner: { initials: "AM", tone: "a2" }, priority: "high", due: "5 nov", start: "2026-11-02", end: "2026-11-05", progressRatio: 1 }),
-  tk({ id: "s2", code: "MUR-4", title: "Ajustar o cálculo proporcional", depth: 2, kind: "sub", status: "progress", parentId: "t1", lastChild: true, owner: { initials: "GT", tone: "a1" }, priority: "medium", due: "10 nov", start: "2026-11-05", end: "2026-11-10", progressRatio: 0.3, deps: ["s1"] }),
+  tk({ id: "s2", code: "MUR-4", title: "Ajustar o cálculo proporcional", depth: 2, kind: "sub", status: "progress", parentId: "t1", lastChild: true, owner: { initials: "GT", tone: "a1" }, priority: "medium", due: "10 nov", start: "2026-11-05", end: "2026-11-10", progressRatio: 0.25, deps: ["s1"] }),
   tk({ id: "t2", code: "MUR-5", title: "Migrar webhooks do Stripe", depth: 1, kind: "task", status: "blocked", parentId: "e1", owner: { initials: "RS", tone: "a3" }, priority: "high", due: "16 nov", start: "2026-11-10", end: "2026-11-16", progressRatio: 0.1, deps: ["t1"] }),
   tk({ id: "t3", code: "MUR-6", title: "Aviso de cartão vencendo", depth: 1, kind: "task", status: "active", parentId: "e1", owner: { initials: "LP", tone: "a4" }, priority: "low", due: "20 nov", start: "2026-11-14", end: "2026-11-20", progressRatio: 0 }),
   tk({ id: "t4", code: "MUR-7", title: "Fatura em PDF com a marca", depth: 1, kind: "task", status: "done", parentId: "e1", lastChild: true, owner: { initials: "AM", tone: "a2" }, priority: "medium", due: "8 nov", start: "2026-11-03", end: "2026-11-08", progressRatio: 1 }),
   tk({ id: "e2", code: "MUR-10", title: "Membros e convites", depth: 0, kind: "epic", status: "active", childGroupId: "e2", progress: { done: 0, total: 3 }, start: "2026-11-12", end: "2026-11-28", progressRatio: 0.1 }),
-  tk({ id: "t5", code: "MUR-11", title: "Convite expira em 7 dias", depth: 1, kind: "task", status: "progress", parentId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "18 nov", start: "2026-11-12", end: "2026-11-18", progressRatio: 0.5 }),
+  tk({ id: "t5", code: "MUR-11", title: "Convite expira em 7 dias", depth: 1, kind: "task", status: "progress", parentId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "18 nov", start: "2026-11-12", end: "2026-11-18", progressRatio: 0.8 }),
   tk({ id: "t6", code: "MUR-12", title: "Carência de quem passa do limite", depth: 1, kind: "task", status: "blocked", parentId: "e2", owner: { initials: "GT", tone: "a1" }, priority: "high", due: "24 nov", start: "2026-11-18", end: "2026-11-24", progressRatio: 0, deps: ["t5", "t2"] }),
-  tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, owner: { initials: "LP", tone: "a4" }, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
+  tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
 ]
 const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
 // data local: new Date("2026-11-01") é meia-noite UTC, e no Brasil vira 31 out
@@ -680,35 +680,61 @@ function Atalhos({ t, acao }: { t: TaskTableTask; acao: (o: string, t: TaskTable
   )
 }
 
-/** Status como o Linear: um ícone por estado, na cor do tom. Trocar de
-    estado troca o ícone pelo desfoque. */
-const ICONE_STATUS: Record<TaskTableStatus, (t: number) => React.ReactNode> = {
-  active: (t) => <Circle size={t} weight="bold" />,
-  progress: (t) => <CircleHalf size={t} weight="fill" />,
-  blocked: (t) => <Prohibit size={t} weight="bold" />,
-  done: (t) => <CheckCircle size={t} weight="fill" />,
-}
-function StatusIcone({ status, tamanho = 18 }: { status: TaskTableStatus; tamanho?: number }) {
+/** Status como o Linear: um ícone por estado, na cor do tom.
+    - backlog (aberta e sem responsável): círculo tracejado
+    - aberta: círculo vazio
+    - fazendo: a pizza que enche com o andamento (o chart-pie do Phosphor é
+      uma fatia fixa e não diz quanto falta; esta é desenhada no traço dele)
+    - bloqueada: proibido · feita: check
+    Trocar de estado troca o ícone pelo desfoque. */
+type Visual = TaskTableStatus | "backlog"
+const visualDe = (status: TaskTableStatus, semDono?: boolean): Visual => (status === "active" && semDono ? "backlog" : status)
+const ROTULO_VISUAL: Record<Visual, string> = { backlog: "Backlog", active: "Aberta", progress: "Fazendo", blocked: "Bloqueada", done: "Feita" }
+const COR_VISUAL: Record<Visual, string> = { backlog: "var(--ds-tinta-2)", active: "var(--tone-green-dot)", progress: "var(--tone-blue-dot)", blocked: "var(--tone-red-dot)", done: "var(--success)" }
+
+function Pizza({ fracao, t }: { fracao: number; t: number }) {
+  // o anel no traço do Phosphor (bold ≈ 24/256 do lado) e a fatia por dentro, com folga
+  const f = Math.min(Math.max(fracao, 0.08), 0.92)
+  const r = 4.2
+  const ang = f * 2 * Math.PI
+  const x = 8 + r * Math.sin(ang)
+  const y = 8 - r * Math.cos(ang)
   return (
-    <span className="relative grid shrink-0 place-items-center" style={{ width: tamanho, height: tamanho, color: status === "done" ? "var(--success)" : `var(--tone-${ST_F[status].tom}-dot)` }}>
+    <svg width={t} height={t} viewBox="0 0 16 16" aria-hidden>
+      <circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <motion.path initial={false} animate={{ d: `M8 8 L8 ${8 - r} A${r} ${r} 0 ${f > 0.5 ? 1 : 0} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z` }} transition={{ duration: 0.5, ease: CURVA }} fill="currentColor" />
+    </svg>
+  )
+}
+
+function StatusIcone({ status, tamanho = 18, progresso = 0, semDono = false }: { status: TaskTableStatus; tamanho?: number; progresso?: number; semDono?: boolean }) {
+  const v = visualDe(status, semDono)
+  const icone =
+    v === "backlog" ? <CircleDashed size={tamanho} weight="bold" /> :
+    v === "active" ? <Circle size={tamanho} weight="bold" /> :
+    v === "progress" ? <Pizza fracao={progresso} t={tamanho} /> :
+    v === "blocked" ? <Prohibit size={tamanho} weight="bold" /> :
+    <CheckCircle size={tamanho} weight="fill" />
+  return (
+    <span className="relative grid shrink-0 place-items-center" style={{ width: tamanho, height: tamanho, color: COR_VISUAL[v] }}>
       <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span key={status} initial={{ opacity: 0, filter: "blur(5px)", scale: 0.7 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(5px)", scale: 0.7, transition: { duration: 0.15 } }} transition={{ duration: 0.35, ease: CURVA }} className="grid place-items-center">
-          {ICONE_STATUS[status](tamanho)}
+        <motion.span key={v} initial={{ opacity: 0, filter: "blur(5px)", scale: 0.7 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(5px)", scale: 0.7, transition: { duration: 0.15 } }} transition={{ duration: 0.35, ease: CURVA }} className="grid place-items-center">
+          {icone}
         </motion.span>
       </AnimatePresence>
     </span>
   )
 }
 /** O ícone de status é o botão de concluir. Enquanto salva, gira. */
-function StatusBotao({ status, salvando, onClick }: { status: TaskTableStatus; salvando: boolean; onClick: () => void }) {
+function StatusBotao({ status, salvando, onClick, progresso, semDono }: { status: TaskTableStatus; salvando: boolean; onClick: () => void; progresso?: number; semDono?: boolean }) {
   return (
-    <button type="button" aria-label={status === "done" ? "Reabrir" : "Concluir"} title={ST_F[status].rotulo} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-6 shrink-0 place-items-center rounded-[6px] transition-colors hover:bg-[var(--ds-trilho)]">
+    <button type="button" aria-label={status === "done" ? "Reabrir" : "Concluir"} title={ROTULO_VISUAL[visualDe(status, semDono)]} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-6 shrink-0 place-items-center rounded-[6px] transition-colors hover:bg-[var(--ds-trilho)]">
       {salvando ? (
         <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, ease: "linear", repeat: Infinity }} style={{ color: "var(--ds-tinta-2)" }}>
           <CircleNotch size={16} weight="bold" />
         </motion.span>
       ) : (
-        <StatusIcone status={status} tamanho={17} />
+        <StatusIcone status={status} tamanho={17} progresso={progresso} semDono={semDono} />
       )}
     </button>
   )
@@ -729,13 +755,13 @@ function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
 }
 
 /** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
-function SeloTroca({ status }: { status: TaskTableStatus }) {
+function SeloTroca({ status, progresso, semDono }: { status: TaskTableStatus; progresso?: number; semDono?: boolean }) {
   return (
     <AnimatePresence mode="wait" initial={false}>
-      <motion.span key={status} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA}>
+      <motion.span key={visualDe(status, semDono)} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA}>
         <span className="flex items-center gap-2 text-[13px]" style={{ color: "var(--ds-tinta-forte)" }}>
-          <StatusIcone status={status} tamanho={16} />
-          {ST_F[status].rotulo}
+          <StatusIcone status={status} tamanho={16} progresso={progresso} semDono={semDono} />
+          {ROTULO_VISUAL[visualDe(status, semDono)]}
         </span>
       </motion.span>
     </AnimatePresence>
@@ -846,7 +872,7 @@ function ArvoreFamilia({
             ) : (
               <span className="w-5 shrink-0" />
             )}
-            <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} progresso={t.progressRatio} semDono={!t.owner} />
             <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
               {t.code}
             </span>
@@ -864,7 +890,7 @@ function ArvoreFamilia({
               </span>
             ) : null}
           </span>
-          <SeloTroca status={st} />
+          <SeloTroca status={st} progresso={t.progressRatio} semDono={!t.owner} />
           <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
@@ -955,7 +981,7 @@ function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle 
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-2">
-          <StatusBotao status={feito ? "done" : (c.statusId as TaskTableStatus)} salvando={false} onClick={() => onToggle?.()} />
+          <StatusBotao status={feito ? "done" : (c.statusId as TaskTableStatus)} salvando={false} onClick={() => onToggle?.()} progresso={c.progress / 100} semDono={!c.assignee} />
           <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
             {c.slug}
           </span>
@@ -1233,7 +1259,7 @@ function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskT
               return (
                 <motion.div key={t.id} onClick={() => abrir(t)} onMouseEnter={() => setFoco(t.id)} onMouseLeave={() => setFoco(null)} animate={{ opacity: recua ? 0.35 : 1 }} transition={{ duration: 0.3 }} className="absolute inset-x-0 flex cursor-pointer" style={{ top, height: H, borderBottom: "1px solid var(--ds-fio)" }}>
                   <div className="sticky left-0 z-10 -mb-px flex shrink-0 items-center gap-2 truncate pr-4 text-[13.5px]" style={{ width: NOME_LARG, paddingLeft: t.depth === 2 ? 46 : 22, background: "var(--ds-placa-solida)", boxShadow: "1px 0 0 var(--ds-fio), inset 0 -1px 0 var(--ds-fio)", color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-                    <StatusIcone status={st} tamanho={14} />
+                    <StatusIcone status={st} tamanho={14} progresso={t.progressRatio} semDono={!t.owner} />
                     <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
                       {t.code}
                     </span>
@@ -1265,7 +1291,7 @@ function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas
   const segura = FAMILIA.filter((x) => x.deps?.includes(t.id))
   const mini = (x: TaskTableTask) => (
     <button key={x.id} type="button" onClick={() => abrir(x)} className="flex h-10 items-center gap-3 rounded-[8px] px-2 text-left text-[13.5px] transition-colors hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta-forte)" }}>
-      <StatusIcone status={feitas.has(x.id) ? "done" : x.status} tamanho={15} />
+      <StatusIcone status={feitas.has(x.id) ? "done" : x.status} tamanho={15} progresso={x.progressRatio} semDono={!x.owner} />
       <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
         {x.code}
       </span>
@@ -1287,7 +1313,7 @@ function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas
         <CabecalhoFrente etiqueta={t.depth === 2 ? `${t.code} · subtarefa` : t.code} tom={ST_F[st].tom} titulo={t.title} fechar={fechar} />
         <Ficha
           linhas={[
-            ["Status", <SeloTroca key="s" status={st} />],
+            ["Status", <SeloTroca key="s" status={st} progresso={t.progressRatio} semDono={!t.owner} />],
             ["Responsável", t.owner ? <><Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> {NOME_DONO[t.owner.initials]}</> : "—"],
             ["Prazo", <><CalendarBlank size={16} /> {t.due}</>],
             ["Prioridade", <Prioridade key="p" p={t.priority} />],
