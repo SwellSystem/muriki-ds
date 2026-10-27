@@ -711,17 +711,17 @@ function IndicadorSalvo({ estado }: { estado: "ocioso" | "salvando" | "salvo" })
   )
 }
 
-/** O cabeçalho das colunas, sem barra: os rótulos soltos em mono, presos no
-    topo ao rolar, e o desfoque se dissolvendo por cima da lista — o mesmo
-    cabeçalho que some da linguagem. A coluna ordenada leva o quadradinho azul. */
+/** O cabeçalho das colunas mora DENTRO da placa do grupo, logo abaixo do
+    título, com a mesma grade e o mesmo recuo das linhas. Já foi solto na
+    página, preso no topo: ficava fora das placas e não conversava com o
+    conteúdo. A coluna ordenada leva o quadradinho azul. */
 function CabecalhoColunas({ colunas, grade, ordem, ordenar }: { colunas: { k: string; r: string; direita?: boolean }[]; grade: string; ordem: string; ordenar: (k: string) => void }) {
   return (
-    <div className="sticky top-0 z-10 -mx-8 px-8" style={{ isolation: "isolate" }}>
-      <span aria-hidden className="absolute inset-x-0 top-0 -bottom-5 -z-10" style={{ background: "linear-gradient(to bottom, var(--ds-placa-1) 35%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", maskImage: "linear-gradient(to bottom, black 50%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent)" }} />
-      <div className={`grid h-10 items-center gap-4 px-5 ${grade}`}>
-        {colunas.map((c) =>
+    <div>
+      <div className={`grid h-9 items-center gap-4 px-5 ${grade}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
+        {colunas.map((c, i) =>
           c.r ? (
-            <button key={c.k} type="button" onClick={() => ordenar(c.k)} className={`group relative flex items-center font-mono text-[10.5px] tracking-[0.12em] uppercase transition-colors ${c.direita ? "justify-end" : ""}`} style={{ color: ordem === c.k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+            <button key={c.k} type="button" onClick={() => ordenar(c.k)} className={`group relative flex items-center font-mono text-[10px] tracking-[0.12em] uppercase transition-colors ${c.direita ? "justify-end" : ""}`} style={{ color: ordem === c.k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)", paddingLeft: i === 0 ? 60 : undefined }}>
               {/* o quadradinho fica fora do fluxo, à esquerda: o rótulo alinha com o conteúdo da coluna */}
               <span className="relative">
                 {ordem === c.k ? <motion.span layoutId="ordem" className="absolute top-1/2 -left-3.5 size-1.5 -translate-y-1/2" style={{ background: "var(--primary)" }} transition={{ type: "spring", bounce: 0.2, duration: 0.45 }} /> : <span className="absolute top-1/2 -left-3.5 size-1.5 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-40" style={{ background: "var(--ds-tinta-2)" }} />}
@@ -834,19 +834,6 @@ function ArvoreFamilia({
   }
   return (
     <div className="flex flex-col">
-      <CabecalhoColunas
-        grade={GRADE_ARVORE}
-        ordem={ordem}
-        ordenar={setOrdem}
-        colunas={[
-          { k: "tarefa", r: "Tarefa" },
-          { k: "status", r: "Status" },
-          { k: "prioridade", r: "Prioridade" },
-          { k: "dono", r: "" },
-          { k: "prazo", r: "Prazo", direita: true },
-          { k: "atalhos", r: "" },
-        ]}
-      />
       <div className="flex flex-col gap-5">
         {FAMILIA.filter((e) => e.depth === 0).map((e) => {
           const fechado = fechados.has(e.id)
@@ -873,6 +860,25 @@ function ArvoreFamilia({
                   </span>
                 </div>
               </header>
+              <AnimatePresence initial={false}>
+                {!fechado ? (
+                  <motion.div key="cab" initial={{ opacity: 0, height: 0, filter: "blur(6px)" }} animate={{ opacity: 1, height: "auto", filter: "blur(0px)" }} exit={{ opacity: 0, height: 0, filter: "blur(6px)" }} transition={{ duration: 0.4, ease: CURVA }} className="overflow-hidden">
+                    <CabecalhoColunas
+                      grade={GRADE_ARVORE}
+                      ordem={ordem}
+                      ordenar={setOrdem}
+                      colunas={[
+                        { k: "tarefa", r: "Tarefa" },
+                        { k: "status", r: "Status" },
+                        { k: "prioridade", r: "Prioridade" },
+                        { k: "dono", r: "" },
+                        { k: "prazo", r: "Prazo", direita: true },
+                        { k: "atalhos", r: "" },
+                      ]}
+                    />
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
               <AnimatePresence initial={false}>{!fechado ? filhos.map((f, i) => linha(f, i === filhos.length - 1)) : null}</AnimatePresence>
             </section>
           )
