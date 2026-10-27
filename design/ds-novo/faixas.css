@@ -7,7 +7,9 @@
   --ds-placa-1: oklch(0.985 0.006 85 / 0.55);
   --ds-placa-2: oklch(0.995 0.004 85 / 0.72);
   --ds-placa-forte: oklch(0.995 0.003 85 / 0.93);
+  --ds-placa-solida: oklch(0.995 0.003 85);
   --ds-trilho: oklch(0.45 0.035 85 / 0.07);
+  --ds-trilho-forte: oklch(0.45 0.035 85 / 0.14);
   --ds-fio: oklch(0.45 0.035 85 / 0.13);
   --ds-fio-forte: oklch(0.45 0.035 85 / 0.38);
   --ds-tinta: oklch(0.38 0.02 250);
@@ -28,7 +30,9 @@
   --ds-placa-1: oklch(0.2 0.005 107 / 0.55);
   --ds-placa-2: oklch(0.24 0.005 107 / 0.6);
   --ds-placa-forte: oklch(0.25 0.005 107 / 0.93);
+  --ds-placa-solida: oklch(0.25 0.005 107);
   --ds-trilho: oklch(1 0 0 / 0.05);
+  --ds-trilho-forte: oklch(1 0 0 / 0.1);
   --ds-fio: oklch(1 0 0 / 0.08);
   --ds-fio-forte: oklch(1 0 0 / 0.28);
   --ds-tinta: oklch(0.86 0.005 100);
