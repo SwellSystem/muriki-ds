@@ -13,7 +13,10 @@ import {
   CircleDashed,
   CircleHalf,
   CircleHalfTilt,
+  ArrowDown,
+  ArrowUp,
   ExclamationMark,
+  Warning,
   Prohibit,
   Check,
   CircleNotch,
@@ -738,7 +741,8 @@ function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
   const tom = TOM_PRIO[p]
   return (
     <span className={`inline-flex w-fit items-center gap-1.5 rounded-[7px] ${pequena ? "h-6 px-2 text-[11.5px]" : "h-7 px-2.5 text-[12.5px]"}`} style={{ background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` }}>
-      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${tom}-dot)` }} />}
+      {/* um ícone por nível: urgente !, alta seta para cima, média aviso, baixa seta para baixo */}
+      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : p === "high" ? <ArrowUp size={12} weight="bold" /> : p === "medium" ? <Warning size={12} weight="bold" /> : <ArrowDown size={12} weight="bold" />}
       {PRIO_F[p]}
     </span>
   )
