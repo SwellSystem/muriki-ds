@@ -759,17 +759,6 @@ function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
   )
 }
 
-/** A prioridade na lista corrida: a mesma badge, só com o ícone. O nome vem no title. */
-function PrioridadeIcone({ p }: { p?: string }) {
-  if (!p || p === "none") return <span className="size-6" />
-  const tom = TOM_PRIO[p]
-  return (
-    <span title={PRIO_F[p]} className="grid size-6 place-items-center rounded-[6px]" style={{ background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` }}>
-      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : p === "high" ? <TrendUp size={13} weight="bold" /> : p === "medium" ? <Minus size={12} weight="bold" /> : <TrendDown size={13} weight="bold" />}
-    </span>
-  )
-}
-
 /** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
 function SeloTroca({ status, progresso, semDono }: { status: TaskTableStatus; progresso?: number; semDono?: boolean }) {
   return (
@@ -800,8 +789,14 @@ function IndicadorSalvo({ estado }: { estado: "ocioso" | "salvando" | "salvo" })
 }
 
 
-/** A lista em árvore: cada épico é uma placa dentro da placa; tarefa e
-    subtarefa penduradas no fio; atalhos no hover. */
+/** As tarefas do projeto no mesmo modelo do Meu foco: uma tabela só, com
+    UM cabeçalho (sem fundo próprio, só os rótulos e um filete; o fundo
+    aparece quando a lista rola por baixo), e os grupos — os épicos e o
+    "Sem épico" — como faixas de seção dentro dela. Tarefa e subtarefa
+    penduradas no fio; o status por extenso na coluna (o ícone na frente é
+    o concluir); atalhos no hover. */
+const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_104px_116px_40px_60px]"
+
 function ArvoreFamilia({
   fechados,
   alternar,
@@ -819,14 +814,18 @@ function ArvoreFamilia({
   abrir: (t: TaskTableTask) => void
   acao: (o: string, t: TaskTableTask) => void
 }) {
-  const ordem = "tarefa"
-  const ORD: Record<string, (t: TaskTableTask) => string | number> = {
-    tarefa: (t) => t.code.padStart(8, "0"),
-    status: (t) => ({ blocked: 0, progress: 1, active: 2, done: 3 })[feitas.has(t.id) ? "done" : t.status],
-    prioridade: (t) => ({ urgent: 0, high: 1, medium: 2, low: 3, none: 4 })[t.priority ?? "none"],
-    prazo: (t) => diaDe(t.end),
-  }
-  const ordena = (ls: TaskTableTask[]) => [...ls].sort((a, b) => (ORD[ordem](a) < ORD[ordem](b) ? -1 : ORD[ordem](a) > ORD[ordem](b) ? 1 : 0))
+  // o fundo do cabeçalho só aparece quando o topo da tabela sai de vista
+  const marco = React.useRef<HTMLDivElement>(null)
+  const [rolou, setRolou] = React.useState(false)
+  React.useEffect(() => {
+    const el = marco.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setRolou(!e.isIntersecting))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  const ordena = (ls: TaskTableTask[]) => [...ls].sort((a, b) => a.code.localeCompare(b.code, "pt", { numeric: true }))
+
   const linha = (t: TaskTableTask, ultimo: boolean): React.ReactNode => {
     const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
     const grupo = t.childGroupId
@@ -842,10 +841,10 @@ function ArvoreFamilia({
           transition={{ duration: 0.4, ease: CURVA }}
           onClick={() => abrir(t)}
           tabIndex={0}
-          className="group relative flex cursor-pointer items-center gap-4 overflow-hidden px-5 outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)]"
-          style={{ borderTop: "1px solid var(--ds-fio)" }}
+          className={`group relative grid cursor-pointer items-center gap-6 overflow-hidden px-5 outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_PROJ}`}
+          style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}
         >
-          <span className="relative flex min-w-0 flex-1 items-center gap-2.5" style={{ paddingLeft: (t.depth - 1) * 26 }}>
+          <span className="relative flex min-w-0 items-center gap-2.5" style={{ paddingLeft: (t.depth - 1) * 26 }}>
             {t.depth === 2 ? (
               <>
                 <span aria-hidden className="absolute top-[-26px] left-[10px] w-px" style={{ height: ultimo ? 26 : 52, background: "var(--ds-fio-forte)" }} />
@@ -879,13 +878,15 @@ function ArvoreFamilia({
               </span>
             ) : null}
           </span>
-          {/* a ponta direita, junta e compacta: prioridade (badge só com o ícone), dono, prazo */}
-          <span className="flex shrink-0 items-center gap-3">
-            <PrioridadeIcone p={t.priority} />
-            {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
-            <span className="w-12 text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {t.due}
-            </span>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span key={visualDe(st, !t.owner)} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA} className="text-[13px]" style={{ color: st === "blocked" ? "var(--destructive)" : st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta)" }}>
+              {ROTULO_VISUAL[visualDe(st, !t.owner)]}
+            </motion.span>
+          </AnimatePresence>
+          <Prioridade p={t.priority} />
+          {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
+          <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {t.due}
           </span>
           <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 pl-10 opacity-0 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100" style={{ background: "linear-gradient(to right, transparent, var(--ds-placa-solida) 40px)" }}>
             <Atalhos t={{ ...t, status: st }} acao={acao} />
@@ -895,57 +896,74 @@ function ArvoreFamilia({
       </React.Fragment>
     )
   }
+
+  /** a faixa de seção do grupo, dentro da tabela */
+  const secao = (id: string, conteudo: React.ReactNode, direita: React.ReactNode) => {
+    const fechado = fechados.has(id)
+    return (
+      <button type="button" onClick={() => alternar(id)} className="flex h-10 w-full items-center gap-3 px-5 text-left" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+        <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
+          <CaretRight size={12} weight="bold" />
+        </motion.span>
+        {conteudo}
+        <span className="ml-auto flex items-center gap-3">{direita}</span>
+      </button>
+    )
+  }
+
   return (
-    <div className="flex flex-col">
-      <div className="flex flex-col gap-5">
-        {FAMILIA.filter((e) => e.depth === 0).map((e) => {
-          const fechado = fechados.has(e.id)
-          const filhos = ordena(filhosDe(e.id))
-          return (
-            <section key={e.id} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-              <header className="flex h-12 items-center px-5">
-                <span className="flex min-w-0 flex-1 items-center gap-4">
-                <button type="button" onClick={() => alternar(e.id)} className="flex items-center gap-3">
-                  <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
-                    <CaretRight size={13} weight="bold" />
-                  </motion.span>
-                  <Flag size={14} weight="fill" style={{ color: "var(--primary)" }} />
-                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-                    {e.code}
-                  </span>
-                  <Etiqueta cor="var(--primary)">{e.title}</Etiqueta>
-                </button>
-                <div className="ml-auto flex items-center gap-3 pr-2">
-                  <div className="h-1 w-24 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho)" }}>
-                    <motion.div className="h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${(e.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1, ease: CURVA }} style={{ background: "var(--primary)" }} />
-                  </div>
-                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-                    {e.progress?.done}/{e.progress?.total}
-                  </span>
-                </div>
+    <>
+      <div ref={marco} className="h-px" />
+      <section className="relative rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+        {/* o cabeçalho: um só, sem fundo próprio, preso no topo; o fundo aparece ao rolar */}
+        <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_PROJ}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+          <span className="pl-[60px]">Tarefa</span>
+          <span>Status</span>
+          <span>Prioridade</span>
+          <span />
+          <span className="text-right">Prazo</span>
+        </div>
+        {FAMILIA.filter((e) => e.depth === 0).map((e) => (
+          <div key={e.id}>
+            {secao(
+              e.id,
+              <>
+                <Flag size={13} weight="fill" style={{ color: "var(--primary)" }} />
+                <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {e.code}
                 </span>
-              </header>
-              <AnimatePresence initial={false}>{!fechado ? filhos.map((f, i) => linha(f, i === filhos.length - 1)) : null}</AnimatePresence>
-            </section>
-          )
-        })}
+                <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase" style={{ color: "var(--ds-tinta-forte)" }}>
+                  {e.title}
+                </span>
+              </>,
+              <>
+                <span className="h-1 w-20 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho-forte)" }}>
+                  <motion.span className="block h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${(e.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1, ease: CURVA }} style={{ background: "var(--primary)" }} />
+                </span>
+                <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                  {e.progress?.done}/{e.progress?.total}
+                </span>
+              </>
+            )}
+            <AnimatePresence initial={false}>{!fechados.has(e.id) ? ordena(filhosDe(e.id)).map((f, i, a) => linha(f, i === a.length - 1)) : null}</AnimatePresence>
+          </div>
+        ))}
         {SOLTAS.length ? (
-          <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-            {/* sem épico: o mesmo cabeçalho de grupo, sem bandeira nem andamento — é um lugar, não uma entrega */}
-            <header className="flex h-12 items-center justify-between px-5">
-              <span className="flex items-center gap-3">
-                <span className="w-[13px]" />
-                <Etiqueta cor="var(--ds-tinta-2)">Sem épico</Etiqueta>
-              </span>
-              <span className="pr-2 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+          <div>
+            {secao(
+              "sem-epico",
+              <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+                Sem épico
+              </span>,
+              <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
                 {SOLTAS.length}
               </span>
-            </header>
-            <AnimatePresence initial={false}>{ordena(SOLTAS).map((f, i, a) => linha(f, i === a.length - 1))}</AnimatePresence>
-          </section>
+            )}
+            <AnimatePresence initial={false}>{!fechados.has("sem-epico") ? ordena(SOLTAS).map((f, i, a) => linha(f, i === a.length - 1)) : null}</AnimatePresence>
+          </div>
         ) : null}
-      </div>
-    </div>
+      </section>
+    </>
   )
 }
 
