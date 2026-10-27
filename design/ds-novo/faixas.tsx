@@ -273,10 +273,17 @@ function Escolha<V extends string>({ id, opcoes, valor, onChange }: { id: string
             {ativo ? (
               <motion.span layoutId={`escolha-${id}`} className="absolute inset-0 rounded-[7px]" style={{ background: o.tom ? `var(--tone-${o.tom})` : "var(--ds-placa-forte)", boxShadow: "0 2px 8px -2px var(--ds-sombra), inset 0 0 0 1px var(--ds-fio)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} />
             ) : null}
-            <span className="relative flex items-center gap-2">
+            {/* a opção que acaba de ser escolhida chega desfocada: a troca é sempre pelo desfoque */}
+            <motion.span
+              key={ativo ? "ativo" : "inativo"}
+              initial={ativo ? { opacity: 0, filter: "blur(6px)" } : false}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              transition={{ duration: 0.35, ease: CURVA }}
+              className="relative flex items-center gap-2"
+            >
               {o.tom ? <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${o.tom}-dot)` }} /> : null}
               {o.rotulo}
-            </span>
+            </motion.span>
           </button>
         )
       })}
@@ -1182,6 +1189,14 @@ function TelaMembros() {
             <CabecalhoFrente etiqueta={`${time.nome} · ${aberto.pendente ? "convite pendente" : "membro"}`} tom={time.tom} titulo={aberto.nome} fechar={() => setAberto(null)} />
             <Ficha
               linhas={[
+                [
+                  "Papel",
+                  <AnimatePresence key="p" mode="wait">
+                    <motion.span key={aberto.papel} initial={{ opacity: 0, filter: "blur(8px)", y: 4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: -4 }} transition={{ duration: 0.35, ease: CURVA }}>
+                      <Selo {...PAPEL[aberto.papel]} />
+                    </motion.span>
+                  </AnimatePresence>,
+                ],
                 ["E-mail", aberto.email],
                 ["Último acesso", aberto.acesso],
                 ["Time", time.nome],
