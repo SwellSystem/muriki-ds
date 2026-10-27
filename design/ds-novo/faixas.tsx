@@ -7,6 +7,11 @@ import {
   CalendarBlank,
   CaretRight,
   ChartBar,
+  CheckCircle,
+  Circle,
+  CircleHalf,
+  ExclamationMark,
+  Prohibit,
   Check,
   CircleNotch,
   DotsThree,
@@ -675,21 +680,51 @@ function Atalhos({ t, acao }: { t: TaskTableTask; acao: (o: string, t: TaskTable
   )
 }
 
-function Concluir({ feita, salvando, onClick }: { feita: boolean; salvando: boolean; onClick: () => void }) {
+/** Status como o Linear: um ícone por estado, na cor do tom. Trocar de
+    estado troca o ícone pelo desfoque. */
+const ICONE_STATUS: Record<TaskTableStatus, (t: number) => React.ReactNode> = {
+  active: (t) => <Circle size={t} weight="bold" />,
+  progress: (t) => <CircleHalf size={t} weight="fill" />,
+  blocked: (t) => <Prohibit size={t} weight="bold" />,
+  done: (t) => <CheckCircle size={t} weight="fill" />,
+}
+function StatusIcone({ status, tamanho = 18 }: { status: TaskTableStatus; tamanho?: number }) {
   return (
-    <button type="button" aria-label={feita ? "Reabrir" : "Concluir"} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-5 shrink-0 place-items-center rounded-full transition-[background-color,box-shadow] duration-300" style={{ background: feita ? "var(--success)" : "transparent", boxShadow: feita ? "0 0 0 1px var(--success)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "white" }}>
-      <AnimatePresence mode="wait" initial={false}>
-        {salvando ? (
-          <motion.span key="g" initial={{ opacity: 0 }} animate={{ opacity: 1, rotate: 360 }} exit={{ opacity: 0 }} transition={{ rotate: { duration: 0.8, ease: "linear", repeat: Infinity }, default: { duration: 0.2 } }} style={{ color: feita ? "white" : "var(--ds-tinta-2)" }}>
-            <CircleNotch size={13} weight="bold" />
-          </motion.span>
-        ) : feita ? (
-          <motion.span key="c" initial={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} transition={{ duration: 0.3, ease: CURVA }}>
-            <Check size={11} weight="bold" />
-          </motion.span>
-        ) : null}
+    <span className="relative grid shrink-0 place-items-center" style={{ width: tamanho, height: tamanho, color: status === "done" ? "var(--success)" : `var(--tone-${ST_F[status].tom}-dot)` }}>
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span key={status} initial={{ opacity: 0, filter: "blur(5px)", scale: 0.7 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(5px)", scale: 0.7, transition: { duration: 0.15 } }} transition={{ duration: 0.35, ease: CURVA }} className="grid place-items-center">
+          {ICONE_STATUS[status](tamanho)}
+        </motion.span>
       </AnimatePresence>
+    </span>
+  )
+}
+/** O ícone de status é o botão de concluir. Enquanto salva, gira. */
+function StatusBotao({ status, salvando, onClick }: { status: TaskTableStatus; salvando: boolean; onClick: () => void }) {
+  return (
+    <button type="button" aria-label={status === "done" ? "Reabrir" : "Concluir"} title={ST_F[status].rotulo} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-6 shrink-0 place-items-center rounded-[6px] transition-colors hover:bg-[var(--ds-trilho)]">
+      {salvando ? (
+        <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, ease: "linear", repeat: Infinity }} style={{ color: "var(--ds-tinta-2)" }}>
+          <CircleNotch size={16} weight="bold" />
+        </motion.span>
+      ) : (
+        <StatusIcone status={status} tamanho={17} />
+      )}
     </button>
+  )
+}
+/** Prioridade é badge: a pílula com a cor. Com os dois em ícone (status e
+    prioridade) a linha ficava sem nenhum ponto de cor para o olho bater; o
+    status ficou ícone porque ele também é o botão de concluir. */
+const TOM_PRIO: Record<string, string> = { urgent: "red", high: "orange", medium: "blue", low: "gray" }
+function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
+  if (!p || p === "none") return <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>—</span>
+  const tom = TOM_PRIO[p]
+  return (
+    <span className={`inline-flex w-fit items-center gap-1.5 rounded-[7px] ${pequena ? "h-6 px-2 text-[11.5px]" : "h-7 px-2.5 text-[12.5px]"}`} style={{ background: `var(--tone-${tom})`, color: `var(--tone-${tom}-foreground)` }}>
+      {p === "urgent" ? <ExclamationMark size={12} weight="bold" /> : <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${tom}-dot)` }} />}
+      {PRIO_F[p]}
+    </span>
   )
 }
 
@@ -698,7 +733,10 @@ function SeloTroca({ status }: { status: TaskTableStatus }) {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <motion.span key={status} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA}>
-        <Selo {...ST_F[status]} />
+        <span className="flex items-center gap-2 text-[13px]" style={{ color: "var(--ds-tinta-forte)" }}>
+          <StatusIcone status={status} tamanho={16} />
+          {ST_F[status].rotulo}
+        </span>
       </motion.span>
     </AnimatePresence>
   )
@@ -808,7 +846,7 @@ function ArvoreFamilia({
             ) : (
               <span className="w-5 shrink-0" />
             )}
-            <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
             <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
               {t.code}
             </span>
@@ -827,9 +865,7 @@ function ArvoreFamilia({
             ) : null}
           </span>
           <SeloTroca status={st} />
-          <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
-            {PRIO_F[t.priority ?? "none"]}
-          </span>
+          <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
             {t.due}
@@ -902,7 +938,6 @@ function ArvoreFamilia({
     e prioridade · prazo em mono embaixo. `assignee` é o único campo a mais
     que o KanbanTask do registry: opcional, quem não manda não ganha avatar. */
 type CardQuadro = KanbanTask & { assignee?: { initials: string; tone: string } }
-const PRIO_ROTULO: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "" }
 const VAZIAS = ["Um respiro.", "Vazio por enquanto.", "Silêncio."]
 
 function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle }: { c: CardQuadro; fantasma?: boolean; solto?: boolean; onClick?: () => void; onToggle?: () => void }) {
@@ -920,9 +955,7 @@ function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle 
     >
       <div className="flex items-center justify-between">
         <span className="flex items-center gap-2">
-          <button type="button" aria-label={feito ? "Reabrir" : "Concluir"} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onToggle?.())} className="grid size-[18px] place-items-center rounded-full transition-[background-color,box-shadow] duration-300" style={{ background: feito ? "var(--success)" : "transparent", boxShadow: feito ? "0 0 0 1px var(--success)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "white" }}>
-            <AnimatePresence>{feito ? <motion.span initial={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} transition={{ duration: 0.3, ease: CURVA }}><Check size={10} weight="bold" /></motion.span> : null}</AnimatePresence>
-          </button>
+          <StatusBotao status={feito ? "done" : (c.statusId as TaskTableStatus)} salvando={false} onClick={() => onToggle?.()} />
           <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
             {c.slug}
           </span>
@@ -932,8 +965,11 @@ function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle 
       <span className="text-[14.5px] leading-snug transition-colors duration-300" style={{ color: feito ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
         {c.title}
       </span>
-      <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
-        {[PRIO_ROTULO[c.priority], c.timeLabel].filter(Boolean).join(" · ")}
+      <span className="flex items-center justify-between gap-2">
+        <Prioridade p={c.priority} pequena />
+        <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+          {c.timeLabel}
+        </span>
       </span>
     </div>
   )
@@ -1197,7 +1233,7 @@ function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskT
               return (
                 <motion.div key={t.id} onClick={() => abrir(t)} onMouseEnter={() => setFoco(t.id)} onMouseLeave={() => setFoco(null)} animate={{ opacity: recua ? 0.35 : 1 }} transition={{ duration: 0.3 }} className="absolute inset-x-0 flex cursor-pointer" style={{ top, height: H, borderBottom: "1px solid var(--ds-fio)" }}>
                   <div className="sticky left-0 z-10 -mb-px flex shrink-0 items-center gap-2 truncate pr-4 text-[13.5px]" style={{ width: NOME_LARG, paddingLeft: t.depth === 2 ? 46 : 22, background: "var(--ds-placa-solida)", boxShadow: "1px 0 0 var(--ds-fio), inset 0 -1px 0 var(--ds-fio)", color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-                    <span className="size-1.5 shrink-0 rounded-full" style={{ background: `var(--tone-${tom}-dot)` }} />
+                    <StatusIcone status={st} tamanho={14} />
                     <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
                       {t.code}
                     </span>
@@ -1229,7 +1265,7 @@ function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas
   const segura = FAMILIA.filter((x) => x.deps?.includes(t.id))
   const mini = (x: TaskTableTask) => (
     <button key={x.id} type="button" onClick={() => abrir(x)} className="flex h-10 items-center gap-3 rounded-[8px] px-2 text-left text-[13.5px] transition-colors hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta-forte)" }}>
-      <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${ST_F[feitas.has(x.id) ? "done" : x.status].tom}-dot)` }} />
+      <StatusIcone status={feitas.has(x.id) ? "done" : x.status} tamanho={15} />
       <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
         {x.code}
       </span>
@@ -1254,7 +1290,7 @@ function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas
             ["Status", <SeloTroca key="s" status={st} />],
             ["Responsável", t.owner ? <><Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> {NOME_DONO[t.owner.initials]}</> : "—"],
             ["Prazo", <><CalendarBlank size={16} /> {t.due}</>],
-            ["Prioridade", PRIO_F[t.priority ?? "none"]],
+            ["Prioridade", <Prioridade key="p" p={t.priority} />],
           ]}
         />
         {bloco(`Subtarefas · ${subs.length}`, subs)}
