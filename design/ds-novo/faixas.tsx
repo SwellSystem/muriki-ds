@@ -17,6 +17,8 @@ import {
   Minus,
   TrendDown,
   TrendUp,
+  Target,
+  User,
   Prohibit,
   Check,
   CircleNotch,
@@ -1692,6 +1694,175 @@ function TelaClientes() {
   )
 }
 
+// ── tela 4: o Focus — as tarefas da pessoa ───────────────────────────────
+
+/* Sem épico: a lista é de quem está olhando, misturando tarefas pessoais e
+   de projetos. Organiza por QUANDO (atrasadas, hoje, esta semana, depois),
+   e de onde a tarefa vem vira uma coluna (Origem). Uma placa só, com UM
+   cabeçalho de tabela, preso no topo ao rolar, dentro da placa e com a
+   mesma grade das linhas; os grupos de tempo são linhas de seção, não
+   placas separadas. */
+type Origem = { tipo: "pessoal" } | { tipo: "projeto"; nome: string; tom: string }
+interface TarefaFocus {
+  id: string
+  codigo?: string
+  titulo: string
+  status: TaskTableStatus
+  progresso?: number
+  prioridade: "urgent" | "high" | "medium" | "low" | "none"
+  prazo: string
+  origem: Origem
+  quando: "atrasadas" | "hoje" | "semana" | "depois"
+}
+const PESSOAL: Origem = { tipo: "pessoal" }
+const proj = (nome: string, tom: string): Origem => ({ tipo: "projeto", nome, tom })
+const FOCUS: TarefaFocus[] = [
+  { id: "f1", codigo: "MUR-5", titulo: "Migrar webhooks do Stripe", status: "blocked", prioridade: "high", prazo: "8 nov", origem: proj("Cobrança", "blue"), quando: "atrasadas" },
+  { id: "f2", titulo: "Pagar o boleto do coworking", status: "active", prioridade: "urgent", prazo: "9 nov", origem: PESSOAL, quando: "atrasadas" },
+  { id: "f3", codigo: "MUR-2", titulo: "Revisar o fluxo de cobrança", status: "progress", progresso: 0.85, prioridade: "urgent", prazo: "hoje", origem: proj("Cobrança", "blue"), quando: "hoje" },
+  { id: "f4", titulo: "Ligar para a contadora", status: "active", prioridade: "medium", prazo: "hoje", origem: PESSOAL, quando: "hoje" },
+  { id: "f5", codigo: "ONB-4", titulo: "Gravar o vídeo do primeiro acesso", status: "progress", progresso: 0.3, prioridade: "medium", prazo: "hoje", origem: proj("Onboarding", "purple"), quando: "hoje" },
+  { id: "f6", codigo: "MUR-12", titulo: "Carência de quem passa do limite", status: "active", prioridade: "high", prazo: "qui", origem: proj("Cobrança", "blue"), quando: "semana" },
+  { id: "f7", titulo: "Ler o contrato do novo cliente", status: "active", prioridade: "low", prazo: "sex", origem: PESSOAL, quando: "semana" },
+  { id: "f8", codigo: "INT-7", titulo: "Testar o webhook do GitHub", status: "progress", progresso: 0.5, prioridade: "medium", prazo: "sex", origem: proj("Integrações", "green"), quando: "semana" },
+  { id: "f9", codigo: "SIT-2", titulo: "Revisar o texto da home", status: "active", prioridade: "low", prazo: "24 nov", origem: proj("Site", "orange"), quando: "depois" },
+  { id: "f10", titulo: "Renovar o passaporte", status: "active", prioridade: "none", prazo: "dez", origem: PESSOAL, quando: "depois" },
+]
+const GRUPOS_FOCUS = [
+  { id: "atrasadas", nome: "Atrasadas", cor: "var(--destructive)" },
+  { id: "hoje", nome: "Hoje", cor: "var(--primary)" },
+  { id: "semana", nome: "Esta semana", cor: "var(--ds-tinta-2)" },
+  { id: "depois", nome: "Depois", cor: "var(--ds-tinta-2)" },
+] as const
+const GRADE_FOCUS = "grid-cols-[minmax(0,1fr)_160px_120px_72px]"
+
+function OrigemTag({ o }: { o: Origem }) {
+  return o.tipo === "pessoal" ? (
+    <span className="flex items-center gap-2 text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+      <User size={14} /> Pessoal
+    </span>
+  ) : (
+    <span className="flex min-w-0 items-center gap-2 text-[13px]" style={{ color: "var(--ds-tinta)" }}>
+      <span className="size-2 shrink-0 rounded-[2px]" style={{ background: `var(--tone-${o.tom}-dot)` }} />
+      <span className="truncate">{o.nome}</span>
+    </span>
+  )
+}
+
+function TelaFocus() {
+  const [filtro, setFiltro] = React.useState<"todas" | "pessoais" | "projetos">("todas")
+  const [feitas, setFeitas] = React.useState<Set<string>>(new Set())
+  const [salvando, setSalvando] = React.useState<string | null>(null)
+  const [aviso, avisar] = useAviso()
+  const carregando = useCarregando(filtro, 600)
+  const concluir = (id: string) => {
+    if (salvando) return
+    setSalvando(id)
+    setTimeout(() => {
+      setFeitas((f) => {
+        const n = new Set(f)
+        if (n.has(id)) n.delete(id)
+        else n.add(id)
+        return n
+      })
+      setSalvando(null)
+      avisar("Tarefa concluída")
+    }, 800)
+  }
+  const visiveis = FOCUS.filter((t) => filtro === "todas" || (filtro === "pessoais" ? t.origem.tipo === "pessoal" : t.origem.tipo === "projeto"))
+  const hoje = FOCUS.filter((t) => t.quando === "hoje").length
+  const atrasadas = FOCUS.filter((t) => t.quando === "atrasadas").length
+
+  return (
+    <>
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]" style={placa()}>
+        <header className="flex items-end justify-between gap-6 px-8 pt-7 pb-6">
+          <div className="flex flex-col gap-2.5">
+            <Etiqueta cor="var(--accent)">
+              Terça, 10 nov · {hoje} para hoje · {atrasadas} atrasadas
+            </Etiqueta>
+            <h1 className="text-[40px] leading-none font-light tracking-[-0.035em]" style={{ color: "var(--ds-tinta-forte)" }}>
+              Meu foco
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Escolha
+              id="filtro-focus"
+              valor={filtro}
+              onChange={setFiltro}
+              opcoes={[
+                { v: "todas", rotulo: "Todas" },
+                { v: "pessoais", rotulo: "Pessoais" },
+                { v: "projetos", rotulo: "De projeto" },
+              ]}
+            />
+            <Botao solido onClick={() => avisar("Nova tarefa pessoal")}>
+              <Plus size={16} /> Nova tarefa
+            </Botao>
+          </div>
+        </header>
+        <div className="muriki-scroll min-h-0 flex-1 overflow-auto px-8 pb-8">
+          <section className="relative rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+            {/* o cabeçalho da tabela: um só, dentro da placa, preso no topo ao rolar */}
+            <div className={`sticky top-0 z-10 grid h-11 items-center gap-4 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase ${GRADE_FOCUS}`} style={{ background: "var(--ds-placa-solida)", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+              <span className="pl-[34px]">Tarefa</span>
+              <span>Origem</span>
+              <span>Prioridade</span>
+              <span className="text-right">Prazo</span>
+            </div>
+            <AnimatePresence mode="wait">
+              <motion.div key={carregando ? "c" : filtro} {...troca}>
+                {GRUPOS_FOCUS.map((g) => {
+                  const ts = visiveis.filter((t) => t.quando === g.id)
+                  if (!ts.length) return null
+                  return (
+                    <div key={g.id}>
+                      {/* a seção do grupo: uma faixa fina dentro da tabela, não uma placa nova */}
+                      <div className="flex h-9 items-center gap-2.5 px-5" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+                        <span className="size-1.5" style={{ background: g.cor }} />
+                        <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase" style={{ color: g.id === "atrasadas" ? "var(--destructive)" : "var(--ds-tinta-forte)" }}>
+                          {g.nome}
+                        </span>
+                        <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                          {ts.length}
+                        </span>
+                      </div>
+                      {ts.map((t) => {
+                        const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+                        return (
+                          <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-4 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+                            <span className="flex min-w-0 items-center gap-2.5">
+                              <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} progresso={t.progresso} />
+                              {t.codigo ? (
+                                <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                                  {t.codigo}
+                                </span>
+                              ) : null}
+                              <span className="truncate text-[14.5px] transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+                                {t.titulo}
+                              </span>
+                            </span>
+                            <OrigemTag o={t.origem} />
+                            <Prioridade p={t.prioridade} />
+                            <span className="text-right font-mono text-[11.5px]" style={{ color: t.quando === "atrasadas" && st !== "done" ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
+                              {t.prazo}
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  )
+                })}
+              </motion.div>
+            </AnimatePresence>
+          </section>
+        </div>
+      </main>
+      {aviso}
+    </>
+  )
+}
+
 // ── tela 3: membros por time (Platform) ──────────────────────────────────
 
 type Papel = "admin" | "membro" | "convidado"
@@ -1875,13 +2046,14 @@ function TelaMembros() {
 
 function App() {
   const [escuro, setEscuro] = React.useState(() => location.hash.includes("escuro"))
-  const [tela, setTela] = React.useState(() => (location.hash.includes("clientes") ? "clientes" : location.hash.includes("membros") ? "membros" : "tarefas"))
+  const [tela, setTela] = React.useState(() => (location.hash.includes("clientes") ? "clientes" : location.hash.includes("membros") ? "membros" : location.hash.includes("focus") ? "focus" : "tarefas"))
   React.useLayoutEffect(() => {
     document.documentElement.classList.toggle("dark", escuro)
   }, [escuro])
 
   const nav = [
     { id: "inicio", i: <House size={18} />, r: "Início" },
+    { id: "focus", i: <Target size={18} />, r: "Meu foco" },
     { id: "tarefas", i: <ListChecks size={18} />, r: "Tarefas" },
     { id: "quadros", i: <Kanban size={18} />, r: "Quadros" },
     { id: "clientes", i: <AddressBook size={18} />, r: "Clientes" },
@@ -1903,7 +2075,7 @@ function App() {
         </div>
         {nav.map((n) => {
           const ativo = n.id === tela
-          const vivo = n.id === "tarefas" || n.id === "clientes" || n.id === "membros"
+          const vivo = n.id === "tarefas" || n.id === "clientes" || n.id === "membros" || n.id === "focus"
           return (
             <button
               key={n.id}
@@ -1942,7 +2114,7 @@ function App() {
       <div className="relative flex min-w-0 flex-1">
         <AnimatePresence mode="wait">
           <motion.div key={tela} {...troca} className="relative flex min-w-0 flex-1">
-            {tela === "tarefas" ? <TelaTarefas /> : tela === "clientes" ? <TelaClientes /> : <TelaMembros />}
+            {tela === "tarefas" ? <TelaTarefas /> : tela === "clientes" ? <TelaClientes /> : tela === "focus" ? <TelaFocus /> : <TelaMembros />}
           </motion.div>
         </AnimatePresence>
       </div>
