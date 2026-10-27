@@ -224,6 +224,113 @@ function EsqueletoLista({ grupos = 2, linhas = 5, colunas }: { grupos?: number; 
   )
 }
 
+// ── o formulário ─────────────────────────────────────────────────────────
+
+/** Um campo: o rótulo em mono em cima, o controle, e o erro que chega
+    desfocado embaixo. */
+function Campo({ rotulo, erro, children }: { rotulo: string; erro?: string | null; children: React.ReactNode }) {
+  return (
+    <label className="flex flex-col gap-2">
+      <span className="font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ color: erro ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
+        {rotulo}
+      </span>
+      {children}
+      <AnimatePresence>
+        {erro ? (
+          <motion.span initial={{ opacity: 0, filter: "blur(6px)", y: -4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(6px)" }} transition={{ duration: 0.3, ease: CURVA }} className="text-[12.5px]" style={{ color: "var(--destructive)" }}>
+            {erro}
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
+    </label>
+  )
+}
+
+/** O campo de texto: 40px, e em foco o anel azul com um halo desfocado. */
+function Entrada({ valor, onChange, placeholder, erro = false, autoFocus = false, area = false }: { valor: string; onChange: (v: string) => void; placeholder?: string; erro?: boolean; autoFocus?: boolean; area?: boolean }) {
+  const comum = {
+    value: valor,
+    placeholder,
+    autoFocus,
+    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => onChange(e.target.value),
+    className: `w-full rounded-[10px] px-3.5 text-[14.5px] outline-none transition-[box-shadow] duration-200 placeholder:text-[var(--ds-tinta-2)] ${area ? "min-h-[96px] resize-none py-3 leading-relaxed" : "h-10"}`,
+    style: { background: "var(--ds-placa-forte)", color: "var(--ds-tinta-forte)", ["--anel" as string]: erro ? "var(--destructive)" : "var(--primary)", boxShadow: `inset 0 0 0 1px ${erro ? "var(--destructive)" : "var(--ds-fio-forte)"}` },
+    onFocus: (e: React.FocusEvent<HTMLElement>) => (e.currentTarget.style.boxShadow = "inset 0 0 0 1.5px var(--anel), 0 0 0 4px color-mix(in oklab, var(--anel) 14%, transparent), 0 0 18px color-mix(in oklab, var(--anel) 28%, transparent)"),
+    onBlur: (e: React.FocusEvent<HTMLElement>) => (e.currentTarget.style.boxShadow = `inset 0 0 0 1px ${erro ? "var(--destructive)" : "var(--ds-fio-forte)"}`),
+  }
+  return area ? <textarea {...comum} /> : <input {...comum} />
+}
+
+/** A escolha entre poucas opções: pílula que desliza num trilho, 40px.
+    Com tom, a opção escolhida leva a cor dela. */
+function Escolha<V extends string>({ id, opcoes, valor, onChange }: { id: string; opcoes: { v: V; rotulo: string; tom?: string }[]; valor: V; onChange: (v: V) => void }) {
+  return (
+    <div className="flex h-10 items-center rounded-[10px] p-1" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      {opcoes.map((o) => {
+        const ativo = o.v === valor
+        return (
+          <button key={o.v} type="button" onClick={() => onChange(o.v)} className="relative flex h-8 flex-1 items-center justify-center gap-2 px-3 text-[13.5px] whitespace-nowrap" style={{ color: ativo ? (o.tom ? `var(--tone-${o.tom}-foreground)` : "var(--ds-tinta-forte)") : "var(--ds-tinta-2)" }}>
+            {ativo ? (
+              <motion.span layoutId={`escolha-${id}`} className="absolute inset-0 rounded-[7px]" style={{ background: o.tom ? `var(--tone-${o.tom})` : "var(--ds-placa-forte)", boxShadow: "0 2px 8px -2px var(--ds-sombra), inset 0 0 0 1px var(--ds-fio)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} />
+            ) : null}
+            <span className="relative flex items-center gap-2">
+              {o.tom ? <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${o.tom}-dot)` }} /> : null}
+              {o.rotulo}
+            </span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
+/** Quem: os avatares em fila; o escolhido acende com o anel azul. */
+function Pessoas({ valor, onChange }: { valor: string; onChange: (v: string) => void }) {
+  return (
+    <div className="flex gap-2">
+      {DONOS.map((d) => (
+        <button key={d} type="button" onClick={() => onChange(d)} className="rounded-full transition-[box-shadow] duration-200" style={{ boxShadow: d === valor ? "0 0 0 2px var(--ds-placa-forte), 0 0 0 4px var(--primary), 0 0 16px color-mix(in oklab, var(--primary) 40%, transparent)" : undefined }} aria-pressed={d === valor}>
+          <Avatar iniciais={d} tom={d === valor ? "blue" : undefined} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** O aviso: placa pequena que chega desfocada no canto e vai embora sozinha. */
+function useAviso() {
+  const [texto, setTexto] = React.useState<string | null>(null)
+  React.useEffect(() => {
+    if (!texto) return
+    const t = setTimeout(() => setTexto(null), 2600)
+    return () => clearTimeout(t)
+  }, [texto])
+  const aviso = (
+    // centrado embaixo, num trilho que não pega clique: no canto ele caía em cima dos botões da frente
+    <div className="pointer-events-none fixed inset-x-0 bottom-8 z-50 flex justify-center">
+    <AnimatePresence>
+      {texto ? (
+        <motion.div
+          key={texto}
+          initial={{ opacity: 0, y: 16, filter: "blur(12px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: 8, filter: "blur(12px)" }}
+          transition={{ duration: 0.45, ease: CURVA }}
+          className="pointer-events-auto flex items-center gap-3 rounded-[12px] px-4 py-3 text-[14px]"
+          style={{ ...placa("var(--ds-placa-forte)"), boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 24px 50px -20px var(--ds-sombra)", color: "var(--ds-tinta-forte)" }}
+        >
+          <span className="grid size-6 place-items-center rounded-full" style={{ background: "var(--tone-green)", color: "var(--tone-green-foreground)" }}>
+            <Check size={13} weight="bold" />
+          </span>
+          {texto}
+        </motion.div>
+      ) : null}
+    </AnimatePresence>
+    </div>
+  )
+  return [aviso, setTexto] as const
+}
+
 // ── as faixas deitadas ───────────────────────────────────────────────────
 
 interface ItemFaixa {
@@ -344,7 +451,7 @@ function Frente({ children }: { children: React.ReactNode }) {
       animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
       exit={{ opacity: 0, x: 40, filter: "blur(16px)" }}
       transition={{ duration: 0.45, ease: CURVA }}
-      className="absolute inset-y-4 right-4 z-20 flex w-[440px] flex-col gap-6 rounded-[14px] p-7"
+      className="muriki-scroll absolute inset-y-4 right-4 z-20 flex w-[440px] flex-col gap-6 overflow-y-auto rounded-[14px] p-7"
       style={{ ...placa("var(--ds-placa-forte)"), boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 40px 80px -30px var(--ds-sombra)" }}
     >
       {children}
@@ -527,12 +634,67 @@ function QuadroTarefas({ abrir }: { abrir: (t: Tarefa) => void }) {
   )
 }
 
+/** Nova tarefa: o formulário na camada da frente. */
+function NovaTarefa({ projeto, fechar, criar }: { projeto: ItemFaixa; fechar: () => void; criar: (titulo: string) => void }) {
+  const [titulo, setTitulo] = React.useState("")
+  const [status, setStatus] = React.useState<Status>("aberta")
+  const [prioridade, setPrioridade] = React.useState<(typeof PRIORIDADES)[number]>("media")
+  const [dono, setDono] = React.useState("GT")
+  const [prazo, setPrazo] = React.useState("")
+  const [descricao, setDescricao] = React.useState("")
+  const [tentou, setTentou] = React.useState(false)
+  const erroTitulo = tentou && !titulo.trim() ? "Dê um título para a tarefa." : null
+  return (
+    <>
+      <CabecalhoFrente etiqueta={`Nova tarefa · ${projeto.nome}`} tom={projeto.tom} titulo="O que precisa ser feito?" fechar={fechar} />
+      <form
+        className="flex flex-1 flex-col gap-5"
+        onSubmit={(e) => {
+          e.preventDefault()
+          setTentou(true)
+          if (titulo.trim()) criar(titulo.trim())
+        }}
+      >
+        <Campo rotulo="Título" erro={erroTitulo}>
+          <Entrada valor={titulo} onChange={setTitulo} placeholder="Ex.: revisar o fluxo de cobrança" erro={Boolean(erroTitulo)} autoFocus />
+        </Campo>
+        <Campo rotulo="Status">
+          <Escolha id="status" valor={status} onChange={setStatus} opcoes={(["aberta", "fazendo", "bloqueada"] as Status[]).map((v) => ({ v, rotulo: TOM[v].rotulo, tom: TOM[v].tom }))} />
+        </Campo>
+        <Campo rotulo="Prioridade">
+          <Escolha id="prioridade" valor={prioridade} onChange={setPrioridade} opcoes={PRIORIDADES.map((v) => ({ v, rotulo: PRIO[v] }))} />
+        </Campo>
+        <div className="grid grid-cols-2 gap-4">
+          <Campo rotulo="Responsável">
+            <Pessoas valor={dono} onChange={setDono} />
+          </Campo>
+          <Campo rotulo="Prazo">
+            <Entrada valor={prazo} onChange={setPrazo} placeholder="20 nov" />
+          </Campo>
+        </div>
+        <Campo rotulo="Descrição">
+          <Entrada valor={descricao} onChange={setDescricao} placeholder="O que é, e por quê" area />
+        </Campo>
+        <div className="mt-auto flex gap-2 pt-2">
+          <button type="submit" className="inline-flex h-10 items-center gap-2 rounded-[10px] px-4 text-[14px] active:scale-[0.98]" style={{ background: "var(--primary)", color: "var(--primary-foreground)", boxShadow: "0 8px 22px -8px color-mix(in oklab, var(--primary) 60%, transparent)" }}>
+            Criar tarefa
+          </button>
+          <Botao onClick={fechar}>Cancelar</Botao>
+        </div>
+      </form>
+    </>
+  )
+}
+
 function TelaTarefas() {
   const [foco, setFoco] = React.useState("cobranca")
   const [vista, setVista] = React.useState(() => (location.hash.includes("quadro") ? "quadro" : "lista"))
   const [aberta, setAberta] = React.useState<Tarefa | null>(() => (location.hash.includes("aberta") ? GRUPOS[0].tarefas[0] : null))
   const [marcadas, setMarcadas] = React.useState<Set<string>>(() => new Set(["g0-1", "g0-2"]))
+  const [nova, setNova] = React.useState(() => location.hash.includes("nova"))
+  const [aviso, avisar] = useAviso()
   const carregando = useCarregando(`${foco}-${vista}`)
+  const projeto = PROJETOS.find((p) => p.id === foco)!
   const alternar = (id: string) =>
     setMarcadas((m) => {
       const n = new Set(m)
@@ -546,13 +708,16 @@ function TelaTarefas() {
         itens={PROJETOS}
         focoId={foco}
         onFoco={setFoco}
-        recua={aberta !== null}
-        onFundo={() => setAberta(null)}
+        recua={aberta !== null || nova}
+        onFundo={() => {
+          setAberta(null)
+          setNova(false)
+        }}
         acoes={
           <>
             <Busca texto="Buscar tarefa" />
             <Vistas valor={vista} onChange={setVista} />
-            <Botao solido>
+            <Botao solido onClick={() => setNova(true)}>
               <Plus size={16} /> Nova tarefa
             </Botao>
           </>
@@ -572,6 +737,18 @@ function TelaTarefas() {
         )}
       />
       <AnimatePresence>
+        {nova ? (
+          <Frente key="nova">
+            <NovaTarefa
+              projeto={projeto}
+              fechar={() => setNova(false)}
+              criar={(t) => {
+                setNova(false)
+                avisar(`“${t}” entrou em ${projeto.nome}`)
+              }}
+            />
+          </Frente>
+        ) : null}
         {aberta ? (
           <Frente key={aberta.id}>
             <CabecalhoFrente etiqueta={aberta.codigo} tom={TOM[aberta.status].tom} titulo={aberta.titulo} fechar={() => setAberta(null)} />
@@ -593,6 +770,7 @@ function TelaTarefas() {
           </Frente>
         ) : null}
       </AnimatePresence>
+      {aviso}
     </>
   )
 }
@@ -744,9 +922,43 @@ function EsqueletoClientes() {
   )
 }
 
+function EditarCliente({ cliente, salvar, cancelar }: { cliente: Cliente; salvar: (c: Cliente) => void; cancelar: () => void }) {
+  const [nome, setNome] = React.useState(cliente.nome)
+  const [email, setEmail] = React.useState(cliente.email)
+  const [plano, setPlano] = React.useState(cliente.plano)
+  const erroEmail = email.includes("@") ? null : "Esse e-mail não parece completo."
+  return (
+    <form
+      className="flex flex-1 flex-col gap-5"
+      onSubmit={(e) => {
+        e.preventDefault()
+        if (!erroEmail && nome.trim()) salvar({ ...cliente, nome: nome.trim(), email, plano })
+      }}
+    >
+      <Campo rotulo="Nome">
+        <Entrada valor={nome} onChange={setNome} autoFocus />
+      </Campo>
+      <Campo rotulo="E-mail" erro={erroEmail}>
+        <Entrada valor={email} onChange={setEmail} erro={Boolean(erroEmail)} />
+      </Campo>
+      <Campo rotulo="Plano">
+        <Escolha id="plano" valor={plano} onChange={setPlano} opcoes={["Starter", "Pro", "Team"].map((v) => ({ v, rotulo: v }))} />
+      </Campo>
+      <div className="mt-auto flex gap-2 pt-2">
+        <button type="submit" className="inline-flex h-10 items-center rounded-[10px] px-4 text-[14px] active:scale-[0.98]" style={{ background: "var(--primary)", color: "var(--primary-foreground)", boxShadow: "0 8px 22px -8px color-mix(in oklab, var(--primary) 60%, transparent)" }}>
+          Salvar
+        </button>
+        <Botao onClick={cancelar}>Cancelar</Botao>
+      </div>
+    </form>
+  )
+}
+
 function TelaClientes() {
   const [foco, setFoco] = React.useState("pagantes")
   const [aberto, setAberto] = React.useState<Cliente | null>(null)
+  const [editando, setEditando] = React.useState(false)
+  const [aviso, avisar] = useAviso()
   const carregando = useCarregando(foco)
   const estado = ESTADOS.find((e) => e.id === foco)!
   return (
@@ -756,7 +968,10 @@ function TelaClientes() {
         focoId={foco}
         onFoco={setFoco}
         recua={aberto !== null}
-        onFundo={() => setAberto(null)}
+        onFundo={() => {
+          setAberto(null)
+          setEditando(false)
+        }}
         acoes={
           <>
             <Busca texto="Buscar por nome ou e-mail" />
@@ -774,7 +989,22 @@ function TelaClientes() {
       <AnimatePresence>
         {aberto ? (
           <Frente key={aberto.id}>
-            <CabecalhoFrente etiqueta={`Cliente desde ${aberto.desde}`} tom={estado.tom} titulo={aberto.nome} fechar={() => setAberto(null)} />
+            <CabecalhoFrente etiqueta={editando ? "Editando" : `Cliente desde ${aberto.desde}`} tom={estado.tom} titulo={aberto.nome} fechar={() => { setAberto(null); setEditando(false) }} />
+            <AnimatePresence mode="wait">
+            {editando ? (
+              <motion.div key="editar" {...troca} className="flex flex-1 flex-col">
+                <EditarCliente
+                  cliente={aberto}
+                  cancelar={() => setEditando(false)}
+                  salvar={(c) => {
+                    setAberto(c)
+                    setEditando(false)
+                    avisar("Dados do cliente salvos")
+                  }}
+                />
+              </motion.div>
+            ) : (
+            <motion.div key="ficha" {...troca} className="flex flex-1 flex-col gap-6">
             <Ficha
               linhas={[
                 ["E-mail", aberto.email],
@@ -796,12 +1026,187 @@ function TelaClientes() {
               ))}
             </div>
             <div className="mt-auto flex gap-2">
-              <Botao solido>Ver pagamentos</Botao>
-              <Botao>Inativar</Botao>
+              <Botao solido onClick={() => setEditando(true)}>Editar</Botao>
+              <Botao>Ver pagamentos</Botao>
+            </div>
+            </motion.div>
+            )}
+            </AnimatePresence>
+          </Frente>
+        ) : null}
+      </AnimatePresence>
+      {aviso}
+    </>
+  )
+}
+
+// ── tela 3: membros por time (Platform) ──────────────────────────────────
+
+type Papel = "admin" | "membro" | "convidado"
+const PAPEL: Record<Papel, { rotulo: string; tom: string }> = {
+  admin: { rotulo: "Admin", tom: "blue" },
+  membro: { rotulo: "Membro", tom: "gray" },
+  convidado: { rotulo: "Convidado", tom: "yellow" },
+}
+interface Membro {
+  id: string
+  iniciais: string
+  tom: string
+  nome: string
+  email: string
+  papel: Papel
+  acesso: string
+  pendente: boolean
+}
+const TIMES: (ItemFaixa & { assentos: number; pessoas: number })[] = [
+  { id: "produto", nome: "Produto", tom: "blue", assentos: 8, pessoas: 6, resumo: "6 de 8 assentos", fracao: 6 / 8, valor: "6" },
+  { id: "engenharia", nome: "Engenharia", tom: "purple", assentos: 14, pessoas: 12, resumo: "12 de 14 assentos", fracao: 12 / 14, valor: "12" },
+  { id: "design", nome: "Design", tom: "pink", assentos: 6, pessoas: 4, resumo: "4 de 6 assentos", fracao: 4 / 6, valor: "4" },
+  { id: "comercial", nome: "Comercial", tom: "orange", assentos: 6, pessoas: 5, resumo: "5 de 6 assentos", fracao: 5 / 6, valor: "5" },
+  { id: "convites", nome: "Convites pendentes", tom: "yellow", assentos: 3, pessoas: 3, resumo: "esperando aceite", fracao: 1, valor: "3" },
+]
+function membrosDe(time: string): Membro[] {
+  const t = TIMES.find((x) => x.id === time)!
+  const desloca = TIMES.indexOf(t) * 3
+  return Array.from({ length: t.pessoas }, (_, i) => {
+    const [iniciais, nome, email] = PESSOAS[(i + desloca) % PESSOAS.length]
+    const pendente = time === "convites"
+    return {
+      id: `${time}-${i}`,
+      iniciais,
+      tom: TONS_AVATAR[(i + desloca) % TONS_AVATAR.length],
+      nome,
+      email,
+      papel: pendente ? "convidado" : i === 0 ? "admin" : "membro",
+      acesso: pendente ? "convite enviado há " + (i + 2) + " dias" : ACESSOS[(i + desloca) % ACESSOS.length],
+      pendente,
+    }
+  })
+}
+const COLS_MEMBRO = "grid-cols-[minmax(0,2.4fr)_130px_150px_90px]"
+
+function ListaMembros({ time, abrir }: { time: string; abrir: (m: Membro) => void }) {
+  return (
+    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      <header className={`grid h-11 items-center gap-4 px-5 font-mono text-[10.5px] tracking-[0.1em] uppercase ${COLS_MEMBRO}`} style={{ color: "var(--ds-tinta-2)" }}>
+        <span>Pessoa</span>
+        <span>Papel</span>
+        <span>Último acesso</span>
+        <span className="text-right">2FA</span>
+      </header>
+      {membrosDe(time).map((m) => (
+        <div key={m.id} onClick={() => abrir(m)} className={`grid h-[60px] cursor-pointer items-center gap-4 px-5 ${COLS_MEMBRO}`} style={{ borderTop: "1px solid var(--ds-fio)", opacity: m.pendente ? 0.75 : 1 }}>
+          <span className="flex min-w-0 items-center gap-3">
+            <Avatar iniciais={m.iniciais} tom={m.pendente ? undefined : m.tom} />
+            <span className="flex min-w-0 flex-col">
+              <span className="truncate text-[14.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
+                {m.nome}
+              </span>
+              <span className="truncate text-[12.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                {m.email}
+              </span>
+            </span>
+          </span>
+          <Selo {...PAPEL[m.papel]} />
+          <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {m.acesso}
+          </span>
+          <span className="text-right font-mono text-[11.5px] tracking-[0.08em] uppercase" style={{ color: m.pendente ? "var(--ds-tinta-2)" : "var(--success)" }}>
+            {m.pendente ? "—" : "Ativo"}
+          </span>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+function EsqueletoMembros() {
+  return (
+    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
+      <header className={`grid h-11 items-center gap-4 px-5 ${COLS_MEMBRO}`}>
+        {[16, 10, 22, 6].map((w, i) => (
+          <Osso key={i} className={`h-2 ${i === 3 ? "ml-auto" : ""}`} style={{ width: `${w * 4}px` }} />
+        ))}
+      </header>
+      {Array.from({ length: 5 }, (_, l) => (
+        <div key={l} className={`grid h-[60px] items-center gap-4 px-5 ${COLS_MEMBRO}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
+          <span className="flex items-center gap-3">
+            <Osso azul className="size-8 rounded-full" />
+            <span className="flex flex-1 flex-col gap-2">
+              <Osso className="h-3" style={{ width: `${35 + ((l * 13) % 30)}%` }} />
+              <Osso className="h-2" style={{ width: `${28 + ((l * 7) % 25)}%` }} />
+            </span>
+          </span>
+          <Osso azul className="h-7 w-20 rounded-[7px]" />
+          <Osso className="h-2.5 w-20" />
+          <Osso className="ml-auto h-2.5 w-10" />
+        </div>
+      ))}
+    </section>
+  )
+}
+
+function TelaMembros() {
+  const [foco, setFoco] = React.useState("produto")
+  const [aberto, setAberto] = React.useState<Membro | null>(null)
+  const [aviso, avisar] = useAviso()
+  const carregando = useCarregando(foco)
+  const time = TIMES.find((t) => t.id === foco)!
+  return (
+    <>
+      <Faixas
+        itens={TIMES}
+        focoId={foco}
+        onFoco={setFoco}
+        recua={aberto !== null}
+        onFundo={() => setAberto(null)}
+        acoes={
+          <>
+            <Busca texto="Buscar pessoa" />
+            <Botao solido onClick={() => avisar(`Convite pronto para ${time.nome}`)}>
+              <Plus size={16} /> Convidar
+            </Botao>
+          </>
+        }
+        corpo={() => (
+          <AnimatePresence mode="wait">
+            <motion.div key={carregando ? "carregando" : foco} {...troca}>
+              {carregando ? <EsqueletoMembros /> : <ListaMembros time={foco} abrir={setAberto} />}
+            </motion.div>
+          </AnimatePresence>
+        )}
+      />
+      <AnimatePresence>
+        {aberto ? (
+          <Frente key={aberto.id}>
+            <CabecalhoFrente etiqueta={`${time.nome} · ${aberto.pendente ? "convite pendente" : "membro"}`} tom={time.tom} titulo={aberto.nome} fechar={() => setAberto(null)} />
+            <Ficha
+              linhas={[
+                ["E-mail", aberto.email],
+                ["Último acesso", aberto.acesso],
+                ["Time", time.nome],
+              ]}
+            />
+            {/* o papel muda direto aqui: a escolha é o próprio controle, sem modo de edição */}
+            <Campo rotulo="Papel no time">
+              <Escolha
+                id="papel"
+                valor={aberto.papel}
+                onChange={(papel) => {
+                  setAberto({ ...aberto, papel })
+                  avisar(`${aberto.nome.split(" ")[0]} agora é ${PAPEL[papel].rotulo.toLowerCase()}`)
+                }}
+                opcoes={(Object.keys(PAPEL) as Papel[]).map((v) => ({ v, rotulo: PAPEL[v].rotulo, tom: PAPEL[v].tom }))}
+              />
+            </Campo>
+            <div className="mt-auto flex gap-2">
+              {aberto.pendente ? <Botao solido onClick={() => avisar("Convite reenviado")}>Reenviar convite</Botao> : <Botao solido>Mudar de time</Botao>}
+              <Botao>Remover do time</Botao>
             </div>
           </Frente>
         ) : null}
       </AnimatePresence>
+      {aviso}
     </>
   )
 }
@@ -810,7 +1215,7 @@ function TelaClientes() {
 
 function App() {
   const [escuro, setEscuro] = React.useState(() => location.hash.includes("escuro"))
-  const [tela, setTela] = React.useState(() => (location.hash.includes("clientes") ? "clientes" : "tarefas"))
+  const [tela, setTela] = React.useState(() => (location.hash.includes("clientes") ? "clientes" : location.hash.includes("membros") ? "membros" : "tarefas"))
   React.useLayoutEffect(() => {
     document.documentElement.classList.toggle("dark", escuro)
   }, [escuro])
@@ -838,7 +1243,7 @@ function App() {
         </div>
         {nav.map((n) => {
           const ativo = n.id === tela
-          const vivo = n.id === "tarefas" || n.id === "clientes"
+          const vivo = n.id === "tarefas" || n.id === "clientes" || n.id === "membros"
           return (
             <button
               key={n.id}
@@ -870,7 +1275,7 @@ function App() {
       <div className="relative flex min-w-0 flex-1">
         <AnimatePresence mode="wait">
           <motion.div key={tela} {...troca} className="relative flex min-w-0 flex-1">
-            {tela === "tarefas" ? <TelaTarefas /> : <TelaClientes />}
+            {tela === "tarefas" ? <TelaTarefas /> : tela === "clientes" ? <TelaClientes /> : <TelaMembros />}
           </motion.div>
         </AnimatePresence>
       </div>
