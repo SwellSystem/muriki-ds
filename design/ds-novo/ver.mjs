@@ -4,6 +4,8 @@
 //   cd design/ds-novo && bun ver.mjs vitrine    → todos os componentes, Papel | Vidro | Blur
 //   cd design/ds-novo && bun ver.mjs platform   → a tela de tarefas com o AppShell
 //   cd design/ds-novo && bun ver.mjs entrada    → a página de entrada no estilo Rivio
+//   cd design/ds-novo && bun ver.mjs elementos  → os elementos na linguagem
+//   cd design/ds-novo && bun ver.mjs tarefas    → a família de tarefas: árvore + linha do tempo
 //
 // O repo não tem o tailwindcss: na primeira vez ele é instalado numa pasta
 // de trabalho fora do repo (/tmp/muriki-ds-novo), junto com a saída.
