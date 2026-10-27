@@ -1734,7 +1734,7 @@ const GRUPOS_FOCUS = [
   { id: "semana", nome: "Esta semana", cor: "var(--ds-tinta-2)" },
   { id: "depois", nome: "Depois", cor: "var(--ds-tinta-2)" },
 ] as const
-const GRADE_FOCUS = "grid-cols-[minmax(0,1fr)_160px_120px_72px]"
+const GRADE_FOCUS = "grid-cols-[minmax(0,1fr)_112px_150px_116px_60px]"
 
 function OrigemTag({ o }: { o: Origem }) {
   return o.tipo === "pessoal" ? (
@@ -1754,6 +1754,7 @@ function TelaFocus() {
   const [feitas, setFeitas] = React.useState<Set<string>>(new Set())
   const [salvando, setSalvando] = React.useState<string | null>(null)
   const [aviso, avisar] = useAviso()
+  const [rolou, setRolou] = React.useState(false)
   const carregando = useCarregando(filtro, 600)
   const concluir = (id: string) => {
     if (salvando) return
@@ -1801,11 +1802,13 @@ function TelaFocus() {
             </Botao>
           </div>
         </header>
-        <div className="muriki-scroll min-h-0 flex-1 overflow-auto px-8 pb-8">
+        <div className="muriki-scroll min-h-0 flex-1 overflow-auto px-8 pb-8" onScroll={(e) => setRolou(e.currentTarget.scrollTop > 4)}>
           <section className="relative rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-            {/* o cabeçalho da tabela: um só, dentro da placa, preso no topo ao rolar */}
-            <div className={`sticky top-0 z-10 grid h-11 items-center gap-4 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase ${GRADE_FOCUS}`} style={{ background: "var(--ds-placa-solida)", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+            {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
+                Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
+            <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="pl-[34px]">Tarefa</span>
+              <span>Status</span>
               <span>Origem</span>
               <span>Prioridade</span>
               <span className="text-right">Prazo</span>
@@ -1830,7 +1833,7 @@ function TelaFocus() {
                       {ts.map((t) => {
                         const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
                         return (
-                          <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-4 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+                          <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
                               <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} progresso={t.progresso} />
                               {t.codigo ? (
@@ -1842,6 +1845,12 @@ function TelaFocus() {
                                 {t.titulo}
                               </span>
                             </span>
+                            {/* o status por extenso: o ícone na frente é o botão de concluir, aqui não se repete */}
+                            <AnimatePresence mode="wait" initial={false}>
+                              <motion.span key={st} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA} className="text-[13px]" style={{ color: st === "blocked" ? "var(--destructive)" : st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta)" }}>
+                                {ROTULO_VISUAL[visualDe(st)]}
+                              </motion.span>
+                            </AnimatePresence>
                             <OrigemTag o={t.origem} />
                             <Prioridade p={t.prioridade} />
                             <span className="text-right font-mono text-[11.5px]" style={{ color: t.quando === "atrasadas" && st !== "done" ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
