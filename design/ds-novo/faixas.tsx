@@ -9,7 +9,10 @@ import {
   ChartBar,
   CheckCircle,
   Circle,
+  ChartPieSlice,
   CircleDashed,
+  CircleHalf,
+  CircleHalfTilt,
   ExclamationMark,
   Prohibit,
   Check,
@@ -683,8 +686,10 @@ function Atalhos({ t, acao }: { t: TaskTableTask; acao: (o: string, t: TaskTable
 /** Status como o Linear: um ícone por estado, na cor do tom.
     - backlog (aberta e sem responsável): círculo tracejado
     - aberta: círculo vazio
-    - fazendo: a pizza que enche com o andamento (o chart-pie do Phosphor é
-      uma fatia fixa e não diz quanto falta; esta é desenhada no traço dele)
+    - fazendo: os ícones do Phosphor pelo andamento — chart-pie-slice
+      começando (até 40%), circle-half na metade, circle-half-tilt quase lá
+      (acima de 70%). Já foi uma pizza desenhada à mão: os ícones pedidos são
+      os do Phosphor, no mesmo traço do resto.
     - bloqueada: proibido · feita: check
     Trocar de estado troca o ícone pelo desfoque. */
 type Visual = TaskTableStatus | "backlog"
@@ -692,33 +697,18 @@ const visualDe = (status: TaskTableStatus, semDono?: boolean): Visual => (status
 const ROTULO_VISUAL: Record<Visual, string> = { backlog: "Backlog", active: "Aberta", progress: "Fazendo", blocked: "Bloqueada", done: "Feita" }
 const COR_VISUAL: Record<Visual, string> = { backlog: "var(--ds-tinta-2)", active: "var(--tone-green-dot)", progress: "var(--tone-blue-dot)", blocked: "var(--tone-red-dot)", done: "var(--success)" }
 
-function Pizza({ fracao, t }: { fracao: number; t: number }) {
-  // o anel no traço do Phosphor (bold ≈ 24/256 do lado) e a fatia por dentro, com folga
-  const f = Math.min(Math.max(fracao, 0.08), 0.92)
-  const r = 4.2
-  const ang = f * 2 * Math.PI
-  const x = 8 + r * Math.sin(ang)
-  const y = 8 - r * Math.cos(ang)
-  return (
-    <svg width={t} height={t} viewBox="0 0 16 16" aria-hidden>
-      <circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" strokeWidth="1.6" />
-      <motion.path initial={false} animate={{ d: `M8 8 L8 ${8 - r} A${r} ${r} 0 ${f > 0.5 ? 1 : 0} 1 ${x.toFixed(2)} ${y.toFixed(2)} Z` }} transition={{ duration: 0.5, ease: CURVA }} fill="currentColor" />
-    </svg>
-  )
-}
-
 function StatusIcone({ status, tamanho = 18, progresso = 0, semDono = false }: { status: TaskTableStatus; tamanho?: number; progresso?: number; semDono?: boolean }) {
   const v = visualDe(status, semDono)
   const icone =
     v === "backlog" ? <CircleDashed size={tamanho} weight="bold" /> :
     v === "active" ? <Circle size={tamanho} weight="bold" /> :
-    v === "progress" ? <Pizza fracao={progresso} t={tamanho} /> :
+    v === "progress" ? (progresso < 0.4 ? <ChartPieSlice size={tamanho} weight="fill" /> : progresso <= 0.7 ? <CircleHalf size={tamanho} weight="fill" /> : <CircleHalfTilt size={tamanho} weight="fill" />) :
     v === "blocked" ? <Prohibit size={tamanho} weight="bold" /> :
     <CheckCircle size={tamanho} weight="fill" />
   return (
     <span className="relative grid shrink-0 place-items-center" style={{ width: tamanho, height: tamanho, color: COR_VISUAL[v] }}>
       <AnimatePresence mode="popLayout" initial={false}>
-        <motion.span key={v} initial={{ opacity: 0, filter: "blur(5px)", scale: 0.7 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(5px)", scale: 0.7, transition: { duration: 0.15 } }} transition={{ duration: 0.35, ease: CURVA }} className="grid place-items-center">
+        <motion.span key={v === "progress" ? `progress-${progresso < 0.4 ? 0 : progresso <= 0.7 ? 1 : 2}` : v} initial={{ opacity: 0, filter: "blur(5px)", scale: 0.7 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(5px)", scale: 0.7, transition: { duration: 0.15 } }} transition={{ duration: 0.35, ease: CURVA }} className="grid place-items-center">
           {icone}
         </motion.span>
       </AnimatePresence>
