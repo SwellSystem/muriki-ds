@@ -1,22 +1,31 @@
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { createRoot } from "react-dom/client"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   AddressBook,
   CalendarBlank,
-  CaretDown,
+  CaretRight,
   ChartBar,
   Check,
+  CircleNotch,
+  DotsThree,
+  Flag,
   House,
   Kanban,
+  LinkSimple,
   ListChecks,
+  LockOpen,
   MagnifyingGlass,
+  PencilSimple,
   Plus,
+  TreeStructure,
   Users,
   X,
 } from "@phosphor-icons/react"
 
 import { MurikiLogo } from "@/components/ui/muriki-logo"
+import type { TaskTableStatus, TaskTableTask } from "@/components/blocks/task-table"
 
 /* Estudo livre do DS novo, na linguagem que nasceu da rivio.com.br:
    camadas, atmosfera, calma, e o desfoque nas trocas. Duas telas do mesmo
@@ -160,6 +169,7 @@ function Vistas({ valor, onChange }: { valor: string; onChange: (v: string) => v
   const opcoes = [
     { v: "lista", rotulo: "Lista", icone: <ListChecks size={16} /> },
     { v: "quadro", rotulo: "Quadro", icone: <Kanban size={16} /> },
+    { v: "linha", rotulo: "Linha do tempo", icone: <CalendarBlank size={16} /> },
   ]
   return (
     <div className="flex h-10 items-center rounded-[10px] p-1" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
@@ -504,36 +514,8 @@ function Ficha({ linhas }: { linhas: [string, React.ReactNode][] }) {
 // ── tela 1: tarefas ──────────────────────────────────────────────────────
 
 type Status = "aberta" | "fazendo" | "bloqueada" | "feita"
-interface Tarefa {
-  id: string
-  codigo: string
-  titulo: string
-  status: Status
-  dono: string
-  prazo: string
-  prioridade: "urgente" | "alta" | "media" | "baixa"
-}
-const TITULOS = ["Revisar o fluxo de cobrança", "Migrar webhooks do Stripe", "Ajustar o onboarding do time", "Tela de membros com carência", "Corrigir o filtro por prazo", "Exportar relatório em PDF"]
-const STATUS: Status[] = ["fazendo", "aberta", "bloqueada", "feita", "aberta", "fazendo"]
 const DONOS = ["GT", "AM", "RS", "LP"]
 const PRIORIDADES = ["urgente", "alta", "media", "baixa"] as const
-const GRUPOS = ["Cobrança recorrente", "Membros e convites", "Relatórios"].map((titulo, g) => ({
-  id: `g${g}`,
-  titulo,
-  feitas: 2 + g,
-  total: 6,
-  tarefas: TITULOS.map(
-    (_, i): Tarefa => ({
-      id: `g${g}-${i}`,
-      codigo: `MUR-${g * 10 + i + 1}`,
-      titulo: TITULOS[(i + g) % TITULOS.length],
-      status: STATUS[(i + g) % STATUS.length],
-      dono: DONOS[(i + g) % DONOS.length],
-      prazo: `${10 + i} nov`,
-      prioridade: PRIORIDADES[(i * 3 + g) % 4],
-    })
-  ),
-}))
 const TOM: Record<Status, { rotulo: string; tom: string }> = {
   aberta: { rotulo: "Aberta", tom: "green" },
   fazendo: { rotulo: "Fazendo", tom: "blue" },
@@ -550,100 +532,6 @@ const PROJETOS: ItemFaixa[] = [
   { id: "integracoes", nome: "Integrações", tom: "green", resumo: "15 tarefas · 2 bloqueadas", fracao: 0.8, valor: "80%" },
   { id: "site", nome: "Site", tom: "orange", resumo: "7 tarefas · 0 bloqueadas", fracao: 0.12, valor: "12%" },
 ]
-
-function ListaTarefas({ marcadas, alternar, abrir }: { marcadas: Set<string>; alternar: (id: string) => void; abrir: (t: Tarefa) => void }) {
-  return (
-    <div className="flex flex-col gap-5">
-      {GRUPOS.map((g) => (
-        <section key={g.id} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-          <header className="flex h-12 items-center justify-between px-5">
-            <div className="flex items-center gap-3">
-              <CaretDown size={13} style={{ color: "var(--ds-tinta-2)" }} />
-              <Etiqueta cor="var(--primary)">{g.titulo}</Etiqueta>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="h-1 w-24 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho)" }}>
-                <div className="h-full rounded-full" style={{ width: `${(g.feitas / g.total) * 100}%`, background: "var(--primary)" }} />
-              </div>
-              <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-                {g.feitas}/{g.total}
-              </span>
-            </div>
-          </header>
-          {g.tarefas.map((t) => {
-            const marcada = marcadas.has(t.id)
-            return (
-              <div
-                key={t.id}
-                onClick={() => abrir(t)}
-                className={`grid h-[52px] cursor-pointer items-center gap-4 px-5 transition-[background-color,opacity] duration-300 ${COLS_TAREFA}`}
-                style={{ borderTop: "1px solid var(--ds-fio)", background: marcada ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined, opacity: t.status === "feita" ? 0.55 : 1 }}
-              >
-                <Caixa marcada={marcada} onChange={() => alternar(t.id)} />
-                <span className="font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-                  {t.codigo}
-                </span>
-                <span className="truncate text-[14.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
-                  {t.titulo}
-                </span>
-                <Selo {...TOM[t.status]} />
-                <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
-                  {PRIO[t.prioridade]}
-                </span>
-                <Avatar iniciais={t.dono} />
-                <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-                  {t.prazo}
-                </span>
-              </div>
-            )
-          })}
-        </section>
-      ))}
-    </div>
-  )
-}
-
-function QuadroTarefas({ abrir }: { abrir: (t: Tarefa) => void }) {
-  const todas = GRUPOS.flatMap((g) => g.tarefas)
-  const colunas: Status[] = ["aberta", "fazendo", "bloqueada", "feita"]
-  return (
-    <div className="grid grid-cols-4 gap-4">
-      {colunas.map((c) => (
-        <div key={c} className="flex flex-col gap-3 rounded-[12px] p-3" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-          <div className="flex h-9 items-center justify-between px-2">
-            <Etiqueta cor={`var(--tone-${TOM[c].tom}-dot)`}>{TOM[c].rotulo}</Etiqueta>
-            <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {todas.filter((t) => t.status === c).length}
-            </span>
-          </div>
-          {todas
-            .filter((t) => t.status === c)
-            .map((t) => (
-              <button
-                key={t.id}
-                onClick={() => abrir(t)}
-                className="flex flex-col gap-3 rounded-[10px] p-4 text-left transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5"
-                style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)" }}
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-                    {t.codigo}
-                  </span>
-                  <Avatar iniciais={t.dono} />
-                </div>
-                <span className="text-[14.5px] leading-snug" style={{ color: "var(--ds-tinta-forte)" }}>
-                  {t.titulo}
-                </span>
-                <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
-                  {PRIO[t.prioridade]} · {t.prazo}
-                </span>
-              </button>
-            ))}
-        </div>
-      ))}
-    </div>
-  )
-}
 
 /** Nova tarefa: o formulário na camada da frente. */
 function NovaTarefa({ projeto, fechar, criar }: { projeto: ItemFaixa; fechar: () => void; criar: (titulo: string) => void }) {
@@ -697,22 +585,530 @@ function NovaTarefa({ projeto, fechar, criar }: { projeto: ItemFaixa; fechar: ()
   )
 }
 
+// ── a família de tarefas: TaskTableTask, como o Platform manda ───────────
+
+const ST_F: Record<TaskTableStatus, { rotulo: string; tom: string }> = {
+  active: { rotulo: "Aberta", tom: "green" },
+  progress: { rotulo: "Fazendo", tom: "blue" },
+  blocked: { rotulo: "Bloqueada", tom: "red" },
+  done: { rotulo: "Feita", tom: "gray" },
+}
+const TOM_DONO = { a1: "blue", a2: "purple", a3: "orange", a4: "gray" } as const
+const NOME_DONO: Record<string, string> = { GT: "Guilherme T.", AM: "Ana Moura", RS: "Rafael Silva", LP: "Lúcia Prado" }
+const tk = (o: Partial<TaskTableTask> & Pick<TaskTableTask, "id" | "code" | "title" | "depth" | "kind" | "status">): TaskTableTask => o
+const FAMILIA: TaskTableTask[] = [
+  tk({ id: "e1", code: "MUR-1", title: "Cobrança recorrente", depth: 0, kind: "epic", status: "progress", childGroupId: "e1", progress: { done: 2, total: 5 }, start: "2026-11-02", end: "2026-11-24", progressRatio: 0.4 }),
+  tk({ id: "t1", code: "MUR-2", title: "Revisar o fluxo de cobrança", depth: 1, kind: "task", status: "progress", parentId: "e1", childGroupId: "t1", owner: { initials: "GT", tone: "a1" }, priority: "urgent", due: "10 nov", start: "2026-11-02", end: "2026-11-10", progressRatio: 0.6, progress: { done: 1, total: 2 } }),
+  tk({ id: "s1", code: "MUR-3", title: "Mapear quem é cobrado duas vezes", depth: 2, kind: "sub", status: "done", parentId: "t1", owner: { initials: "AM", tone: "a2" }, priority: "high", due: "5 nov", start: "2026-11-02", end: "2026-11-05", progressRatio: 1 }),
+  tk({ id: "s2", code: "MUR-4", title: "Ajustar o cálculo proporcional", depth: 2, kind: "sub", status: "progress", parentId: "t1", lastChild: true, owner: { initials: "GT", tone: "a1" }, priority: "medium", due: "10 nov", start: "2026-11-05", end: "2026-11-10", progressRatio: 0.3, deps: ["s1"] }),
+  tk({ id: "t2", code: "MUR-5", title: "Migrar webhooks do Stripe", depth: 1, kind: "task", status: "blocked", parentId: "e1", owner: { initials: "RS", tone: "a3" }, priority: "high", due: "16 nov", start: "2026-11-10", end: "2026-11-16", progressRatio: 0.1, deps: ["t1"] }),
+  tk({ id: "t3", code: "MUR-6", title: "Aviso de cartão vencendo", depth: 1, kind: "task", status: "active", parentId: "e1", owner: { initials: "LP", tone: "a4" }, priority: "low", due: "20 nov", start: "2026-11-14", end: "2026-11-20", progressRatio: 0 }),
+  tk({ id: "t4", code: "MUR-7", title: "Fatura em PDF com a marca", depth: 1, kind: "task", status: "done", parentId: "e1", lastChild: true, owner: { initials: "AM", tone: "a2" }, priority: "medium", due: "8 nov", start: "2026-11-03", end: "2026-11-08", progressRatio: 1 }),
+  tk({ id: "e2", code: "MUR-10", title: "Membros e convites", depth: 0, kind: "epic", status: "active", childGroupId: "e2", progress: { done: 0, total: 3 }, start: "2026-11-12", end: "2026-11-28", progressRatio: 0.1 }),
+  tk({ id: "t5", code: "MUR-11", title: "Convite expira em 7 dias", depth: 1, kind: "task", status: "progress", parentId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "18 nov", start: "2026-11-12", end: "2026-11-18", progressRatio: 0.5 }),
+  tk({ id: "t6", code: "MUR-12", title: "Carência de quem passa do limite", depth: 1, kind: "task", status: "blocked", parentId: "e2", owner: { initials: "GT", tone: "a1" }, priority: "high", due: "24 nov", start: "2026-11-18", end: "2026-11-24", progressRatio: 0, deps: ["t5", "t2"] }),
+  tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, owner: { initials: "LP", tone: "a4" }, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
+]
+const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
+const INICIO_MES = new Date("2026-11-01")
+const DIAS_MES = 30
+const HOJE_DIA = 9
+const diaDe = (iso?: string) => (iso ? Math.round((new Date(iso).getTime() - INICIO_MES.getTime()) / 86400000) : 0)
+const filhosDe = (id: string) => FAMILIA.filter((x) => x.parentId === id)
+
+/** Tooltip que chega desfocado: o nome do atalho, já que o atalho é só ícone. */
+function Dica({ texto, children }: { texto: string; children: React.ReactNode }) {
+  // num portal no body: dentro da linha (que corta o que passa da borda) a dica saía pela metade
+  const [pos, setPos] = React.useState<{ x: number; y: number } | null>(null)
+  return (
+    <span
+      className="inline-flex"
+      onMouseEnter={(e) => {
+        const r = e.currentTarget.getBoundingClientRect()
+        setPos({ x: r.left + r.width / 2, y: r.top })
+      }}
+      onMouseLeave={() => setPos(null)}
+    >
+      {children}
+      {createPortal(
+        <AnimatePresence>
+          {pos ? (
+            <motion.span initial={{ opacity: 0, filter: "blur(8px)", y: 4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: 4 }} transition={{ duration: 0.25, ease: CURVA }} className="pointer-events-none fixed z-50 rounded-[7px] px-2 py-1 text-[12px] whitespace-nowrap" style={{ left: pos.x, top: pos.y - 8, translate: "-50% -100%", background: "var(--ds-tinta-forte)", color: "var(--ds-chao)" }}>
+              {texto}
+            </motion.span>
+          ) : null}
+        </AnimatePresence>,
+        document.body
+      )}
+    </span>
+  )
+}
+
+/** Os atalhos da linha: só ícone, com dica. Chegam desfocados quando o
+    ponteiro entra na linha (ou quando ela recebe foco de teclado). */
+function Atalhos({ t, acao }: { t: TaskTableTask; acao: (o: string, t: TaskTableTask) => void }) {
+  const itens: [string, React.ReactNode][] = [
+    ...(t.depth < 2 ? [["Adicionar subtarefa", <TreeStructure key="s" size={15} />] as [string, React.ReactNode]] : []),
+    ["Editar", <PencilSimple key="e" size={15} />],
+    ...(t.status === "blocked" ? [["Desbloquear", <LockOpen key="d" size={15} />] as [string, React.ReactNode]] : []),
+    ["Mais", <DotsThree key="m" size={18} weight="bold" />],
+  ]
+  return (
+    <span className="flex justify-end gap-0.5 opacity-0 blur-[5px] transition-[opacity,filter] duration-300 group-focus-within:opacity-100 group-focus-within:blur-none group-hover:opacity-100 group-hover:blur-none">
+      {itens.map(([r, i]) => (
+        <Dica key={r} texto={r}>
+          <button type="button" aria-label={r} onClick={(e) => (e.stopPropagation(), acao(r, t))} className="grid size-8 place-items-center rounded-[8px] transition-colors hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta)" }}>
+            {i}
+          </button>
+        </Dica>
+      ))}
+    </span>
+  )
+}
+
+function Concluir({ feita, salvando, onClick }: { feita: boolean; salvando: boolean; onClick: () => void }) {
+  return (
+    <button type="button" aria-label={feita ? "Reabrir" : "Concluir"} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-5 shrink-0 place-items-center rounded-full transition-[background-color,box-shadow] duration-300" style={{ background: feita ? "var(--success)" : "transparent", boxShadow: feita ? "0 0 0 1px var(--success)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "white" }}>
+      <AnimatePresence mode="wait" initial={false}>
+        {salvando ? (
+          <motion.span key="g" initial={{ opacity: 0 }} animate={{ opacity: 1, rotate: 360 }} exit={{ opacity: 0 }} transition={{ rotate: { duration: 0.8, ease: "linear", repeat: Infinity }, default: { duration: 0.2 } }} style={{ color: feita ? "white" : "var(--ds-tinta-2)" }}>
+            <CircleNotch size={13} weight="bold" />
+          </motion.span>
+        ) : feita ? (
+          <motion.span key="c" initial={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} transition={{ duration: 0.3, ease: CURVA }}>
+            <Check size={11} weight="bold" />
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
+    </button>
+  )
+}
+
+/** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
+function SeloTroca({ status }: { status: TaskTableStatus }) {
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span key={status} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA}>
+        <Selo {...ST_F[status]} />
+      </motion.span>
+    </AnimatePresence>
+  )
+}
+
+function IndicadorSalvo({ estado }: { estado: "ocioso" | "salvando" | "salvo" }) {
+  return (
+    <div className="flex h-10 min-w-[104px] items-center justify-end">
+      <AnimatePresence mode="wait">
+        {estado === "ocioso" ? null : (
+          <motion.span key={estado} initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA} className="flex items-center gap-2 font-mono text-[11px] tracking-[0.1em] uppercase" style={{ color: estado === "salvo" ? "var(--success)" : "var(--ds-tinta-2)" }}>
+            {estado === "salvando" ? <motion.span className="size-1.5 rounded-full" style={{ background: "var(--primary)" }} animate={{ opacity: [1, 0.3, 1] }} transition={{ duration: 1, repeat: Infinity }} /> : <Check size={12} weight="bold" />}
+            {estado === "salvando" ? "Salvando…" : "Salvo"}
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+/** O cabeçalho das colunas, sem barra: os rótulos soltos em mono, presos no
+    topo ao rolar, e o desfoque se dissolvendo por cima da lista — o mesmo
+    cabeçalho que some da linguagem. A coluna ordenada leva o quadradinho azul. */
+function CabecalhoColunas({ colunas, grade, ordem, ordenar }: { colunas: { k: string; r: string; direita?: boolean }[]; grade: string; ordem: string; ordenar: (k: string) => void }) {
+  return (
+    <div className="sticky top-0 z-10 -mx-8 px-8" style={{ isolation: "isolate" }}>
+      <span aria-hidden className="absolute inset-x-0 top-0 -bottom-5 -z-10" style={{ background: "linear-gradient(to bottom, var(--ds-placa-1) 35%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", maskImage: "linear-gradient(to bottom, black 50%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent)" }} />
+      <div className={`grid h-10 items-center gap-4 px-5 ${grade}`}>
+        {colunas.map((c) =>
+          c.r ? (
+            <button key={c.k} type="button" onClick={() => ordenar(c.k)} className={`group relative flex items-center font-mono text-[10.5px] tracking-[0.12em] uppercase transition-colors ${c.direita ? "justify-end" : ""}`} style={{ color: ordem === c.k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+              {/* o quadradinho fica fora do fluxo, à esquerda: o rótulo alinha com o conteúdo da coluna */}
+              <span className="relative">
+                {ordem === c.k ? <motion.span layoutId="ordem" className="absolute top-1/2 -left-3.5 size-1.5 -translate-y-1/2" style={{ background: "var(--primary)" }} transition={{ type: "spring", bounce: 0.2, duration: 0.45 }} /> : <span className="absolute top-1/2 -left-3.5 size-1.5 -translate-y-1/2 opacity-0 transition-opacity group-hover:opacity-40" style={{ background: "var(--ds-tinta-2)" }} />}
+                {c.r}
+              </span>
+            </button>
+          ) : (
+            <span key={c.k} />
+          )
+        )}
+      </div>
+    </div>
+  )
+}
+
+const GRADE_ARVORE = "grid-cols-[minmax(0,1fr)_120px_96px_44px_70px_140px]"
+
+/** A lista em árvore: cada épico é uma placa dentro da placa; tarefa e
+    subtarefa penduradas no fio; atalhos no hover. */
+function ArvoreFamilia({
+  fechados,
+  alternar,
+  feitas,
+  salvando,
+  concluir,
+  abrir,
+  acao,
+}: {
+  fechados: Set<string>
+  alternar: (id: string) => void
+  feitas: Set<string>
+  salvando: string | null
+  concluir: (id: string) => void
+  abrir: (t: TaskTableTask) => void
+  acao: (o: string, t: TaskTableTask) => void
+}) {
+  const [ordem, setOrdem] = React.useState("tarefa")
+  const ORD: Record<string, (t: TaskTableTask) => string | number> = {
+    tarefa: (t) => t.code.padStart(8, "0"),
+    status: (t) => ({ blocked: 0, progress: 1, active: 2, done: 3 })[feitas.has(t.id) ? "done" : t.status],
+    prioridade: (t) => ({ urgent: 0, high: 1, medium: 2, low: 3, none: 4 })[t.priority ?? "none"],
+    prazo: (t) => diaDe(t.end),
+  }
+  const ordena = (ls: TaskTableTask[]) => [...ls].sort((a, b) => (ORD[ordem](a) < ORD[ordem](b) ? -1 : ORD[ordem](a) > ORD[ordem](b) ? 1 : 0))
+  const linha = (t: TaskTableTask, ultimo: boolean): React.ReactNode => {
+    const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+    const grupo = t.childGroupId
+    const fechado = grupo ? fechados.has(grupo) : false
+    const filhos = grupo ? ordena(filhosDe(t.id)) : []
+    return (
+      <React.Fragment key={t.id}>
+        <motion.div
+          layout
+          initial={{ opacity: 0, height: 0, filter: "blur(8px)" }}
+          animate={{ opacity: 1, height: 52, filter: "blur(0px)" }}
+          exit={{ opacity: 0, height: 0, filter: "blur(8px)" }}
+          transition={{ duration: 0.4, ease: CURVA }}
+          onClick={() => abrir(t)}
+          tabIndex={0}
+          className={`group relative grid cursor-pointer items-center gap-4 overflow-hidden px-5 outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_ARVORE}`}
+          style={{ borderTop: "1px solid var(--ds-fio)" }}
+        >
+          <span className="relative flex min-w-0 items-center gap-2.5" style={{ paddingLeft: (t.depth - 1) * 26 }}>
+            {t.depth === 2 ? (
+              <>
+                <span aria-hidden className="absolute top-[-26px] left-[10px] w-px" style={{ height: ultimo ? 26 : 52, background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute top-0 left-[10px] h-px w-3" style={{ background: "var(--ds-fio-forte)" }} />
+              </>
+            ) : null}
+            {grupo ? (
+              <button type="button" onClick={(e) => (e.stopPropagation(), alternar(grupo))} aria-label={fechado ? "Abrir subtarefas" : "Recolher subtarefas"} className="grid size-5 shrink-0 place-items-center rounded-[5px] hover:bg-[var(--ds-trilho)]" style={{ color: "var(--ds-tinta-2)" }}>
+                <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }}>
+                  <CaretRight size={12} weight="bold" />
+                </motion.span>
+              </button>
+            ) : (
+              <span className="w-5 shrink-0" />
+            )}
+            <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {t.code}
+            </span>
+            <span className="truncate text-[14.5px] transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+              {t.title}
+            </span>
+            {t.progress && grupo ? (
+              <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                {t.progress.done}/{t.progress.total}
+              </span>
+            ) : null}
+            {t.deps?.length ? (
+              <span className="flex shrink-0 items-center gap-1 rounded-[6px] px-1.5 py-0.5 font-mono text-[10px]" style={{ background: "var(--ds-trilho)", color: "var(--ds-tinta-2)" }}>
+                <LinkSimple size={11} /> {t.deps.length}
+              </span>
+            ) : null}
+          </span>
+          <SeloTroca status={st} />
+          <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {PRIO_F[t.priority ?? "none"]}
+          </span>
+          {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span />}
+          <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {t.due}
+          </span>
+          <Atalhos t={{ ...t, status: st }} acao={acao} />
+        </motion.div>
+        <AnimatePresence initial={false}>{!fechado ? filhos.map((f, i) => linha(f, i === filhos.length - 1)) : null}</AnimatePresence>
+      </React.Fragment>
+    )
+  }
+  return (
+    <div className="flex flex-col">
+      <CabecalhoColunas
+        grade={GRADE_ARVORE}
+        ordem={ordem}
+        ordenar={setOrdem}
+        colunas={[
+          { k: "tarefa", r: "Tarefa" },
+          { k: "status", r: "Status" },
+          { k: "prioridade", r: "Prioridade" },
+          { k: "dono", r: "" },
+          { k: "prazo", r: "Prazo", direita: true },
+          { k: "atalhos", r: "" },
+        ]}
+      />
+      <div className="flex flex-col gap-5">
+        {FAMILIA.filter((e) => e.depth === 0).map((e) => {
+          const fechado = fechados.has(e.id)
+          const filhos = ordena(filhosDe(e.id))
+          return (
+            <section key={e.id} className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+              <header className="group flex h-12 items-center justify-between px-5">
+                <button type="button" onClick={() => alternar(e.id)} className="flex items-center gap-3">
+                  <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
+                    <CaretRight size={13} weight="bold" />
+                  </motion.span>
+                  <Flag size={14} weight="fill" style={{ color: "var(--primary)" }} />
+                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                    {e.code}
+                  </span>
+                  <Etiqueta cor="var(--primary)">{e.title}</Etiqueta>
+                </button>
+                <div className="flex items-center gap-3">
+                  <div className="h-1 w-24 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho)" }}>
+                    <motion.div className="h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${(e.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1, ease: CURVA }} style={{ background: "var(--primary)" }} />
+                  </div>
+                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                    {e.progress?.done}/{e.progress?.total}
+                  </span>
+                </div>
+              </header>
+              <AnimatePresence initial={false}>{!fechado ? filhos.map((f, i) => linha(f, i === filhos.length - 1)) : null}</AnimatePresence>
+            </section>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+/** O quadro da família: as tarefas (sem os épicos) por status. */
+function QuadroFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void }) {
+  const ts = FAMILIA.filter((t) => t.depth > 0).map((t) => ({ ...t, status: (feitas.has(t.id) ? "done" : t.status) as TaskTableStatus }))
+  return (
+    <div className="grid grid-cols-4 gap-4">
+      {(["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((c) => (
+        <div key={c} className="flex flex-col gap-3 rounded-[12px] p-3" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+          <div className="flex h-9 items-center justify-between px-2">
+            <Etiqueta cor={`var(--tone-${ST_F[c].tom}-dot)`}>{ST_F[c].rotulo}</Etiqueta>
+            <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {ts.filter((t) => t.status === c).length}
+            </span>
+          </div>
+          {ts
+            .filter((t) => t.status === c)
+            .map((t) => (
+              <button key={t.id} type="button" onClick={() => abrir(t)} className="flex flex-col gap-3 rounded-[10px] p-4 text-left transition-transform duration-300 hover:-translate-y-0.5" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)" }}>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                    {t.code}
+                    {t.depth === 2 ? " · sub" : ""}
+                  </span>
+                  {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : null}
+                </div>
+                <span className="text-[14.5px] leading-snug" style={{ color: "var(--ds-tinta-forte)" }}>
+                  {t.title}
+                </span>
+                <span className="flex items-center gap-2 font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+                  {PRIO_F[t.priority ?? "none"]} · {t.due}
+                  {t.deps?.length ? (
+                    <span className="flex items-center gap-1">
+                      · <LinkSimple size={11} /> {t.deps.length}
+                    </span>
+                  ) : null}
+                </span>
+              </button>
+            ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** A linha do tempo da família, no tom das faixas: por épico, uma placa;
+    à esquerda o nome, à direita a barra enchendo; vínculos tracejados; o
+    hoje em azul. Hover numa tarefa acende ela e os vínculos. */
+function LinhaFamilia({ feitas, abrir }: { feitas: Set<string>; abrir: (t: TaskTableTask) => void }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [larg, setLarg] = React.useState(700)
+  const [foco, setFoco] = React.useState<string | null>(null)
+  React.useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setLarg(el.clientWidth - 260))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+  const px = Math.max(larg, 200) / DIAS_MES
+  const ligados = foco ? new Set([foco, ...(FAMILIA.find((x) => x.id === foco)?.deps ?? []), ...FAMILIA.filter((x) => x.deps?.includes(foco)).map((x) => x.id)]) : null
+  const ordemLinhas = FAMILIA
+  const H = 44
+  const posY = new Map<string, number>()
+  return (
+    <div ref={ref} className="flex flex-col gap-5">
+      <div className="sticky top-0 z-10 -mx-8 px-8" style={{ isolation: "isolate" }}>
+        <span aria-hidden className="absolute inset-x-0 top-0 -bottom-5 -z-10" style={{ background: "linear-gradient(to bottom, var(--ds-placa-1) 35%, transparent)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", maskImage: "linear-gradient(to bottom, black 50%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent)" }} />
+        <div className="relative ml-[260px] h-10">
+          {[0, 7, 14, 21, 28].map((d) => (
+            <span key={d} className="absolute top-1/2 -translate-y-1/2 font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ left: d * px, color: "var(--ds-tinta-2)" }}>
+              {d + 1} nov
+            </span>
+          ))}
+          <span className="absolute top-1/2 flex -translate-y-1/2 items-center gap-1.5 font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ left: HOJE_DIA * px - 3, color: "var(--primary)" }}>
+            <span className="size-1.5" style={{ background: "var(--primary)" }} /> hoje
+          </span>
+        </div>
+      </div>
+      {FAMILIA.filter((e) => e.depth === 0).map((e) => {
+        const linhas = ordemLinhas.filter((x) => x.depth > 0 && (x.parentId === e.id || FAMILIA.find((p) => p.id === x.parentId)?.parentId === e.id))
+        linhas.forEach((x, i) => posY.set(x.id, i))
+        return (
+          <section key={e.id} className="relative overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+            <header className="flex h-12 items-center gap-3 px-5" style={{ borderBottom: "1px solid var(--ds-fio)" }}>
+              <Flag size={14} weight="fill" style={{ color: "var(--primary)" }} />
+              <Etiqueta cor="var(--primary)">{e.title}</Etiqueta>
+            </header>
+            <div className="relative">
+              {/* o hoje atravessa a placa */}
+              <span className="pointer-events-none absolute top-0 bottom-0 z-10 w-0.5" style={{ left: 260 + HOJE_DIA * px, background: "var(--primary)", boxShadow: "0 0 10px color-mix(in oklab, var(--primary) 60%, transparent)" }} />
+              <svg className="pointer-events-none absolute top-0 left-[260px] z-0 overflow-visible" width={larg} height={linhas.length * H}>
+                {linhas.flatMap((t) =>
+                  (t.deps ?? []).map((d) => {
+                    const de = FAMILIA.find((x) => x.id === d)
+                    const a = posY.get(d)
+                    const b = posY.get(t.id)
+                    if (!de || a === undefined || b === undefined) return null
+                    const x1 = (diaDe(de.end) + 1) * px
+                    const x2 = diaDe(t.start) * px
+                    const y1 = a * H + H / 2
+                    const y2 = b * H + H / 2
+                    const meio = Math.max(x1 + 10, (x1 + x2) / 2)
+                    const aceso = ligados ? ligados.has(t.id) && ligados.has(d) : false
+                    return (
+                      <motion.path key={`${d}-${t.id}`} d={`M ${x1} ${y1} H ${meio} V ${y2} H ${x2 - 3}`} fill="none" strokeDasharray="4 4" animate={{ opacity: ligados && !aceso ? 0.15 : 1, stroke: aceso ? "var(--primary)" : "var(--ds-fio-forte)" }} transition={{ duration: 0.3 }} />
+                    )
+                  })
+                )}
+              </svg>
+              {linhas.map((t, i) => {
+                const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+                const tom = ST_F[st].tom
+                const ini = diaDe(t.start)
+                const fim = diaDe(t.end) + 1
+                const recua = ligados && !ligados.has(t.id)
+                const prog = feitas.has(t.id) ? 1 : (t.progressRatio ?? 0)
+                return (
+                  <motion.div key={t.id} onClick={() => abrir(t)} onMouseEnter={() => setFoco(t.id)} onMouseLeave={() => setFoco(null)} animate={{ opacity: recua ? 0.35 : 1 }} transition={{ duration: 0.3 }} className="relative flex cursor-pointer items-center" style={{ height: H, borderTop: i ? "1px solid var(--ds-fio)" : undefined }}>
+                    <span className="flex w-[260px] shrink-0 items-center gap-2 truncate px-5 text-[13.5px]" style={{ paddingLeft: t.depth === 2 ? 44 : 20, color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+                      <span className="font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                        {t.code}
+                      </span>
+                      <span className="truncate">{t.title}</span>
+                    </span>
+                    <motion.span
+                      className="absolute z-[1] overflow-hidden rounded-[8px]"
+                      initial={{ opacity: 0, filter: "blur(10px)" }}
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      transition={{ duration: 0.5, ease: CURVA, delay: 0.05 * i }}
+                      style={{ left: 260 + ini * px, width: (fim - ini) * px - 3, top: 10, height: 24, background: `var(--tone-${tom})`, boxShadow: foco === t.id ? `0 0 0 1.5px var(--tone-${tom}-dot), 0 8px 20px -8px var(--tone-${tom}-dot)` : `inset 0 0 0 1px color-mix(in oklab, var(--tone-${tom}-dot) 28%, transparent)` }}
+                    >
+                      <motion.span className="absolute inset-y-0 left-0" initial={{ width: 0 }} animate={{ width: `${prog * 100}%` }} transition={{ duration: 1.1, ease: CURVA, delay: 0.15 + 0.06 * i }} style={{ background: `color-mix(in oklab, var(--tone-${tom}-dot) 35%, transparent)` }} />
+                    </motion.span>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </section>
+        )
+      })}
+    </div>
+  )
+}
+
+/** A tarefa aberta, na frente: a ficha, as subtarefas e os vínculos. */
+function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas: Set<string>; fechar: () => void; abrir: (t: TaskTableTask) => void }) {
+  const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+  const subs = filhosDe(t.id)
+  const depende = (t.deps ?? []).map((d) => FAMILIA.find((x) => x.id === d)!).filter(Boolean)
+  const segura = FAMILIA.filter((x) => x.deps?.includes(t.id))
+  const mini = (x: TaskTableTask) => (
+    <button key={x.id} type="button" onClick={() => abrir(x)} className="flex h-10 items-center gap-3 rounded-[8px] px-2 text-left text-[13.5px] transition-colors hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta-forte)" }}>
+      <span className="size-1.5 rounded-full" style={{ background: `var(--tone-${ST_F[feitas.has(x.id) ? "done" : x.status].tom}-dot)` }} />
+      <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+        {x.code}
+      </span>
+      <span className="truncate">{x.title}</span>
+    </button>
+  )
+  const bloco = (rotulo: string, xs: TaskTableTask[]) =>
+    xs.length ? (
+      <div className="flex flex-col gap-1 rounded-[12px] p-3" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+        <span className="px-2 pb-1">
+          <Etiqueta cor="var(--primary)">{rotulo}</Etiqueta>
+        </span>
+        {xs.map(mini)}
+      </div>
+    ) : null
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div key={t.id} {...troca} className="flex flex-1 flex-col gap-6">
+        <CabecalhoFrente etiqueta={t.depth === 2 ? `${t.code} · subtarefa` : t.code} tom={ST_F[st].tom} titulo={t.title} fechar={fechar} />
+        <Ficha
+          linhas={[
+            ["Status", <SeloTroca key="s" status={st} />],
+            ["Responsável", t.owner ? <><Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> {NOME_DONO[t.owner.initials]}</> : "—"],
+            ["Prazo", <><CalendarBlank size={16} /> {t.due}</>],
+            ["Prioridade", PRIO_F[t.priority ?? "none"]],
+          ]}
+        />
+        {bloco(`Subtarefas · ${subs.length}`, subs)}
+        {bloco("Depende de", depende)}
+        {bloco("Segura", segura)}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
 function TelaTarefas() {
   const [foco, setFoco] = React.useState("cobranca")
   const [vista, setVista] = React.useState(() => (location.hash.includes("quadro") ? "quadro" : "lista"))
-  const [aberta, setAberta] = React.useState<Tarefa | null>(() => (location.hash.includes("aberta") ? GRUPOS[0].tarefas[0] : null))
-  const [marcadas, setMarcadas] = React.useState<Set<string>>(() => new Set(["g0-1", "g0-2"]))
+  const [aberta, setAberta] = React.useState<TaskTableTask | null>(() => (location.hash.includes("aberta") ? FAMILIA[1] : null))
   const [nova, setNova] = React.useState(() => location.hash.includes("nova"))
+  const [fechados, setFechados] = React.useState<Set<string>>(new Set())
+  const [feitas, setFeitas] = React.useState<Set<string>>(new Set())
+  const [salvando, setSalvando] = React.useState<string | null>(null)
+  const [estado, setEstado] = React.useState<"ocioso" | "salvando" | "salvo">("ocioso")
   const [aviso, avisar] = useAviso()
   const carregando = useCarregando(`${foco}-${vista}`)
   const projeto = PROJETOS.find((p) => p.id === foco)!
   const alternar = (id: string) =>
-    setMarcadas((m) => {
+    setFechados((m) => {
       const n = new Set(m)
       if (n.has(id)) n.delete(id)
       else n.add(id)
       return n
     })
+  // concluir: gira enquanto salva, o status troca pelo desfoque, o indicador diz Salvo
+  const concluir = (id: string) => {
+    if (salvando) return
+    setSalvando(id)
+    setEstado("salvando")
+    setTimeout(() => {
+      setFeitas((f) => {
+        const n = new Set(f)
+        if (n.has(id)) n.delete(id)
+        else n.add(id)
+        return n
+      })
+      setSalvando(null)
+      setEstado("salvo")
+      setTimeout(() => setEstado("ocioso"), 1600)
+    }, 900)
+  }
+  const acao = (o: string, t: TaskTableTask) => {
+    if (o === "Editar") setAberta(t)
+    else if (o === "Desbloquear") avisar(`${t.code} desbloqueada`)
+    else if (o === "Adicionar subtarefa") avisar(`Nova subtarefa em ${t.code}`)
+  }
   return (
     <>
       <Faixas
@@ -726,7 +1122,7 @@ function TelaTarefas() {
         }}
         acoes={
           <>
-            <Busca texto="Buscar tarefa" />
+            <IndicadorSalvo estado={estado} />
             <Vistas valor={vista} onChange={setVista} />
             <Botao solido onClick={() => setNova(true)}>
               <Plus size={16} /> Nova tarefa
@@ -739,9 +1135,11 @@ function TelaTarefas() {
               {carregando ? (
                 <EsqueletoLista colunas={COLS_TAREFA} />
               ) : vista === "lista" ? (
-                <ListaTarefas marcadas={marcadas} alternar={alternar} abrir={setAberta} />
+                <ArvoreFamilia fechados={fechados} alternar={alternar} feitas={feitas} salvando={salvando} concluir={concluir} abrir={setAberta} acao={acao} />
+              ) : vista === "quadro" ? (
+                <QuadroFamilia feitas={feitas} abrir={setAberta} />
               ) : (
-                <QuadroTarefas abrir={setAberta} />
+                <LinhaFamilia feitas={feitas} abrir={setAberta} />
               )}
             </motion.div>
           </AnimatePresence>
@@ -761,21 +1159,10 @@ function TelaTarefas() {
           </Frente>
         ) : null}
         {aberta ? (
-          <Frente key={aberta.id}>
-            <CabecalhoFrente etiqueta={aberta.codigo} tom={TOM[aberta.status].tom} titulo={aberta.titulo} fechar={() => setAberta(null)} />
-            <Ficha
-              linhas={[
-                ["Status", <Selo key="s" {...TOM[aberta.status]} />],
-                ["Responsável", <><Avatar iniciais={aberta.dono} /> {aberta.dono === "GT" ? "Guilherme T." : "Ana M."}</>],
-                ["Prazo", <><CalendarBlank size={16} /> {aberta.prazo}</>],
-                ["Prioridade", PRIO[aberta.prioridade]],
-              ]}
-            />
-            <p className="text-[14.5px] leading-relaxed" style={{ color: "var(--ds-tinta)" }}>
-              Revisar com o time de produto antes da sprint. O fluxo atual cobra duas vezes quem troca de plano no meio do mês.
-            </p>
+          <Frente key="tarefa">
+            <DetalheFamilia t={aberta} feitas={feitas} fechar={() => setAberta(null)} abrir={setAberta} />
             <div className="mt-auto flex gap-2">
-              <Botao solido>Concluir tarefa</Botao>
+              <Botao solido onClick={() => concluir(aberta.id)}>{feitas.has(aberta.id) || aberta.status === "done" ? "Reabrir" : "Concluir tarefa"}</Botao>
               <Botao>Comentar</Botao>
             </div>
           </Frente>
