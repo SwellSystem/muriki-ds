@@ -381,50 +381,6 @@ interface ItemFaixa {
   valor: string
 }
 
-// ── as opções em estudo ──────────────────────────────────────────────────
-// Cada pergunta aberta vira 3 opções lado a lado, trocadas no painel do canto
-// (ou pelo hash: #rotulo-b, #epico-c). A primeira é o padrão.
-
-const OPCOES = [
-  { nome: "rotulo", rotulo: "Rótulo", opcoes: ["Sem número", "Na etiqueta", "Na margem"] },
-  { nome: "epico", rotulo: "Épico", opcoes: ["Faixa", "Faixa + colunas", "Linha de tarefa"] },
-] as const
-
-const ouvirHash = (f: () => void) => (addEventListener("hashchange", f), () => removeEventListener("hashchange", f))
-function useOpcao(nome: string) {
-  const hash = React.useSyncExternalStore(ouvirHash, () => location.hash)
-  return hash.match(new RegExp(`${nome}-([abc])`))?.[1] ?? "a"
-}
-function escolherOpcao(nome: string, v: string) {
-  const resto = location.hash.slice(1).split("&").filter((x) => x && !x.startsWith(`${nome}-`))
-  location.hash = [...resto, `${nome}-${v}`].join("&")
-}
-
-function PainelOpcoes() {
-  const valores = { rotulo: useOpcao("rotulo"), epico: useOpcao("epico") }
-  return (
-    <div className="fixed right-6 bottom-6 z-50 flex flex-col gap-2.5 rounded-[12px] p-3" style={{ ...placa("var(--ds-placa-forte)"), boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 20px 40px -20px var(--ds-sombra)" }}>
-      {OPCOES.map((o) => (
-        <div key={o.nome} className="flex items-center gap-3">
-          <span className="w-14"><Etiqueta>{o.rotulo}</Etiqueta></span>
-          <div className="flex gap-1">
-            {o.opcoes.map((r, i) => {
-              const v = "abc"[i]
-              const ativo = valores[o.nome] === v
-              return (
-                <button key={v} type="button" onClick={() => escolherOpcao(o.nome, v)} className="relative h-8 rounded-[8px] px-2.5 text-[12.5px]" style={{ color: ativo ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
-                  {ativo ? <motion.span layoutId={`opcao-${o.nome}`} className="absolute inset-0 rounded-[8px]" style={{ background: "var(--ds-trilho-forte)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} /> : null}
-                  <span className="relative font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>{v.toUpperCase()}</span> <span className="relative">{r}</span>
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 /** O item recolhido: faixa deitada com o número, o nome e a fração
     carregando da esquerda para a direita. Clicada, cresce até virar a área. */
 function Faixa({ item, n, abrir }: { item: ItemFaixa; n: number; abrir: () => void }) {
@@ -484,9 +440,6 @@ function Faixas({
   acoes: React.ReactNode
   corpo: (item: ItemFaixa) => React.ReactNode
 }) {
-  // o número empurrava o rótulo e o título para dentro, fora do alinhamento com a tabela:
-  // a) some da área (fica só nas faixas) · b) entra na etiqueta · c) pendura na margem
-  const rotulo = useOpcao("rotulo")
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2.5">
       {itens.map((item, i) =>
@@ -503,15 +456,12 @@ function Faixas({
             <motion.header {...troca} className="flex items-end justify-between gap-6 px-8 pt-6 pb-5">
               <div className="flex flex-col gap-2">
                 <Etiqueta cor={`var(--tone-${item.tom}-dot)`}>
-                  {rotulo === "b" ? `${String(i + 1).padStart(2, "0")} · ` : null}
+                  {/* o número mora na etiqueta: antes, ao lado do título, empurrava o rótulo
+                      e o título para dentro, fora do alinhamento com a tabela */}
+                  {String(i + 1).padStart(2, "0")} ·{" "}
                   {item.resumo} · {item.valor}
                 </Etiqueta>
-                <h1 className="relative text-[38px] leading-none font-light tracking-[-0.035em]" style={{ color: "var(--ds-tinta-forte)" }}>
-                  {rotulo === "c" ? (
-                    <span className="absolute right-full bottom-[3px] pr-3 text-[22px] leading-none tabular-nums" style={{ color: "var(--ds-tinta-2)" }}>
-                      {i + 1}
-                    </span>
-                  ) : null}
+                <h1 className="text-[38px] leading-none font-light tracking-[-0.035em]" style={{ color: "var(--ds-tinta-forte)" }}>
                   {item.nome}
                 </h1>
               </div>
@@ -659,14 +609,14 @@ const TOM_DONO = { a1: "blue", a2: "purple", a3: "orange", a4: "gray" } as const
 const NOME_DONO: Record<string, string> = { GT: "Guilherme T.", AM: "Ana Moura", RS: "Rafael Silva", LP: "Lúcia Prado" }
 const tk = (o: Partial<TaskTableTask> & Pick<TaskTableTask, "id" | "code" | "title" | "depth" | "kind" | "status">): TaskTableTask => o
 const FAMILIA: TaskTableTask[] = [
-  tk({ id: "e1", code: "MUR-1", title: "Cobrança recorrente", depth: 0, kind: "epic", status: "progress", childGroupId: "e1", owner: { initials: "GT", tone: "a1" }, priority: "high", due: "24 nov", progress: { done: 2, total: 5 }, start: "2026-11-02", end: "2026-11-24", progressRatio: 0.4 }),
+  tk({ id: "e1", code: "MUR-1", title: "Cobrança recorrente", depth: 0, kind: "epic", status: "progress", childGroupId: "e1", progress: { done: 2, total: 5 }, start: "2026-11-02", end: "2026-11-24", progressRatio: 0.4 }),
   tk({ id: "t1", code: "MUR-2", title: "Revisar o fluxo de cobrança", depth: 1, kind: "task", status: "progress", parentId: "e1", childGroupId: "t1", owner: { initials: "GT", tone: "a1" }, priority: "urgent", due: "10 nov", start: "2026-11-02", end: "2026-11-10", progressRatio: 0.85, progress: { done: 1, total: 2 } }),
   tk({ id: "s1", code: "MUR-3", title: "Mapear quem é cobrado duas vezes", depth: 2, kind: "sub", status: "done", parentId: "t1", owner: { initials: "AM", tone: "a2" }, priority: "high", due: "5 nov", start: "2026-11-02", end: "2026-11-05", progressRatio: 1 }),
   tk({ id: "s2", code: "MUR-4", title: "Ajustar o cálculo proporcional", depth: 2, kind: "sub", status: "progress", parentId: "t1", lastChild: true, owner: { initials: "GT", tone: "a1" }, priority: "medium", due: "10 nov", start: "2026-11-05", end: "2026-11-10", progressRatio: 0.5, deps: ["s1"] }),
   tk({ id: "t2", code: "MUR-5", title: "Migrar webhooks do Stripe", depth: 1, kind: "task", status: "blocked", parentId: "e1", owner: { initials: "RS", tone: "a3" }, priority: "high", due: "16 nov", start: "2026-11-10", end: "2026-11-16", progressRatio: 0.1, deps: ["t1"] }),
   tk({ id: "t3", code: "MUR-6", title: "Aviso de cartão vencendo", depth: 1, kind: "task", status: "active", parentId: "e1", owner: { initials: "LP", tone: "a4" }, priority: "low", due: "20 nov", start: "2026-11-14", end: "2026-11-20", progressRatio: 0 }),
   tk({ id: "t4", code: "MUR-7", title: "Fatura em PDF com a marca", depth: 1, kind: "task", status: "done", parentId: "e1", lastChild: true, owner: { initials: "AM", tone: "a2" }, priority: "medium", due: "8 nov", start: "2026-11-03", end: "2026-11-08", progressRatio: 1 }),
-  tk({ id: "e2", code: "MUR-10", title: "Membros e convites", depth: 0, kind: "epic", status: "active", childGroupId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "28 nov", progress: { done: 0, total: 3 }, start: "2026-11-12", end: "2026-11-28", progressRatio: 0.1 }),
+  tk({ id: "e2", code: "MUR-10", title: "Membros e convites", depth: 0, kind: "epic", status: "active", childGroupId: "e2", progress: { done: 0, total: 3 }, start: "2026-11-12", end: "2026-11-28", progressRatio: 0.1 }),
   tk({ id: "t5", code: "MUR-11", title: "Convite expira em 7 dias", depth: 1, kind: "task", status: "progress", parentId: "e2", owner: { initials: "RS", tone: "a3" }, priority: "medium", due: "18 nov", start: "2026-11-12", end: "2026-11-18", progressRatio: 0.2 }),
   tk({ id: "t6", code: "MUR-12", title: "Carência de quem passa do limite", depth: 1, kind: "task", status: "blocked", parentId: "e2", owner: { initials: "GT", tone: "a1" }, priority: "high", due: "24 nov", start: "2026-11-18", end: "2026-11-24", progressRatio: 0, deps: ["t5", "t2"] }),
   tk({ id: "t7", code: "MUR-13", title: "Trocar o dono do workspace", depth: 1, kind: "task", status: "active", parentId: "e2", lastChild: true, priority: "low", due: "28 nov", start: "2026-11-22", end: "2026-11-28", progressRatio: 0 }),
@@ -682,7 +632,6 @@ const FAMILIA: TaskTableTask[] = [
 const SOLTAS = FAMILIA.filter((t) => t.depth === 1 && !t.parentId)
 /** O que o TaskTableTask não traz: comentários e etiqueta (exemplo). */
 const EXTRA: Record<string, { comentarios?: number; etiqueta?: string; mais?: string[]; criador?: string }> = {
-  e1: { mais: ["AM"], criador: "GT" },
   t1: { comentarios: 3, mais: ["AM", "RS"], criador: "LP" },
   t2: { comentarios: 5, etiqueta: "api", criador: "GT" },
   t3: { criador: "GT" },
@@ -1258,57 +1207,6 @@ function ArvoreFamilia({
     )
   }
 
-  // o épico como tarefa: b) a faixa ganha as colunas (status, prioridade, pessoas, prazo);
-  // c) vira uma linha como as outras, com a bandeira no lugar do círculo
-  const epico = useOpcao("epico")
-  const epicoComColunas = (e: TaskTableTask) => {
-    const fechado = fechados.has(e.id)
-    const faixa = epico === "b"
-    return (
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => alternar(e.id)}
-        className={`relative grid cursor-pointer items-center gap-6 px-8 transition-colors hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${faixa ? "h-11" : "h-[56px]"} ${GRADE_PROJ}`}
-        style={{ background: faixa ? "var(--ds-trilho)" : undefined, boxShadow: `inset 0 -1px 0 ${faixa ? "var(--ds-fio)" : "var(--ds-fio-forte)"}` }}
-      >
-        {/* a seta mora na margem, como a das tarefas: a bandeira fica no início da tabela */}
-        <motion.span className="absolute top-1/2 left-[7px] -mt-1.5" animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
-          <CaretRight size={12} weight="bold" />
-        </motion.span>
-        <span className="flex min-w-0 items-center gap-2.5">
-          <span className="grid size-[18px] shrink-0 place-items-center">
-            <Flag size={faixa ? 13 : 16} weight="fill" style={{ color: "var(--primary)" }} />
-          </span>
-          <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-            {e.code}
-          </span>
-          {faixa ? (
-            <span className="truncate font-mono text-[10.5px] tracking-[0.12em] uppercase" style={{ color: "var(--ds-tinta-forte)" }}>
-              {e.title}
-            </span>
-          ) : (
-            <span className="truncate text-[15px] font-semibold" style={{ color: "var(--ds-tinta-forte)" }}>
-              {e.title}
-            </span>
-          )}
-          <span className="ml-2 h-1 w-16 shrink-0 overflow-hidden rounded-full" style={{ background: "var(--ds-trilho-forte)" }}>
-            <motion.span className="block h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${(e.progressRatio ?? 0) * 100}%` }} transition={{ duration: 1, ease: CURVA }} style={{ background: "var(--primary)" }} />
-          </span>
-          <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-            {e.progress?.done}/{e.progress?.total}
-          </span>
-        </span>
-        <StatusEditavel status={statusDe(e.id)} progresso={e.progressRatio} semDono={!e.owner} salvando={salvando === e.id} mudar={(n) => mudarStatus(e.id, n)} />
-        <Prioridade p={e.priority} pequena={faixa} />
-        <Responsaveis t={e} />
-        <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-          {e.due ?? "—"}
-        </span>
-      </div>
-    )
-  }
-
   return (
     <>
       <div ref={marco} className="h-px" />
@@ -1373,9 +1271,7 @@ function ArvoreFamilia({
         <AnimatePresence initial={false}>{ordena(SOLTAS).map((f, i, a) => linha(f, i === a.length - 1))}</AnimatePresence>
         {FAMILIA.filter((e) => e.depth === 0).map((e) => (
           <div key={e.id}>
-            {epico !== "a" ? (
-              epicoComColunas(e)
-            ) : secao(
+            {secao(
               e.id,
               <>
                 <Flag size={13} weight="fill" style={{ color: "var(--primary)" }} />
@@ -2535,7 +2431,6 @@ function App() {
           </motion.div>
         </AnimatePresence>
       </div>
-      <PainelOpcoes />
     </div>
   )
 }
