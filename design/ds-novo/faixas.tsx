@@ -793,7 +793,7 @@ function StatusBadge({ status, progresso, semDono, salvando = false, onClick }: 
       aria-label={status === "done" ? "Reabrir" : "Concluir"}
       onPointerDown={(e) => e.stopPropagation()}
       onClick={(e) => (e.stopPropagation(), onClick?.())}
-      className="inline-flex h-7 w-fit items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] transition-[box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_currentColor]"
+      className="group/badge inline-flex h-7 w-fit items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] transition-[box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_currentColor]"
       style={{ background: v === "backlog" ? "transparent" : `var(--tone-${tom})`, color: v === "done" ? "var(--ds-tinta-2)" : `var(--tone-${tom}-foreground)`, boxShadow: v === "backlog" ? "inset 0 0 0 1px var(--ds-fio-forte)" : undefined }}
     >
       <AnimatePresence mode="wait" initial={false}>
@@ -810,6 +810,7 @@ function StatusBadge({ status, progresso, semDono, salvando = false, onClick }: 
           {salvando ? "Salvando" : ROTULO_VISUAL[v]}
         </motion.span>
       </AnimatePresence>
+      <CaretDown size={10} weight="bold" className="-mr-0.5 opacity-0 transition-opacity group-hover/badge:opacity-60" />
     </button>
   )
 }
@@ -900,6 +901,100 @@ function Chip({ icone, children }: { icone: React.ReactNode; children: React.Rea
   )
 }
 
+/** Trocar o status na própria lista: clicar na badge abre este menu, preso
+    embaixo dela. Num portal no body (a linha corta o que passa da borda);
+    chega e sai pelo desfoque; Esc ou clique fora fecha; setas e Enter
+    navegam. A escolha troca a badge pelo desfoque. */
+const ESTADOS_MENU: TaskTableStatus[] = ["active", "progress", "blocked", "done"]
+function StatusMenu({ ancora, atual, progresso, escolher, fechar }: { ancora: DOMRect; atual: TaskTableStatus; progresso?: number; escolher: (s: TaskTableStatus) => void; fechar: () => void }) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const [i, setI] = React.useState(Math.max(0, ESTADOS_MENU.indexOf(atual)))
+  React.useEffect(() => {
+    const fora = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && fechar()
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key === "Escape") fechar()
+      else if (e.key === "ArrowDown") (e.preventDefault(), setI((x) => (x + 1) % ESTADOS_MENU.length))
+      else if (e.key === "ArrowUp") (e.preventDefault(), setI((x) => (x + ESTADOS_MENU.length - 1) % ESTADOS_MENU.length))
+      else if (e.key === "Enter") (e.preventDefault(), escolher(ESTADOS_MENU[i]))
+      else if (/^[1-4]$/.test(e.key)) (e.preventDefault(), escolher(ESTADOS_MENU[Number(e.key) - 1]))
+    }
+    setTimeout(() => addEventListener("mousedown", fora))
+    addEventListener("keydown", tecla)
+    return () => {
+      removeEventListener("mousedown", fora)
+      removeEventListener("keydown", tecla)
+    }
+  }, [fechar, escolher, i])
+  return createPortal(
+    <motion.div
+      ref={ref}
+      role="menu"
+      initial={{ opacity: 0, filter: "blur(10px)", y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, filter: "blur(0px)", y: 0, scale: 1 }}
+      exit={{ opacity: 0, filter: "blur(10px)", y: -6, scale: 0.98 }}
+      transition={{ duration: 0.28, ease: CURVA }}
+      className="fixed z-50 flex w-48 flex-col gap-0.5 rounded-[10px] p-1.5"
+      style={{ left: ancora.left, top: ancora.bottom + 6, background: "var(--ds-placa-solida)", boxShadow: "inset 0 0 0 1px var(--ds-fio), 0 24px 50px -20px var(--ds-sombra)" }}
+    >
+      <span className="px-2 pt-1 pb-1.5 font-mono text-[10px] tracking-[0.12em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+        Mudar status
+      </span>
+      {ESTADOS_MENU.map((st, k) => (
+        <motion.button
+          key={st}
+          type="button"
+          role="menuitemradio"
+          aria-checked={st === atual}
+          initial={{ opacity: 0, filter: "blur(6px)", x: -4 }}
+          animate={{ opacity: 1, filter: "blur(0px)", x: 0 }}
+          transition={{ duration: 0.3, ease: CURVA, delay: 0.03 * k }}
+          onMouseEnter={() => setI(k)}
+          onClick={() => escolher(st)}
+          className="flex h-9 items-center gap-2.5 rounded-[7px] px-2 text-left text-[13.5px]"
+          style={{ background: k === i ? "var(--ds-trilho)" : undefined, color: "var(--ds-tinta-forte)" }}
+        >
+          <StatusIcone status={st} tamanho={15} progresso={progresso ?? 0.5} />
+          {ROTULO_VISUAL[st]}
+          <span className="ml-auto flex items-center gap-2">
+            {st === atual ? <Check size={13} weight="bold" style={{ color: "var(--primary)" }} /> : null}
+            <span className="font-mono text-[10px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {k + 1}
+            </span>
+          </span>
+        </motion.button>
+      ))}
+    </motion.div>,
+    document.body
+  )
+}
+
+/** A badge com o menu: clicar abre; escolher troca. */
+function StatusEditavel({ status, progresso, semDono, salvando, mudar }: { status: TaskTableStatus; progresso?: number; semDono?: boolean; salvando?: boolean; mudar: (s: TaskTableStatus) => void }) {
+  const [ancora, setAncora] = React.useState<DOMRect | null>(null)
+  const fechar = React.useCallback(() => setAncora(null), [])
+  const escolher = React.useCallback(
+    (s: TaskTableStatus) => {
+      setAncora(null)
+      if (s !== status) mudar(s)
+    },
+    [mudar, status]
+  )
+  return (
+    <span className="inline-flex" onClick={(e) => e.stopPropagation()}>
+      <span
+        onClickCapture={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          setAncora(ancora ? null : (e.currentTarget as HTMLElement).getBoundingClientRect())
+        }}
+      >
+        <StatusBadge status={status} progresso={progresso} semDono={semDono} salvando={salvando} />
+      </span>
+      <AnimatePresence>{ancora ? <StatusMenu key="menu" ancora={ancora} atual={status} progresso={progresso} escolher={escolher} fechar={fechar} /> : null}</AnimatePresence>
+    </span>
+  )
+}
+
 /** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
 function SeloTroca({ status, progresso, semDono }: { status: TaskTableStatus; progresso?: number; semDono?: boolean }) {
   return (
@@ -941,7 +1036,8 @@ const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_124px_116px_40px_60px]"
 function ArvoreFamilia({
   fechados,
   alternar,
-  feitas,
+  statusDe,
+  mudarStatus,
   salvando,
   concluir,
   abrir,
@@ -950,6 +1046,8 @@ function ArvoreFamilia({
   fechados: Set<string>
   alternar: (id: string) => void
   feitas: Set<string>
+  statusDe: (id: string) => TaskTableStatus
+  mudarStatus: (id: string, st: TaskTableStatus) => void
   salvando: string | null
   concluir: (id: string) => void
   abrir: (t: TaskTableTask) => void
@@ -969,7 +1067,7 @@ function ArvoreFamilia({
   const [ordem, setOrdem] = React.useState<{ k: "tarefa" | "status" | "prioridade" | "prazo"; desc: boolean }>({ k: "tarefa", desc: false })
   const chave: Record<string, (t: TaskTableTask) => string | number> = {
     tarefa: (t) => t.code.replace(/\D/g, "").padStart(6, "0"),
-    status: (t) => ({ blocked: 0, progress: 1, active: 2, done: 3 })[feitas.has(t.id) ? "done" : t.status],
+    status: (t) => ({ blocked: 0, progress: 1, active: 2, done: 3 })[statusDe(t.id)],
     prioridade: (t) => ({ urgent: 0, high: 1, medium: 2, low: 3, none: 4 })[t.priority ?? "none"],
     prazo: (t) => diaDe(t.end),
   }
@@ -991,7 +1089,7 @@ function ArvoreFamilia({
   const selecionando = modificador || marcadas.size > 0
 
   const linha = (t: TaskTableTask, ultimo: boolean): React.ReactNode => {
-    const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+    const st: TaskTableStatus = statusDe(t.id)
     const grupo = t.childGroupId
     const fechado = grupo ? fechados.has(grupo) : false
     const filhos = grupo ? ordena(filhosDe(t.id)) : []
@@ -1040,7 +1138,7 @@ function ArvoreFamilia({
             {EXTRA[t.id]?.comentarios ? <Chip icone={<ChatCircle size={11} />}>{EXTRA[t.id].comentarios}</Chip> : null}
             {EXTRA[t.id]?.etiqueta ? <Chip icone={<Hash size={11} />}>{EXTRA[t.id].etiqueta}</Chip> : null}
           </span>
-          <StatusBadge status={st} progresso={t.progressRatio} semDono={!t.owner} />
+          <StatusEditavel status={st} progresso={t.progressRatio} semDono={!t.owner} salvando={salvando === t.id} mudar={(n) => mudarStatus(t.id, n)} />
           <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
@@ -1084,7 +1182,7 @@ function ArvoreFamilia({
                   {marcadas.size} {marcadas.size === 1 ? "marcada" : "marcadas"}
                 </span>
                 {[
-                  ["Concluir", () => marcadas.forEach((id) => !feitas.has(id) && concluir(id))],
+                  ["Concluir", () => marcadas.forEach((id) => statusDe(id) !== "done" && mudarStatus(id, "done"))],
                   ["Mover para Fazendo", () => {}],
                   ["Trocar responsável", () => {}],
                 ].map(([r, f]) => (
@@ -1566,23 +1664,29 @@ function TelaTarefas() {
       else n.add(id)
       return n
     })
-  // concluir: gira enquanto salva, o status troca pelo desfoque, o indicador diz Salvo
-  const concluir = (id: string) => {
+  // o status que a pessoa mudou na lista; o resto vem da tarefa
+  const [mudados, setMudados] = React.useState<Record<string, TaskTableStatus>>({})
+  const statusDe = (id: string): TaskTableStatus => mudados[id] ?? (feitas.has(id) ? "done" : (FAMILIA.find((x) => x.id === id)?.status ?? "active"))
+  // mudar o status: gira enquanto salva, a badge troca pelo desfoque, o indicador diz Salvo
+  const mudarStatus = (id: string, st: TaskTableStatus) => {
     if (salvando) return
     setSalvando(id)
     setEstado("salvando")
     setTimeout(() => {
+      setMudados((m) => ({ ...m, [id]: st }))
       setFeitas((f) => {
         const n = new Set(f)
-        if (n.has(id)) n.delete(id)
-        else n.add(id)
+        if (st === "done") n.add(id)
+        else n.delete(id)
         return n
       })
       setSalvando(null)
       setEstado("salvo")
       setTimeout(() => setEstado("ocioso"), 1600)
-    }, 900)
+    }, 700)
   }
+  // concluir é mudar para Feita (ou reabrir)
+  const concluir = (id: string) => mudarStatus(id, statusDe(id) === "done" ? "active" : "done")
   const acao = (o: string, t: TaskTableTask) => {
     if (o === "Editar") setAberta(t)
     else if (o === "Desbloquear") avisar(`${t.code} desbloqueada`)
@@ -1614,7 +1718,7 @@ function TelaTarefas() {
               {carregando ? (
                 <EsqueletoTabela />
               ) : vista === "lista" ? (
-                <ArvoreFamilia fechados={fechados} alternar={alternar} feitas={feitas} salvando={salvando} concluir={concluir} abrir={setAberta} acao={acao} />
+                <ArvoreFamilia fechados={fechados} alternar={alternar} feitas={feitas} statusDe={statusDe} mudarStatus={mudarStatus} salvando={salvando} concluir={concluir} abrir={setAberta} acao={acao} />
               ) : vista === "quadro" ? (
                 <QuadroFamilia feitas={feitas} abrir={setAberta} avisar={avisar} />
               ) : (
@@ -1974,25 +2078,22 @@ function OrigemTag({ o }: { o: Origem }) {
 
 function TelaFocus() {
   const [filtro, setFiltro] = React.useState<"todas" | "pessoais" | "projetos">("todas")
-  const [feitas, setFeitas] = React.useState<Set<string>>(new Set())
+  const [mudados, setMudados] = React.useState<Record<string, TaskTableStatus>>({})
   const [salvando, setSalvando] = React.useState<string | null>(null)
   const [aviso, avisar] = useAviso()
   const [rolou, setRolou] = React.useState(false)
   const carregando = useCarregando(filtro, 600)
-  const concluir = (id: string) => {
+  const statusDe = (t: TarefaFocus): TaskTableStatus => mudados[t.id] ?? t.status
+  const mudarStatus = (t: TarefaFocus, st: TaskTableStatus) => {
     if (salvando) return
-    setSalvando(id)
+    setSalvando(t.id)
     setTimeout(() => {
-      setFeitas((f) => {
-        const n = new Set(f)
-        if (n.has(id)) n.delete(id)
-        else n.add(id)
-        return n
-      })
+      setMudados((m) => ({ ...m, [t.id]: st }))
       setSalvando(null)
-      avisar("Tarefa concluída")
-    }, 800)
+      avisar(st === "done" ? "Tarefa concluída" : `Agora está ${ROTULO_VISUAL[st].toLowerCase()}`)
+    }, 700)
   }
+  const concluir = (t: TarefaFocus) => mudarStatus(t, statusDe(t) === "done" ? "active" : "done")
   const visiveis = FOCUS.filter((t) => filtro === "todas" || (filtro === "pessoais" ? t.origem.tipo === "pessoal" : t.origem.tipo === "projeto"))
   const hoje = FOCUS.filter((t) => t.quando === "hoje").length
   const atrasadas = FOCUS.filter((t) => t.quando === "atrasadas").length
@@ -2054,11 +2155,11 @@ function TelaFocus() {
                         </span>
                       </div>
                       {ts.map((t) => {
-                        const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
+                        const st: TaskTableStatus = statusDe(t)
                         return (
                           <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-8 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
-                              <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+                              <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t)} />
                               {t.codigo ? (
                                 <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
                                   {t.codigo}
@@ -2068,7 +2169,7 @@ function TelaFocus() {
                                 {t.titulo}
                               </span>
                             </span>
-                            <StatusBadge status={st} progresso={t.progresso} />
+                            <StatusEditavel status={st} progresso={t.progresso} salvando={salvando === t.id} mudar={(n) => mudarStatus(t, n)} />
                             <OrigemTag o={t.origem} />
                             <Prioridade p={t.prioridade} />
                             <span className="text-right font-mono text-[11.5px]" style={{ color: t.quando === "atrasadas" && st !== "done" ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
