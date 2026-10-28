@@ -348,8 +348,8 @@ function useAviso() {
     faixas de seção, com ossos nas colunas. Azul só no que chega com cor. */
 function EsqueletoTabela() {
   return (
-    <section className="rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
-      <div className={`grid h-11 items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+    <section className="-mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
+      <div className={`grid h-11 items-center gap-6 px-8 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
         <Osso className="ml-[58px] h-2 w-14" />
         <Osso className="h-2 w-12" />
         <Osso className="h-2 w-16" />
@@ -358,12 +358,12 @@ function EsqueletoTabela() {
       </div>
       {[5, 3].map((n, g) => (
         <div key={g}>
-          <div className="flex h-10 items-center gap-3 px-5" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+          <div className="flex h-10 items-center gap-3 px-8" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
             <Osso className="h-2.5 w-44" />
             <Osso azul className="ml-auto h-1 w-20" />
           </div>
           {Array.from({ length: n }, (_, l) => (
-            <div key={l} className={`grid h-[52px] items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+            <div key={l} className={`grid h-[52px] items-center gap-6 px-8 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="flex items-center gap-2.5 pl-[30px]">
                 <Osso className="size-[18px] rounded-full" />
                 <Osso className="h-2.5 w-11" />
@@ -835,6 +835,60 @@ function Concluir({ feita, salvando, onClick }: { feita: boolean; salvando: bool
   )
 }
 
+/** Shift ou Cmd/Ctrl segurado: a tabela entra no modo de selecionar. */
+function useModificador() {
+  const [on, setOn] = React.useState(false)
+  React.useEffect(() => {
+    const ver = (e: KeyboardEvent) => setOn(e.shiftKey || e.metaKey || e.ctrlKey)
+    const sair = () => setOn(false)
+    addEventListener("keydown", ver)
+    addEventListener("keyup", ver)
+    addEventListener("blur", sair)
+    return () => {
+      removeEventListener("keydown", ver)
+      removeEventListener("keyup", ver)
+      removeEventListener("blur", sair)
+    }
+  }, [])
+  return on
+}
+
+/** O controle da frente da linha: um só. Parado é o círculo de concluir;
+    no modo de selecionar (Shift/Cmd segurado, ou já havendo linha marcada)
+    ele vira o quadrado, trocando pelo desfoque. Já foram dois controles
+    lado a lado — quadrado e círculo — e ficava estranho. */
+function Marcador({ selecionando, marcada, onMarcar, feita, salvando, onConcluir }: { selecionando: boolean; marcada: boolean; onMarcar: () => void; feita: boolean; salvando: boolean; onConcluir: () => void }) {
+  return (
+    <span className="relative grid size-[18px] shrink-0 place-items-center">
+      <AnimatePresence mode="popLayout" initial={false}>
+        {selecionando ? (
+          <motion.button
+            key="sel"
+            type="button"
+            role="checkbox"
+            aria-checked={marcada}
+            aria-label="Selecionar"
+            initial={{ opacity: 0, filter: "blur(4px)", scale: 0.8 }}
+            animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }}
+            exit={{ opacity: 0, filter: "blur(4px)", scale: 0.8 }}
+            transition={{ duration: 0.22, ease: CURVA }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => (e.stopPropagation(), onMarcar())}
+            className="grid size-4 place-items-center rounded-[4px]"
+            style={{ background: marcada ? "var(--primary)" : "var(--ds-placa-solida)", boxShadow: marcada ? "0 0 0 1px var(--primary)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "var(--primary-foreground)" }}
+          >
+            {marcada ? <Check size={10} weight="bold" /> : null}
+          </motion.button>
+        ) : (
+          <motion.span key="ok" initial={{ opacity: 0, filter: "blur(4px)", scale: 0.8 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(4px)", scale: 0.8 }} transition={{ duration: 0.22, ease: CURVA }} className="grid">
+            <Concluir feita={feita} salvando={salvando} onClick={onConcluir} />
+          </motion.span>
+        )}
+      </AnimatePresence>
+    </span>
+  )
+}
+
 /** Os metadados da tarefa, todos no mesmo chip: subtarefas, vínculos,
     comentários, etiqueta. Só aparece o que existe. */
 function Chip({ icone, children }: { icone: React.ReactNode; children: React.ReactNode }) {
@@ -933,6 +987,8 @@ function ArvoreFamilia({
       else n.add(id)
       return n
     })
+  const modificador = useModificador()
+  const selecionando = modificador || marcadas.size > 0
 
   const linha = (t: TaskTableTask, ultimo: boolean): React.ReactNode => {
     const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
@@ -947,23 +1003,13 @@ function ArvoreFamilia({
           animate={{ opacity: 1, height: 52, filter: "blur(0px)" }}
           exit={{ opacity: 0, height: 0, filter: "blur(8px)" }}
           transition={{ duration: 0.4, ease: CURVA }}
-          onClick={() => abrir(t)}
+          // com Shift o navegador também selecionava o texto da página: o mousedown com modificador não seleciona
+          onMouseDown={(ev) => (ev.shiftKey || ev.metaKey || ev.ctrlKey) && ev.preventDefault()}
+          onClick={(ev) => (ev.shiftKey || ev.metaKey || ev.ctrlKey ? marcar(t.id) : abrir(t))}
           tabIndex={0}
-          className={`group relative grid cursor-pointer items-center gap-6 overflow-hidden px-5 outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_PROJ}`}
+          className={`group relative grid cursor-pointer items-center gap-6 overflow-hidden px-8 ${selecionando ? "select-none" : ""} outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_PROJ}`}
           style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", background: marcadas.has(t.id) ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined }}
         >
-          {/* marcar a linha: na borda esquerda, no hover (ou sempre, quando há seleção) */}
-          <button
-            type="button"
-            role="checkbox"
-            aria-checked={marcadas.has(t.id)}
-            aria-label={`Selecionar ${t.code}`}
-            onClick={(ev) => (ev.stopPropagation(), marcar(t.id))}
-            className={`absolute top-1/2 left-1 z-[1] grid size-3.5 -translate-y-1/2 place-items-center rounded-[4px] transition-opacity duration-200 ${marcadas.size ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
-            style={{ background: marcadas.has(t.id) ? "var(--primary)" : "var(--ds-placa-solida)", boxShadow: marcadas.has(t.id) ? "0 0 0 1px var(--primary)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "var(--primary-foreground)" }}
-          >
-            {marcadas.has(t.id) ? <Check size={10} weight="bold" /> : null}
-          </button>
           <span className="relative flex min-w-0 items-center gap-2.5" style={{ paddingLeft: (t.depth - 1) * 26 }}>
             {t.depth === 2 ? (
               <>
@@ -982,7 +1028,7 @@ function ArvoreFamilia({
             )}
             {/* círculo de concluir · código · título com peso · os chips do que existir.
                 (O código já veio depois do título: na frente ele lê melhor, ao lado do círculo.) */}
-            <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <Marcador selecionando={selecionando} marcada={marcadas.has(t.id)} onMarcar={() => marcar(t.id)} feita={st === "done"} salvando={salvando === t.id} onConcluir={() => concluir(t.id)} />
             <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
               {t.code}
             </span>
@@ -1013,7 +1059,7 @@ function ArvoreFamilia({
   const secao = (id: string, conteudo: React.ReactNode, direita: React.ReactNode) => {
     const fechado = fechados.has(id)
     return (
-      <button type="button" onClick={() => alternar(id)} className="flex h-10 w-full items-center gap-3 px-5 text-left" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+      <button type="button" onClick={() => alternar(id)} className="flex h-10 w-full items-center gap-3 px-8 text-left" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
         <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }} style={{ color: "var(--ds-tinta-2)" }}>
           <CaretRight size={12} weight="bold" />
         </motion.span>
@@ -1026,13 +1072,14 @@ function ArvoreFamilia({
   return (
     <>
       <div ref={marco} className="h-px" />
-      <section className="relative rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+      {/* a tabela é a própria tela: de ponta a ponta, sem canto nem contorno nas laterais */}
+      <section className="relative -mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
         {/* o cabeçalho: um só, sem fundo próprio, preso no topo; o fundo aparece ao rolar */}
-        <div className="sticky top-0 z-10 h-11 rounded-t-[12px] transition-[background-color] duration-300" style={{ background: rolou || marcadas.size ? "var(--ds-placa-solida)" : "transparent", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+        <div className="sticky top-0 z-10 h-11 transition-[background-color] duration-300" style={{ background: rolou || marcadas.size ? "var(--ds-placa-solida)" : "transparent", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
           <AnimatePresence mode="wait" initial={false}>
             {marcadas.size ? (
               // com linhas marcadas, o cabeçalho vira a barra de ações em lote
-              <motion.div key="lote" initial={{ opacity: 0, filter: "blur(8px)", y: -4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: -4 }} transition={{ duration: 0.3, ease: CURVA }} className="flex h-full items-center gap-2 rounded-t-[12px] px-5" style={{ background: "color-mix(in oklab, var(--primary) 8%, transparent)" }}>
+              <motion.div key="lote" initial={{ opacity: 0, filter: "blur(8px)", y: -4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: -4 }} transition={{ duration: 0.3, ease: CURVA }} className="flex h-full items-center gap-2 px-8" style={{ background: "color-mix(in oklab, var(--primary) 8%, transparent)" }}>
                 <span className="mr-2 font-mono text-[10.5px] tracking-[0.1em] uppercase" style={{ color: "var(--primary)" }}>
                   {marcadas.size} {marcadas.size === 1 ? "marcada" : "marcadas"}
                 </span>
@@ -1050,7 +1097,7 @@ function ArvoreFamilia({
                 </button>
               </motion.div>
             ) : (
-              <motion.div key="cab" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.3, ease: CURVA }} className={`grid h-full items-center gap-6 px-5 font-mono text-[10px] tracking-[0.12em] uppercase ${GRADE_PROJ}`}>
+              <motion.div key="cab" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.3, ease: CURVA }} className={`grid h-full items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase ${GRADE_PROJ}`}>
                 {(
                   [
                     ["tarefa", "Tarefa"],
@@ -1110,7 +1157,7 @@ function ArvoreFamilia({
                 ordena(filhosDe(e.id)).map((f, i, a) => linha(f, i === a.length - 1))
               ) : (
                 // o épico ainda vazio: um convite, não um buraco
-                <motion.div key="vazio" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.35, ease: CURVA }} className="flex h-[52px] items-center gap-3 pl-[85px] text-[13.5px]" style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", color: "var(--ds-tinta-2)" }}>
+                <motion.div key="vazio" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.35, ease: CURVA }} className="flex h-[52px] items-center gap-3 pl-[97px] text-[13.5px]" style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", color: "var(--ds-tinta-2)" }}>
                   <span className="italic">Nenhuma tarefa neste épico ainda.</span>
                   <button type="button" className="flex items-center gap-1.5 rounded-[7px] px-2 py-1 text-[13px] transition-colors hover:bg-[var(--ds-trilho)]" style={{ color: "var(--primary)" }}>
                     <Plus size={13} /> Adicionar tarefa
@@ -1979,10 +2026,10 @@ function TelaFocus() {
           </div>
         </header>
         <div className="muriki-scroll min-h-0 flex-1 overflow-auto px-8 pb-8" onScroll={(e) => setRolou(e.currentTarget.scrollTop > 4)}>
-          <section className="relative rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
+          <section className="relative -mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
             {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
                 Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
-            <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+            <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="pl-7">Tarefa</span>
               <span>Status</span>
               <span>Origem</span>
@@ -1997,7 +2044,7 @@ function TelaFocus() {
                   return (
                     <div key={g.id}>
                       {/* a seção do grupo: uma faixa fina dentro da tabela, não uma placa nova */}
-                      <div className="flex h-9 items-center gap-2.5 px-5" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+                      <div className="flex h-9 items-center gap-2.5 px-8" style={{ background: "var(--ds-trilho)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                         <span className="size-1.5" style={{ background: g.cor }} />
                         <span className="font-mono text-[10.5px] tracking-[0.12em] uppercase" style={{ color: g.id === "atrasadas" ? "var(--destructive)" : "var(--ds-tinta-forte)" }}>
                           {g.nome}
@@ -2009,7 +2056,7 @@ function TelaFocus() {
                       {ts.map((t) => {
                         const st: TaskTableStatus = feitas.has(t.id) ? "done" : t.status
                         return (
-                          <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+                          <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-8 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
                               <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
                               {t.codigo ? (
