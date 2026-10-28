@@ -6,6 +6,8 @@ import {
   AddressBook,
   CalendarBlank,
   CaretDown,
+  ChatCircle,
+  Hash,
   CaretRight,
   ChartBar,
   CheckCircle,
@@ -348,7 +350,7 @@ function EsqueletoTabela() {
   return (
     <section className="rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
       <div className={`grid h-11 items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-        <Osso className="ml-[30px] h-2 w-14" />
+        <Osso className="ml-[58px] h-2 w-14" />
         <Osso className="h-2 w-12" />
         <Osso className="h-2 w-16" />
         <span />
@@ -363,8 +365,9 @@ function EsqueletoTabela() {
           {Array.from({ length: n }, (_, l) => (
             <div key={l} className={`grid h-[52px] items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="flex items-center gap-2.5 pl-[30px]">
-                <Osso className="h-2.5 w-11" />
+                <Osso className="size-[18px] rounded-full" />
                 <Osso className="h-3" style={{ width: `${45 + ((l * 17 + g * 11) % 35)}%` }} />
+                <Osso className="h-2.5 w-11" />
               </span>
               <Osso azul className="h-7 w-24 rounded-[7px]" />
               <Osso azul className="h-7 w-20 rounded-[7px]" />
@@ -643,6 +646,15 @@ const FAMILIA: TaskTableTask[] = [
 ]
 /** As tarefas sem épico: o primeiro nível sem pai. */
 const SOLTAS = FAMILIA.filter((t) => t.depth === 1 && !t.parentId)
+/** O que o TaskTableTask não traz: comentários e etiqueta (exemplo). */
+const EXTRA: Record<string, { comentarios?: number; etiqueta?: string }> = {
+  t1: { comentarios: 3 },
+  t2: { comentarios: 5, etiqueta: "api" },
+  t6: { comentarios: 1 },
+  t8: { comentarios: 2 },
+  t9: { etiqueta: "site" },
+  s3: { etiqueta: "site" },
+}
 const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
 // data local: new Date("2026-11-01") é meia-noite UTC, e no Brasil vira 31 out
 const INICIO_MES = new Date(2026, 10, 1)
@@ -802,6 +814,38 @@ function StatusBadge({ status, progresso, semDono, salvando = false, onClick }: 
   )
 }
 
+/** O círculo de concluir, na frente da linha: neutro em qualquer status,
+    check verde quando feita, gira enquanto salva. É a âncora da linha; o
+    status em si mora na badge. */
+function Concluir({ feita, salvando, onClick }: { feita: boolean; salvando: boolean; onClick: () => void }) {
+  return (
+    <button type="button" aria-label={feita ? "Reabrir" : "Concluir"} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-[18px] shrink-0 place-items-center rounded-full transition-[background-color,box-shadow] duration-300 hover:shadow-[inset_0_0_0_1.5px_var(--success)]" style={{ background: feita ? "var(--success)" : "transparent", boxShadow: feita ? "0 0 0 1px var(--success)" : "inset 0 0 0 1.5px var(--ds-fio-forte)", color: "white" }}>
+      <AnimatePresence mode="wait" initial={false}>
+        {salvando ? (
+          <motion.span key="g" initial={{ opacity: 0 }} animate={{ opacity: 1, rotate: 360 }} exit={{ opacity: 0 }} transition={{ rotate: { duration: 0.8, ease: "linear", repeat: Infinity }, default: { duration: 0.2 } }} className="grid" style={{ color: feita ? "white" : "var(--ds-tinta-2)" }}>
+            <CircleNotch size={12} weight="bold" />
+          </motion.span>
+        ) : feita ? (
+          <motion.span key="c" initial={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} animate={{ opacity: 1, filter: "blur(0px)", scale: 1 }} exit={{ opacity: 0, filter: "blur(4px)", scale: 0.6 }} transition={{ duration: 0.3, ease: CURVA }} className="grid">
+            <Check size={10} weight="bold" />
+          </motion.span>
+        ) : null}
+      </AnimatePresence>
+    </button>
+  )
+}
+
+/** Os metadados da tarefa, todos no mesmo chip: subtarefas, vínculos,
+    comentários, etiqueta. Só aparece o que existe. */
+function Chip({ icone, children }: { icone: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <span className="inline-flex h-5 shrink-0 items-center gap-1 rounded-[6px] px-1.5 font-mono text-[10.5px]" style={{ background: "var(--ds-trilho)", color: "var(--ds-tinta-2)" }}>
+      {icone}
+      {children}
+    </span>
+  )
+}
+
 /** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
 function SeloTroca({ status, progresso, semDono }: { status: TaskTableStatus; progresso?: number; semDono?: boolean }) {
   return (
@@ -936,24 +980,20 @@ function ArvoreFamilia({
             ) : (
               <span className="w-5 shrink-0" />
             )}
-            <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {t.code}
-            </span>
-            <span className="truncate text-[14.5px] transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+            {/* círculo de concluir · título primeiro, com peso · código depois, apagado · os chips do que existir */}
+            <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <span className="truncate text-[14.5px] font-medium transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
               {t.title}
             </span>
-            {t.progress && grupo ? (
-              <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-                {t.progress.done}/{t.progress.total}
-              </span>
-            ) : null}
-            {t.deps?.length ? (
-              <span className="flex shrink-0 items-center gap-1 rounded-[6px] px-1.5 py-0.5 font-mono text-[10px]" style={{ background: "var(--ds-trilho)", color: "var(--ds-tinta-2)" }}>
-                <LinkSimple size={11} /> {t.deps.length}
-              </span>
-            ) : null}
+            <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "color-mix(in oklab, var(--ds-tinta-2) 75%, transparent)" }}>
+              {t.code}
+            </span>
+            {t.progress && grupo ? <Chip icone={<TreeStructure size={11} />}>{t.progress.done}/{t.progress.total}</Chip> : null}
+            {t.deps?.length ? <Chip icone={<LinkSimple size={11} />}>{t.deps.length}</Chip> : null}
+            {EXTRA[t.id]?.comentarios ? <Chip icone={<ChatCircle size={11} />}>{EXTRA[t.id].comentarios}</Chip> : null}
+            {EXTRA[t.id]?.etiqueta ? <Chip icone={<Hash size={11} />}>{EXTRA[t.id].etiqueta}</Chip> : null}
           </span>
-          <StatusBadge status={st} progresso={t.progressRatio} semDono={!t.owner} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+          <StatusBadge status={st} progresso={t.progressRatio} semDono={!t.owner} />
           <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
@@ -1020,7 +1060,7 @@ function ArvoreFamilia({
                   ] as const
                 ).map(([k, r]) =>
                   k ? (
-                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[30px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[58px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
                       {r}
                       {/* a seta da ordem: aparece na coluna ativa, gira quando inverte */}
                       <motion.span animate={{ rotate: ordem.k === k && ordem.desc ? 180 : 0, opacity: ordem.k === k ? 1 : 0 }} transition={{ duration: 0.3, ease: CURVA }} className="group-hover:opacity-50!" style={{ color: ordem.k === k ? "var(--primary)" : undefined }}>
@@ -1939,7 +1979,7 @@ function TelaFocus() {
             {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
                 Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
             <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-              <span>Tarefa</span>
+              <span className="pl-7">Tarefa</span>
               <span>Status</span>
               <span>Origem</span>
               <span>Prioridade</span>
@@ -1967,16 +2007,17 @@ function TelaFocus() {
                         return (
                           <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
+                              <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+                              <span className="truncate text-[14.5px] font-medium transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+                                {t.titulo}
+                              </span>
                               {t.codigo ? (
-                                <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+                                <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "color-mix(in oklab, var(--ds-tinta-2) 75%, transparent)" }}>
                                   {t.codigo}
                                 </span>
                               ) : null}
-                              <span className="truncate text-[14.5px] transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-                                {t.titulo}
-                              </span>
                             </span>
-                            <StatusBadge status={st} progresso={t.progresso} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+                            <StatusBadge status={st} progresso={t.progresso} />
                             <OrigemTag o={t.origem} />
                             <Prioridade p={t.prioridade} />
                             <span className="text-right font-mono text-[11.5px]" style={{ color: t.quando === "atrasadas" && st !== "done" ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
