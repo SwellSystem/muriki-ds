@@ -366,8 +366,8 @@ function EsqueletoTabela() {
             <div key={l} className={`grid h-[52px] items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="flex items-center gap-2.5 pl-[30px]">
                 <Osso className="size-[18px] rounded-full" />
-                <Osso className="h-3" style={{ width: `${45 + ((l * 17 + g * 11) % 35)}%` }} />
                 <Osso className="h-2.5 w-11" />
+                <Osso className="h-3" style={{ width: `${45 + ((l * 17 + g * 11) % 35)}%` }} />
               </span>
               <Osso azul className="h-7 w-24 rounded-[7px]" />
               <Osso azul className="h-7 w-20 rounded-[7px]" />
@@ -980,13 +980,14 @@ function ArvoreFamilia({
             ) : (
               <span className="w-5 shrink-0" />
             )}
-            {/* círculo de concluir · título primeiro, com peso · código depois, apagado · os chips do que existir */}
+            {/* círculo de concluir · código · título com peso · os chips do que existir.
+                (O código já veio depois do título: na frente ele lê melhor, ao lado do círculo.) */}
             <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
+            <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
+              {t.code}
+            </span>
             <span className="truncate text-[14.5px] font-medium transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
               {t.title}
-            </span>
-            <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "color-mix(in oklab, var(--ds-tinta-2) 75%, transparent)" }}>
-              {t.code}
             </span>
             {t.progress && grupo ? <Chip icone={<TreeStructure size={11} />}>{t.progress.done}/{t.progress.total}</Chip> : null}
             {t.deps?.length ? <Chip icone={<LinkSimple size={11} />}>{t.deps.length}</Chip> : null}
@@ -2008,14 +2009,14 @@ function TelaFocus() {
                           <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
                               <Concluir feita={st === "done"} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
-                              <span className="truncate text-[14.5px] font-medium transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-                                {t.titulo}
-                              </span>
                               {t.codigo ? (
-                                <span className="shrink-0 font-mono text-[10.5px]" style={{ color: "color-mix(in oklab, var(--ds-tinta-2) 75%, transparent)" }}>
+                                <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
                                   {t.codigo}
                                 </span>
                               ) : null}
+                              <span className="truncate text-[14.5px] font-medium transition-colors duration-300" style={{ color: st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
+                                {t.titulo}
+                              </span>
                             </span>
                             <StatusBadge status={st} progresso={t.progresso} />
                             <OrigemTag o={t.origem} />
