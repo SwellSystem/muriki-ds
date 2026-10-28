@@ -623,13 +623,45 @@ const FAMILIA: TaskTableTask[] = [
 /** As tarefas sem épico: o primeiro nível sem pai. */
 const SOLTAS = FAMILIA.filter((t) => t.depth === 1 && !t.parentId)
 /** O que o TaskTableTask não traz: comentários e etiqueta (exemplo). */
-const EXTRA: Record<string, { comentarios?: number; etiqueta?: string }> = {
-  t1: { comentarios: 3 },
-  t2: { comentarios: 5, etiqueta: "api" },
-  t6: { comentarios: 1 },
-  t8: { comentarios: 2 },
-  t9: { etiqueta: "site" },
-  s3: { etiqueta: "site" },
+const EXTRA: Record<string, { comentarios?: number; etiqueta?: string; mais?: string[]; criador?: string }> = {
+  t1: { comentarios: 3, mais: ["AM", "RS"], criador: "LP" },
+  t2: { comentarios: 5, etiqueta: "api", criador: "GT" },
+  t3: { criador: "GT" },
+  t5: { mais: ["LP"], criador: "GT" },
+  t6: { comentarios: 1, mais: ["RS", "AM", "LP"], criador: "RS" },
+  t8: { comentarios: 2, mais: ["GT"], criador: "AM" },
+  t9: { etiqueta: "site", criador: "GT" },
+  s3: { etiqueta: "site", criador: "LP" },
+}
+const TOM_PESSOA: Record<string, string> = { GT: "blue", AM: "purple", RS: "orange", LP: "gray" }
+/** Quem executa: o owner do TaskTableTask mais os outros responsáveis. */
+const responsaveis = (t: TaskTableTask) => (t.owner ? [t.owner.initials, ...(EXTRA[t.id]?.mais ?? [])] : [])
+const criadorDe = (t: TaskTableTask) => EXTRA[t.id]?.criador ?? t.owner?.initials ?? "GT"
+
+/** Os responsáveis empilhados: até 3 avatares sobrepostos, depois "+N". No hover, a dica diz quem
+    são e quem criou a tarefa. Sem ninguém, o círculo tracejado. */
+function Responsaveis({ t }: { t: TaskTableTask }) {
+  const rs = responsaveis(t)
+  if (!rs.length) return <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />
+  const vis = rs.slice(0, rs.length > 3 ? 2 : 3)
+  const resto = rs.length - vis.length
+  const dica = `${rs.length > 1 ? "Responsáveis" : "Responsável"}: ${rs.map((i) => NOME_DONO[i]).join(", ")} · Criada por ${NOME_DONO[criadorDe(t)]}`
+  return (
+    <Dica texto={dica}>
+      <span className="flex items-center">
+        {vis.map((i, k) => (
+          <span key={i} className="rounded-full" style={{ marginLeft: k ? -10 : 0, boxShadow: "0 0 0 2px var(--ds-placa-1)", zIndex: 3 - k }}>
+            <Avatar iniciais={i} tom={TOM_PESSOA[i]} />
+          </span>
+        ))}
+        {resto ? (
+          <span className="grid size-8 place-items-center rounded-full font-mono text-[10.5px]" style={{ marginLeft: -10, background: "var(--ds-trilho-forte)", color: "var(--ds-tinta)", boxShadow: "0 0 0 2px var(--ds-placa-1)" }}>
+            +{resto}
+          </span>
+        ) : null}
+      </span>
+    </Dica>
+  )
 }
 const PRIO_F: Record<string, string> = { urgent: "Urgente", high: "Alta", medium: "Média", low: "Baixa", none: "—" }
 // data local: new Date("2026-11-01") é meia-noite UTC, e no Brasil vira 31 out
@@ -659,7 +691,7 @@ function Dica({ texto, children }: { texto: string; children: React.ReactNode })
       {createPortal(
         <AnimatePresence>
           {pos ? (
-            <motion.span initial={{ opacity: 0, filter: "blur(8px)", y: 4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: 4 }} transition={{ duration: 0.25, ease: CURVA }} className="pointer-events-none fixed z-50 rounded-[7px] px-2 py-1 text-[12px] whitespace-nowrap" style={{ left: pos.x, top: pos.y - 8, translate: "-50% -100%", background: "var(--ds-tinta-forte)", color: "var(--ds-chao)" }}>
+            <motion.span initial={{ opacity: 0, filter: "blur(8px)", y: 4 }} animate={{ opacity: 1, filter: "blur(0px)", y: 0 }} exit={{ opacity: 0, filter: "blur(8px)", y: 4 }} transition={{ duration: 0.25, ease: CURVA }} className="pointer-events-none fixed z-50 rounded-[7px] px-2 py-1 text-[12px] whitespace-nowrap" style={{ left: Math.min(pos.x, innerWidth - 16), top: pos.y - 8, translate: pos.x > innerWidth - 220 ? "-100% -100%" : "-50% -100%", background: "var(--ds-tinta-forte)", color: "var(--ds-chao)" }}>
               {texto}
             </motion.span>
           ) : null}
@@ -993,7 +1025,7 @@ function IndicadorSalvo({ estado }: { estado: "ocioso" | "salvando" | "salvo" })
     "Sem épico" — como faixas de seção dentro dela. Tarefa e subtarefa
     penduradas no fio; o status por extenso na coluna (o ícone na frente é
     o concluir); atalhos no hover. */
-const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_124px_116px_40px_60px]"
+const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_124px_116px_76px_60px]"
 
 function ArvoreFamilia({
   fechados,
@@ -1116,7 +1148,7 @@ function ArvoreFamilia({
           </span>
           <StatusEditavel status={st} progresso={t.progressRatio} semDono={!t.owner} salvando={salvando === t.id} mudar={(n) => mudarStatus(t.id, n)} />
           <Prioridade p={t.priority} />
-          {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
+          <Responsaveis t={t} />
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
             {t.due}
           </span>
@@ -1450,7 +1482,21 @@ function DetalheFamilia({ t, feitas, fechar, abrir }: { t: TaskTableTask; feitas
         <Ficha
           linhas={[
             ["Status", <SeloTroca key="s" status={st} progresso={t.progressRatio} semDono={!t.owner} />],
-            ["Responsável", t.owner ? <><Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> {NOME_DONO[t.owner.initials]}</> : "—"],
+            [
+              responsaveis(t).length > 1 ? "Responsáveis" : "Responsável",
+              responsaveis(t).length ? (
+                <span key="r" className="flex flex-col gap-2">
+                  {responsaveis(t).map((i) => (
+                    <span key={i} className="flex items-center gap-2">
+                      <Avatar iniciais={i} tom={TOM_PESSOA[i]} /> {NOME_DONO[i]}
+                    </span>
+                  ))}
+                </span>
+              ) : (
+                "—"
+              ),
+            ],
+            ["Criada por", <><Avatar iniciais={criadorDe(t)} tom={TOM_PESSOA[criadorDe(t)]} /> {NOME_DONO[criadorDe(t)]}</>],
             ["Prazo", <><CalendarBlank size={16} /> {t.due}</>],
             ["Prioridade", <Prioridade key="p" p={t.priority} />],
           ]}
