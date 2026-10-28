@@ -1094,16 +1094,16 @@ function ArvoreFamilia({
           <span className="relative flex min-w-0 items-center gap-2.5 self-stretch" style={{ paddingLeft: (t.depth - 1) * 26 }}>
             {t.depth === 2 ? (
               // o fio: desce do centro do círculo da tarefa mãe (seta 20 + espaço 10 + metade do círculo 9 = 39px)
-              // e dobra até a borda do círculo da subtarefa (26 de recuo + 20 + 10 = 56px). Já desceu do
-              // lado da seta, desalinhado dos dois círculos.
+              // e dobra até perto do círculo da subtarefa (que começa em 56px), com 4px de folga nas duas
+              // pontas: grudado nos círculos ficava pesado. Já desceu do lado da seta, desalinhado.
               <>
                 <span aria-hidden className="absolute left-[39px] w-px" style={{ top: -10, height: (ultimo ? 26 : 52) + 10, background: "var(--ds-fio-forte)" }} />
-                <span aria-hidden className="absolute top-1/2 left-[39px] h-px w-[17px]" style={{ background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute top-1/2 left-[39px] h-px w-[13px]" style={{ background: "var(--ds-fio-forte)" }} />
               </>
             ) : null}
             {/* a tarefa mãe aberta solta o começo do fio, do pé do círculo até a borda de baixo da linha
                 (a linha da subtarefa corta o que passa da borda dela) */}
-            {grupo && !fechado && filhos.length ? <span aria-hidden className="absolute left-[39px] w-px" style={{ top: 35 - 26 + 26, height: 17, background: "var(--ds-fio-forte)" }} /> : null}
+            {grupo && !fechado && filhos.length ? <span aria-hidden className="absolute left-[39px] w-px" style={{ top: 39, height: 13, background: "var(--ds-fio-forte)" }} /> : null}
             {grupo ? (
               <button type="button" onClick={(e) => (e.stopPropagation(), alternar(grupo))} aria-label={fechado ? "Abrir subtarefas" : "Recolher subtarefas"} className="grid size-5 shrink-0 place-items-center rounded-[5px] hover:bg-[var(--ds-trilho)]" style={{ color: "var(--ds-tinta-2)" }}>
                 <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }}>
