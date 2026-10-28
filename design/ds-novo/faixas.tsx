@@ -1107,15 +1107,18 @@ function ArvoreFamilia({
             {t.deps?.length ? <Chip icone={<LinkSimple size={11} />}>{t.deps.length}</Chip> : null}
             {EXTRA[t.id]?.comentarios ? <Chip icone={<ChatCircle size={11} />}>{EXTRA[t.id].comentarios}</Chip> : null}
             {EXTRA[t.id]?.etiqueta ? <Chip icone={<Hash size={11} />}>{EXTRA[t.id].etiqueta}</Chip> : null}
+            {/* os atalhos moram no vão do meio, no fim da coluna da tarefa, sem fundo: é espaço vazio.
+                Já ficaram na ponta direita, por cima do dono e do prazo. Ocupam o lugar no fluxo, então um
+                título longo encurta antes deles em vez de passar por baixo. */}
+            <span className="pointer-events-none ml-auto flex shrink-0 items-center pl-4 opacity-0 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100">
+              <Atalhos t={{ ...t, status: st }} acao={acao} />
+            </span>
           </span>
           <StatusEditavel status={st} progresso={t.progressRatio} semDono={!t.owner} salvando={salvando === t.id} mudar={(n) => mudarStatus(t.id, n)} />
           <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
             {t.due}
-          </span>
-          <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 pl-14 opacity-0 transition-opacity duration-300 group-focus-within:pointer-events-auto group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:opacity-100" style={{ background: "linear-gradient(to right, transparent, color-mix(in oklab, var(--primary) 5%, var(--ds-placa-solida)) 48px)" }}>
-            <Atalhos t={{ ...t, status: st }} acao={acao} />
           </span>
         </motion.div>
         <AnimatePresence initial={false}>{!fechado ? filhos.map((f, i) => linha(f, i === filhos.length - 1)) : null}</AnimatePresence>
