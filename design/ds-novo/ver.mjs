@@ -1,11 +1,7 @@
 // Monta um dos estudos do DS novo numa página só e abre no navegador.
 //
 //   cd design/ds-novo && bun ver.mjs            → faixas (o estudo aprovado)
-//   cd design/ds-novo && bun ver.mjs vitrine    → todos os componentes, Papel | Vidro | Blur
-//   cd design/ds-novo && bun ver.mjs platform   → a tela de tarefas com o AppShell
-//   cd design/ds-novo && bun ver.mjs entrada    → a página de entrada no estilo Rivio
 //   cd design/ds-novo && bun ver.mjs elementos  → os elementos na linguagem
-//   cd design/ds-novo && bun ver.mjs tarefas    → a família de tarefas: árvore + linha do tempo
 //
 // O repo não tem o tailwindcss: na primeira vez ele é instalado numa pasta
 // de trabalho fora do repo (/tmp/muriki-ds-novo), junto com a saída.
@@ -29,17 +25,13 @@ const reg = JSON.parse(readFileSync(join(raiz, "registry.json"), "utf8"))
 const css = (o) => Object.entries(o).map(([k, v]) => (typeof v === "object" ? `${k}{${css(v)}}` : `${k}:${v};`)).join("")
 writeFileSync(join(obra, "skeleton.css"), css(reg.items.find((i) => i.name === "skeleton").css))
 
-// o muriki.css importa "tailwindcss", que só resolve dentro da pasta de trabalho: as camadas vão
-// copiadas para lá, não importadas do registry
-for (const [de, para] of [["theme/muriki.css", "muriki.css"], ["vidro/vidro.css", "vidro.css"], ["blur/blur.css", "blur.css"]]) {
-  writeFileSync(join(obra, para), readFileSync(join(raiz, "registry/muriki", de)))
-}
+// o muriki.css importa "tailwindcss", que só resolve dentro da pasta de trabalho: vai copiado
+// para lá, não importado do registry
+writeFileSync(join(obra, "muriki.css"), readFileSync(join(raiz, "registry/muriki/theme/muriki.css")))
 
 writeFileSync(
   join(obra, "in.css"),
   `@import "./muriki.css";
-@import "./vidro.css";
-@import "./blur.css";
 @import "./skeleton.css";
 @import "${aqui}/faixas.css";
 @custom-variant dark (&:is(.dark *));
