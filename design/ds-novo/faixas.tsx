@@ -6,6 +6,7 @@ import {
   AddressBook,
   CalendarBlank,
   CaretDown,
+  CaretLeft,
   ChatCircle,
   Hash,
   CaretRight,
@@ -133,27 +134,6 @@ function Avatar({ iniciais, tom }: { iniciais: string; tom?: string }) {
     >
       {iniciais}
     </span>
-  )
-}
-
-function Caixa({ marcada, onChange }: { marcada: boolean; onChange: () => void }) {
-  return (
-    <button
-      role="checkbox"
-      aria-checked={marcada}
-      onClick={(e) => {
-        e.stopPropagation()
-        onChange()
-      }}
-      className="grid size-[18px] shrink-0 place-items-center rounded-[5px] transition-colors"
-      style={{
-        background: marcada ? "var(--primary)" : "transparent",
-        boxShadow: marcada ? "0 0 0 1px var(--primary)" : "inset 0 0 0 1.5px var(--ds-fio-forte)",
-        color: "var(--primary-foreground)",
-      }}
-    >
-      {marcada ? <Check size={12} weight="bold" /> : null}
-    </button>
   )
 }
 
@@ -1625,13 +1605,16 @@ const PESSOAS = [
 ]
 const TONS_AVATAR = ["blue", "green", "orange", "yellow", "purple", "cyan"]
 const ACESSOS = ["agora", "há 12 min", "há 2 h", "ontem", "há 3 dias", "há 6 dias", "há 2 meses"]
-function clientesDe(estado: string): Cliente[] {
-  const desloca = ESTADOS.findIndex((e) => e.id === estado) * 2
+const POR_PAGINA = 10
+function clientesDe(estado: string, pagina = 1): Cliente[] {
+  const total = ESTADOS.find((e) => e.id === estado)!.qtd
+  const desloca = ESTADOS.findIndex((e) => e.id === estado) * 2 + (pagina - 1) * 3
   const pagos = estado === "pagantes" || estado === "atraso" || estado === "cancelados"
-  return Array.from({ length: 7 }, (_, i) => {
+  const n = Math.min(POR_PAGINA, total - (pagina - 1) * POR_PAGINA)
+  return Array.from({ length: n }, (_, i) => {
     const [iniciais, nome, email] = PESSOAS[(i + desloca) % PESSOAS.length]
     return {
-      id: `${estado}-${i}`,
+      id: `${estado}-${pagina}-${i}`,
       iniciais,
       tom: TONS_AVATAR[(i + desloca) % TONS_AVATAR.length],
       nome,
@@ -1643,83 +1626,143 @@ function clientesDe(estado: string): Cliente[] {
     }
   })
 }
-const COLS_CLIENTE = "grid-cols-[18px_minmax(0,2.4fr)_90px_120px_110px_110px]"
+const COLS_CLIENTE = "grid-cols-[minmax(0,2.4fr)_90px_120px_110px_110px]"
 const reais = (v: number) => `R$ ${v.toLocaleString("pt-BR")}`
 
-function ListaClientes({ estado, abrir }: { estado: string; abrir: (c: Cliente) => void }) {
-  const [marcados, setMarcados] = React.useState<Set<string>>(new Set())
+/** As páginas que aparecem: as pontas, a atual e as vizinhas; o resto vira "…". */
+function paginasVisiveis(atual: number, total: number): (number | "…")[] {
+  const set = new Set([1, total, atual - 1, atual, atual + 1].filter((n) => n >= 1 && n <= total))
+  const ord = [...set].sort((a, b) => a - b)
+  const out: (number | "…")[] = []
+  ord.forEach((n, i) => {
+    if (i && n - ord[i - 1] > 1) out.push("…")
+    out.push(n)
+  })
+  return out
+}
+
+/** A paginação: o rodapé da tabela, sem placa. À esquerda "11–20 de 771";
+    à direita anterior, as páginas (a atual leva a pílula, que desliza) e
+    próxima. Trocar de página passa pelo skeleton e pelo desfoque. Setas do
+    teclado (← →) também trocam. */
+function Paginacao({ id, pagina, total, porPagina, mudar }: { id: string; pagina: number; total: number; porPagina: number; mudar: (p: number) => void }) {
+  const paginas = Math.max(1, Math.ceil(total / porPagina))
+  const de = (pagina - 1) * porPagina + 1
+  const ate = Math.min(pagina * porPagina, total)
+  React.useEffect(() => {
+    const tecla = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement).closest("input, textarea")) return
+      if (e.key === "ArrowRight" && pagina < paginas) mudar(pagina + 1)
+      if (e.key === "ArrowLeft" && pagina > 1) mudar(pagina - 1)
+    }
+    addEventListener("keydown", tecla)
+    return () => removeEventListener("keydown", tecla)
+  }, [pagina, paginas, mudar])
+  const seta = (dir: -1 | 1) => {
+    const alvo = pagina + dir
+    const off = alvo < 1 || alvo > paginas
+    return (
+      <button type="button" disabled={off} onClick={() => mudar(alvo)} aria-label={dir < 0 ? "Página anterior" : "Próxima página"} className="grid size-9 place-items-center rounded-[9px] transition-colors hover:bg-[var(--ds-trilho)] disabled:opacity-30 disabled:hover:bg-transparent" style={{ color: "var(--ds-tinta)" }}>
+        {dir < 0 ? <CaretLeft size={14} weight="bold" /> : <CaretRight size={14} weight="bold" />}
+      </button>
+    )
+  }
   return (
-    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }}>
-      <header className={`grid h-11 items-center gap-4 px-5 font-mono text-[10.5px] tracking-[0.1em] uppercase ${COLS_CLIENTE}`} style={{ color: "var(--ds-tinta-2)" }}>
-        <span />
-        <span>Cliente</span>
-        <span>Plano</span>
-        <span>Último acesso</span>
-        <span>Desde</span>
-        <span className="text-right">Total pago</span>
-      </header>
-      {clientesDe(estado).map((c) => {
-        const marcado = marcados.has(c.id)
-        return (
-          <div
-            key={c.id}
-            onClick={() => abrir(c)}
-            className={`grid h-[60px] cursor-pointer items-center gap-4 px-5 transition-colors duration-300 ${COLS_CLIENTE}`}
-            style={{ borderTop: "1px solid var(--ds-fio)", background: marcado ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined }}
-          >
-            <Caixa
-              marcada={marcado}
-              onChange={() =>
-                setMarcados((m) => {
-                  const n = new Set(m)
-                  if (n.has(c.id)) n.delete(c.id)
-                  else n.add(c.id)
-                  return n
-                })
-              }
-            />
-            <span className="flex min-w-0 items-center gap-3">
-              <Avatar iniciais={c.iniciais} tom={c.tom} />
-              <span className="flex min-w-0 flex-col">
-                <span className="truncate text-[14.5px]" style={{ color: "var(--ds-tinta-forte)" }}>
-                  {c.nome}
-                </span>
-                <span className="truncate text-[12.5px]" style={{ color: "var(--ds-tinta-2)" }}>
-                  {c.email}
-                </span>
-              </span>
+    <nav aria-label="Paginação" className="flex h-14 items-center justify-between px-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span key={pagina} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.15 } }} transition={CHEGADA} className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
+          <span style={{ color: "var(--ds-tinta-forte)" }}>
+            {de}–{ate}
+          </span>{" "}
+          de {total.toLocaleString("pt-BR")}
+        </motion.span>
+      </AnimatePresence>
+      <span className="flex items-center gap-1">
+        {seta(-1)}
+        {paginasVisiveis(pagina, paginas).map((n, i) =>
+          n === "…" ? (
+            <span key={`r${i}`} className="w-6 text-center font-mono text-[12px]" style={{ color: "var(--ds-tinta-2)" }}>
+              …
             </span>
-            <span className="text-[13.5px]" style={{ color: "var(--ds-tinta)" }}>
-              {c.plano}
-            </span>
-            <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {c.acesso}
-            </span>
-            <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {c.desde}
-            </span>
-            <span className="text-right font-mono text-[12.5px]" style={{ color: c.pago ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
-              {c.pago ? reais(c.pago) : "—"}
-            </span>
-          </div>
-        )
-      })}
-    </section>
+          ) : (
+            <button key={n} type="button" aria-current={n === pagina ? "page" : undefined} onClick={() => mudar(n)} className="relative grid h-9 min-w-9 place-items-center rounded-[9px] px-2 font-mono text-[12.5px] tabular-nums" style={{ color: n === pagina ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+              {n === pagina ? <motion.span layoutId={`pag-${id}`} className="absolute inset-0 rounded-[9px]" style={{ background: "var(--ds-placa-forte)", boxShadow: "inset 0 0 0 1px var(--ds-fio-forte), 0 2px 8px -3px var(--ds-sombra)" }} transition={{ type: "spring", bounce: 0.15, duration: 0.45 }} /> : null}
+              <span className="relative">{n}</span>
+            </button>
+          )
+        )}
+        {seta(1)}
+      </span>
+    </nav>
   )
 }
 
-function EsqueletoClientes() {
+/** O cabeçalho das tabelas de dados: o mesmo da de tarefas — rótulos em
+    mono, sem fundo, filete fino; preso no topo. */
+function CabecalhoDados({ grade, rotulos }: { grade: string; rotulos: { r: string; direita?: boolean }[] }) {
+  // sem fundo parado; o fundo aparece quando a lista rola por baixo (o marco sai de vista)
+  const marco = React.useRef<HTMLSpanElement>(null)
+  const [rolou, setRolou] = React.useState(false)
+  React.useEffect(() => {
+    const el = marco.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setRolou(!e.isIntersecting))
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
   return (
-    <section className="overflow-hidden rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
-      <header className={`grid h-11 items-center gap-4 px-5 ${COLS_CLIENTE}`}>
-        <span />
-        {[16, 10, 18, 10, 16].map((w, i) => (
-          <Osso key={i} className="h-2" style={{ width: `${w * 4}px` }} />
-        ))}
-      </header>
-      {Array.from({ length: 7 }, (_, l) => (
-        <div key={l} className={`grid h-[60px] items-center gap-4 px-5 ${COLS_CLIENTE}`} style={{ borderTop: "1px solid var(--ds-fio)" }}>
-          <Osso className="size-[18px]" />
+    <>
+    <span ref={marco} className="block h-px" />
+    <div className={`sticky top-0 z-10 -mt-px grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${grade}`} style={{ color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)", background: rolou ? "var(--ds-placa-solida)" : "transparent" }}>
+      {rotulos.map((c, i) => (
+        <span key={i} className={c.direita ? "text-right" : ""}>
+          {c.r}
+        </span>
+      ))}
+    </div>
+    </>
+  )
+}
+
+function LinhasClientes({ estado, pagina, abrir }: { estado: string; pagina: number; abrir: (c: Cliente) => void }) {
+  return (
+    <>
+      {clientesDe(estado, pagina).map((c) => (
+        <div key={c.id} onClick={() => abrir(c)} className={`grid h-[60px] cursor-pointer items-center gap-6 px-8 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${COLS_CLIENTE}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+          <span className="flex min-w-0 items-center gap-3">
+            <Avatar iniciais={c.iniciais} tom={c.tom} />
+            <span className="flex min-w-0 flex-col">
+              <span className="truncate text-[14.5px] font-medium" style={{ color: "var(--ds-tinta-forte)" }}>
+                {c.nome}
+              </span>
+              <span className="truncate text-[12.5px]" style={{ color: "var(--ds-tinta-2)" }}>
+                {c.email}
+              </span>
+            </span>
+          </span>
+          <span className="text-[13.5px]" style={{ color: "var(--ds-tinta)" }}>
+            {c.plano}
+          </span>
+          <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {c.acesso}
+          </span>
+          <span className="text-[13px]" style={{ color: "var(--ds-tinta-2)" }}>
+            {c.desde}
+          </span>
+          <span className="text-right font-mono text-[12.5px]" style={{ color: c.pago ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+            {c.pago ? reais(c.pago) : "—"}
+          </span>
+        </div>
+      ))}
+    </>
+  )
+}
+
+function EsqueletoLinhasClientes({ n = POR_PAGINA }: { n?: number }) {
+  return (
+    <div aria-busy="true" aria-label="Carregando">
+      {Array.from({ length: n }, (_, l) => (
+        <div key={l} className={`grid h-[60px] items-center gap-6 px-8 ${COLS_CLIENTE}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
           <span className="flex items-center gap-3">
             <Osso azul className="size-8 rounded-full" />
             <span className="flex flex-1 flex-col gap-2">
@@ -1733,6 +1776,26 @@ function EsqueletoClientes() {
           <Osso className="ml-auto h-2.5 w-14" />
         </div>
       ))}
+    </div>
+  )
+}
+
+/** A tabela de clientes no modelo aprovado: de ponta a ponta, um cabeçalho,
+    e a paginação no rodapé. Só as linhas trocam de página (skeleton e
+    desfoque); cabeçalho e rodapé ficam. */
+function TabelaClientes({ estado, abrir }: { estado: string; abrir: (c: Cliente) => void }) {
+  const [pagina, setPagina] = React.useState(1)
+  const total = ESTADOS.find((e) => e.id === estado)!.qtd
+  const carregando = useCarregando(`${estado}-${pagina}`, 550)
+  return (
+    <section className="-mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
+      <CabecalhoDados grade={COLS_CLIENTE} rotulos={[{ r: "Cliente" }, { r: "Plano" }, { r: "Último acesso" }, { r: "Desde" }, { r: "Total pago", direita: true }]} />
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div key={carregando ? "c" : pagina} {...troca}>
+          {carregando ? <EsqueletoLinhasClientes n={Math.min(POR_PAGINA, total - (pagina - 1) * POR_PAGINA)} /> : <LinhasClientes estado={estado} pagina={pagina} abrir={abrir} />}
+        </motion.div>
+      </AnimatePresence>
+      <Paginacao id={estado} pagina={pagina} total={total} porPagina={POR_PAGINA} mudar={setPagina} />
     </section>
   )
 }
@@ -1774,7 +1837,6 @@ function TelaClientes() {
   const [aberto, setAberto] = React.useState<Cliente | null>(null)
   const [editando, setEditando] = React.useState(false)
   const [aviso, avisar] = useAviso()
-  const carregando = useCarregando(foco)
   const estado = ESTADOS.find((e) => e.id === foco)!
   return (
     <>
@@ -1795,8 +1857,8 @@ function TelaClientes() {
         }
         corpo={() => (
           <AnimatePresence mode="wait">
-            <motion.div key={carregando ? "carregando" : foco} {...troca}>
-              {carregando ? <EsqueletoClientes /> : <ListaClientes estado={foco} abrir={setAberto} />}
+            <motion.div key={foco} {...troca}>
+              <TabelaClientes estado={foco} abrir={setAberto} />
             </motion.div>
           </AnimatePresence>
         )}
