@@ -326,7 +326,7 @@ function EsqueletoTabela() {
   return (
     <section className="-mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
       <div className={`grid h-11 items-center gap-6 px-8 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-        <Osso className="ml-[58px] h-2 w-14" />
+        <Osso className="h-2 w-14" />
         <Osso className="h-2 w-12" />
         <Osso className="h-2 w-16" />
         <span />
@@ -340,7 +340,7 @@ function EsqueletoTabela() {
           </div>
           {Array.from({ length: n }, (_, l) => (
             <div key={l} className={`grid h-[52px] items-center gap-6 px-8 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-              <span className="flex items-center gap-2.5 pl-[30px]">
+              <span className="flex items-center gap-2.5">
                 <Osso className="size-[18px] rounded-full" />
                 <Osso className="h-2.5 w-11" />
                 <Osso className="h-3" style={{ width: `${45 + ((l * 17 + g * 11) % 35)}%` }} />
@@ -1073,26 +1073,27 @@ function ArvoreFamilia({
           {/* self-stretch: a área ocupa a altura da linha, e o fio da árvore se mede por ela */}
           <span className="relative flex min-w-0 items-center gap-2.5 self-stretch" style={{ paddingLeft: (t.depth - 1) * 26 }}>
             {t.depth === 2 ? (
-              // o fio: desce do centro do círculo da tarefa mãe (seta 20 + espaço 10 + metade do círculo 9 = 39px)
-              // e dobra até perto do círculo da subtarefa (que começa em 56px), com 4px de folga nas duas
+              // o fio: desce do centro do círculo da tarefa mãe (metade do círculo = 9px)
+              // e dobra até perto do círculo da subtarefa (que começa em 26px), com 4px de folga nas duas
               // pontas: grudado nos círculos ficava pesado. Já desceu do lado da seta, desalinhado.
               <>
-                <span aria-hidden className="absolute left-[39px] w-px" style={{ top: -10, height: (ultimo ? 26 : 52) + 10, background: "var(--ds-fio-forte)" }} />
-                <span aria-hidden className="absolute top-1/2 left-[39px] h-px w-[13px]" style={{ background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute left-[9px] w-px" style={{ top: -10, height: (ultimo ? 26 : 52) + 10, background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute top-1/2 left-[9px] h-px w-[13px]" style={{ background: "var(--ds-fio-forte)" }} />
               </>
             ) : null}
             {/* a tarefa mãe aberta solta o começo do fio, do pé do círculo até a borda de baixo da linha
                 (a linha da subtarefa corta o que passa da borda dela) */}
-            {grupo && !fechado && filhos.length ? <span aria-hidden className="absolute left-[39px] w-px" style={{ top: 39, height: 13, background: "var(--ds-fio-forte)" }} /> : null}
+            {grupo && !fechado && filhos.length ? <span aria-hidden className="absolute left-[9px] w-px" style={{ top: 39, height: 13, background: "var(--ds-fio-forte)" }} /> : null}
+            {/* a seta de abrir e fechar mora na margem, à esquerda do círculo: assim o círculo começa
+                no início da tabela, alinhado com o título da página e com o rótulo TAREFA. Já reservou
+                uma coluna de 20px em toda linha, com ou sem subtarefa. */}
             {grupo ? (
-              <button type="button" onClick={(e) => (e.stopPropagation(), alternar(grupo))} aria-label={fechado ? "Abrir subtarefas" : "Recolher subtarefas"} className="grid size-5 shrink-0 place-items-center rounded-[5px] hover:bg-[var(--ds-trilho)]" style={{ color: "var(--ds-tinta-2)" }}>
+              <button type="button" onClick={(e) => (e.stopPropagation(), alternar(grupo))} aria-label={fechado ? "Abrir subtarefas" : "Recolher subtarefas"} className="absolute top-1/2 grid size-5 -translate-y-1/2 place-items-center rounded-[5px] hover:bg-[var(--ds-trilho)]" style={{ left: (t.depth - 1) * 26 - 25, color: "var(--ds-tinta-2)" }}>
                 <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }}>
                   <CaretRight size={12} weight="bold" />
                 </motion.span>
               </button>
-            ) : (
-              <span className="w-5 shrink-0" />
-            )}
+            ) : null}
             {/* círculo de concluir · código · título com peso · os chips do que existir.
                 (O código já veio depois do título: na frente ele lê melhor, ao lado do círculo.) */}
             <Marcador selecionando={selecionando} marcada={marcadas.has(t.id)} onMarcar={() => marcar(t.id)} feita={st === "done"} salvando={salvando === t.id} onConcluir={() => concluir(t.id)} />
@@ -1175,7 +1176,7 @@ function ArvoreFamilia({
                   ] as const
                 ).map(([k, r]) =>
                   k ? (
-                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[58px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-0" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
                       {/* a seta da ordem: aparece na coluna ativa, gira quando inverte. Na coluna
                           alinhada à direita ela vem ANTES do rótulo — depois, mesmo invisível,
                           empurrava o rótulo para fora do alinhamento com os valores. */}
@@ -1224,7 +1225,7 @@ function ArvoreFamilia({
                 ordena(filhosDe(e.id)).map((f, i, a) => linha(f, i === a.length - 1))
               ) : (
                 // o épico ainda vazio: um convite, não um buraco
-                <motion.div key="vazio" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.35, ease: CURVA }} className="flex h-[52px] items-center gap-3 pl-[97px] text-[13.5px]" style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", color: "var(--ds-tinta-2)" }}>
+                <motion.div key="vazio" initial={{ opacity: 0, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)" }} transition={{ duration: 0.35, ease: CURVA }} className="flex h-[52px] items-center gap-3 pl-[60px] text-[13.5px]" style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", color: "var(--ds-tinta-2)" }}>
                   <span className="italic">Nenhuma tarefa neste épico ainda.</span>
                   <button type="button" className="flex items-center gap-1.5 rounded-[7px] px-2 py-1 text-[13px] transition-colors hover:bg-[var(--ds-trilho)]" style={{ color: "var(--primary)" }}>
                     <Plus size={13} /> Adicionar tarefa
@@ -2027,7 +2028,7 @@ function TelaFocus() {
             {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
                 Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
             <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-              <span className="pl-7">Tarefa</span>
+              <span>Tarefa</span>
               <span>Status</span>
               <span>Origem</span>
               <span>Prioridade</span>
