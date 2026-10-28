@@ -42,11 +42,7 @@ import {
 
 import { MurikiLogo } from "@/components/ui/muriki-logo"
 import type { TaskTableStatus, TaskTableTask } from "@/components/blocks/task-table"
-import type { KanbanColumnSpec, KanbanTask } from "@/components/blocks/kanban"
-import { flattenColumns, moveTaskLocally, type KanbanColumnState } from "@/components/blocks/kanban/kanban-drop"
-import { DndContext, DragOverlay, KeyboardSensor, PointerSensor, closestCorners, useDroppable, useSensor, useSensors, type DragEndEvent, type DragOverEvent, type DragStartEvent } from "@dnd-kit/core"
-import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { KanbanBoard, type KanbanColumnSpec, type KanbanTask } from "@/components/blocks/kanban"
 
 /* Estudo livre do DS novo, na linguagem que nasceu da rivio.com.br:
    camadas, atmosfera, calma, e o desfoque nas trocas. Duas telas do mesmo
@@ -749,20 +745,6 @@ function StatusIcone({ status, tamanho = 18, progresso = 0, semDono = false }: {
     </span>
   )
 }
-/** O ícone de status é o botão de concluir. Enquanto salva, gira. */
-function StatusBotao({ status, salvando, onClick, progresso, semDono }: { status: TaskTableStatus; salvando: boolean; onClick: () => void; progresso?: number; semDono?: boolean }) {
-  return (
-    <button type="button" aria-label={status === "done" ? "Reabrir" : "Concluir"} title={ROTULO_VISUAL[visualDe(status, semDono)]} onPointerDown={(e) => e.stopPropagation()} onClick={(e) => (e.stopPropagation(), onClick())} className="grid size-6 shrink-0 place-items-center rounded-[6px] transition-colors hover:bg-[var(--ds-trilho)]">
-      {salvando ? (
-        <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, ease: "linear", repeat: Infinity }} style={{ color: "var(--ds-tinta-2)" }}>
-          <CircleNotch size={16} weight="bold" />
-        </motion.span>
-      ) : (
-        <StatusIcone status={status} tamanho={17} progresso={progresso} semDono={semDono} />
-      )}
-    </button>
-  )
-}
 /** Prioridade é badge: a pílula com a cor. Com os dois em ícone (status e
     prioridade) a linha ficava sem nenhum ponto de cor para o olho bater; o
     status ficou ícone porque ele também é o botão de concluir. */
@@ -1108,13 +1090,20 @@ function ArvoreFamilia({
           className={`group relative grid cursor-pointer items-center gap-6 overflow-hidden px-8 ${selecionando ? "select-none" : ""} outline-none transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] focus-visible:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_PROJ}`}
           style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)", background: marcadas.has(t.id) ? "color-mix(in oklab, var(--primary) 8%, transparent)" : undefined }}
         >
-          <span className="relative flex min-w-0 items-center gap-2.5" style={{ paddingLeft: (t.depth - 1) * 26 }}>
+          {/* self-stretch: a área ocupa a altura da linha, e o fio da árvore se mede por ela */}
+          <span className="relative flex min-w-0 items-center gap-2.5 self-stretch" style={{ paddingLeft: (t.depth - 1) * 26 }}>
             {t.depth === 2 ? (
+              // o fio: desce do centro do círculo da tarefa mãe (seta 20 + espaço 10 + metade do círculo 9 = 39px)
+              // e dobra até a borda do círculo da subtarefa (26 de recuo + 20 + 10 = 56px). Já desceu do
+              // lado da seta, desalinhado dos dois círculos.
               <>
-                <span aria-hidden className="absolute top-[-26px] left-[10px] w-px" style={{ height: ultimo ? 26 : 52, background: "var(--ds-fio-forte)" }} />
-                <span aria-hidden className="absolute top-0 left-[10px] h-px w-3" style={{ background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute left-[39px] w-px" style={{ top: -10, height: (ultimo ? 26 : 52) + 10, background: "var(--ds-fio-forte)" }} />
+                <span aria-hidden className="absolute top-1/2 left-[39px] h-px w-[17px]" style={{ background: "var(--ds-fio-forte)" }} />
               </>
             ) : null}
+            {/* a tarefa mãe aberta solta o começo do fio, do pé do círculo até a borda de baixo da linha
+                (a linha da subtarefa corta o que passa da borda dela) */}
+            {grupo && !fechado && filhos.length ? <span aria-hidden className="absolute left-[39px] w-px" style={{ top: 35 - 26 + 26, height: 17, background: "var(--ds-fio-forte)" }} /> : null}
             {grupo ? (
               <button type="button" onClick={(e) => (e.stopPropagation(), alternar(grupo))} aria-label={fechado ? "Abrir subtarefas" : "Recolher subtarefas"} className="grid size-5 shrink-0 place-items-center rounded-[5px] hover:bg-[var(--ds-trilho)]" style={{ color: "var(--ds-tinta-2)" }}>
                 <motion.span animate={{ rotate: fechado ? 0 : 90 }} transition={{ duration: 0.3, ease: CURVA }}>
@@ -1272,166 +1261,8 @@ function ArvoreFamilia({
 
 // ── o quadro: a versão nova do kanban, mesma API ─────────────────────────
 
-/** O card do quadro, com a cara aprovada: código e avatar em cima, título,
-    e prioridade · prazo em mono embaixo. `assignee` é o único campo a mais
-    que o KanbanTask do registry: opcional, quem não manda não ganha avatar. */
+/** O card do quadro carrega o avatar além do KanbanTask (o board ignora). */
 type CardQuadro = KanbanTask & { assignee?: { initials: string; tone: string } }
-const VAZIAS = ["Um respiro.", "Vazio por enquanto.", "Silêncio."]
-
-function CardQuadroView({ c, fantasma = false, solto = false, onClick, onToggle }: { c: CardQuadro; fantasma?: boolean; solto?: boolean; onClick?: () => void; onToggle?: () => void }) {
-  const feito = c.progress === 100
-  return (
-    <div
-      onClick={onClick}
-      className="flex cursor-grab flex-col gap-3 rounded-[10px] p-4 text-left transition-[opacity,box-shadow] duration-300 active:cursor-grabbing"
-      style={{
-        background: "var(--ds-placa-solida)",
-        boxShadow: solto ? "inset 0 0 0 1.5px var(--primary), 0 30px 60px -20px var(--ds-sombra)" : "inset 0 0 0 1px var(--ds-fio), 0 10px 24px -18px var(--ds-sombra)",
-        opacity: fantasma ? 0.35 : 1,
-        filter: fantasma ? "blur(1px)" : undefined,
-      }}
-    >
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2">
-          <StatusBotao status={feito ? "done" : (c.statusId as TaskTableStatus)} salvando={false} onClick={() => onToggle?.()} progresso={c.progress / 100} semDono={!c.assignee} />
-          <span className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-            {c.slug}
-          </span>
-        </span>
-        {c.assignee ? <Avatar iniciais={c.assignee.initials} tom={c.assignee.tone} /> : null}
-      </div>
-      <span className="text-[14.5px] leading-snug transition-colors duration-300" style={{ color: feito ? "var(--ds-tinta-2)" : "var(--ds-tinta-forte)" }}>
-        {c.title}
-      </span>
-      <span className="flex items-center justify-between gap-2">
-        <Prioridade p={c.priority} pequena />
-        <span className="font-mono text-[11px] tracking-[0.08em] uppercase" style={{ color: "var(--ds-tinta-2)" }}>
-          {c.timeLabel}
-        </span>
-      </span>
-    </div>
-  )
-}
-
-function CardArrastavel({ c, onClick, onToggle }: { c: CardQuadro; onClick: () => void; onToggle: () => void }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: c.slug })
-  return (
-    <motion.div layout="position" transition={{ duration: 0.4, ease: CURVA }} ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} {...attributes} {...listeners}>
-      <CardQuadroView c={c} fantasma={isDragging} onClick={onClick} onToggle={onToggle} />
-    </motion.div>
-  )
-}
-
-function ColunaQuadro({ col, alvo, arrastando, onCard, onToggle, onAdd }: { col: KanbanColumnState; alvo: boolean; arrastando: boolean; onCard: (c: CardQuadro) => void; onToggle: (c: CardQuadro) => void; onAdd?: () => void }) {
-  const { setNodeRef } = useDroppable({ id: col.id })
-  const vazia = col.tasks.length === 0
-  return (
-    <motion.div
-      ref={setNodeRef}
-      animate={{ opacity: arrastando && !alvo ? 0.55 : 1 }}
-      transition={{ duration: 0.3 }}
-      className="flex w-[272px] shrink-0 flex-col gap-3 rounded-[12px] p-3 transition-[box-shadow,background-color] duration-300"
-      style={{ background: alvo ? "color-mix(in oklab, var(--primary) 7%, var(--ds-trilho))" : "var(--ds-trilho)", boxShadow: alvo ? "inset 0 0 0 1.5px var(--primary)" : "inset 0 0 0 1px var(--ds-fio)" }}
-    >
-      <div className="flex h-9 items-center justify-between px-2">
-        <Etiqueta cor={col.color ?? "var(--ds-tinta-2)"}>{col.name}</Etiqueta>
-        <span className="flex items-center gap-2">
-          <AnimatePresence mode="wait">
-            <motion.span key={col.tasks.length} initial={{ opacity: 0.2, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={CHEGADA} className="font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
-              {col.tasks.length}
-            </motion.span>
-          </AnimatePresence>
-          {onAdd ? (
-            <button type="button" onClick={onAdd} aria-label={`Novo card em ${col.name}`} className="grid size-6 place-items-center rounded-[6px] hover:bg-[var(--ds-placa-forte)]" style={{ color: "var(--ds-tinta-2)" }}>
-              <Plus size={13} />
-            </button>
-          ) : null}
-        </span>
-      </div>
-      <SortableContext items={col.tasks.map((t) => t.slug)} strategy={verticalListSortingStrategy}>
-        {(col.tasks as CardQuadro[]).map((c) => (
-          <CardArrastavel key={c.slug} c={c} onClick={() => onCard(c)} onToggle={() => onToggle(c)} />
-        ))}
-      </SortableContext>
-      {vazia ? (
-        <div className="grid min-h-[96px] place-items-center rounded-[10px] text-[13px] italic" style={{ color: "var(--ds-tinta-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)", borderStyle: "dashed" }}>
-          <AnimatePresence mode="wait">
-            <motion.span key={alvo ? "solte" : "vazia"} initial={{ opacity: 0, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} transition={CHEGADA}>
-              {alvo ? "Solte aqui." : VAZIAS[col.id.length % VAZIAS.length]}
-            </motion.span>
-          </AnimatePresence>
-        </div>
-      ) : null}
-    </motion.div>
-  )
-}
-
-/** A versão nova do KanbanBoard: a MESMA API (columns, tasks, onTasksChange,
-    onMoved, onToggleDone, onAddCard, onCardClick) e a mesma lógica de soltar
-    (kanban-drop do registry), com o desenho da linguagem. Ao soltar numa
-    coluna nova, o card chega desfocado no lugar. */
-function QuadroFaixas({ columns, tasks, onTasksChange, onMoved, onToggleDone, onAddCard, onCardClick }: { columns: KanbanColumnSpec[]; tasks: CardQuadro[]; onTasksChange?: (t: CardQuadro[]) => void; onMoved?: (t: CardQuadro, coluna: string) => void; onToggleDone?: (slug: string, next: boolean) => void; onAddCard?: (colunaId: string) => void; onCardClick?: (t: CardQuadro) => void }) {
-  const base = React.useMemo<KanbanColumnState[]>(() => columns.map((c) => ({ ...c, tasks: tasks.filter((t) => t.statusId === c.id) })), [columns, tasks])
-  const [local, setLocal] = React.useState<KanbanColumnState[] | null>(null)
-  const [ativo, setAtivo] = React.useState<CardQuadro | null>(null)
-  const [alvo, setAlvo] = React.useState<string | null>(null)
-  const [aviso, setAviso] = React.useState("")
-  const cols = local ?? base
-  const sensores = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor))
-  const colunaDe = (id: string) => cols.find((c) => c.id === id || c.tasks.some((t) => t.slug === id))?.id ?? null
-
-  const inicio = (e: DragStartEvent) => {
-    setAtivo(tasks.find((t) => t.slug === e.active.id) ?? null)
-    setLocal(base)
-  }
-  const sobre = (e: DragOverEvent) => {
-    if (!e.over) return
-    setAlvo(colunaDe(String(e.over.id)))
-    setLocal((c) => moveTaskLocally(c ?? base, String(e.active.id), String(e.over!.id)))
-  }
-  const fim = (e: DragEndEvent) => {
-    const final = local ?? base
-    const plano = flattenColumns(final) as CardQuadro[]
-    const movido = plano.find((t) => t.slug === e.active.id)
-    if (movido && ativo && movido.statusId !== ativo.statusId) {
-      const nome = columns.find((c) => c.id === movido.statusId)?.name ?? ""
-      onMoved?.(movido, nome)
-      setAviso(`${movido.title} movida para ${nome}`)
-    }
-    onTasksChange?.(plano)
-    setLocal(null)
-    setAtivo(null)
-    setAlvo(null)
-  }
-
-  return (
-    <DndContext sensors={sensores} collisionDetection={closestCorners} onDragStart={inicio} onDragOver={sobre} onDragEnd={fim} onDragCancel={() => (setLocal(null), setAtivo(null), setAlvo(null))}>
-      <div className="muriki-scroll -mx-8 flex gap-4 overflow-x-auto px-8 pb-2">
-        {cols.map((col) => (
-          <ColunaQuadro
-            key={col.id}
-            col={col}
-            alvo={alvo === col.id}
-            arrastando={ativo !== null}
-            onCard={(c) => onCardClick?.(c)}
-            onToggle={(c) => onToggleDone?.(c.slug, c.progress !== 100)}
-            onAdd={onAddCard ? () => onAddCard(col.id) : undefined}
-          />
-        ))}
-      </div>
-      <DragOverlay dropAnimation={{ duration: 300, easing: "cubic-bezier(0.16, 1, 0.3, 1)" }}>
-        {ativo ? (
-          <div style={{ rotate: "-2deg", scale: "1.03" }}>
-            <CardQuadroView c={ativo} solto />
-          </div>
-        ) : null}
-      </DragOverlay>
-      <div role="status" aria-live="polite" className="sr-only">
-        {aviso}
-      </div>
-    </DndContext>
-  )
-}
 
 const COLUNAS_QUADRO: KanbanColumnSpec[] = (["active", "progress", "blocked", "done"] as TaskTableStatus[]).map((st) => ({ id: st, name: ST_F[st].rotulo, color: `var(--tone-${ST_F[st].tom}-dot)` }))
 
@@ -1450,11 +1281,14 @@ function QuadroFamilia({ feitas, abrir, avisar }: { feitas: Set<string>; abrir: 
       }
     })
   )
+  // o Quadro é o KanbanBoard do registry, como o Platform usa hoje — sem redesenho.
+  // (Já houve uma versão desenhada na linguagem, QuadroFaixas: recusada. Fica no
+  // arquivo como estudo, mas não é o quadro.)
   return (
-    <QuadroFaixas
+    <KanbanBoard
       columns={COLUNAS_QUADRO}
       tasks={cards}
-      onTasksChange={setCards}
+      onTasksChange={(ts) => setCards(ts as CardQuadro[])}
       onMoved={(c, col) => avisar(`${c.slug} foi para ${col}`)}
       onToggleDone={(slug, next) => setCards((cs) => cs.map((c) => (c.slug === slug ? { ...c, progress: next ? 100 : 0 } : c)))}
       onAddCard={(col) => avisar(`Novo card em ${COLUNAS_QUADRO.find((c) => c.id === col)?.name}`)}
