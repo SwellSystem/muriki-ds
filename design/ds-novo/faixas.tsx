@@ -348,7 +348,7 @@ function EsqueletoTabela() {
   return (
     <section className="rounded-[12px]" style={{ background: "var(--ds-placa-2)", boxShadow: "inset 0 0 0 1px var(--ds-fio)" }} aria-busy="true" aria-label="Carregando">
       <div className={`grid h-11 items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-        <Osso className="ml-[60px] h-2 w-14" />
+        <Osso className="ml-[30px] h-2 w-14" />
         <Osso className="h-2 w-12" />
         <Osso className="h-2 w-16" />
         <span />
@@ -363,11 +363,10 @@ function EsqueletoTabela() {
           {Array.from({ length: n }, (_, l) => (
             <div key={l} className={`grid h-[52px] items-center gap-6 px-5 ${GRADE_PROJ}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
               <span className="flex items-center gap-2.5 pl-[30px]">
-                <Osso azul className="size-[17px] rounded-full" />
                 <Osso className="h-2.5 w-11" />
                 <Osso className="h-3" style={{ width: `${45 + ((l * 17 + g * 11) % 35)}%` }} />
               </span>
-              <Osso className="h-2.5 w-14" />
+              <Osso azul className="h-7 w-24 rounded-[7px]" />
               <Osso azul className="h-7 w-20 rounded-[7px]" />
               <Osso azul className="size-8 rounded-full" />
               <Osso className="ml-auto h-2.5 w-10" />
@@ -768,6 +767,41 @@ function Prioridade({ p, pequena = false }: { p?: string; pequena?: boolean }) {
   )
 }
 
+/** O status em badge, num lugar só (a coluna Status): o ícone e o nome, na
+    cor do estado. É também o concluir: clicou, gira enquanto salva e troca
+    pelo desfoque. Já foi ícone ao lado do nome + texto na coluna — status
+    em dois lugares. */
+const TOM_VISUAL: Record<Visual, string> = { backlog: "gray", active: "green", progress: "blue", blocked: "red", done: "gray" }
+function StatusBadge({ status, progresso, semDono, salvando = false, onClick }: { status: TaskTableStatus; progresso?: number; semDono?: boolean; salvando?: boolean; onClick?: () => void }) {
+  const v = visualDe(status, semDono)
+  const tom = TOM_VISUAL[v]
+  return (
+    <button
+      type="button"
+      aria-label={status === "done" ? "Reabrir" : "Concluir"}
+      onPointerDown={(e) => e.stopPropagation()}
+      onClick={(e) => (e.stopPropagation(), onClick?.())}
+      className="inline-flex h-7 w-fit items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] transition-[box-shadow] duration-200 hover:shadow-[inset_0_0_0_1px_currentColor]"
+      style={{ background: v === "backlog" ? "transparent" : `var(--tone-${tom})`, color: v === "done" ? "var(--ds-tinta-2)" : `var(--tone-${tom}-foreground)`, boxShadow: v === "backlog" ? "inset 0 0 0 1px var(--ds-fio-forte)" : undefined }}
+    >
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.span key={salvando ? "salvando" : v} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.15 } }} transition={CHEGADA} className="flex items-center gap-1.5">
+          {salvando ? (
+            <motion.span animate={{ rotate: 360 }} transition={{ duration: 0.8, ease: "linear", repeat: Infinity }} className="grid">
+              <CircleNotch size={14} weight="bold" />
+            </motion.span>
+          ) : (
+            <span className="grid" style={{ color: v === "done" ? "var(--success)" : v === "backlog" ? "var(--ds-tinta-2)" : `var(--tone-${tom}-dot)` }}>
+              <StatusIcone status={status} tamanho={14} progresso={progresso} semDono={semDono} />
+            </span>
+          )}
+          {salvando ? "Salvando" : ROTULO_VISUAL[v]}
+        </motion.span>
+      </AnimatePresence>
+    </button>
+  )
+}
+
 /** O status troca pelo desfoque; a saída é curta para a confirmação chegar logo. */
 function SeloTroca({ status, progresso, semDono }: { status: TaskTableStatus; progresso?: number; semDono?: boolean }) {
   return (
@@ -804,7 +838,7 @@ function IndicadorSalvo({ estado }: { estado: "ocioso" | "salvando" | "salvo" })
     "Sem épico" — como faixas de seção dentro dela. Tarefa e subtarefa
     penduradas no fio; o status por extenso na coluna (o ícone na frente é
     o concluir); atalhos no hover. */
-const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_104px_116px_40px_60px]"
+const GRADE_PROJ = "grid-cols-[minmax(0,1fr)_124px_116px_40px_60px]"
 
 function ArvoreFamilia({
   fechados,
@@ -902,7 +936,6 @@ function ArvoreFamilia({
             ) : (
               <span className="w-5 shrink-0" />
             )}
-            <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} progresso={t.progressRatio} semDono={!t.owner} />
             <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
               {t.code}
             </span>
@@ -920,11 +953,7 @@ function ArvoreFamilia({
               </span>
             ) : null}
           </span>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.span key={visualDe(st, !t.owner)} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA} className="text-[13px]" style={{ color: st === "blocked" ? "var(--destructive)" : st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta)" }}>
-              {ROTULO_VISUAL[visualDe(st, !t.owner)]}
-            </motion.span>
-          </AnimatePresence>
+          <StatusBadge status={st} progresso={t.progressRatio} semDono={!t.owner} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
           <Prioridade p={t.priority} />
           {t.owner ? <Avatar iniciais={t.owner.initials} tom={TOM_DONO[t.owner.tone ?? "a4"]} /> : <span className="size-8 rounded-full" style={{ border: "1.5px dashed var(--ds-fio-forte)" }} title="Sem responsável" />}
           <span className="text-right font-mono text-[11.5px]" style={{ color: "var(--ds-tinta-2)" }}>
@@ -991,7 +1020,7 @@ function ArvoreFamilia({
                   ] as const
                 ).map(([k, r]) =>
                   k ? (
-                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[60px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
+                    <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[30px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
                       {r}
                       {/* a seta da ordem: aparece na coluna ativa, gira quando inverte */}
                       <motion.span animate={{ rotate: ordem.k === k && ordem.desc ? 180 : 0, opacity: ordem.k === k ? 1 : 0 }} transition={{ duration: 0.3, ease: CURVA }} className="group-hover:opacity-50!" style={{ color: ordem.k === k ? "var(--primary)" : undefined }}>
@@ -1837,7 +1866,7 @@ const GRUPOS_FOCUS = [
   { id: "semana", nome: "Esta semana", cor: "var(--ds-tinta-2)" },
   { id: "depois", nome: "Depois", cor: "var(--ds-tinta-2)" },
 ] as const
-const GRADE_FOCUS = "grid-cols-[minmax(0,1fr)_112px_150px_116px_60px]"
+const GRADE_FOCUS = "grid-cols-[minmax(0,1fr)_124px_150px_116px_60px]"
 
 function OrigemTag({ o }: { o: Origem }) {
   return o.tipo === "pessoal" ? (
@@ -1910,7 +1939,7 @@ function TelaFocus() {
             {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
                 Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
             <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 rounded-t-[12px] px-5 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
-              <span className="pl-[34px]">Tarefa</span>
+              <span>Tarefa</span>
               <span>Status</span>
               <span>Origem</span>
               <span>Prioridade</span>
@@ -1938,7 +1967,6 @@ function TelaFocus() {
                         return (
                           <div key={t.id} className={`group relative grid h-[52px] cursor-pointer items-center gap-6 px-5 transition-colors duration-200 hover:bg-[color-mix(in_oklab,var(--primary)_5%,transparent)] ${GRADE_FOCUS}`} style={{ boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
                             <span className="flex min-w-0 items-center gap-2.5">
-                              <StatusBotao status={st} salvando={salvando === t.id} onClick={() => concluir(t.id)} progresso={t.progresso} />
                               {t.codigo ? (
                                 <span className="shrink-0 font-mono text-[11px]" style={{ color: "var(--ds-tinta-2)" }}>
                                   {t.codigo}
@@ -1948,12 +1976,7 @@ function TelaFocus() {
                                 {t.titulo}
                               </span>
                             </span>
-                            {/* o status por extenso: o ícone na frente é o botão de concluir, aqui não se repete */}
-                            <AnimatePresence mode="wait" initial={false}>
-                              <motion.span key={st} initial={{ opacity: 0.2, filter: "blur(8px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(8px)", transition: { duration: 0.18 } }} transition={CHEGADA} className="text-[13px]" style={{ color: st === "blocked" ? "var(--destructive)" : st === "done" ? "var(--ds-tinta-2)" : "var(--ds-tinta)" }}>
-                                {ROTULO_VISUAL[visualDe(st)]}
-                              </motion.span>
-                            </AnimatePresence>
+                            <StatusBadge status={st} progresso={t.progresso} salvando={salvando === t.id} onClick={() => concluir(t.id)} />
                             <OrigemTag o={t.origem} />
                             <Prioridade p={t.prioridade} />
                             <span className="text-right font-mono text-[11.5px]" style={{ color: t.quando === "atrasadas" && st !== "done" ? "var(--destructive)" : "var(--ds-tinta-2)" }}>
