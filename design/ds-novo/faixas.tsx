@@ -61,7 +61,9 @@ const CHEGADA = { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as [number, number, 
    desfocado e assenta. */
 const troca = {
   initial: { opacity: 0, filter: "blur(14px)", y: 10 },
-  animate: { opacity: 1, filter: "blur(0px)", y: 0 },
+  // ao terminar, o filtro sai de vez (none, não blur(0px)): filtro num ancestral vira "backdrop root"
+  // e desliga o desfoque de quem está dentro — o cabeçalho da tabela parava de desfocar a lista.
+  animate: { opacity: 1, filter: "blur(0px)", y: 0, transitionEnd: { filter: "none" } },
   exit: { opacity: 0, filter: "blur(14px)", y: -10 },
   transition: { duration: 0.42, ease: CURVA },
 }
@@ -72,6 +74,14 @@ const placa = (fundo = "var(--ds-placa-1)") => ({
   WebkitBackdropFilter: "blur(30px) saturate(1.3)",
   boxShadow: "inset 0 0 0 1px var(--ds-fio)",
 })
+
+/** O vidro da placa numa camada ATRÁS do conteúdo, e não na própria placa.
+    Uma placa com backdrop-filter vira "backdrop root": o desfoque de quem
+    mora dentro dela (o cabeçalho da tabela, ao rolar) não enxerga a lista e
+    só desbota. Com o vidro numa camada irmã, a placa fica livre. */
+function VidroAtras({ raio = 14 }: { raio?: number }) {
+  return <span aria-hidden className="pointer-events-none absolute inset-0 -z-10" style={{ ...placa(), borderRadius: raio }} />
+}
 
 /** Carregando por um instante sempre que a chave muda: abrir a tela,
     trocar de faixa, trocar de vista. Simula a ida ao servidor. */
@@ -437,12 +447,12 @@ function Faixas({
           <motion.main
             key={item.id}
             layoutId={`faixa-${item.id}`}
-            animate={recua ? { filter: "blur(3px)", scale: 0.985, opacity: 0.7 } : { filter: "blur(0px)", scale: 1, opacity: 1 }}
+            animate={recua ? { filter: "blur(3px)", scale: 0.985, opacity: 0.7 } : { filter: "blur(0px)", scale: 1, opacity: 1, transitionEnd: { filter: "none" } }}
             transition={{ duration: 0.55, ease: CURVA }}
             onClick={() => recua && onFundo()}
-            className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]"
-            style={placa()}
+            className="relative z-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]"
           >
+            <VidroAtras />
             <motion.header {...troca} className="flex items-end justify-between gap-6 px-8 pt-6 pb-5">
               <div className="flex items-baseline gap-4">
                 <span className="text-[22px] font-light tabular-nums" style={{ color: "var(--ds-tinta-2)" }}>
@@ -806,6 +816,33 @@ function StatusBadge({ status, progresso, semDono, salvando = false, onClick }: 
       </AnimatePresence>
       <CaretDown size={10} weight="bold" className="-mr-0.5 opacity-0 transition-opacity group-hover/badge:opacity-60" />
     </button>
+  )
+}
+
+/** O véu do cabeçalho preso: quando a lista rola por baixo, ele não ganha
+    fundo sólido — desfoca o que passa e se dissolve na borda de baixo, como
+    o cabeçalho que some da linguagem. Mora atrás dos rótulos e passa um
+    pouco da altura deles, para o desfoque sumir aos poucos. Sem isolation
+    no cabeçalho: ela cria um "backdrop root" e o desfoque não enxergava a
+    lista atrás — só desbotava. Fica em -z-10 dentro do cabeçalho (que já é
+    um contexto de empilhamento por ser sticky com z-10): atrás dos rótulos
+    sem pôr camada posicionada por cima dele — rótulo largo posicionado em
+    cima cortava o desfoque na coluna da tarefa. */
+function VeuRolagem({ on }: { on: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className="pointer-events-none absolute inset-x-0 top-0 -z-10 transition-opacity duration-300"
+      style={{
+        bottom: -22,
+        opacity: on ? 1 : 0,
+        background: "linear-gradient(to bottom, color-mix(in oklab, var(--ds-placa-solida) 72%, transparent) 55%, transparent)",
+        backdropFilter: "blur(14px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(14px) saturate(1.2)",
+        maskImage: "linear-gradient(to bottom, black 60%, transparent)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 60%, transparent)",
+      }}
+    />
   )
 }
 
@@ -1178,7 +1215,8 @@ function ArvoreFamilia({
       {/* a tabela é a própria tela: de ponta a ponta, sem canto nem contorno nas laterais */}
       <section className="relative -mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
         {/* o cabeçalho: um só, sem fundo próprio, preso no topo; o fundo aparece ao rolar */}
-        <div className="sticky top-0 z-10 h-11 transition-[background-color] duration-300" style={{ background: rolou || marcadas.size ? "var(--ds-placa-solida)" : "transparent", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+        <div className="sticky top-0 z-10 h-11" style={{ boxShadow: rolou ? "none" : "inset 0 -1px 0 var(--ds-fio)" }}>
+          <VeuRolagem on={rolou || marcadas.size > 0} />
           <AnimatePresence mode="wait" initial={false}>
             {marcadas.size ? (
               // com linhas marcadas, o cabeçalho vira a barra de ações em lote
@@ -1763,9 +1801,10 @@ function CabecalhoDados({ grade, rotulos }: { grade: string; rotulos: { r: strin
   return (
     <>
     <span ref={marco} className="block h-px" />
-    <div className={`sticky top-0 z-10 -mt-px grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${grade}`} style={{ color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)", background: rolou ? "var(--ds-placa-solida)" : "transparent" }}>
+    <div className={`sticky top-0 z-10 -mt-px grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase ${grade}`} style={{ color: "var(--ds-tinta-2)", boxShadow: rolou ? "none" : "inset 0 -1px 0 var(--ds-fio)" }}>
+      <VeuRolagem on={rolou} />
       {rotulos.map((c, i) => (
-        <span key={i} className={c.direita ? "text-right" : ""}>
+        <span key={i} className={c.direita ? "justify-self-end" : ""}>
           {c.r}
         </span>
       ))}
@@ -2046,7 +2085,8 @@ function TelaFocus() {
 
   return (
     <>
-      <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]" style={placa()}>
+      <main className="relative z-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-[14px]">
+        <VidroAtras />
         <header className="flex items-end justify-between gap-6 px-8 pt-7 pb-6">
           <div className="flex flex-col gap-2.5">
             <Etiqueta cor="var(--accent)">
@@ -2076,12 +2116,13 @@ function TelaFocus() {
           <section className="relative -mx-8" style={{ boxShadow: "inset 0 1px 0 var(--ds-fio)" }}>
             {/* o cabeçalho da tabela: um só, sem fundo próprio — os rótulos e um filete fino.
                 Preso no topo; o fundo só aparece quando a lista rola por baixo dele. */}
-            <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase transition-[background-color] duration-300 ${GRADE_FOCUS}`} style={{ background: rolou ? "var(--ds-placa-solida)" : "transparent", color: "var(--ds-tinta-2)", boxShadow: "inset 0 -1px 0 var(--ds-fio)" }}>
+            <div className={`sticky top-0 z-10 grid h-11 items-center gap-6 px-8 font-mono text-[10px] tracking-[0.12em] uppercase ${GRADE_FOCUS}`} style={{ color: "var(--ds-tinta-2)", boxShadow: rolou ? "none" : "inset 0 -1px 0 var(--ds-fio)" }}>
+              <VeuRolagem on={rolou} />
               <span>Tarefa</span>
               <span>Status</span>
               <span>Origem</span>
               <span>Prioridade</span>
-              <span className="text-right">Prazo</span>
+              <span className="justify-self-end">Prazo</span>
             </div>
             <AnimatePresence mode="wait">
               <motion.div key={carregando ? "c" : filtro} {...troca}>
