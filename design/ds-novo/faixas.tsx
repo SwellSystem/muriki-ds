@@ -1062,11 +1062,14 @@ function ArvoreFamilia({
                 ).map(([k, r]) =>
                   k ? (
                     <button key={k} type="button" onClick={() => setOrdem((o) => ({ k, desc: o.k === k ? !o.desc : false }))} className={`group flex items-center gap-1.5 uppercase ${k === "prazo" ? "justify-end" : ""} ${k === "tarefa" ? "pl-[58px]" : ""}`} style={{ color: ordem.k === k ? "var(--ds-tinta-forte)" : "var(--ds-tinta-2)" }}>
-                      {r}
-                      {/* a seta da ordem: aparece na coluna ativa, gira quando inverte */}
+                      {/* a seta da ordem: aparece na coluna ativa, gira quando inverte. Na coluna
+                          alinhada à direita ela vem ANTES do rótulo — depois, mesmo invisível,
+                          empurrava o rótulo para fora do alinhamento com os valores. */}
+                      {k !== "prazo" ? r : null}
                       <motion.span animate={{ rotate: ordem.k === k && ordem.desc ? 180 : 0, opacity: ordem.k === k ? 1 : 0 }} transition={{ duration: 0.3, ease: CURVA }} className="group-hover:opacity-50!" style={{ color: ordem.k === k ? "var(--primary)" : undefined }}>
                         <CaretDown size={10} weight="bold" />
                       </motion.span>
+                      {k === "prazo" ? r : null}
                     </button>
                   ) : (
                     <span key="dono" />
