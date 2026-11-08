@@ -1,9 +1,9 @@
 /* Tokens do estudo das faixas (design/ds-novo/faixas.tsx). Paleta do Muriki: papel quente, tinta fria, azul 262.6. */
 :root {
-  --ds-chao: oklch(0.925 0.022 80);
-  --ds-luz: oklch(0.995 0.035 90 / 0.75);
-  --ds-luz-forte: oklch(0.98 0.06 88 / 0.55);
-  --ds-madeira: oklch(0.7 0.07 62 / 0.32);
+  --ds-chao: oklch(0.975 0.007 85);
+  --ds-luz: oklch(1 0.012 90 / 0.5);
+  --ds-luz-forte: oklch(0.995 0.02 88 / 0.35);
+  --ds-madeira: oklch(0.8 0.03 70 / 0.1);
   --ds-placa-1: oklch(0.985 0.006 85 / 0.55);
   --ds-placa-2: oklch(0.995 0.004 85 / 0.72);
   --ds-placa-forte: oklch(0.995 0.003 85 / 0.93);
@@ -24,9 +24,9 @@
 }
 .dark {
   --ds-chao: oklch(0.15 0.006 107);
-  --ds-luz: oklch(0.42 0.07 262.6 / 0.4);
-  --ds-luz-forte: oklch(0.42 0.11 262.6 / 0.35);
-  --ds-madeira: oklch(0.42 0.06 60 / 0.3);
+  --ds-luz: oklch(0.42 0.05 262.6 / 0.14);
+  --ds-luz-forte: oklch(0.42 0.07 262.6 / 0.14);
+  --ds-madeira: oklch(0.42 0.03 60 / 0.08);
   --ds-placa-1: oklch(0.2 0.005 107 / 0.55);
   --ds-placa-2: oklch(0.24 0.005 107 / 0.6);
   --ds-placa-forte: oklch(0.25 0.005 107 / 0.93);

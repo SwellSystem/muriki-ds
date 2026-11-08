@@ -54,4 +54,4 @@ writeFileSync(
 <style>${readFileSync(join(obra, "out.css"), "utf8")}</style></head><body><div id="root"></div><script type="module">${js}</script></body></html>`
 )
 console.log(saida)
-await $`open ${saida}`
+if (!process.env.SEM_ABRIR) await $`open ${saida}`
