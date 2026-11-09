@@ -10,6 +10,7 @@ import { KanbanBoard, type KanbanColumnSpec, type KanbanTask } from "@/component
 import { LanguageSwitcher } from "@/components/blocks/language-switcher/language-switcher"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
+import { DatePicker, DateRangePicker } from "@/components/ui/date-picker"
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Modal, ModalBody, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalTitle } from "@/components/ui/modal"
@@ -970,9 +971,9 @@ function ConfigCalendario({ f, avisar, abrirConectar, voltar }: { f: Focus; avis
             <ViewToggle size="sm" value={String(p.semanaComeca)} onChange={(v) => muda({ semanaComeca: Number(v) as 0 | 1 })} ariaLabel="Começo da semana" options={[{ value: "0", label: "Domingo" }, { value: "1", label: "Segunda" }]} />
           </Ajuste>
           <Ajuste rotulo="Horário de trabalho" texto="O calendário abre no começo dele.">
-            <Input type="time" value={p.expediente[0]} onChange={(e) => muda({ expediente: [e.target.value, p.expediente[1]] })} aria-label="Começa" className={`w-[96px] ${campoSutil}`} />
+            <HoraPicker rotulo="Começa" valor={p.expediente[0]} mudar={(h) => muda({ expediente: [h, p.expediente[1]] })} />
             <span className="text-muted-foreground">–</span>
-            <Input type="time" value={p.expediente[1]} onChange={(e) => muda({ expediente: [p.expediente[0], e.target.value] })} aria-label="Termina" className={`w-[96px] ${campoSutil}`} />
+            <HoraPicker rotulo="Termina" valor={p.expediente[1]} desde={p.expediente[0]} mudar={(h) => muda({ expediente: [p.expediente[0], h] })} />
           </Ajuste>
           <Ajuste rotulo="Mostrar o fim de semana" texto="Na semana, sábado e domingo.">
             <Switch checked={p.fimDeSemana} onCheckedChange={(v) => muda({ fimDeSemana: Boolean(v) })} aria-label="Mostrar o fim de semana" />
@@ -1013,6 +1014,65 @@ const juntar = (data: string, hora: string) => {
   const [a, m, d] = data.split("-").map(Number)
   const [h, mi] = hora.split(":").map(Number)
   return new Date(a, m - 1, d, h, mi)
+}
+
+/** O campo de hora da casa, no lugar do <input type="time"> (que pinta a roleta do navegador): o
+    gatilho é igual ao do DatePicker (a superfície do campo, o relógio como afixo) e a lista vem num
+    Popover, de 15 em 15 minutos, já rolada até a hora escolhida. Com `desde`, é o campo do fim: só
+    as horas depois do começo, cada uma com a duração ao lado ("11:30 · 30 min"). */
+function HoraPicker({ valor, mudar, desde, disabled, rotulo }: { valor: string; mudar: (h: string) => void; desde?: string; disabled?: boolean; rotulo: string }) {
+  const [aberto, setAberto] = React.useState(false)
+  const lista = React.useRef<HTMLDivElement>(null)
+  const inicio = desde ? minutosDoDia(desde) + 15 : 0
+  const horas: string[] = []
+  for (let m = inicio; m < 24 * 60; m += 15) horas.push(`${pad(Math.floor(m / 60))}:${pad(m % 60)}`)
+  React.useEffect(() => {
+    if (!aberto) return
+    const t = setTimeout(() => lista.current?.querySelector<HTMLElement>("[data-escolhida]")?.scrollIntoView({ block: "center" }), 20)
+    return () => clearTimeout(t)
+  }, [aberto])
+  return (
+    <Popover open={aberto} onOpenChange={setAberto}>
+      <PopoverTrigger
+        disabled={disabled}
+        aria-label={`${rotulo}: ${valor}`}
+        render={
+          <button
+            type="button"
+            className="flex h-9 shrink-0 cursor-pointer items-center gap-2 rounded-[9px] bg-field px-3 text-left text-sm text-foreground tabular-nums shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--input)_45%,var(--field))] transition-[box-shadow] outline-none hover:shadow-[inset_0_0_0_1px_var(--input)] focus-visible:shadow-[inset_0_0_0_1px_var(--primary)] focus-visible:ring-[3px] focus-visible:ring-ring/20 disabled:pointer-events-none disabled:opacity-70 data-popup-open:shadow-[inset_0_0_0_1px_var(--primary)] data-popup-open:ring-[3px] data-popup-open:ring-ring/20"
+          />
+        }
+      >
+        <Clock aria-hidden size={15} className="text-muted-foreground" />
+        <Chega texto={valor} />
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-[168px] p-1">
+        <div ref={lista} role="listbox" aria-label={rotulo} className="flex max-h-60 flex-col overflow-y-auto">
+          {horas.map((h) => {
+            const on = h === valor
+            const dur = desde ? minutosDoDia(h) - minutosDoDia(desde) : 0
+            return (
+              <button
+                key={h}
+                type="button"
+                role="option"
+                aria-selected={on}
+                data-escolhida={on ? "" : undefined}
+                onClick={() => {
+                  mudar(h)
+                  setAberto(false)
+                }}
+                className={`flex h-8 shrink-0 items-center justify-between rounded-[7px] px-2.5 text-[13px] tabular-nums ${on ? "bg-primary-subtle font-medium text-primary-subtle-foreground" : "text-foreground hover:bg-secondary"}`}
+              >
+                {h}
+                {desde ? <span className={`text-[12px] ${on ? "" : "text-muted-foreground"}`}>{rotuloDuracao(dur)}</span> : null}
+              </button>
+            )
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 /** Uma linha do modal do evento: o ícone à esquerda, sempre na mesma coluna, e o campo. */
@@ -1305,19 +1365,18 @@ function ModalEvento({ evento, fechar, f, avisar }: { evento: Evento | null; fec
             <LinhaModal icone={<Clock size={17} />} alinhar="start">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-wrap items-center gap-1.5">
-                  <Input type="date" disabled={convidado} value={data} onChange={(e) => setData(e.target.value)} aria-label="Dia" className={`w-[148px] ${campoSutil}`} />
                   <AnimatePresence initial={false} mode="popLayout">
                     {inteiro ? (
-                      <motion.span key="ate" initial={{ opacity: 0, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(6px)" }} transition={{ duration: 0.3, ease: CURVA }} className="flex items-center gap-1.5">
-                        <span className="text-[13px] text-muted-foreground">até</span>
-                        <Input type="date" disabled={convidado} value={dataFim < data ? data : dataFim} min={data} onChange={(e) => setDataFim(e.target.value)} aria-label="Último dia" className={`w-[148px] ${campoSutil}`} />
+                      <motion.span key="periodo" initial={{ opacity: 0, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(6px)" }} transition={{ duration: 0.3, ease: CURVA }}>
+                        {/* dia inteiro: o período num campo só, de um dia até o outro */}
+                        <DateRangePicker size="lg" disabled={convidado} value={{ from: data, to: dataFim < data ? data : dataFim }} onValueChange={(v) => (setData(v.from || data), setDataFim(v.to || v.from || data))} className="w-[260px]" />
                       </motion.span>
                     ) : (
-                      <motion.span key="horas" initial={{ opacity: 0, filter: "blur(6px)", width: 0 }} animate={{ opacity: 1, filter: "blur(0px)", width: "auto" }} exit={{ opacity: 0, filter: "blur(6px)", width: 0 }} transition={{ duration: 0.3, ease: CURVA }} className="flex items-center gap-1.5 overflow-hidden">
-                        <Input type="time" disabled={convidado} value={ini} onChange={(e) => setIni(e.target.value)} aria-label="Começa" className={`w-[96px] ${campoSutil}`} />
-                        <span className="text-[13px] whitespace-nowrap text-muted-foreground">
-                          até <Chega texto={fim} className="text-foreground tabular-nums" />
-                        </span>
+                      <motion.span key="horas" initial={{ opacity: 0, filter: "blur(6px)" }} animate={{ opacity: 1, filter: "blur(0px)" }} exit={{ opacity: 0, filter: "blur(6px)" }} transition={{ duration: 0.3, ease: CURVA }} className="flex flex-wrap items-center gap-1.5">
+                        <DatePicker size="lg" disabled={convidado} value={data} onValueChange={(v) => v && setData(v)} className="w-[150px]" />
+                        <HoraPicker rotulo="Começa" disabled={convidado} valor={ini} mudar={setIni} />
+                        <span className="text-muted-foreground">–</span>
+                        <HoraPicker rotulo="Termina" disabled={convidado} valor={fim} desde={ini} mudar={(h) => setDuracao(minutosDoDia(h) - minutosDoDia(ini))} />
                       </motion.span>
                     )}
                   </AnimatePresence>
