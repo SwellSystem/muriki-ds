@@ -21,6 +21,10 @@
   --ds-osso: oklch(0.45 0.035 85 / 0.1);
   --ds-osso-brilho: oklch(1 0 0 / 0.6);
   --ds-osso-azul: oklch(0.47 0.185 262.6 / 0.14);
+  /* o sidebar: mais claro que o conteúdo, quase branco, para a moldura recuar e o trabalho ficar na frente */
+  --lateral: oklch(0.997 0.002 90);
+  /* quanto da cor da conta o card do evento leva */
+  --veu: 9%;
 }
 .dark {
   --ds-chao: oklch(0.15 0.006 107);
@@ -42,4 +46,6 @@
   --ds-osso: oklch(1 0 0 / 0.07);
   --ds-osso-brilho: oklch(1 0 0 / 0.12);
   --ds-osso-azul: oklch(0.7 0.145 262.6 / 0.22);
+  --lateral: var(--card);
+  --veu: 18%;
 }
