@@ -480,6 +480,54 @@
       "docs": "Base UI: o valor é do tipo que você passar, não a string que o <select> nativo obriga. Passe `items` (um mapa valor→rótulo) no Select: a lista vive num portal que só monta ao abrir, então sem esse mapa o gatilho mostra o valor cru antes da primeira abertura."
     },
     {
+      "name": "people-picker",
+      "type": "registry:ui",
+      "title": "People Picker",
+      "description": "Quem é o responsável, um ou vários. O gatilho é o avatar (fantasma, cabe na célula da tabela); sem responsável é um círculo tracejado. Busca no nome e no e-mail, \"Você\" primeiro com `me`, \"+N\" depois de `maxAvatars`, `showName` para o painel da tarefa.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/avatar"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/people-picker.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Combobox do Base UI com a busca dentro do painel. `value` é um id (ou null) ou, com `multiple`, uma lista de ids; `onChange` devolve no mesmo formato. No modo de vários, marcar não fecha nem limpa a busca. Textos por i18n (people_picker.*)."
+    },
+    {
+      "name": "label-picker",
+      "type": "registry:ui",
+      "title": "Label Picker",
+      "description": "Etiquetas com cor: o gatilho mostra as escolhidas como badges com ponto (até `maxTags`, depois \"+N\"). Com `onCreate`, o que se digita e não existe vira \"Criar etiqueta “x”\". Cor de etiqueta é só identificação, não prioridade.",
+      "dependencies": [
+        "@base-ui/react",
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/badge"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/label-picker.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Combobox do Base UI, múltiplo, com a busca dentro do painel. `labels` traz { id, name, tone? } com os tons do Badge; `value` é a lista de ids. O picker não cria cor nem id: `onCreate(nome)` avisa, quem usa cria e devolve em `labels` e `value`. Textos por i18n (label_picker.*)."
+    },
+    {
       "name": "tooltip",
       "type": "registry:ui",
       "title": "Tooltip",
