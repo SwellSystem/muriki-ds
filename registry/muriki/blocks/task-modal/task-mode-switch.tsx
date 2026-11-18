@@ -8,6 +8,9 @@
 // É o caso legítimo de ícone sem rótulo no ViewToggle: são três opções, e
 // três nunca é confundido com um switch. O `ariaLabel` de cada uma continua
 // obrigatório, pela mesma regra do RowActions.
+//
+// A ordem vai do menor para o maior (painel lateral, modal central, tela
+// cheia), como no seletor do Peek aprovado: a fileira lê como um zoom.
 import { CardsThree, FrameCorners, SidebarSimple } from "@phosphor-icons/react"
 
 import { ViewToggle } from "@/components/ui/view-toggle"
@@ -36,14 +39,14 @@ export function TaskModeSwitch({
       className={className}
       options={[
         {
-          value: "central",
-          ariaLabel: t("task_modal.mode.central"),
-          icon: <CardsThree aria-hidden weight="bold" />,
-        },
-        {
           value: "drawer",
           ariaLabel: t("task_modal.mode.drawer"),
           icon: <SidebarSimple aria-hidden weight="bold" />,
+        },
+        {
+          value: "central",
+          ariaLabel: t("task_modal.mode.central"),
+          icon: <CardsThree aria-hidden weight="bold" />,
         },
         {
           value: "full",

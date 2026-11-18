@@ -53,24 +53,53 @@ const PRIORITY_ORDER: TaskModalPriority[] = [
 ]
 
 const cellClass =
-  "inline-flex min-h-[26px] max-w-full items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+  "inline-flex min-h-[26px] max-w-full min-w-0 items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+
+// O valor cabe na coluna, não importa o tamanho do nome: no trilho estreito
+// um status longo ou "Guilherme Teodoro dos Santos" encolhem com reticências
+// em vez de passar da borda. O Badge é `inline-flex` (texto solto não ganha
+// reticências), então aqui ele vira bloco e o ponto vira `inline-block`.
+const truncatedBadgeClass =
+  "block min-w-0 max-w-full shrink truncate leading-[22px] [&>span:first-child]:mr-1.5 [&>span:first-child]:mb-px [&>span:first-child]:inline-block [&>span:first-child]:align-middle"
 
 const ghostTriggerClass = cn(
   cellClass,
   "h-auto w-fit border-transparent bg-transparent shadow-none data-[placeholder]:text-muted-foreground/70"
 )
 
+// Nas pílulas o controle é o MESMO da lista; muda só a roupa: cápsula com
+// filete, sem a coluna de rótulo. Por isso é uma classe a mais por cima da
+// célula, e não um segundo conjunto de controles que poderia divergir.
+const pillClass =
+  "min-h-7 rounded-full border-border px-2.5 hover:bg-secondary/70"
+
+/** As linhas da lista, na ordem em que aparecem. */
+export type TaskModalPropertyField =
+  | "status"
+  | "priority"
+  | "assignees"
+  | "start"
+  | "due"
+  | "project"
+  | "tags"
+  | "points"
+
 function PropRow({
   icon,
   label,
+  pill = false,
   children,
 }: {
   icon: ReactNode
   label: string
+  pill?: boolean
   children: ReactNode
 }) {
+  if (pill) {
+    return <div className="flex min-w-0 flex-col gap-0.5">{children}</div>
+  }
   return (
-    <div className="grid min-h-[30px] grid-cols-[128px_1fr] items-start gap-2 rounded-sm transition-colors hover:bg-secondary/60 md:grid-cols-[148px_1fr]">
+    <div className="grid min-h-[30px] grid-cols-[112px_minmax(0,1fr)] items-start gap-2 rounded-sm transition-colors hover:bg-secondary/60">
       <div className="flex h-[30px] items-center gap-2 pl-1.5 text-[12.5px] font-medium text-muted-foreground select-none">
         <span className="flex w-[17px] shrink-0 justify-center text-muted-foreground">
           {icon}
@@ -96,6 +125,14 @@ export interface TaskModalPropertyListProps {
   requirePriority?: boolean
   requireDueDate?: boolean
   dueDateError?: string | null
+  /**
+   * `list` (padrão) é a lista com rótulo à esquerda. `pills` é a fileira de
+   * cápsulas logo abaixo do título: o que muda toda hora, à mão. As duas leem
+   * e escrevem o mesmo `value`, então mudar numa muda na outra.
+   */
+  variant?: "list" | "pills"
+  /** Quais linhas mostrar. Padrão: todas (as opcionais seguem as opções). */
+  fields?: TaskModalPropertyField[]
 }
 
 /**
@@ -116,8 +153,17 @@ export function TaskModalPropertyList({
   requirePriority = false,
   requireDueDate = false,
   dueDateError = null,
+  variant = "list",
+  fields,
 }: TaskModalPropertyListProps) {
   const t = useTranslate()
+  const pill = variant === "pills"
+  const show = (field: TaskModalPropertyField) =>
+    fields === undefined || fields.includes(field)
+  const cell = pill ? cn(cellClass, pillClass) : cellClass
+  const ghostTrigger = pill
+    ? cn(ghostTriggerClass, pillClass)
+    : ghostTriggerClass
 
   const currentStatus = statuses.find((status) => status.id === value.statusId)
   const selectedPeople = (people ?? []).filter((person) =>
@@ -143,141 +189,158 @@ export function TaskModalPropertyList({
 
   return (
     <div
-      className="flex flex-col gap-0.5 px-5 py-2"
-      data-testid="task-modal-properties"
+      className={
+        pill
+          ? "flex flex-wrap items-start gap-1.5 px-5 py-1"
+          : "flex flex-col gap-0.5 px-5 py-2"
+      }
+      data-testid={pill ? "task-modal-pills" : "task-modal-properties"}
     >
       {/* Status */}
-      <PropRow
-        icon={<CircleHalf size={15} />}
-        label={t("task_modal.props.status")}
-      >
-        <Select
-          value={value.statusId.length === 0 ? null : value.statusId}
-          onValueChange={(next) => onChange({ statusId: next ?? "" })}
+      {show("status") && (
+        <PropRow
+          pill={pill}
+          icon={<CircleHalf size={15} />}
+          label={t("task_modal.props.status")}
         >
-          <SelectTrigger
-            className={cn(
-              ghostTriggerClass,
-              requireStatus &&
-                value.statusId.length === 0 &&
-                "border-destructive/50 bg-destructive/5"
-            )}
-            aria-label={t("task_modal.props.status")}
-            aria-invalid={
-              requireStatus && value.statusId.length === 0 ? true : undefined
-            }
-            aria-errormessage={
-              requireStatus && value.statusId.length === 0
-                ? "task-modal-status-error"
-                : undefined
-            }
+          <Select
+            value={value.statusId.length === 0 ? null : value.statusId}
+            onValueChange={(next) => onChange({ statusId: next ?? "" })}
           >
-            <span className="inline-flex items-center gap-1.5">
-              {currentStatus ? (
-                <StatusPill
-                  status={currentStatus.kind}
-                  label={currentStatus.name}
-                />
-              ) : (
-                <span className="text-muted-foreground/70">
-                  {t("task_modal.props.empty")}
-                </span>
+            <SelectTrigger
+              className={cn(
+                ghostTrigger,
+                requireStatus &&
+                  value.statusId.length === 0 &&
+                  "border-destructive/50 bg-destructive/5"
               )}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            {statuses.map((status) => (
-              <SelectItem key={status.id} value={status.id}>
-                <StatusPill status={status.kind} label={status.name} />
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {requireStatus && value.statusId.length === 0 && (
-          <p
-            id="task-modal-status-error"
-            role="alert"
-            className="mt-1 text-xs text-destructive"
-          >
-            {t("task_modal.props.status_required")}
-          </p>
-        )}
-      </PropRow>
+              aria-label={t("task_modal.props.status")}
+              aria-invalid={
+                requireStatus && value.statusId.length === 0 ? true : undefined
+              }
+              aria-errormessage={
+                requireStatus && value.statusId.length === 0
+                  ? "task-modal-status-error"
+                  : undefined
+              }
+            >
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                {currentStatus ? (
+                  <StatusPill
+                    status={currentStatus.kind}
+                    label={currentStatus.name}
+                    className={truncatedBadgeClass}
+                  />
+                ) : (
+                  <span className="text-muted-foreground/70">
+                    {pill
+                      ? t("task_modal.props.status")
+                      : t("task_modal.props.empty")}
+                  </span>
+                )}
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              {statuses.map((status) => (
+                <SelectItem key={status.id} value={status.id}>
+                  <StatusPill status={status.kind} label={status.name} />
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {/* A pílula só marca (aria-invalid); quem explica é a lista. */}
+          {!pill && requireStatus && value.statusId.length === 0 && (
+            <p
+              id="task-modal-status-error"
+              role="alert"
+              className="mt-1 text-xs text-destructive"
+            >
+              {t("task_modal.props.status_required")}
+            </p>
+          )}
+        </PropRow>
+      )}
 
       {/* Priority */}
-      <PropRow
-        icon={<CellSignalFull size={15} />}
-        label={t("task_modal.props.priority")}
-      >
-        <Select
-          value={value.priority}
-          onValueChange={(next) =>
-            onChange({ priority: next as TaskModalPriority })
-          }
+      {show("priority") && (
+        <PropRow
+          pill={pill}
+          icon={<CellSignalFull size={15} />}
+          label={t("task_modal.props.priority")}
         >
-          <SelectTrigger
-            className={cn(
-              ghostTriggerClass,
-              requirePriority &&
-                value.priority === "none" &&
-                "border-destructive/50 bg-destructive/5"
-            )}
-            aria-label={t("task_modal.props.priority")}
-            aria-invalid={
-              requirePriority && value.priority === "none" ? true : undefined
+          <Select
+            value={value.priority}
+            onValueChange={(next) =>
+              onChange({ priority: next as TaskModalPriority })
             }
           >
-            <span className="inline-flex items-center gap-1.5">
-              {value.priority === "none" ? (
-                <span className="text-muted-foreground/70">
-                  {t("task_modal.priority.none")}
-                </span>
-              ) : (
-                <PriorityFlag
-                  level={value.priority as PriorityLevel}
-                  label={t(`priority_flag.${value.priority}`)}
-                />
+            <SelectTrigger
+              className={cn(
+                ghostTrigger,
+                requirePriority &&
+                  value.priority === "none" &&
+                  "border-destructive/50 bg-destructive/5"
               )}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            {PRIORITY_ORDER.map((level) => (
-              <SelectItem key={level} value={level}>
-                {level === "none" ? (
-                  <span className="text-muted-foreground">
+              aria-label={t("task_modal.props.priority")}
+              aria-invalid={
+                requirePriority && value.priority === "none" ? true : undefined
+              }
+            >
+              <span className="inline-flex min-w-0 items-center gap-1.5">
+                {value.priority === "none" ? (
+                  <span className="text-muted-foreground/70">
                     {t("task_modal.priority.none")}
                   </span>
                 ) : (
                   <PriorityFlag
-                    level={level as PriorityLevel}
-                    label={t(`priority_flag.${level}`)}
+                    level={value.priority as PriorityLevel}
+                    label={t(`priority_flag.${value.priority}`)}
                   />
                 )}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </PropRow>
+              </span>
+            </SelectTrigger>
+            <SelectContent>
+              {PRIORITY_ORDER.map((level) => (
+                <SelectItem key={level} value={level}>
+                  {level === "none" ? (
+                    <span className="text-muted-foreground">
+                      {t("task_modal.priority.none")}
+                    </span>
+                  ) : (
+                    <PriorityFlag
+                      level={level as PriorityLevel}
+                      label={t(`priority_flag.${level}`)}
+                    />
+                  )}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </PropRow>
+      )}
 
       {/* Assignees */}
-      {people !== undefined && (
+      {people !== undefined && show("assignees") && (
         <PropRow
+          pill={pill}
           icon={<User size={15} />}
           label={t("task_modal.props.assignees")}
         >
           <Popover>
             <PopoverTrigger
-              className={cn(cellClass, "cursor-pointer")}
+              className={cn(cell, "cursor-pointer")}
               aria-label={t("task_modal.props.assignees")}
             >
               {selectedPeople.length === 0 ? (
                 <span className="inline-flex items-center gap-1 text-muted-foreground/70">
                   <Plus size={14} aria-hidden />
-                  {t("task_modal.props.empty")}
+                  {pill
+                    ? t("task_modal.props.assignees")
+                    : t("task_modal.props.empty")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5">
-                  <span className="flex items-center">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className="flex shrink-0 items-center">
                     {selectedPeople.slice(0, 4).map((person) => (
                       <Avatar
                         key={person.id}
@@ -330,77 +393,84 @@ export function TaskModalPropertyList({
       )}
 
       {/* Start date */}
-      <PropRow
-        icon={<CalendarCheck size={15} />}
-        label={t("task_modal.props.start")}
-      >
-        <input
-          type="date"
-          value={value.startDate ?? ""}
-          onChange={(event) =>
-            onChange({
-              startDate:
-                event.currentTarget.value.length === 0
-                  ? null
-                  : event.currentTarget.value,
-            })
-          }
-          aria-label={t("task_modal.props.start")}
-          className={cn(cellClass, "cursor-pointer font-mono text-[12px]")}
-        />
-      </PropRow>
-
-      {/* Due date */}
-      <PropRow
-        icon={<CalendarBlank size={15} />}
-        label={t("task_modal.props.due")}
-      >
-        <div className="flex min-w-0 flex-col gap-0.5">
+      {show("start") && (
+        <PropRow
+          pill={pill}
+          icon={<CalendarCheck size={15} />}
+          label={t("task_modal.props.start")}
+        >
           <input
             type="date"
-            value={value.dueDate ?? ""}
+            value={value.startDate ?? ""}
             onChange={(event) =>
               onChange({
-                dueDate:
+                startDate:
                   event.currentTarget.value.length === 0
                     ? null
                     : event.currentTarget.value,
               })
             }
-            aria-label={t("task_modal.props.due")}
-            aria-invalid={
-              (requireDueDate && value.dueDate === null) ||
-              dueDateError !== null
-                ? true
-                : undefined
-            }
-            aria-describedby={
-              dueDateError !== null ? "due-date-error" : undefined
-            }
-            required={requireDueDate}
-            className={cn(
-              cellClass,
-              "cursor-pointer font-mono text-[12px]",
-              ((requireDueDate && value.dueDate === null) ||
-                dueDateError !== null) &&
-                "border-destructive/50 bg-destructive/5"
-            )}
+            aria-label={t("task_modal.props.start")}
+            className={cn(cell, "cursor-pointer font-mono text-[12px]")}
           />
-          {dueDateError !== null && (
-            <span
-              id="due-date-error"
-              role="alert"
-              className="pl-2 text-[11px] text-destructive"
-            >
-              {dueDateError}
-            </span>
-          )}
-        </div>
-      </PropRow>
+        </PropRow>
+      )}
+
+      {/* Due date */}
+      {show("due") && (
+        <PropRow
+          pill={pill}
+          icon={<CalendarBlank size={15} />}
+          label={t("task_modal.props.due")}
+        >
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <input
+              type="date"
+              value={value.dueDate ?? ""}
+              onChange={(event) =>
+                onChange({
+                  dueDate:
+                    event.currentTarget.value.length === 0
+                      ? null
+                      : event.currentTarget.value,
+                })
+              }
+              aria-label={t("task_modal.props.due")}
+              aria-invalid={
+                (requireDueDate && value.dueDate === null) ||
+                dueDateError !== null
+                  ? true
+                  : undefined
+              }
+              aria-describedby={
+                !pill && dueDateError !== null ? "due-date-error" : undefined
+              }
+              required={requireDueDate}
+              className={cn(
+                cell,
+                "cursor-pointer font-mono text-[12px]",
+                ((requireDueDate && value.dueDate === null) ||
+                  dueDateError !== null) &&
+                  "border-destructive/50 bg-destructive/5"
+              )}
+            />
+            {!pill && dueDateError !== null && (
+              <span
+                id="due-date-error"
+                role="alert"
+                className="pl-2 text-[11px] text-destructive"
+              >
+                {dueDateError}
+              </span>
+            )}
+          </div>
+        </PropRow>
+      )}
 
       {/* Project (optional) */}
-      {projects !== undefined && (
+      {projects !== undefined && show("project") && (
         <PropRow
+          pill={pill}
           icon={<Stack size={15} />}
           label={t("task_modal.props.project")}
         >
@@ -412,7 +482,7 @@ export function TaskModalPropertyList({
           >
             <SelectTrigger
               size="sm"
-              className={ghostTriggerClass}
+              className={ghostTrigger}
               aria-label={t("task_modal.props.project")}
             >
               {value.projectId === null ? (
@@ -420,7 +490,7 @@ export function TaskModalPropertyList({
                   {t("task_modal.props.choose_project")}
                 </span>
               ) : (
-                <span>
+                <span className="truncate">
                   {projects.find((project) => project.id === value.projectId)
                     ?.name ?? value.projectId}
                 </span>
@@ -444,14 +514,15 @@ export function TaskModalPropertyList({
       )}
 
       {/* Tags (optional) */}
-      {tags !== undefined && (
+      {tags !== undefined && show("tags") && (
         <PropRow
+          pill={pill}
           icon={<TagIcon size={15} />}
           label={t("task_modal.props.tags")}
         >
           <Popover>
             <PopoverTrigger
-              className={cn(cellClass, "cursor-pointer")}
+              className={cn(cell, "cursor-pointer")}
               aria-label={t("task_modal.props.tags")}
             >
               {selectedTags.length === 0 ? (
@@ -511,8 +582,9 @@ export function TaskModalPropertyList({
       )}
 
       {/* Estimate / points (optional) */}
-      {showPoints && (
+      {showPoints && show("points") && (
         <PropRow
+          pill={pill}
           icon={<ChartBar size={15} />}
           label={t("task_modal.props.points")}
         >
@@ -524,7 +596,7 @@ export function TaskModalPropertyList({
           >
             <SelectTrigger
               size="sm"
-              className={ghostTriggerClass}
+              className={ghostTrigger}
               aria-label={t("task_modal.props.points")}
             >
               {value.points === null ? (

@@ -8,6 +8,11 @@
 // controlado: recebe `value`/`onChange` e dispara `onSubmit`. Reutilizável por
 // focus e projects — cada módulo passa as opções (statuses, pessoas, projetos,
 // tags) que possui e liga o submit ao seu data layer.
+//
+// O corpo segue a direção D aprovada no protótipo da tarefa (pílulas abaixo
+// do título + trilho de propriedades ao lado, decidido pelo espaço). O seletor
+// de modo vai do painel ao modal e à tela cheia; só o modal central desfoca o
+// fundo (classe `muriki-task-modal-central`, CSS no item do registry).
 import { CaretRight, Plus } from "@phosphor-icons/react"
 import { useState, type KeyboardEvent, type ReactNode } from "react"
 
@@ -27,12 +32,16 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { useTranslate } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 
 import { TaskModalAttachments } from "./task-modal-attachments"
 import { TaskModalDescription } from "./task-modal-description"
-import { TaskModalPropertyList } from "./task-modal-property-list"
+import {
+  TaskModalPropertyList,
+  type TaskModalPropertyField,
+} from "./task-modal-property-list"
 import { TaskModalSubtasks } from "./task-modal-subtasks"
-import { TaskModalTitle } from "./task-modal-title"
+import { TaskModalTitle, type TaskTitleSize } from "./task-modal-title"
 import type {
   TaskDraft,
   TaskModalMode,
@@ -42,6 +51,20 @@ import type {
   TaskModalTagOption,
 } from "./task-modal-types"
 import { TaskModeSwitch } from "./task-mode-switch"
+
+// O que muda toda hora vai nas pílulas; o resto, na lista curta do estreito.
+const PILL_FIELDS: TaskModalPropertyField[] = [
+  "status",
+  "priority",
+  "assignees",
+  "due",
+]
+const SHORT_FIELDS: TaskModalPropertyField[] = [
+  "start",
+  "project",
+  "tags",
+  "points",
+]
 
 export interface TaskModalSubmitOptions {
   /** `true` quando o usuário marcou "Criar mais" — consumidor mantém aberto. */
@@ -112,6 +135,7 @@ export function TaskModal({
 }: TaskModalProps) {
   const t = useTranslate()
   const [createMore, setCreateMore] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
 
   const canSubmit =
     value.title.trim().length > 0 &&
@@ -133,7 +157,12 @@ export function TaskModal({
   }
 
   const header = (
-    <div className="flex items-center gap-2 px-5 py-2.5 pr-12 shadow-[inset_0_-1px_0_var(--border)]">
+    <div
+      className={cn(
+        "relative z-10 flex items-center gap-2 px-5 py-2.5 pr-12 transition-shadow duration-200",
+        scrolled && "shadow-[0_1px_0_var(--border)]"
+      )}
+    >
       <div className="flex min-w-0 flex-1 items-center gap-1.5 text-xs font-medium text-muted-foreground">
         <Badge tone="blue" className="font-mono">
           {contextLabel ?? t("task_modal.context_default")}
@@ -175,110 +204,92 @@ export function TaskModal({
     </div>
   )
 
-  const sections = (titleSize: "mid" | "big" | "huge") => (
-    <>
-      <TaskModalTitle
-        value={value.title}
-        onChange={(next) => onChange({ title: next })}
-        slug={slug}
-        size={titleSize}
-      />
-      <TaskModalPropertyList
-        value={value}
-        onChange={onChange}
-        statuses={statuses}
-        people={people}
-        projects={projects}
-        tags={tags}
-        showPoints={showPoints}
-        requireStatus={requireStatus}
-        requirePriority={requirePriority}
-        requireDueDate={requireDueDate}
-        dueDateError={dueDateError}
-      />
-      <TaskModalDescription
-        value={value.description}
-        onChange={(next) => onChange({ description: next })}
-      />
-      {showSubtasks && (
-        <TaskModalSubtasks
-          subtasks={value.subtasks}
-          onChange={(next) => onChange({ subtasks: next })}
-        />
-      )}
-      {showAttachments && (
-        <TaskModalAttachments
-          attachments={value.attachments}
-          onRemove={(id) =>
-            onChange({
-              attachments: value.attachments.filter(
-                (attachment) => attachment.id !== id
-              ),
-            })
-          }
-        />
-      )}
-    </>
-  )
+  // ── corpo (direção D aprovada em prototipos/tarefa-v2) ──────────────────
+  // Um corpo só para os três modos; quem decide o desenho é o ESPAÇO, por
+  // container query, e não o modo: a partir de 760px de corpo aparece o
+  // trilho com todas as propriedades (modal central e tela cheia); mais
+  // estreito (painel), o trilho some e vira uma lista curta abaixo das
+  // pílulas, só com o que as pílulas não têm.
+  //
+  // As pílulas (status, prioridade, responsáveis, prazo) repetem o trilho de
+  // propósito: o que muda toda hora fica à mão, logo abaixo do título. É o
+  // mesmo `value`, então mudar num lugar muda no outro.
+  //
+  // Cada coluna rola sozinha; a moldura fica parada. O cabeçalho ganha o
+  // filete só quando a coluna principal saiu do topo.
+  const propertyProps = {
+    value,
+    onChange,
+    statuses,
+    people,
+    projects,
+    tags,
+    showPoints,
+    requireStatus,
+    requirePriority,
+    requireDueDate,
+    dueDateError,
+  }
 
-  // ── stacked body (central / drawer) ──────────────────────────────────────
-  const stackedBody = (titleSize: "mid" | "big") => (
-    <div className="muriki-scroll flex min-h-0 flex-1 flex-col overflow-y-auto">
-      {sections(titleSize)}
-    </div>
-  )
-
-  // ── fullscreen body (Notion page: main + side properties) ─────────────────
-  const fullscreenBody = (
-    <div className="grid min-h-0 flex-1 grid-cols-1 md:grid-cols-[1fr_312px]">
-      <div className="muriki-scroll min-h-0 overflow-y-auto pb-10">
-        <TaskModalTitle
-          value={value.title}
-          onChange={(next) => onChange({ title: next })}
-          slug={slug}
-          size="huge"
-        />
-        <TaskModalDescription
-          value={value.description}
-          onChange={(next) => onChange({ description: next })}
-        />
-        {showSubtasks && (
-          <TaskModalSubtasks
-            subtasks={value.subtasks}
-            onChange={(next) => onChange({ subtasks: next })}
-          />
-        )}
-        {showAttachments && (
-          <TaskModalAttachments
-            attachments={value.attachments}
-            onRemove={(id) =>
-              onChange({
-                attachments: value.attachments.filter(
-                  (attachment) => attachment.id !== id
-                ),
-              })
-            }
-          />
-        )}
+  const body = (titleSize: TaskTitleSize) => (
+    <div className="@container/task flex min-h-0 flex-1 flex-col">
+      <div className="grid min-h-0 flex-1 grid-cols-1 @min-[760px]/task:grid-cols-[minmax(0,1fr)_clamp(280px,30%,330px)]">
+        <div
+          className="muriki-scroll min-h-0 overflow-x-hidden overflow-y-auto pb-6"
+          onScroll={(event) => setScrolled(event.currentTarget.scrollTop > 0)}
+        >
+          <div className="mx-auto w-full max-w-[760px]">
+            <TaskModalTitle
+              value={value.title}
+              onChange={(next) => onChange({ title: next })}
+              slug={slug}
+              size={titleSize}
+            />
+            <TaskModalPropertyList
+              {...propertyProps}
+              variant="pills"
+              fields={PILL_FIELDS}
+            />
+            <div className="@min-[760px]/task:hidden">
+              <TaskModalPropertyList
+                {...propertyProps}
+                fields={SHORT_FIELDS}
+              />
+            </div>
+            <TaskModalDescription
+              value={value.description}
+              onChange={(next) => onChange({ description: next })}
+            />
+            {showSubtasks && (
+              <TaskModalSubtasks
+                subtasks={value.subtasks}
+                onChange={(next) => onChange({ subtasks: next })}
+              />
+            )}
+            {showAttachments && (
+              <TaskModalAttachments
+                attachments={value.attachments}
+                onRemove={(id) =>
+                  onChange({
+                    attachments: value.attachments.filter(
+                      (attachment) => attachment.id !== id
+                    ),
+                  })
+                }
+              />
+            )}
+          </div>
+        </div>
+        <aside
+          aria-label={t("task_modal.properties")}
+          className="muriki-scroll hidden min-h-0 overflow-y-auto bg-sunken/60 shadow-[inset_1px_0_0_var(--border)] @min-[760px]/task:block"
+        >
+          <p className="px-5 pt-4 pb-1 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase">
+            {t("task_modal.properties")}
+          </p>
+          <TaskModalPropertyList {...propertyProps} />
+        </aside>
       </div>
-      <aside className="muriki-scroll min-h-0 overflow-y-auto bg-sunken/60 shadow-[inset_0_1px_0_var(--border)] md:shadow-[inset_1px_0_0_var(--border)]">
-        <p className="px-5 pt-4 pb-1 font-mono text-[10.5px] font-semibold tracking-widest text-muted-foreground uppercase">
-          {t("task_modal.properties")}
-        </p>
-        <TaskModalPropertyList
-          value={value}
-          onChange={onChange}
-          statuses={statuses}
-          people={people}
-          projects={projects}
-          tags={tags}
-          showPoints={showPoints}
-          requireStatus={requireStatus}
-          requirePriority={requirePriority}
-          requireDueDate={requireDueDate}
-          dueDateError={dueDateError}
-        />
-      </aside>
     </div>
   )
 
@@ -301,7 +312,7 @@ export function TaskModal({
           </SheetDescription>
           <ModalShell onKeyDown={handleKeyDown}>
             {header}
-            {stackedBody("mid")}
+            {body("mid")}
             {footer}
           </ModalShell>
         </SheetContent>
@@ -316,7 +327,11 @@ export function TaskModal({
       <DialogContent
         anatomy="framed"
         fullscreen={isFull}
-        className={isFull ? undefined : "max-h-[86vh] sm:max-w-[600px]"}
+        className={
+          isFull
+            ? undefined
+            : "muriki-task-modal-central max-h-[86vh] sm:max-w-[min(980px,calc(100vw-2rem))]"
+        }
         data-testid={isFull ? "task-modal-full" : "task-modal-central"}
       >
         <DialogTitle className="sr-only">{a11yTitle}</DialogTitle>
@@ -325,7 +340,7 @@ export function TaskModal({
         </DialogDescription>
         <ModalShell onKeyDown={handleKeyDown}>
           {header}
-          {isFull ? fullscreenBody : stackedBody("big")}
+          {body(isFull ? "huge" : "big")}
           {footer}
         </ModalShell>
       </DialogContent>
