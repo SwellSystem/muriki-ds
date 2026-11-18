@@ -128,6 +128,13 @@ const body = `
       rotulado('errado — rail quase branco', planos('oklch(0.998 0.002 85)', 'oklch(0.968 0.009 93)', false, 'rail 0,998 — acima do cartão')) +
       rotulado('certo — claro, rail entre os dois', planos(RAIL_CLARO, 'oklch(0.968 0.009 93)', false, 'rail 0,984 · página 0,968')) +
       rotulado('certo — escuro, rail abaixo', planos(RAIL_ESCURO, 'oklch(0.175 0.004 107)', true, 'rail 0,152 · página 0,175')))}
+
+    ${regra('07', 'Desafixado, o rail também recolhe',
+      'Desafixado, o rail some e volta por cima do conteúdo quando o mouse encosta na borda. Ele volta na largura em que estava: o mesmo botão de recolher (e o ⌘B) serve encostado e solto, porque largura é um eixo só. Recolher solto deixa o cartão só com os ícones, com o nome no tooltip, e continua valendo quando você fixar de novo.',
+      rotulado('claro — solto, aberto', tela({ raio: '8px', margem: 8, solto: true })) +
+      rotulado('claro — solto, em ícones', tela({ largura: 46, rotulos: false, raio: '8px', margem: 8, solto: true })) +
+      rotulado('escuro — solto, aberto', tela({ escuro: true, raio: '8px', margem: 8, solto: true })) +
+      rotulado('escuro — solto, em ícones', tela({ escuro: true, largura: 46, rotulos: false, raio: '8px', margem: 8, solto: true })))}
   </div>
 </div>`;
 
