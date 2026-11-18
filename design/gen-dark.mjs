@@ -150,6 +150,32 @@ const login = `
   </div>
 </div>`;
 
+const avisos = `
+<div style="display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;align-items:start;">
+  ${grp('alert · o tom claro vira o abafado do escuro, a tinta sobe', `<div style="width:100%;display:flex;flex-direction:column;gap:10px;">${[
+    ['oklch(0.25 0.005 107)', 'oklch(0.925 0.004 100)', 'oklch(0.70 0.006 100)', 'Contrato dessincronizado', 'O spec da API mudou. Rode o sync antes de mexer na tela.'],
+    ['oklch(0.29 0.055 150)', 'oklch(0.85 0.075 150)', 'oklch(0.85 0.075 150)', 'Tudo sincronizado', 'O client foi regenerado há 2 minutos.'],
+    ['oklch(0.3 0.055 88)', 'oklch(0.87 0.09 90)', 'oklch(0.87 0.09 90)', 'Tarefa bloqueada há 3 dias', 'Ninguém foi notificado do bloqueio ainda.'],
+    ['oklch(0.29 0.06 27)', 'oklch(0.85 0.08 27)', 'oklch(0.85 0.08 27)', 'Falha ao salvar', 'A conexão caiu. Suas alterações estão guardadas localmente.'],
+  ].map(([bg, fg, ic, t, b], i) => `<div style="background:${bg};color:${fg};border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;"><span style="display:flex;height:20px;align-items:center;flex-shrink:0;color:${ic};"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${[
+      '<circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.6v.1" stroke="BG" stroke-width="2.2" stroke-linecap="round"/>',
+      '<circle cx="12" cy="12" r="10"/><path d="m8 12.3 2.7 2.7L16 9.6" fill="none" stroke="BG" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
+      '<path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/><path d="M12 9v4.5M12 16.8v.1" stroke="BG" stroke-width="2.2" stroke-linecap="round"/>',
+      '<circle cx="12" cy="12" r="10"/><path d="M12 7.5v5.5M12 16.4v.1" stroke="BG" stroke-width="2.2" stroke-linecap="round"/>',
+    ][i].replaceAll('BG', bg)}</svg></span><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:600;line-height:20px;">${t}</span><span style="font-size:13px;line-height:19px;opacity:0.85;">${b}</span></div></div>`).join('')}</div>`)}
+  ${grp('card · sem borda, o papel sobe de luz', `
+  <div style="width:100%;background:${D.surface};border-radius:14px;overflow:hidden;">
+    <div style="padding:20px 20px 0;display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:600;line-height:20px;color:${D.fg};">Lançamento do app</span><span style="font-size:13px;color:${D.muted};">Projeto · 24 tarefas</span></div>
+    <div style="padding:12px 20px 20px;"><div style="height:6px;border-radius:99px;background:${D.surface3};overflow:hidden;"><div style="width:62%;height:100%;background:${D.brand};"></div></div></div>
+    <div style="height:1px;background:linear-gradient(to right, transparent, ${D.hairStrong} 12%, ${D.hairStrong} 88%, transparent);"></div>
+    <div style="padding:12px 20px;font-size:12px;color:${D.muted};">Atualizado há 3 min</div>
+  </div>`)}
+  ${grp('accordion', `
+  <div style="width:100%;background:${D.surface};border-radius:14px;padding:6px 0;">
+    ${[['Arquivos', '3', true], ['Testes', '5/6', false], ['Notas', '', false]].map(([t, n, a], i) => `${i ? `<div style="height:1px;background:${D.surface2};"></div>` : ''}<div style="height:38px;display:flex;align-items:center;gap:6px;padding:0 10px;color:${D.muted};"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${a ? 90 : 0}deg);"><path d="m9 6 6 6-6 6"/></svg><span class="mono" style="font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">${t}</span><span class="mono" style="font-size:10px;opacity:0.8;">${n}</span></div>${a ? `<div style="padding:0 14px 12px;font-size:13px;color:${D.body};">main.ts · util.ts · README.md</div>` : ''}`).join('')}
+  </div>`)}
+</div>`;
+
 const body = `
 <div style="display:flex;flex-direction:column;gap:14px;">
   <p class="sec-title" style="color:${D.muted};">As cinco regras da tradução</p>
@@ -159,6 +185,7 @@ const body = `
   ${rail('Botões', 'a família<br>inteira', botoes)}
   ${rail('Badges', 'nove matizes<br>luz invertida', badges)}
   ${rail('Campos', 'e seleção', campos)}
+  ${rail('Avisos e cartões', 'alert, card<br>e accordion', avisos)}
   ${rail('Na tela', 'login e lista<br>em paridade', login, true)}
 </div>`;
 

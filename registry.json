@@ -915,6 +915,81 @@
       "docs": "Nas superfícies que já carregam filete por sombra interna, prefira aquele: dois meios de desenhar a mesma linha divergem de espessura."
     },
     {
+      "name": "alert",
+      "type": "registry:ui",
+      "title": "Alert",
+      "description": "A faixa de aviso dentro da página, nos tons do notice-page: neutro, sucesso, atenção (amarelo, não é erro) e erro. O tipo pelo ícone cheio, o fundo no tom claro, sem borda. actions à direita (embaixo no celular) e onDismiss para o X.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/alert.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Para o que passa, é toast; para a tela inteira, @muriki/notice-page. Erro anuncia como role=alert."
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "title": "Card",
+      "description": "A superfície do cartão dos blocos (rounded-xl, bg-card, shadow-xs, sem borda) como peça: cabeçalho opcional com title, description e action; footer depois de um Separator soft; padding md, sm ou none.",
+      "dependencies": [],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/separator"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/card.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "docs": "Cartão é agrupamento, não botão. padding=\"none\" para lista ou tabela que vai até a borda."
+    },
+    {
+      "name": "accordion",
+      "type": "registry:ui",
+      "title": "Accordion",
+      "description": "As seções que recolhem, no desenho da ExerciseSection: cabeçalho de 38px com seta e rótulo mono maiúsculo, contagem e ações no canto, filete muted entre seções. multiple (padrão, começam abertas) ou single; o corpo entra com o desfoque de sempre.",
+      "dependencies": [
+        "@phosphor-icons/react"
+      ],
+      "registryDependencies": [
+        "utils",
+        "SwellSystem/muriki-ds/theme"
+      ],
+      "files": [
+        {
+          "path": "registry/muriki/ui/accordion.tsx",
+          "type": "registry:ui"
+        }
+      ],
+      "css": {
+        "@keyframes muriki-accordion-in": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(8px)",
+            "transform": "translateY(-4px)"
+          }
+        },
+        ".muriki-accordion-body:not([hidden])": {
+          "animation": "muriki-accordion-in 0.28s cubic-bezier(.16,1,.3,1)"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-accordion-body:not([hidden])": {
+            "animation": "none"
+          }
+        }
+      }
+    },
+    {
       "name": "tabs",
       "type": "registry:ui",
       "title": "Tabs",

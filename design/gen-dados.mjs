@@ -149,21 +149,35 @@ const nav = `
   </div>
 </div>`;
 
-// Alertas
-const alert = (bg, bd, icoColor, icon, title, body) => `
-<div style="background:${bg};border:1px solid ${bd};border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
-  <span style="color:${icoColor};display:flex;flex-shrink:0;margin-top:1px;">${icon}</span>
-  <div style="display:flex;flex-direction:column;gap:2px;">
-    <span style="font-size:13px;font-weight:600;line-height:18px;">${title}</span>
-    <span style="font-size:12.5px;line-height:17px;color:${N.muted};">${body}</span>
-  </div>
-</div>`;
+// Alertas — a peça Alert: sem borda, o fundo inteiro no tom claro, o tipo pelo ícone cheio (tons do notice-page)
+const ALERTA = {
+  neutral:   ['oklch(0.958 0.010 94)', 'oklch(0.32 0.02 248.5)', 'oklch(0.45 0.03 257.7)'],
+  success:   ['oklch(0.935 0.05 150)', 'oklch(0.42 0.11 150)', 'oklch(0.42 0.11 150)'],
+  attention: ['oklch(0.94 0.075 95)', 'oklch(0.44 0.1 82)', 'oklch(0.44 0.1 82)'],
+  danger:    ['oklch(0.935 0.045 27)', 'oklch(0.43 0.16 27)', 'oklch(0.43 0.16 27)'],
+};
+const cheio = d => `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">${d}</svg>`;
+const ICO_ALERTA = {
+  neutral: cheio('<circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.6v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>'),
+  success: cheio('<circle cx="12" cy="12" r="10"/><path d="m8 12.3 2.7 2.7L16 9.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'),
+  attention: cheio('<path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/><path d="M12 9v4.5M12 16.8v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>'),
+  danger: cheio('<circle cx="12" cy="12" r="10"/><path d="M12 7.5v5.5M12 16.4v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>'),
+};
+const alert = (tom, title, body, extra = '') => { const [bg, fg, ic] = ALERTA[tom]; return `
+<div style="background:${bg};color:${fg};border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:${ic};display:flex;flex-shrink:0;height:20px;align-items:center;">${ICO_ALERTA[tom]}</span>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;line-height:20px;">${title}</span>
+    <span style="font-size:13px;line-height:19px;opacity:0.85;">${body}</span>
+  </div>${extra}
+</div>`; };
 const alerts = `
+${cap('alert · neutro, sucesso, atenção (amarelo, não é erro) e erro — sem borda, o tom desenha a faixa')}
 <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px;">
-  ${alert(N.brand50, N.brand200, N.brand, ico.info, 'Contrato dessincronizado', 'O spec da API mudou. Rode o sync antes de mexer na tela.')}
-  ${alert(N.success50, N.success100, N.success, ico.circCheck, 'Tudo sincronizado', 'O client foi regenerado há 2 minutos.')}
-  ${alert(N.warning50, N.warning100, N.warning, ico.alert, 'Tarefa bloqueada há 3 dias', 'Ninguém foi notificado do bloqueio ainda.')}
-  ${alert(N.danger50, N.danger100, N.danger, ico.alert, 'Falha ao salvar', 'A conexão caiu. Suas alterações estão guardadas localmente.')}
+  ${alert('neutral', 'Contrato dessincronizado', 'O spec da API mudou. Rode o sync antes de mexer na tela.')}
+  ${alert('success', 'Tudo sincronizado', 'O client foi regenerado há 2 minutos.')}
+  ${alert('attention', 'Tarefa bloqueada há 3 dias', 'Ninguém foi notificado do bloqueio ainda.', `<span style="align-self:center;height:28px;padding:0 10px;border-radius:7px;background:${N.surface};color:${N.fg};box-shadow:inset 0 0 0 1px ${N.borderInput};font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;">Ver</span>`)}
+  ${alert('danger', 'Falha ao salvar', 'A conexão caiu. Suas alterações estão guardadas localmente.', `<span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;opacity:0.7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>`)}
 </div>
 <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
   ${cap('toast')}
@@ -174,6 +188,51 @@ const alerts = `
       <span style="font-size:12px;color:${N.muted};">MRK-1284 · Revisar contrato OpenAPI</span>
     </div>
     <span style="font-size:12.5px;font-weight:500;color:${N.brand};">Desfazer</span>
+  </div>
+</div>`;
+
+
+// Card e Accordion — as peças: cartão sem borda (sombra leve), rodapé depois do filete soft; seções que recolhem
+const caret = (aberta) => `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(${aberta ? 90 : 0}deg);"><path d="m9 6 6 6-6 6"/></svg>`;
+const secao = (titulo, n, aberta, corpo, fim = '', apagada = false) => `
+<div style="${apagada ? 'opacity:0.45;' : ''}">
+  <div style="height:38px;display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;color:${N.muted};">
+    ${caret(aberta)}<span class="mono" style="font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">${titulo}</span>${n != null ? `<span class="mono" style="font-size:10px;opacity:0.8;">${n}</span>` : ''}
+    ${fim ? `<span style="margin-left:auto;display:flex;">${fim}</span>` : ''}
+  </div>
+  ${aberta ? `<div style="padding:0 14px 12px;font-size:13px;color:${N.fg};">${corpo}</div>` : ''}
+</div>`;
+const filete = `<div style="height:1px;background:linear-gradient(to right, transparent, ${N.b200} 12%, ${N.b200} 88%, transparent);"></div>`;
+const cardAcc = `
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    ${cap('card · title, description, action e footer depois do filete soft')}
+    <div style="background:${N.surface};border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);overflow:hidden;">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:20px 20px 0;">
+        <div style="flex-grow:1;display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:600;line-height:20px;color:${N.fgTitle};">Lançamento do app</span><span style="font-size:13px;line-height:18px;color:${N.muted};">Projeto · 24 tarefas</span></div>
+        <span style="color:${N.muted};display:flex;margin:-2px -4px 0 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+      </div>
+      <div style="padding:12px 20px 20px;"><div style="height:6px;border-radius:99px;background:${N.b100};overflow:hidden;"><div style="width:62%;height:100%;background:${N.brand};border-radius:99px;"></div></div></div>
+      ${filete}
+      <div style="padding:12px 20px;font-size:12px;color:${N.muted};">Atualizado há 3 min</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    ${cap('card padding="none" · a lista vai até a borda')}
+    <div style="background:${N.surface};border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);overflow:hidden;">
+      <div style="padding:14px 16px 0;font-size:14px;font-weight:600;line-height:20px;color:${N.fgTitle};">Atividade</div>
+      <div style="margin-top:12px;">${['Revisar contrato OpenAPI', 'Regenerar client Kubb', 'Subir migration'].map((t, i) => `<div style="height:40px;display:flex;align-items:center;padding:0 16px;font-size:13px;${i ? `border-top:1px solid ${N.b100};` : ''}">${t}</div>`).join('')}</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    ${cap('accordion · multiple (padrão) ou single; o corpo entra desfocado')}
+    <div style="background:${N.surface};border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:6px 0;">
+      ${secao('Arquivos', 3, true, 'main.ts · util.ts · README.md', `<span style="color:${N.muted};font-size:15px;line-height:1;">+</span>`)}
+      <div style="height:1px;background:${N.b100};"></div>
+      ${secao('Testes', '5/6', false)}
+      <div style="height:1px;background:${N.b100};"></div>
+      ${secao('Notas', null, false, '', '', true)}
+    </div>
   </div>
 </div>`;
 
@@ -260,7 +319,7 @@ const html = `<!doctype html>
 
   <div style="display:flex;flex-direction:column;gap:5px;">
     <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;">Dados e feedback</div>
-    <div style="font-size:14px;line-height:1.5;color:${N.muted};max-width:660px;">Badge, Avatar, Tabs, Tooltip, Progress, Alert, Toast, Card e Skeleton. Os exemplos usam o vocabulário real do produto — tarefa, label, contrato, board — porque componente medido com texto genérico esconde onde a linha quebra.</div>
+    <div style="font-size:14px;line-height:1.5;color:${N.muted};max-width:660px;">Badge, Avatar, Tabs, Tooltip, Progress, Alert, Toast, Card, Accordion e Skeleton. Os exemplos usam o vocabulário real do produto — tarefa, label, contrato, board — porque componente medido com texto genérico esconde onde a linha quebra.</div>
   </div>
 
   <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:22px;">
@@ -271,6 +330,11 @@ const html = `<!doctype html>
   <div style="display:grid;grid-template-columns:1fr 1.25fr;gap:22px;">
     <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Navegação e progresso</p><div class="card" style="flex-grow:1;">${nav}</div></div>
     <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Alerta e toast</p><div class="card" style="flex-grow:1;display:flex;flex-direction:column;gap:14px;">${alerts}</div></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Card e accordion</p>
+    <div class="card">${cardAcc}</div>
   </div>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
