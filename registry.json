@@ -3969,7 +3969,7 @@
       "name": "task-table",
       "type": "registry:block",
       "title": "Task Table",
-      "description": "Tabela hierárquica de tasks (epic → task → sub) com toolbar de busca e filtros com menu, seleção em massa, colapso de grupos, slots de composição e paginação.",
+      "description": "Tabela hierárquica de tasks (epic → task → sub, ou subtarefas em children) com toolbar de busca e filtros, seleção em massa, colapso, agrupamento por status/prioridade/projeto/responsável com faixas presas que empilham, slots de composição e paginação.",
       "dependencies": [
         "@phosphor-icons/react"
       ],
@@ -3996,6 +3996,11 @@
           "target": "components/blocks/task-table/task-table-toolbar.tsx"
         },
         {
+          "path": "registry/muriki/blocks/task-table/task-table-groups.ts",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/task-table-groups.ts"
+        },
+        {
           "path": "registry/muriki/blocks/task-table/types.ts",
           "type": "registry:component",
           "target": "components/blocks/task-table/types.ts"
@@ -4006,7 +4011,42 @@
           "target": "components/blocks/task-table/index.ts"
         }
       ],
-      "docs": "Agrupamento e ordenação são do caller: use renderGroupHeaderBefore + trailingRows para faixas de grupo (accordion), e o campo menu dos filtros da toolbar para as listagens. Agrupar por epic preserva a hierarquia; por status/responsável, achate a árvore."
+      "docs": "Agrupamento: passe groupBy ('none' | 'status' | 'priority' | 'project' | 'assignee') e dê altura ao pai — a tabela rola sozinha, com faixas de grupo presas que empilham. Subtarefas podem vir em children (herdam o projeto). Sem groupBy, o agrupamento continua do caller: renderGroupHeaderBefore + trailingRows.",
+      "css": {
+        "@keyframes muriki-tt-in": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(8px)"
+          }
+        },
+        "@keyframes muriki-tt-out": {
+          "to": {
+            "opacity": "0",
+            "filter": "blur(8px)"
+          }
+        },
+        "@keyframes muriki-tt-swap": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(14px)",
+            "transform": "translateY(10px)"
+          }
+        },
+        ".muriki-tt-in > td > *": {
+          "animation": "muriki-tt-in 0.42s cubic-bezier(.16,1,.3,1)"
+        },
+        ".muriki-tt-out > td > *": {
+          "animation": "muriki-tt-out 0.3s ease forwards"
+        },
+        ".muriki-tt-swap": {
+          "animation": "muriki-tt-swap 0.3s cubic-bezier(.16,1,.3,1)"
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-tt-in > td > *, .muriki-tt-out > td > *, .muriki-tt-swap": {
+            "animation": "none"
+          }
+        }
+      }
     },
     {
       "name": "resource-table",

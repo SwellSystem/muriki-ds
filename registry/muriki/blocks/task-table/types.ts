@@ -12,6 +12,44 @@ export interface TaskTableOwner {
   name?: string
 }
 
+/** Tom do ponto do projeto: um dos nove tons do sistema. */
+export type TaskTableTone =
+  | "gray"
+  | "blue"
+  | "cyan"
+  | "green"
+  | "yellow"
+  | "orange"
+  | "red"
+  | "pink"
+  | "purple"
+
+export interface TaskTableProject {
+  id: string
+  name: string
+  tone?: TaskTableTone
+}
+
+/**
+ * Estado do prazo, que pinta o pill da data (mesma escala do DueDate do DS).
+ * Calcular é do caller, como já era formatar `due`.
+ */
+export type TaskTableDueState =
+  | "overdue"
+  | "today"
+  | "tomorrow"
+  | "week"
+  | "later"
+  | "done"
+
+/** Agrupamento interno da tabela (`TaskTableProps.groupBy`). */
+export type TaskTableGroupBy =
+  | "none"
+  | "status"
+  | "priority"
+  | "project"
+  | "assignee"
+
 export interface TaskTableProgress {
   done: number
   total: number
@@ -28,6 +66,16 @@ export interface TaskTableTask {
   priority?: TaskTablePriority
   /** Display-ready due date string (e.g. "22 Abr"). Formatting is the caller's responsibility. */
   due?: string
+  /** Pinta o pill do prazo. Sem ele, o pill fica neutro. */
+  dueState?: TaskTableDueState
+  /** Sem projeto, a coluna mostra "Pessoal". Subtarefas herdam o da mãe. */
+  project?: TaskTableProject
+  /**
+   * Subtarefas aninhadas, na mesma forma. A tabela as achata embaixo da mãe
+   * (depth, parentId, childGroupId e lastChild são preenchidos), herdando o
+   * projeto. Alternativa a mandar a árvore já achatada.
+   */
+  children?: TaskTableSubtask[]
   parentId?: string
   childGroupId?: string
   progress?: TaskTableProgress
@@ -45,3 +93,7 @@ export interface TaskTableTask {
   /** True when the underlying status type is "cancelled" — drives strikethrough on title. */
   cancelled?: boolean
 }
+
+/** Subtarefa em `children`: profundidade e tipo vêm da mãe. */
+export type TaskTableSubtask = Omit<TaskTableTask, "depth" | "kind"> &
+  Partial<Pick<TaskTableTask, "depth" | "kind">>

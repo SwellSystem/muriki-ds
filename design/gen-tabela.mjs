@@ -183,14 +183,61 @@ const meiaDark = darkHalf('No escuro', 'A ferramenta de linha é ghost nos dois 
   </div>
 `);
 
+
+// ── a tabela agrupada (TaskTable com groupBy): mesma função nos dois temas
+const PL = { card:N.surface, stripe0:'oklch(97.5% 0.008 90)', stripe2:'oklch(97.6% 0.012 262.6)', grp:N.surface2, more:N.surface3, hair:N.border, fg:N.fg, body:N.body, muted:N.muted, faint:'oklch(75% 0.01 100)', sel:N.brand100, brand:N.brand, danger:N.danger, success:N.success,
+  due:{ overdue:[C.vermelho.bg, C.vermelho.fg], today:[C.laranja.bg, C.laranja.fg], tomorrow:[C.amarelo.bg, C.amarelo.fg], week:[N.surface3, N.fg], later:['transparent', N.muted] }, dot:{ azul:C.azul.dot, verde:C.verde.dot, laranja:C.laranja.dot } };
+const PD = { card:D.surface, stripe0:'oklch(0.195 0.004 107)', stripe2:'oklch(0.225 0.025 262.6)', grp:D.surface2, more:D.surface3, hair:D.hair, fg:D.fg, body:D.body, muted:D.muted, faint:D.subtle, sel:D.brandSub, brand:D.brand, danger:D.danger, success:D.success,
+  due:{ overdue:['oklch(0.29 0.06 27)','oklch(0.85 0.09 27)'], today:['oklch(0.29 0.06 55)','oklch(0.86 0.085 60)'], tomorrow:['oklch(0.29 0.05 90)','oklch(0.88 0.09 92)'], week:[D.surface3, D.fg], later:['transparent', D.muted] }, dot:{ azul:'oklch(0.70 0.14 262)', verde:'oklch(0.72 0.13 150)', laranja:'oklch(0.74 0.15 60)' } };
+const cal = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></svg>`;
+const semPrio = c => `<svg width="14" height="14" viewBox="0 0 14 14">${[0,1,2].map(i => `<rect x="${1.5+i*4}" y="6.25" width="3" height="1.5" rx=".75" fill="${c}"/>`).join('')}</svg>`;
+const ttTabela = (P) => {
+  const due = (st, t) => `<span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px 0 6px;border-radius:6px;font-size:12px;font-weight:500;white-space:nowrap;background:${P.due[st][0]};color:${P.due[st][1]};">${cal}<span style="flex:0 1 auto;">${t}</span></span>`;
+  const prio = (p) => p ? `<span style="font-size:12.5px;color:${P.body};">${p}</span>` : semPrio(P.faint);
+  const grupo = (cor, nome, n, prog, late = '') => `<div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 14px;background:${P.grp};box-shadow:inset 0 -1px 0 ${P.hair};font-size:13.5px;">
+    <span style="color:${P.muted};font-size:11px;">▾</span><span style="width:8px;height:8px;border-radius:9px;background:${cor};"></span><b style="color:${P.fg};font-weight:600;">${nome}</b><span style="color:${P.muted};">${n}</span>
+    <span style="margin-left:auto;display:inline-flex;align-items:center;gap:10px;font-size:12.5px;color:${P.muted};">${late ? `<span style="color:${P.danger};font-weight:500;">${late}</span>` : ''}${prog[0]} de ${prog[1]}<span style="width:56px;height:4px;border-radius:4px;background:${P.hair};overflow:hidden;"><i style="display:block;height:100%;width:${prog[0]/prog[1]*100}%;background:${P.success};"></i></span></span></div>`;
+  const fila = (i, { code, title, kid = 0, last = false, prio: pr, due: d, sel = false, chip = '', proj }) => `<div style="display:grid;grid-template-columns:34px 1fr 120px 96px 136px;align-items:center;height:40px;font-size:13.5px;background:${sel ? P.sel : [P.stripe0, P.card, P.stripe2][i % 3]};${sel ? `box-shadow:inset 3px 0 0 ${P.brand};` : ''}">
+    <span style="justify-self:center;width:13px;height:13px;border-radius:3px;${sel ? `background:${P.brand};` : `box-shadow:inset 0 0 0 1.5px ${P.faint};`}"></span>
+    <span style="position:relative;display:flex;align-items:center;gap:8px;padding-left:${8 + kid * 26}px;min-width:0;">
+      ${kid ? `<span style="position:absolute;left:${kid * 26 - 9}px;top:-20px;bottom:${last ? '50%' : '-20px'};width:1px;background:${P.hair};"></span><span style="position:absolute;left:${kid * 26 - 9}px;top:50%;width:13px;height:1px;background:${P.hair};"></span>` : ''}
+      <span style="font:500 11px/1 'Geist Mono',monospace;color:${P.muted};width:56px;">${code}</span>
+      <span style="color:${kid ? P.body : P.fg};font-weight:${kid ? 400 : 500};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${title}</span>${chip ? `<span style="font:500 11px/1 'Geist Mono',monospace;color:${P.muted};background:${P.grp};padding:4px 6px;border-radius:6px;">${chip}</span>` : ''}</span>
+    <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:${P.body};"><span style="width:8px;height:8px;border-radius:9px;background:${proj[0]};"></span>${proj[1]}</span>
+    <span>${prio(pr)}</span><span>${d ? due(d[0], d[1]) : ''}</span></div>`;
+  const app = [P.dot.azul, 'App 2.0'], ops = [P.dot.verde, 'Operações'];
+  return `<div style="position:relative;border-radius:14px;overflow:hidden;background:${P.card};box-shadow:inset 0 0 0 1px ${P.hair};">
+    <div style="display:grid;grid-template-columns:34px 1fr 120px 96px 136px;align-items:center;height:36px;font-size:12px;font-weight:500;color:${P.muted};box-shadow:inset 0 -1px 0 ${P.hair};"><span></span><span style="padding-left:8px;">Título</span><span>Projeto</span><span>Prioridade</span><span>Prazo</span></div>
+    <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 16px;background:${P.more};box-shadow:inset 0 -1px 0 ${P.hair};font-size:12.5px;color:${P.muted};">⌃ +2 grupos acima</div>
+    ${grupo(P.dot.verde, 'Operações', 2, [1, 4], '1 atrasada')}
+    ${fila(0, { code:'OPS-77', title:'Fechar contrato do fornecedor de nuvem', prio:'Urgente', due:['overdue','Atrasada 2 dias'], chip:'1/2', proj:ops })}
+    ${fila(1, { code:'OPS-78', title:'Comparar as duas propostas', kid:1, due:['later','14 Nov'], proj:ops })}
+    ${fila(2, { code:'OPS-79', title:'Enviar para o jurídico', kid:1, last:true, prio:'Alta', due:['today','Hoje'], proj:ops })}
+    ${grupo(P.dot.azul, 'App 2.0', 3, [1, 3])}
+    ${fila(0, { code:'APP-148', title:'Corrigir sincronização do Google Agenda', prio:'Urgente', due:['today','Hoje'], sel:true, proj:app })}
+    ${fila(1, { code:'APP-150', title:'Ajustar contraste dos estados', due:['tomorrow','Amanhã'], proj:app })}
+    ${fila(2, { code:'APP-151', title:'Revisar textos do onboarding', due:['week','Sexta'], proj:app })}
+  </div>`;
+};
+const agrupada = `
+<div style="display:grid;grid-template-columns:1.6fr 1fr;gap:26px;align-items:start;">
+  ${bloco('Agrupada — groupBy', 'Cabeçalho de colunas e faixas de grupo presos; as que passaram empilham, e acima de ~28% da altura viram “+N grupos acima”. Fileiras em três faixas por grupo; a subtarefa herda o projeto da mãe.', ttTabela(PL))}
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    ${bloco('Sem prioridade', 'Só o ícone de três traços. Texto repetido em toda fileira vazia é ruído.', `<span style="display:inline-flex;padding:10px;border-radius:10px;background:${N.surface};box-shadow:inset 0 0 0 1px ${HAIR};">${semPrio('oklch(75% 0.01 100)')}</span>`)}
+    ${bloco('O pill do prazo não trunca', 'O valor é flex 0 1 auto, sem largura 100%: “Hoje” fica inteiro mesmo em coluna estreita.', `<span style="display:inline-flex;gap:8px;flex-wrap:wrap;">${['overdue:Atrasada 2 dias','today:Hoje','tomorrow:Amanhã','week:Sexta','later:30 Nov'].map(x => { const [k, t] = x.split(':'); return `<span style="display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 7px 0 6px;border-radius:6px;font-size:12px;font-weight:500;background:${PL.due[k][0]};color:${PL.due[k][1]};">${cal}${t}</span>`; }).join('')}</span>`)}
+  </div>
+</div>`;
+const agrupadaDark = darkHalf('Tabela agrupada no escuro', 'As três faixas descem de luz a partir do card; o azul suave vira um azul fundo, e a faixa de grupo sobe um degrau para continuar presa por cima das fileiras.', ttTabela(PD));
 const body = `
 <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Três regras que não se negociam</p>${regra}</div>
 <div style="display:flex;flex-direction:column;margin-top:-4px;">
   ${rail('Ferramentas', 'da linha<br>só ícone', ferramentas)}
   ${rail('Em lote', 'seleção múltipla<br>cabeçalho', bulk)}
-  ${rail('Densidade', 'compacta · padrão<br>toque', densidade, true)}
+  ${rail('Densidade', 'compacta · padrão<br>toque', densidade)}
+  ${rail('Agrupada', 'TaskTable<br>groupBy', agrupada, true)}
 </div>
-${meiaDark}`;
+${meiaDark}
+${agrupadaDark}`;
 
 const html = page('Ferramentas de tabela',
   'O componente que faz a lista trabalhar: uma barra de ícones sem uma palavra escrita, que aparece na linha sob o cursor e some quando ele sai. Zero texto exige duas coisas em troca — tooltip em todas e <span class="mono" style="font-size:12.5px;">aria-label</span> em todas. Sem isso, é adivinhação com estilo.',

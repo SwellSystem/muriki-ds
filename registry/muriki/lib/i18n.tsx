@@ -41,6 +41,7 @@ const STRINGS: Record<string, unknown> = {
       priority: "Prioridade",
       subtasks: "Subtasks",
       due: "Prazo",
+      project: "Projeto",
     },
     status: {
       active: "Aberta",
@@ -76,6 +77,18 @@ const STRINGS: Record<string, unknown> = {
     pagination_previous: "Página anterior",
     pagination_next: "Próxima página",
     progress_count: "{{done}}/{{total}}",
+    priority_empty: "Sem prioridade",
+    project_personal: "Pessoal",
+    group: {
+      no_owner: "Sem responsável",
+      late_one: "{{count}} atrasada",
+      late_other: "{{count}} atrasadas",
+      progress: "{{done}} de {{total}}",
+      above_one: "+{{count}} grupo acima",
+      above_other: "+{{count}} grupos acima",
+      jump: "Ir para o grupo",
+      go_to_start: "Ir para o começo de {{group}}",
+    },
   },
   task_timeline: {
     search_placeholder: "Buscar tasks, subtasks, responsáveis…",
