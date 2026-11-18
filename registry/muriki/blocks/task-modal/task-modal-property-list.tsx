@@ -53,7 +53,14 @@ const PRIORITY_ORDER: TaskModalPriority[] = [
 ]
 
 const cellClass =
-  "inline-flex min-h-[26px] max-w-full items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+  "inline-flex min-h-[26px] max-w-full min-w-0 items-center gap-1.5 rounded-sm border border-transparent px-2 py-0.5 text-[12.5px] text-foreground transition-colors hover:bg-secondary focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+
+// O valor cabe na coluna, não importa o tamanho do nome: no trilho estreito
+// um status longo ou "Guilherme Teodoro dos Santos" encolhem com reticências
+// em vez de passar da borda. O Badge é `inline-flex` (texto solto não ganha
+// reticências), então aqui ele vira bloco e o ponto vira `inline-block`.
+const truncatedBadgeClass =
+  "block min-w-0 max-w-full shrink truncate leading-[22px] [&>span:first-child]:mr-1.5 [&>span:first-child]:mb-px [&>span:first-child]:inline-block [&>span:first-child]:align-middle"
 
 const ghostTriggerClass = cn(
   cellClass,
@@ -217,11 +224,12 @@ export function TaskModalPropertyList({
                   : undefined
               }
             >
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex min-w-0 items-center gap-1.5">
                 {currentStatus ? (
                   <StatusPill
                     status={currentStatus.kind}
                     label={currentStatus.name}
+                    className={truncatedBadgeClass}
                   />
                 ) : (
                   <span className="text-muted-foreground/70">
@@ -278,7 +286,7 @@ export function TaskModalPropertyList({
                 requirePriority && value.priority === "none" ? true : undefined
               }
             >
-              <span className="inline-flex items-center gap-1.5">
+              <span className="inline-flex min-w-0 items-center gap-1.5">
                 {value.priority === "none" ? (
                   <span className="text-muted-foreground/70">
                     {t("task_modal.priority.none")}
@@ -331,8 +339,8 @@ export function TaskModalPropertyList({
                     : t("task_modal.props.empty")}
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5">
-                  <span className="flex items-center">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className="flex shrink-0 items-center">
                     {selectedPeople.slice(0, 4).map((person) => (
                       <Avatar
                         key={person.id}
@@ -482,7 +490,7 @@ export function TaskModalPropertyList({
                   {t("task_modal.props.choose_project")}
                 </span>
               ) : (
-                <span>
+                <span className="truncate">
                   {projects.find((project) => project.id === value.projectId)
                     ?.name ?? value.projectId}
                 </span>
