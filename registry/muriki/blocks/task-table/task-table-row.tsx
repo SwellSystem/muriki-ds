@@ -22,11 +22,25 @@ import {
 import { CalendarBlankIcon, WarningCircleIcon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  RowActions,
+  type RowAction,
+} from "@/components/blocks/row-actions/row-actions"
 
 import type {
   TaskTableAvatarTone,
+  TaskTableColumnId,
   TaskTableDueState,
   TaskTableKind,
+  TaskTableOwner,
+  TaskTablePatch,
   TaskTablePriority,
   TaskTableStatus,
   TaskTableTask,
@@ -166,6 +180,43 @@ function PriorityCell({ priority }: { priority: TaskTablePriority }) {
   )
 }
 
+function OwnerAvatar({ owner }: { owner: TaskTableOwner }) {
+  return (
+    <span
+      title={owner.name}
+      aria-label={owner.name}
+      className={cn(
+        "inline-flex size-[22px] shrink-0 items-center justify-center rounded-full text-[10px] font-semibold",
+        avatarToneClass[owner.tone ?? "a4"]
+      )}
+    >
+      {owner.initials}
+    </span>
+  )
+}
+
+function StatusView({ status }: { status: TaskTableStatus }) {
+  const t = useTranslate()
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 text-[12.5px] font-medium",
+        statusTextClass[status]
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "size-[7px] shrink-0 rounded-full",
+          statusDotClass[status],
+          "shadow-[0_0_0_3px_color-mix(in_oklab,currentColor_15%,transparent)]"
+        )}
+      />
+      {t(`task_table.status.${status}`)}
+    </span>
+  )
+}
+
 function ProgressCell({ done, total }: { done: number; total: number }) {
   const t = useTranslate()
   const pct = total === 0 ? 0 : Math.round((done / total) * 100)
@@ -179,6 +230,66 @@ function ProgressCell({ done, total }: { done: number; total: number }) {
       </span>
       {t("task_table.progress_count", { done, total })}
     </span>
+  )
+}
+
+/** Ordem padrão das colunas que andam, igual à de antes. */
+export function defaultColumns(
+  showOwner: boolean,
+  showProject: boolean
+): TaskTableColumnId[] {
+  const out: TaskTableColumnId[] = []
+  if (showOwner) out.push("owner")
+  out.push("status")
+  if (showProject) out.push("project")
+  out.push("priority", "subtasks", "due")
+  return out
+}
+
+const STATUSES: TaskTableStatus[] = ["active", "progress", "blocked", "done"]
+const PRIORITIES: TaskTablePriority[] = ["urgent", "high", "medium", "low", "none"]
+
+/**
+ * Picker dentro da célula: com `onChange`, o valor vira gatilho de um menu
+ * de opções no lugar. O clique não chega na fileira (que abriria a tarefa).
+ */
+function CellPicker({
+  label,
+  value,
+  options,
+  onValueChange,
+  children,
+}: {
+  label: string
+  value: string
+  options: { value: string; label: React.ReactNode }[]
+  onValueChange: (value: string) => void
+  children: React.ReactNode
+}) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        render={
+          <button
+            type="button"
+            aria-label={label}
+            onClick={(e) => e.stopPropagation()}
+            className="-mx-1.5 inline-flex h-[26px] max-w-[calc(100%+12px)] min-w-0 items-center rounded-md px-1.5 hover:bg-foreground/5 focus-visible:outline-2 focus-visible:outline-ring data-[popup-open]:bg-foreground/5"
+          >
+            {children}
+          </button>
+        }
+      />
+      <DropdownMenuContent className="w-48" onClick={(e) => e.stopPropagation()}>
+        <DropdownMenuRadioGroup value={value} onValueChange={(v) => onValueChange(String(v))}>
+          {options.map((o) => (
+            <DropdownMenuRadioItem key={o.value} value={o.value}>
+              {o.label}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -294,6 +405,13 @@ export interface TaskTableRowProps {
   stripe?: 0 | 1 | 2
   /** Grupo ou subtarefas abrindo ("in") ou fechando ("out"): a fileira entra e sai desfocada. */
   motion?: "in" | "out"
+  /** Ordem das colunas que andam. Default: a de sempre. */
+  columns?: TaskTableColumnId[]
+  /** Liga os pickers de Status, Prioridade e (com `people`) Responsável. */
+  onChange?: (taskId: string, patch: TaskTablePatch) => void
+  people?: TaskTableOwner[]
+  /** Ações presas na ponta direita (RowActions) — substituem os botões antigos. */
+  rowActions?: RowAction[]
 }
 
 export function TaskTableRow({
@@ -317,6 +435,10 @@ export function TaskTableRow({
   showProjectColumn = false,
   stripe,
   motion,
+  columns,
+  onChange,
+  people,
+  rowActions,
 }: TaskTableRowProps) {
   const t = useTranslate()
 
@@ -351,6 +473,126 @@ export function TaskTableRow({
     isStriped ? "group-hover/row:bg-muted" : hoverBgClass,
     "transition-colors"
   )
+
+  const cells: Record<TaskTableColumnId, React.ReactNode> = {
+    owner: (
+      <td key="owner" className={cn(cellClass, "px-2.5 py-[10px]")}>
+        {onChange && people ? (
+          <CellPicker
+            label={t("task_table.column.owner")}
+            value={task.owner ? (task.owner.name ?? task.owner.initials) : ""}
+            options={[
+              { value: "", label: t("task_table.group.no_owner") },
+              ...people.map((p) => ({
+                value: p.name ?? p.initials,
+                label: (
+                  <span className="inline-flex items-center gap-2">
+                    <OwnerAvatar owner={p} />
+                    {p.name ?? p.initials}
+                  </span>
+                ),
+              })),
+            ]}
+            onValueChange={(v) =>
+              onChange(task.id, {
+                owner: people.find((p) => (p.name ?? p.initials) === v),
+              })
+            }
+          >
+            {task.owner ? (
+              <OwnerAvatar owner={task.owner} />
+            ) : (
+              <span className="inline-flex size-[22px] rounded-full border border-dashed border-muted-foreground/40" />
+            )}
+          </CellPicker>
+        ) : (
+          task.owner && <OwnerAvatar owner={task.owner} />
+        )}
+      </td>
+    ),
+    status: (
+      <td key="status" className={cn(cellClass, "px-2.5 py-[10px]")}>
+        {onChange ? (
+          <CellPicker
+            label={t("task_table.column.status")}
+            value={task.status}
+            options={STATUSES.map((st) => ({
+              value: st,
+              label: <StatusView status={st} />,
+            }))}
+            onValueChange={(v) =>
+              onChange(task.id, { status: v as TaskTableStatus })
+            }
+          >
+            <StatusView status={task.status} />
+          </CellPicker>
+        ) : (
+          <StatusView status={task.status} />
+        )}
+      </td>
+    ),
+    project: (
+      <td key="project" className={cn(cellClass, "px-2.5 py-[10px] text-[12.5px]")}>
+        {task.project ? (
+          <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
+            <span
+              aria-hidden
+              className={cn(
+                "size-2 shrink-0 rounded-full",
+                projectDotClass[task.project.tone ?? "gray"]
+              )}
+            />
+            <span className="truncate">{task.project.name}</span>
+          </span>
+        ) : (
+          <span className="text-muted-foreground/60">
+            {t("task_table.project_personal")}
+          </span>
+        )}
+      </td>
+    ),
+    priority: (
+      <td key="priority" className={cn(cellClass, "px-2.5 py-[10px]")}>
+        {onChange ? (
+          <CellPicker
+            label={t("task_table.column.priority")}
+            value={task.priority ?? "none"}
+            options={PRIORITIES.map((pr) => ({
+              value: pr,
+              label:
+                pr === "none" ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <PriorityCell priority="none" />
+                    {t("task_table.priority_empty")}
+                  </span>
+                ) : (
+                  <PriorityCell priority={pr} />
+                ),
+            }))}
+            onValueChange={(v) =>
+              onChange(task.id, { priority: v as TaskTablePriority })
+            }
+          >
+            <PriorityCell priority={task.priority ?? "none"} />
+          </CellPicker>
+        ) : (
+          <PriorityCell priority={task.priority ?? "none"} />
+        )}
+      </td>
+    ),
+    subtasks: (
+      <td key="subtasks" className={cn(cellClass, "px-2.5 py-[10px]")}>
+        {task.depth === 0 && task.progress ? (
+          <ProgressCell done={task.progress.done} total={task.progress.total} />
+        ) : null}
+      </td>
+    ),
+    due: (
+      <td key="due" className={cn(cellClass, "px-2.5 py-[10px] whitespace-nowrap")}>
+        {task.due ? <DuePill due={task.due} state={task.dueState} /> : null}
+      </td>
+    ),
+  }
 
   return (
     <tr
@@ -476,78 +718,27 @@ export function TaskTableRow({
         </div>
       </td>
 
-      {showOwnerColumn && (
-        <td className={cn(cellClass, "px-2.5 py-[10px]")}>
-          {task.owner && (
-            <span
-              title={task.owner.name}
-              aria-label={task.owner.name}
-              className={cn(
-                "inline-flex size-[22px] items-center justify-center rounded-full text-[10px] font-semibold",
-                avatarToneClass[task.owner.tone ?? "a4"]
-              )}
-            >
-              {task.owner.initials}
-            </span>
-          )}
-        </td>
+      {(columns ?? defaultColumns(showOwnerColumn, showProjectColumn)).map(
+        (id) => cells[id]
       )}
 
-      <td className={cn(cellClass, "px-2.5 py-[10px]")}>
-        <span
-          className={cn(
-            "inline-flex items-center gap-1.5 text-[12.5px] font-medium",
-            statusTextClass[task.status]
-          )}
-        >
+      <td
+        className={cn(
+          cellClass,
+          "w-0 py-[10px] pr-1 whitespace-nowrap",
+          rowActions && "sticky right-0 z-[2] bg-transparent p-0 group-hover/row:bg-transparent"
+        )}
+      >
+        {rowActions ? (
+          // Presas na ponta direita da área visível, mesmo com a tabela
+          // rolando para o lado; o vidro separa os ícones do texto embaixo.
           <span
-            aria-hidden
-            className={cn(
-              "size-[7px] shrink-0 rounded-full",
-              statusDotClass[task.status],
-              "shadow-[0_0_0_3px_color-mix(in_oklab,currentColor_15%,transparent)]"
-            )}
-          />
-          {t(`task_table.status.${task.status}`)}
-        </span>
-      </td>
-
-      {showProjectColumn && (
-        <td className={cn(cellClass, "px-2.5 py-[10px] text-[12.5px]")}>
-          {task.project ? (
-            <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
-              <span
-                aria-hidden
-                className={cn(
-                  "size-2 shrink-0 rounded-full",
-                  projectDotClass[task.project.tone ?? "gray"]
-                )}
-              />
-              <span className="truncate">{task.project.name}</span>
-            </span>
-          ) : (
-            <span className="text-muted-foreground/60">
-              {t("task_table.project_personal")}
-            </span>
-          )}
-        </td>
-      )}
-
-      <td className={cn(cellClass, "px-2.5 py-[10px]")}>
-        <PriorityCell priority={task.priority ?? "none"} />
-      </td>
-
-      <td className={cn(cellClass, "px-2.5 py-[10px]")}>
-        {task.depth === 0 && task.progress ? (
-          <ProgressCell done={task.progress.done} total={task.progress.total} />
-        ) : null}
-      </td>
-
-      <td className={cn(cellClass, "px-2.5 py-[10px] whitespace-nowrap")}>
-        {task.due ? <DuePill due={task.due} state={task.dueState} /> : null}
-      </td>
-
-      <td className={cn(cellClass, "w-0 py-[10px] pr-1 whitespace-nowrap")}>
+            onClick={(e) => e.stopPropagation()}
+            className="absolute top-1/2 right-2 -translate-y-1/2 rounded-lg opacity-0 transition-opacity group-focus-within/row:opacity-100 group-hover/row:bg-card/85 group-hover/row:opacity-100 group-hover/row:shadow-xs group-hover/row:backdrop-blur-sm has-[[data-menu-open]]:opacity-100"
+          >
+            <RowActions actions={rowActions} alwaysVisible />
+          </span>
+        ) : (
         <div
           className={cn(
             "absolute top-0 right-1.5 bottom-0 flex items-center gap-0.5",
@@ -627,6 +818,7 @@ export function TaskTableRow({
             </RowActionButton>
           ) : null}
         </div>
+        )}
       </td>
     </tr>
   )

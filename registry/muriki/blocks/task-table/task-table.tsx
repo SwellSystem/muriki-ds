@@ -9,6 +9,7 @@ import { CaretLeft, CaretRight } from "@phosphor-icons/react"
 import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +21,8 @@ import {
 import {
   flattenTasks,
   groupTasks,
+  rootBlocks,
+  sortTasks,
   TASK_TABLE_EMPTY_GROUP,
   type TaskTableGroup,
 } from "./task-table-groups"
@@ -29,7 +32,29 @@ import {
   TaskTableToolbar,
   type TaskTableToolbarFilter,
 } from "./task-table-toolbar"
-import type { TaskTableGroupBy, TaskTableTask } from "./types"
+import {
+  BulkBar,
+  CalcButton,
+  COLUMN_WIDTH,
+  computeCalc,
+  HeaderCell,
+  Pager,
+  RowContextMenu,
+  SELECT_WIDTH,
+  SkeletonRows,
+  type TaskTableCalc,
+  type TaskTableColumnKey,
+  type TaskTableSort,
+} from "./task-table-parts"
+import { defaultColumns } from "./task-table-row"
+import type { RowAction } from "@/components/blocks/row-actions/row-actions"
+import type {
+  TaskTableColumnId,
+  TaskTableGroupBy,
+  TaskTableOwner,
+  TaskTablePatch,
+  TaskTableTask,
+} from "./types"
 
 export interface TaskTablePagination {
   page: number
@@ -125,6 +150,39 @@ export interface TaskTableProps {
    * Sem a prop, nada muda.
    */
   groupBy?: TaskTableGroupBy
+
+  // ── Só no modo do DS (com `groupBy`) ─────────────────────────────────────
+
+  /**
+   * Liga os pickers nas células: Status, Prioridade e, com `people`,
+   * Responsável. Sem a prop, tudo é só leitura.
+   */
+  onChange?: (taskId: string, patch: TaskTablePatch) => void
+  people?: TaskTableOwner[]
+  /**
+   * Ações da linha: presas na ponta direita (RowActions) e, inteiras, no
+   * menu do botão direito. Destrutivas vão para o fim.
+   */
+  rowActions?: (task: TaskTableTask) => RowAction[]
+  /**
+   * Conteúdo da barra da seleção (escura, embaixo no centro). Ela cobre o
+   * canto dos toasts: enquanto houver seleção, passe `offset` ao `<Toaster>`
+   * (ex.: `offset={{ bottom: 88 }}`) para os avisos subirem.
+   */
+  bulkActions?: (ids: string[], clear: () => void) => React.ReactNode
+  /** Skeleton com a forma da tabela no lugar das fileiras. */
+  loading?: boolean
+  /**
+   * Tarefas-raiz por vez. Com grupo, cada grupo mostra N e um "Mostrar
+   * mais" na linha dos cálculos; sem grupo, páginas no rodapé. Default: 25.
+   */
+  pageSize?: number
+  /** Ordem inicial. Clique no cabeçalho ordena; o prazo usa `end` (ISO). */
+  defaultSort?: TaskTableSort
+  /** Cálculo inicial por coluna. Default: Contagem na coluna Task. */
+  defaultCalcs?: Partial<Record<TaskTableColumnKey, TaskTableCalc>>
+  /** Chamado quando a pessoa arrasta uma coluna (Task fica fixa na frente). */
+  onColumnsChange?: (columns: TaskTableColumnId[]) => void
 }
 
 /** Alturas do cabeçalho de colunas e da faixa de grupo: a pilha soma as duas. */
@@ -186,6 +244,15 @@ export function TaskTable({
   showOwnerColumn = true,
   showProjectColumn = false,
   groupBy,
+  onChange,
+  people,
+  rowActions,
+  bulkActions,
+  loading = false,
+  pageSize = 25,
+  defaultSort,
+  defaultCalcs,
+  onColumnsChange,
 }: TaskTableProps) {
   const t = useTranslate()
   // `children` vira fileira embaixo da mãe; a subtarefa herda o projeto.
@@ -340,9 +407,59 @@ export function TaskTable({
 
   // ── Grupos (só com `groupBy`) ─────────────────────────────────────────────
   const isGrouped = groupBy !== undefined && groupBy !== "none"
+  // Colunas: ordem, largura e ordenação são da tabela (modo do DS).
+  const baseColumns = defaultColumns(showOwnerColumn, showProjectColumn)
+  const [order, setOrder] = React.useState<TaskTableColumnId[]>(baseColumns)
+  const baseKey = baseColumns.join()
+  React.useEffect(() => {
+    const ids = baseKey.split(",") as TaskTableColumnId[]
+    setOrder((o) => {
+      const keep = o.filter((x) => ids.includes(x))
+      return [...keep, ...ids.filter((x) => !keep.includes(x))]
+    })
+  }, [baseKey])
+  const [widths, setWidths] = React.useState<
+    Partial<Record<TaskTableColumnKey, number>>
+  >({})
+  const width = (id: TaskTableColumnKey) => widths[id] ?? COLUMN_WIDTH[id]
+  const [drag, setDrag] = React.useState<TaskTableColumnId | null>(null)
+  const [drop, setDrop] = React.useState<{
+    id: TaskTableColumnKey
+    side: "before" | "after"
+  } | null>(null)
+  const [moved, setMoved] = React.useState<TaskTableColumnId | null>(null)
+  const moveColumn = (id: TaskTableColumnId, to: number) => {
+    setOrder((o) => {
+      const next = o.filter((x) => x !== id)
+      next.splice(Math.max(0, Math.min(next.length, to)), 0, id)
+      onColumnsChange?.(next)
+      return next
+    })
+    setMoved(id)
+    window.setTimeout(() => setMoved((m) => (m === id ? null : m)), 500)
+  }
+  const [sort, setSort] = React.useState<TaskTableSort | undefined>(
+    defaultSort
+  )
+  const [calcs, setCalcs] = React.useState<
+    Partial<Record<TaskTableColumnKey, TaskTableCalc>>
+  >(defaultCalcs ?? { task: "count" })
+  const [shown, setShown] = React.useState<Record<string, number>>({})
+  const [page, setPage] = React.useState(0)
+  React.useEffect(() => {
+    setPage(0)
+    setShown({})
+  }, [groupBy, sort?.id, sort?.dir, pageSize])
+  const [ctxId, setCtxId] = React.useState<string | null>(null)
+
+  const sortedTasks = React.useMemo(
+    () =>
+      isOwnLayout && sort ? sortTasks(tasks, sort.id, sort.dir) : tasks,
+    [tasks, isOwnLayout, sort]
+  )
   const groups = React.useMemo<TaskTableGroup[]>(
-    () => (groupBy ? groupTasks(tasks, groupBy) : []),
-    [tasks, groupBy]
+    () => (groupBy ? groupTasks(sortedTasks, groupBy) : []),
+    [sortedTasks, groupBy]
   )
   const [closed, setClosed] = React.useState<Set<string>>(() => new Set())
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
@@ -482,6 +599,10 @@ export function TaskTable({
           showProjectColumn={showProjectColumn}
           stripe={stripe}
           motion={rowMotion}
+          columns={isOwnLayout ? order : undefined}
+          onChange={isOwnLayout ? onChange : undefined}
+          people={people}
+          rowActions={isOwnLayout ? rowActions?.(task) : undefined}
         />
         {afterRow != null && (
           <tr>
@@ -599,6 +720,176 @@ export function TaskTable({
     )
   }
 
+  // No modo done (onToggleDone presente), seleção em massa não se aplica.
+  const selectAllBox = !isDoneMode && (
+    <input
+      ref={headerCheckboxRef}
+      type="checkbox"
+      aria-label={t("task_table.select_all")}
+      checked={allChecked}
+      onChange={handleSelectAll}
+      disabled={!onCheckedChange || visibleTasks.length === 0}
+      className={cn(
+        "size-[13px] cursor-pointer appearance-none rounded-[3px] border-[1.5px] border-muted-foreground/50 bg-transparent align-[-1px]",
+        "checked:border-primary checked:bg-primary",
+        "indeterminate:border-primary indeterminate:bg-primary/50",
+        "relative checked:after:absolute checked:after:top-[-0.5px] checked:after:left-[2.5px] checked:after:h-2 checked:after:w-1 checked:after:rotate-45 checked:after:border-[1.6px] checked:after:border-t-0 checked:after:border-l-0 checked:after:border-white checked:after:content-['']",
+        "disabled:cursor-not-allowed disabled:opacity-50"
+      )}
+    />
+  )
+
+  // ── Modo do DS: colunas, cálculos, páginas, seleção ──────────────────────
+  const colKeys: TaskTableColumnKey[] = ["task", ...order]
+  const colLabel = (id: TaskTableColumnKey) => t(`task_table.column.${id}`)
+  const tableWidth =
+    SELECT_WIDTH + colKeys.reduce((acc, id) => acc + width(id), 0)
+
+  const ownHead = (
+    <>
+      <colgroup>
+        <col style={{ width: SELECT_WIDTH }} />
+        {colKeys.map((id) => (
+          <col key={id} style={{ width: width(id) }} />
+        ))}
+        <col style={{ width: 0 }} />
+      </colgroup>
+      <thead>
+        <tr>
+          <th scope="col" className="pl-3 text-left">
+            {!loading && selectAllBox}
+          </th>
+          {colKeys.map((id) => (
+            <HeaderCell
+              key={id}
+              id={id}
+              label={colLabel(id)}
+              width={width(id)}
+              sort={sort}
+              onSort={() =>
+                setSort((cur) =>
+                  cur?.id === id
+                    ? { id, dir: cur.dir === "asc" ? "desc" : "asc" }
+                    : { id, dir: "asc" }
+                )
+              }
+              movable={id !== "task"}
+              dragging={drag === id}
+              drop={drop?.id === id ? drop.side : undefined}
+              moved={moved === id}
+              onDragStart={() => id !== "task" && setDrag(id)}
+              onDragOver={(side) => {
+                if (!drag || drag === id) return
+                if (drop?.id !== id || drop.side !== side)
+                  setDrop({ id, side })
+              }}
+              onDragLeave={() =>
+                setDrop((d) => (d?.id === id ? null : d))
+              }
+              onDrop={() => {
+                if (!drag || !drop) return
+                const rest = order.filter((x) => x !== drag)
+                // Soltar na Task (fixa) põe a coluna logo depois dela.
+                const at = id === "task" ? 0 : rest.indexOf(id)
+                moveColumn(
+                  drag,
+                  id === "task" ? 0 : at + (drop.side === "after" ? 1 : 0)
+                )
+                setDrag(null)
+                setDrop(null)
+              }}
+              onDragEnd={() => {
+                setDrag(null)
+                setDrop(null)
+              }}
+              onMove={(delta) => {
+                if (id === "task") return
+                moveColumn(id, order.indexOf(id) + delta)
+                window.setTimeout(() =>
+                  scrollRef.current
+                    ?.querySelector<HTMLElement>(`th[data-col="${id}"] button`)
+                    ?.focus()
+                )
+              }}
+              onResize={(w) => setWidths((x) => ({ ...x, [id]: w }))}
+            />
+          ))}
+          <th scope="col" aria-hidden className="w-0 p-0" />
+        </tr>
+      </thead>
+    </>
+  )
+
+  /** Última linha do grupo: um cálculo por coluna e o "Mostrar mais". */
+  const renderCalcRow = (g: TaskTableGroup, roots: TaskTableTask[], limit: number) => {
+    const more = isGrouped && roots.length > limit
+    return (
+      <tr className="group/calc h-8 text-[12px] text-muted-foreground">
+        <td />
+        {colKeys.map((id) => (
+          <td key={id} className="overflow-visible px-2.5 whitespace-nowrap">
+            {id === "task" && more && (
+              <span className="mr-2.5 inline-flex items-center gap-1 pl-6">
+                <button
+                  type="button"
+                  onClick={() =>
+                    setShown((x) => ({
+                      ...x,
+                      [g.key]: Math.min(roots.length, limit + pageSize),
+                    }))
+                  }
+                  className="inline-flex h-[26px] items-center gap-1.5 rounded-md px-2 text-[13px] font-medium text-primary-subtle-foreground hover:bg-primary-subtle focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  <CaretDownIcon size={13} />
+                  {t("task_table.show_more", {
+                    count: Math.min(pageSize, roots.length - limit),
+                  })}
+                </button>
+                <span className="ml-1.5 text-[12.5px] tabular-nums">
+                  {t("task_table.group.progress", {
+                    done: limit,
+                    total: roots.length,
+                  })}
+                </span>
+              </span>
+            )}
+            <CalcButton
+              label={colLabel(id)}
+              kind={calcs[id] ?? "none"}
+              value={computeCalc(roots, id, calcs[id] ?? "none")}
+              onKindChange={(k) => setCalcs((x) => ({ ...x, [id]: k }))}
+            />
+          </td>
+        ))}
+        <td />
+      </tr>
+    )
+  }
+
+  const rootCount = isOwnLayout && !isGrouped ? rootBlocks(sortedTasks).length : 0
+  const pageCount = Math.max(1, Math.ceil(rootCount / pageSize))
+  const pageNow = Math.min(page, pageCount - 1)
+
+  const clearSelection = () => {
+    for (const id of checkedSet) onCheckedChange?.(id, false)
+  }
+  const ctxTask = ctxId ? taskById.get(ctxId) : undefined
+  const ctxActions = ctxTask && rowActions ? rowActions(ctxTask) : []
+  const withContextMenu = (table: React.ReactNode) =>
+    isOwnLayout && rowActions && !loading ? (
+      <RowContextMenu
+        onRow={setCtxId}
+        actions={[
+          ...ctxActions.filter((a) => !a.destructive),
+          ...ctxActions.filter((a) => a.destructive),
+        ]}
+      >
+        {table}
+      </RowContextMenu>
+    ) : (
+      table
+    )
+
   /** Revezamento das 3 faixas, contando só as fileiras visíveis do grupo. */
   const renderStriped = (rows: TaskTableTask[], groupMotion?: "in" | "out") => {
     let i = 0
@@ -614,7 +905,7 @@ export function TaskTable({
     <div
       className={cn(
         "flex w-full flex-col gap-2",
-        isOwnLayout && "h-full min-h-0",
+        isOwnLayout && "relative h-full min-h-0",
         className
       )}
     >
@@ -671,12 +962,14 @@ export function TaskTable({
             </DropdownMenu>
           </div>
         )}
+        {withContextMenu(
         <table
+          aria-busy={loading || undefined}
+          style={isOwnLayout ? { width: tableWidth } : undefined}
           className={cn(
-            "w-full min-w-[680px]",
             isOwnLayout
-              ? "border-separate border-spacing-0 [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-[4] [&_thead_th]:h-9 [&_thead_th]:bg-card"
-              : "border-collapse"
+              ? "min-w-full table-fixed border-separate border-spacing-0 [&_thead_th]:sticky [&_thead_th]:top-0 [&_thead_th]:z-[4] [&_thead_th]:h-9 [&_thead_th]:bg-card [&_thead_th]:shadow-[inset_0_-1px_0_var(--divider)]"
+              : "w-full min-w-[680px] border-collapse"
           )}
         >
           {/* O cabeçalho separa por SUPERFÍCIE, não por linha. Ele tinha um
@@ -686,30 +979,14 @@ export function TaskTable({
               Agora é uma faixa um degrau abaixo da fileira mais escura da
               tabela: o cabeçalho é o topo da superfície, não um rótulo com
               um traço embaixo. */}
+          {isOwnLayout ? ownHead : (
           <thead className="[&_th]:bg-[color-mix(in_oklab,var(--muted)_85%,var(--card))]">
             <tr>
               <th
                 scope="col"
                 className="w-[22px] px-2.5 py-2 pl-3 text-left text-[10.5px] font-medium tracking-[.08em] text-muted-foreground uppercase"
               >
-                {/* No modo done (onToggleDone presente), seleção em massa não se aplica */}
-                {!isDoneMode && (
-                  <input
-                    ref={headerCheckboxRef}
-                    type="checkbox"
-                    aria-label={t("task_table.select_all")}
-                    checked={allChecked}
-                    onChange={handleSelectAll}
-                    disabled={!onCheckedChange || visibleTasks.length === 0}
-                    className={cn(
-                      "size-[13px] cursor-pointer appearance-none rounded-[3px] border-[1.5px] border-muted-foreground/50 bg-transparent align-[-1px]",
-                      "checked:border-primary checked:bg-primary",
-                      "indeterminate:border-primary indeterminate:bg-primary/50",
-                      "relative checked:after:absolute checked:after:top-[-0.5px] checked:after:left-[2.5px] checked:after:h-2 checked:after:w-1 checked:after:rotate-45 checked:after:border-[1.6px] checked:after:border-t-0 checked:after:border-l-0 checked:after:border-white checked:after:content-['']",
-                      "disabled:cursor-not-allowed disabled:opacity-50"
-                    )}
-                  />
-                )}
+                {selectAllBox}
               </th>
               <th
                 scope="col"
@@ -763,10 +1040,36 @@ export function TaskTable({
               />
             </tr>
           </thead>
-          {isOwnLayout ? (
+          )}
+          {isOwnLayout && loading ? (
+            (isGrouped ? [4, 3] : [6]).map((n, gi) => (
+              <tbody key={gi}>
+                {isGrouped && (
+                  <tr>
+                    <th
+                      colSpan={COL_SPAN}
+                      style={{ top: HEAD_H + gi * GROUP_H }}
+                      className="sticky z-[3] h-9 bg-muted px-4 text-left shadow-[inset_0_-1px_0_var(--divider)]"
+                    >
+                      <span className="sticky left-4 flex items-center gap-3">
+                        <Skeleton className="h-[11px] w-[120px]" />
+                      </span>
+                    </th>
+                  </tr>
+                )}
+                <SkeletonRows columns={colKeys} rows={n} seed={gi} />
+              </tbody>
+            ))
+          ) : isOwnLayout ? (
             groups.map((g, gi) => {
               const gMotion = motion["g:" + g.key]
               const isClosed = closed.has(g.key) && gMotion !== "out"
+              const blocks = rootBlocks(g.rows)
+              const roots = blocks.map((b) => b[0])
+              const limit = isGrouped ? (shown[g.key] ?? pageSize) : Infinity
+              const visible = isGrouped
+                ? blocks.slice(0, limit)
+                : blocks.slice(pageNow * pageSize, pageNow * pageSize + pageSize)
               return (
                 <tbody
                   key={g.key}
@@ -774,7 +1077,8 @@ export function TaskTable({
                   data-closed={closed.has(g.key) || undefined}
                 >
                   {isGrouped && renderGroupHead(g, gi)}
-                  {!isClosed && renderStriped(g.rows, gMotion)}
+                  {!isClosed && renderStriped(visible.flat(), gMotion)}
+                  {!isClosed && renderCalcRow(g, roots, limit)}
                 </tbody>
               )
             })
@@ -791,7 +1095,26 @@ export function TaskTable({
             </tbody>
           )}
         </table>
+        )}
+        {isOwnLayout && !isGrouped && !loading && pageCount > 1 && (
+          <Pager
+            page={pageNow}
+            pageCount={pageCount}
+            total={rootCount}
+            pageSize={pageSize}
+            onPage={(n) => {
+              setPage(n)
+              if (scrollRef.current) scrollRef.current.scrollTop = 0
+            }}
+          />
+        )}
       </div>
+
+      {isOwnLayout && !loading && checkedSet.size > 0 && onCheckedChange && (
+        <BulkBar count={checkedSet.size} onClear={clearSelection}>
+          {bulkActions?.([...checkedSet], clearSelection)}
+        </BulkBar>
+      )}
 
       {showFooter && (summary || pagination) && (
         <div className="flex flex-wrap items-center justify-between gap-2 px-0.5 text-[11.5px] text-muted-foreground">

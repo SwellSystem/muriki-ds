@@ -228,13 +228,32 @@ const agrupada = `
   </div>
 </div>`;
 const agrupadaDark = darkHalf('Tabela agrupada no escuro', 'As três faixas descem de luz a partir do card; o azul suave vira um azul fundo, e a faixa de grupo sobe um degrau para continuar presa por cima das fileiras.', ttTabela(PD));
+
+// ── colunas, cálculos e páginas (modo do DS)
+const ttExtras = (P) => {
+  const th = (t, { sorted = false, drop = false, drag = false, rz = false } = {}) => `<span style="position:relative;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;font-size:10.5px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:${sorted ? P.fg : P.muted};${drop ? `background:${P.stripe2};` : ''}${drag ? 'opacity:.4;' : ''}">${drag ? '⋮⋮ ' : ''}${t}${sorted ? `<span style="color:${P.brand};">▲</span>` : ''}${rz ? `<span style="position:absolute;right:3px;top:8px;bottom:8px;width:2px;border-radius:2px;background:${P.brand};"></span>` : ''}</span>`;
+  const pg = (t, cur = false) => `<span style="display:inline-grid;place-items:center;min-width:30px;height:30px;border-radius:8px;font-size:13px;${cur ? `background:${P.stripe2};color:${P.brand};font-weight:500;` : `color:${P.body};`}">${t}</span>`;
+  return `<div style="display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;border-radius:12px;overflow:hidden;background:${P.card};box-shadow:inset 0 0 0 1px ${P.hair};">${th('Task')}${th('Status', { drag:true })}${th('Prioridade', { drop:true })}${th('Prazo', { sorted:true, rz:true })}</div>
+    <div style="display:flex;align-items:center;gap:14px;height:32px;padding:0 12px;border-radius:12px;background:${P.card};box-shadow:inset 0 0 0 1px ${P.hair};font-size:12px;color:${P.muted};">
+      <span style="color:${P.brand};font-weight:500;font-size:13px;">▾ Mostrar mais 25</span><span>25 de 61</span><span>Contagem <b style="color:${P.fg};">61</b></span><span style="margin-left:auto;">Preenchidos <b style="color:${P.fg};">48</b></span></div>
+    <div style="display:flex;align-items:center;gap:16px;height:48px;padding:0 16px;border-radius:12px;background:${P.card};box-shadow:inset 0 0 0 1px ${P.hair};font-size:13px;color:${P.muted};">
+      <span>Mostrando 1–25 de 120 tarefas</span><span style="margin:0 auto;display:inline-flex;gap:2px;">${pg('‹')}${pg('1', true)}${pg('2')}${pg('…')}${pg('5')}${pg('›')}</span></div>
+  </div>`;
+};
+const extras = `
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start;">
+  ${bloco('Colunas, cálculos e páginas', 'Clique ordena; arrastar move (ou Alt+← →), a borda redimensiona. Task fica fixa. O fim do grupo traz cálculos por coluna e “Mostrar mais”; sem grupo, páginas no rodapé — o “…” abre as escondidas.', ttExtras(PL))}
+  <div style="background:${D.bg};border-radius:14px;padding:18px;">${ttExtras(PD)}</div>
+</div>`;
 const body = `
 <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Três regras que não se negociam</p>${regra}</div>
 <div style="display:flex;flex-direction:column;margin-top:-4px;">
   ${rail('Ferramentas', 'da linha<br>só ícone', ferramentas)}
   ${rail('Em lote', 'seleção múltipla<br>cabeçalho', bulk)}
   ${rail('Densidade', 'compacta · padrão<br>toque', densidade)}
-  ${rail('Agrupada', 'TaskTable<br>groupBy', agrupada, true)}
+  ${rail('Agrupada', 'TaskTable<br>groupBy', agrupada)}
+  ${rail('Colunas', 'ordenar · mover<br>cálculo · páginas', extras, true)}
 </div>
 ${meiaDark}
 ${agrupadaDark}`;
