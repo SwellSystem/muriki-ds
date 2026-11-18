@@ -1,7 +1,7 @@
 import { N, page } from './tokens.mjs';
 import { btn, rr, HAIR } from './buttons.mjs';
 import { C } from './gen-badges.mjs';
-import { D, dbtn, dinput, dcard, darkHalf, dcap, dgrp, rr as drr } from './dark.mjs';
+import { D, DC, dbtn, dinput, dcard, darkHalf, dcap, dgrp, rr as drr } from './dark.mjs';
 const cap = t => `<span class="cap">${t}</span>`;
 const I = {
   chev:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`,
@@ -79,6 +79,49 @@ const selects = `
       ${menu(`${item('backend', { icon:`<span style="width:15px;height:15px;border-radius:4px;background:${N.brand};color:#fff;display:inline-flex;align-items:center;justify-content:center;">${I.check}</span>` })}${item('contrato', { icon:`<span style="width:15px;height:15px;border-radius:4px;background:${N.brand};color:#fff;display:inline-flex;align-items:center;justify-content:center;">${I.check}</span>` })}${item('design', { icon:`<span style="width:15px;height:15px;border-radius:4px;box-shadow:inset 0 0 0 1.5px ${N.borderStrong};display:inline-block;"></span>`, hl:true })}`, 220)}
     </div>`)}
 </div>`;
+
+
+// ── PeoplePicker e LabelPicker: um desenho, duas paletas (claro e escuro)
+const PK = {
+  claro: { bg:N.bg, fg:N.fg, body:N.body, muted:N.muted, subtle:N.subtle, hair:N.border, line:N.borderStrong, hl:N.surface2, brand:N.brand, box:N.surface3, tom:c => C[c], menu },
+  escuro: { bg:D.bg, fg:D.fg, body:D.body, muted:D.muted, subtle:D.subtle, hair:D.hair, line:D.hairStrong, hl:D.surface2, brand:D.brand, box:D.surface3, tom:c => DC[c], menu:(...a) => dmenu(...a) },
+};
+const pkTag = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3.5 12.6V4.5a1 1 0 0 1 1-1h8.1l8 8a1 1 0 0 1 0 1.4l-7.1 7.1a1 1 0 0 1-1.4 0Z"/><circle cx="8.3" cy="8.3" r="1.3" fill="currentColor"/></svg>`;
+const pkPlus = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
+const pickers = (P) => {
+  const av = (ini, cor, sob = false) => { const t = P.tom(cor); return `<span style="width:20px;height:20px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:500;background:${t.bg};color:${t.fg};${sob ? `margin-left:-6px;box-shadow:0 0 0 2px ${P.bg};` : ''}">${ini}</span>`; };
+  const vazio = `<span style="width:20px;height:20px;border-radius:999px;flex-shrink:0;box-sizing:border-box;border:1.5px dashed ${P.line};"></span>`;
+  const gat = (inner, aberto = false) => `<span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 6px;border-radius:7px;font-size:12.5px;color:${P.body};box-sizing:border-box;${aberto ? `background:${P.hl};` : ''}">${inner}</span>`;
+  const mais = n => `<span style="font-size:12.5px;color:${P.muted};">+${n}</span>`;
+  const badge = (cor, txt) => { const t = P.tom(cor); return `<span style="display:inline-flex;align-items:center;gap:4px;height:18px;padding:0 6px;border-radius:4px;background:${t.bg};color:${t.fg};font-size:11px;font-weight:500;"><span style="width:5px;height:5px;border-radius:999px;background:${t.dot};"></span>${txt}</span>`; };
+  const busca = txt => `<div style="display:flex;align-items:center;gap:8px;padding:2px 8px 6px;margin-bottom:4px;border-bottom:1px solid ${P.hair};font-size:13px;height:30px;box-sizing:border-box;color:${txt ? P.body : P.subtle};"><span style="display:flex;color:${P.muted};">${I.search}</span>${txt || 'Buscar pessoa…'}</div>`;
+  const caixa = on => `<span style="width:16px;height:16px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;box-sizing:border-box;${on ? `background:${P.brand};color:#fff;` : `background:${P.box};`}">${on ? I.check : ''}</span>`;
+  const linha = (lead, txt, { desc = '', hl = false, sel = false, box = null } = {}) => `
+    <div style="min-height:32px;padding:3px 8px;border-radius:7px;display:flex;align-items:center;gap:10px;font-size:13px;box-sizing:border-box;color:${P.body};${hl ? `background:${P.hl};` : ''}">
+      ${box === null ? '' : caixa(box)}${lead}
+      <div style="display:flex;flex-direction:column;flex-grow:1;min-width:0;"><span>${txt}</span>${desc ? `<span style="font-size:12px;line-height:16px;color:${P.muted};">${desc}</span>` : ''}</div>
+      ${sel ? `<span style="display:flex;color:${P.brand};">${I.check}</span>` : ''}</div>`;
+  const pe = `<div style="display:flex;justify-content:space-between;padding:8px 8px 3px;margin-top:4px;border-top:1px solid ${P.hair};font-size:12.5px;color:${P.muted};"><span>2 selecionados</span><span style="color:${P.brand};font-weight:500;">Limpar</span></div>`;
+  const ponto = cor => `<span style="width:8px;height:8px;border-radius:999px;background:${P.tom(cor).dot};flex-shrink:0;"></span>`;
+  const t = (titulo, nota) => `<div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:12.5px;font-weight:600;color:${P.fg};">${titulo}</span><span style="font-size:12px;line-height:16px;color:${P.muted};">${nota}</span></div>`;
+  const col = (inner, titulo, nota) => `<div style="display:flex;flex-direction:column;gap:10px;">${inner}${t(titulo, nota)}</div>`;
+  return `
+<div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:24px;align-items:start;">
+  ${col(`<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;">
+      ${gat(vazio)}${gat(`${av('AL', 'rosa')}<span>Ana Lima</span>`)}${gat(`${av('AL', 'rosa')}${av('GT', 'roxo', true)}${av('RS', 'verde', true)}${mais(2)}`)}${gat(`${vazio}<span style="color:${P.muted};">Sem responsável</span>`)}
+    </div>`, 'PeoplePicker — o gatilho é o avatar', 'Fantasma, cabe na célula. Vazio é o círculo tracejado; passou de 3, “+N”. Com showName, o nome ao lado.')}
+  ${col(P.menu(`${busca('')}${linha(vazio, 'Sem responsável', { sel:true, hl:true })}${linha(av('GT', 'roxo'), 'Guilherme Teodoro', { desc:'Você' })}${linha(av('AL', 'rosa'), 'Ana Lima', { desc:'Design' })}${linha(av('RS', 'verde'), 'Rafael Souza')}`, 236),
+    'Um responsável', '“Sem responsável” é o primeiro item. Quem usa vem logo depois, marcado “Você”. Escolheu, fecha.')}
+  ${col(P.menu(`${busca('')}${linha(av('GT', 'roxo'), 'Guilherme Teodoro', { desc:'Você', box:true, hl:true })}${linha(av('AL', 'rosa'), 'Ana Lima', { box:false })}${linha(av('RS', 'verde'), 'Rafael Souza', { box:true })}${pe}`, 236),
+    'Vários responsáveis', 'Caixa à esquerda, o menu fica aberto enquanto se marca. A busca procura no nome e no e-mail.')}
+  ${col(`<div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start;">${gat(`<span style="display:flex;color:${P.muted};">${pkTag}</span><span style="color:${P.muted};">Etiqueta</span>`)}${gat(`${badge('ciano', 'backend')}${badge('roxo', 'contrato')}${mais(1)}`, true)}</div>
+      ${P.menu(`${busca('urg')}${linha(`<span style="display:flex;color:${P.muted};">${pkPlus}</span>`, 'Criar etiqueta “urg”', { hl:true })}`, 220)}
+    </div>`, 'LabelPicker', 'Badges com ponto no gatilho, até 2 e “+N”. Digitou o que não existe: “Criar etiqueta”. Cor é identificação, não prioridade.')}
+</div>
+<div style="display:flex;gap:10px;align-items:center;">${P.menu(`${['backend:ciano:1','contrato:roxo:1','design:rosa:0','infra:cinza:0'].map((r, i) => { const [n, c, on] = r.split(':'); return linha(ponto(c), n, { box:on === '1', hl:i === 0 }); }).join('')}${pe.replace('selecionados', 'selecionadas')}`, 220)}
+  <span style="font-size:12px;line-height:16px;color:${P.muted};max-width:260px;">LabelPicker aberto: caixa, ponto da cor e o nome. Os nove tons do Badge.</span></div>`;
+};
 
 // ── Checkbox
 const cbx = (st, sz = 16) => {
@@ -179,9 +222,11 @@ const body = `
 <div style="display:flex;flex-direction:column;margin-top:-4px;">
   ${rail('Dropdown', 'shadcn<br>DropdownMenu', dropdown)}
   ${rail('Select', 'shadcn Select<br>Combobox', selects)}
+  ${rail('Responsável e etiqueta', 'PeoplePicker<br>LabelPicker', `<div style="display:flex;flex-direction:column;gap:18px;">${pickers(PK.claro)}</div>`)}
   ${rail('Checkbox', 'Radio · Switch<br>e os tipos', checkboxes, true)}
 </div>
-${meiaDark}`;
+${meiaDark}
+${darkHalf('Responsável e etiqueta no escuro', 'O mesmo desenho no escuro: o avatar e o badge trocam para o tom de L≈29%, o círculo tracejado usa o filete forte, e o painel sobe um degrau de superfície.', `<div style="display:flex;flex-direction:column;gap:18px;">${pickers(PK.escuro)}</div>`)}`;
 
 const html = page('Seleção e menus',
   'Dropdown, select, listbox, combobox, checkbox, radio e switch — com o critério de qual usar no topo, porque trocar checkbox por radio é o erro que mais confunde usuário de verdade. Painel flutuante tem raio 12, filete por dentro e a sombra grande; item sob o cursor ganha fundo, nunca borda.',
