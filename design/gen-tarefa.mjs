@@ -1,7 +1,8 @@
 // Prancha da TAREFA: o task-modal na direção D aprovada (prototipos/tarefa-v2).
 // Pílulas abaixo do título + trilho com todas as propriedades, decidido pelo
 // espaço (760px de corpo), cada coluna rolando sozinha e o seletor de modo em
-// três ícones. Claro em cima, escuro embaixo, o mesmo desenho.
+// três ícones; embaixo do detalhe, a colaboração (Conversa · Histórico, ou
+// Notas na task pessoal). Claro em cima, escuro embaixo, o mesmo desenho.
 //
 //   cd design && bun gen-tarefa.mjs
 import { N, page } from './tokens.mjs';
@@ -79,11 +80,44 @@ const rodape = P => `<div style="display:flex;align-items:center;gap:10px;paddin
   <span style="font-size:13px;color:${P.body};padding:0 10px;">Cancelar</span>
   <span style="font-size:13px;font-weight:500;color:${P.card};background:${P.brand};padding:7px 14px;border-radius:9px;">+ Criar task</span></div>`;
 
+// ── colaboração: abas embaixo do detalhe
+const abas = (P, { pessoal = false, ativa = 'talk' } = {}) => `<div style="display:flex;gap:18px;box-shadow:inset 0 -1px 0 ${P.hair};">
+  ${[[pessoal ? '✎ Notas' : '◌ Conversa', 'talk', 3], ['↺ Histórico', 'hist']].map(([t, k, n]) => `<span style="display:inline-flex;align-items:center;gap:6px;height:34px;font-size:13px;font-weight:500;color:${k === ativa ? P.fg : P.muted};${k === ativa ? `box-shadow:inset 0 -2px 0 ${P.brand};` : ''}">${t}${n ? `<span style="min-width:18px;height:18px;border-radius:99px;background:${P.brand};color:${P.card};font-family:'Geist Mono',monospace;font-size:10.5px;display:inline-grid;place-items:center;">${n}</span>` : ''}</span>`).join('')}</div>`;
+const men = (P, t) => `<span style="padding:0 3px;border-radius:5px;background:${P.brandSub};color:${P.brandInk};font-weight:500;">${t}</span>`;
+const comentario = (P, quem, quando, texto, { rx = '', resp = '', novo = false, acoes = false } = {}) => `<div style="position:relative;display:grid;grid-template-columns:24px minmax(0,1fr);gap:4px 10px;padding:8px 0;">
+  ${av(P, quem.split(' ').map(x => x[0]).join(''))}
+  <span style="font-size:12.5px;"><b style="color:${P.fg};">${quem}</b> <span style="color:${P.muted};font-size:11.5px;">${quando}</span>${novo ? ` <span style="font-family:'Geist Mono',monospace;font-size:9.5px;font-weight:600;color:${P.brand};">NOVO</span>` : ''}</span>
+  <span style="grid-column:2;font-size:13px;line-height:19px;color:${P.body};">${texto}</span>
+  ${rx ? `<span style="grid-column:2;display:flex;gap:6px;">${rx}</span>` : ''}
+  ${resp ? `<div style="grid-column:2;padding-left:12px;box-shadow:inset 2px 0 0 ${P.hair};">${resp}</div>` : ''}
+  ${acoes ? `<span style="position:absolute;top:4px;right:0;display:flex;gap:2px;padding:2px 4px;border-radius:9px;background:${P.card};box-shadow:inset 0 0 0 1px ${P.hair};font-size:12px;color:${P.muted};">☺ ↩</span>` : ''}
+</div>`;
+const chip = (P, e, n, minha = false) => `<span style="display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:99px;font-size:12px;${minha ? `background:${P.brandSub};color:${P.brandInk};box-shadow:inset 0 0 0 1px ${P.brand};` : `background:${P.chipBg};color:${P.body};`}">${e} ${n}</span>`;
+const campo = (P, ph, { foco = false, texto = '' } = {}) => `<div style="position:relative;display:grid;gap:6px;padding:8px 8px 8px 12px;border-radius:14px;background:${P.card};box-shadow:inset 0 0 0 1px ${foco ? P.brand : P.hair};">
+  <span style="font-size:13px;color:${texto ? P.body : P.muted};">${texto || ph}</span>
+  <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:${P.muted};">${ph.startsWith('Anotar') ? '' : '@'}<span style="margin-left:auto;">⌘↵ envia</span><span style="width:26px;height:26px;border-radius:8px;background:${P.brand};opacity:${texto ? 1 : .4};"></span></span>
+</div>`;
+const conversa = P => `<div style="display:flex;flex-direction:column;gap:4px;">${abas(P)}
+  ${comentario(P, 'Júlia Mendes', 'há 3 h', `${men(P, '@Ana')} 7 dias de prazo resolve a maioria dos casos.`, { rx: chip(P, '👍', 2, true) + chip(P, '🎯', 1), acoes: true,
+    resp: comentario(P, 'Ana Ribeiro', 'há 2 h', 'Concordo. Vou propor na subtask.') })}
+  ${comentario(P, 'Rafael Costa', 'há 40 min', 'Precisamos dizer no e-mail qual é o time.', { novo: true })}
+  ${campo(P, 'Comentar… use @ para chamar alguém')}</div>`;
+const notas = P => `<div style="display:flex;flex-direction:column;gap:4px;">${abas(P, { pessoal: true })}
+  ${comentario(P, 'Ana Ribeiro', 'ontem', 'Lembrar de perguntar ao suporte quantos convites vencem por semana.')}
+  ${campo(P, 'Anotar…')}</div>`;
+const historico = P => `<div style="display:flex;flex-direction:column;gap:2px;width:420px;">${abas(P, { ativa: 'hist' })}
+  ${[['•', 'Rafael Costa', 'criou a task', 'seg'], ['⌄', 'Ana Ribeiro', 'fez 3 alterações', 'ter'], ['•', 'Ana Ribeiro', 'mudou o status para Em andamento', ''], ['•', 'Ana Ribeiro', 'mudou a prioridade para Alta', ''], ['•', 'Ana Ribeiro', 'definiu o prazo para 20/11', '']].map(([d, q, t, w], i) => `<span style="display:flex;align-items:center;gap:10px;min-height:28px;font-size:12px;color:${P.muted};${i > 1 ? 'padding-left:16px;' : ''}"><span style="width:16px;text-align:center;">${d}</span><span><b style="font-weight:500;color:${P.body};">${q}</b> ${t}</span><span style="margin-left:auto;">${w}</span></span>`).join('')}</div>`;
+const mencao = P => `<div style="display:flex;flex-direction:column;gap:6px;width:360px;padding-top:120px;position:relative;">
+  <div style="position:absolute;left:8px;top:0;width:220px;padding:4px;border-radius:12px;background:${P.card};box-shadow:0 8px 24px oklch(0% 0 0 / 0.18), inset 0 0 0 1px ${P.hair};">
+    ${[['Ana Ribeiro', 'Você'], ['Júlia Mendes'], ['Rafael Costa']].map(([n, v], i) => `<span style="display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:8px;font-size:13px;color:${P.body};${i === 0 ? `background:${P.chipBg};` : ''}">${av(P, n.split(' ').map(x => x[0]).join(''))}${n}${v ? `<small style="margin-left:auto;color:${P.muted};">${v}</small>` : ''}</span>`).join('')}
+  </div>
+  ${campo(P, '', { foco: true, texto: 'Vale chamar @' })}</div>`;
+
 // largo: modal central, com o fundo desfocado atrás
 const largo = (P, { rolou = false, extra = '' } = {}) => `
 <div style="position:relative;border-radius:16px;overflow:hidden;padding:28px 36px;background:repeating-linear-gradient(${P.bg} 0 22px, color-mix(in oklab, ${P.fg} 6%, ${P.bg}) 22px 30px);">
   <div style="position:absolute;inset:0;background:${P.scrim};backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);"></div>
-  <div style="position:relative;width:820px;height:${extra ? 640 : 470}px;margin:0 auto;border-radius:14px;background:${P.card};box-shadow:0 24px 60px -20px oklch(0% 0 0 / 0.35), 0 0 0 1px ${P.hair};display:flex;flex-direction:column;overflow:hidden;">
+  <div style="position:relative;width:820px;height:${extra ? 800 : 470}px;margin:0 auto;border-radius:14px;background:${P.card};box-shadow:0 24px 60px -20px oklch(0% 0 0 / 0.35), 0 0 0 1px ${P.hair};display:flex;flex-direction:column;overflow:hidden;">
     ${cabeca(P, 'modal', rolou)}
     <div style="flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 290px;">
       <div style="position:relative;overflow:hidden;">${rolou ? `<span style="position:absolute;right:3px;top:30px;height:120px;width:4px;border-radius:4px;background:color-mix(in oklab, ${P.fg} 22%, transparent);"></span>` : ''}${principal(P, { deslocado: rolou, extra })}</div>
@@ -103,16 +137,16 @@ const estreito = (P, { extra = '' } = {}) => `
 
 const nota = (P, t, d) => `<div style="display:flex;flex-direction:column;gap:3px;max-width:820px;"><span style="font-size:12.5px;font-weight:600;color:${P.fg};">${t}</span><span style="font-size:12px;line-height:17px;color:${P.muted};">${d}</span></div>`;
 
-const corpo = (extraLargo = '', extraEstreito = '', notasExtras = '') => `
+const corpo = (extraLargo = () => '', extraEstreito = () => '', notasExtras = '') => `
 <div style="display:flex;flex-direction:column;gap:12px;">
   ${cap('largo · modal central (≥ 760px de corpo) — fundo desfocado')}
-  ${largo(CL, { extra: extraLargo })}
+  ${largo(CL, { extra: extraLargo(CL) })}
   ${nota(CL, 'Pílulas e trilho são o mesmo estado', 'Status, prioridade, responsáveis e prazo ficam à mão logo abaixo do título; o trilho repete tudo de propósito. Mudar num lugar muda no outro, porque os dois leem o mesmo value.')}
 </div>
 <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
   <div style="display:flex;flex-direction:column;gap:12px;">
     ${cap('estreito · painel lateral — sem desfoque')}
-    ${estreito(CL, { extra: extraEstreito })}
+    ${estreito(CL, { extra: extraEstreito(CL) })}
   </div>
   <div style="display:flex;flex-direction:column;gap:22px;flex:1;min-width:360px;padding-top:24px;">
     ${nota(CL, 'Quem decide é o espaço', 'Container query no corpo: abaixo de 760px o trilho some e vira uma lista curta com o que as pílulas não têm (início, projeto, etiquetas, pontos).')}
@@ -121,21 +155,27 @@ const corpo = (extraLargo = '', extraEstreito = '', notasExtras = '') => `
     ${notasExtras}
   </div>
 </div>
+<div style="display:flex;flex-direction:column;gap:14px;">
+  ${cap('colaboração — histórico agrupado e @menção')}
+  <div style="display:flex;gap:48px;align-items:flex-start;flex-wrap:wrap;">${historico(CL)}${mencao(CL)}</div>
+  ${nota(CL, 'Eventos seguidos viram um grupo', 'Na Conversa só há comentários. No Histórico, eventos seguidos da mesma pessoa viram "Ana fez 3 alterações", que abre e fecha. O @ abre a lista de pessoas (↑↓ e Enter escolhem), e ⌘↵ envia.')}
+</div>
 <div style="display:flex;flex-direction:column;gap:12px;">
   ${cap('rolado — o cabeçalho ganhou o filete; o trilho ficou parado')}
   ${largo(CL, { rolou: true })}
 </div>
 ${darkHalf('No escuro', 'O mesmo desenho com a luz invertida: o trilho desce um degrau abaixo do cartão em vez de virar uma faixa clara, e o véu do modal central escurece além de desfocar.', `
-  <div style="display:flex;flex-direction:column;gap:12px;">${dcap('largo · modal central')}${largo(CE, { extra: extraLargo })}</div>
+  <div style="display:flex;flex-direction:column;gap:12px;">${dcap('largo · modal central')}${largo(CE, { extra: extraLargo(CE) })}</div>
   <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
-    <div style="display:flex;flex-direction:column;gap:12px;">${dcap('estreito · painel lateral')}${estreito(CE, { extra: extraEstreito })}</div>
-    <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-width:360px;">${dcap('rolado')}<div style="zoom:0.62;">${largo(CE, { rolou: true })}</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px;">${dcap('estreito · painel lateral')}${estreito(CE, { extra: extraEstreito(CE) })}</div>
+    <div style="display:flex;flex-direction:column;gap:22px;flex:1;min-width:360px;">${dcap('rolado')}<div style="zoom:0.62;">${largo(CE, { rolou: true })}</div>
+      ${dcap('histórico e @menção')}${historico(CE)}${mencao(CE)}</div>
   </div>`)}`;
 
 {
   const html = page('Tarefa',
     'O detalhe da tarefa na direção D aprovada: o que muda toda hora em pílulas logo abaixo do título e, quando há espaço, o trilho com todas as propriedades ao lado. As duas são o mesmo estado.',
-    corpo());
+    corpo(conversa, notas, nota(CL, 'Task pessoal: Notas', 'Só a pessoa vê a task, então a aba vira Notas ("Anotar…") e somem @menção, reações e respostas: mencionar avisaria alguém sobre algo que essa pessoa não abre.')));
   await Bun.write('Tarefa.dc.html', html);
   console.log('Tarefa.dc.html', html.length, 'bytes');
 }
