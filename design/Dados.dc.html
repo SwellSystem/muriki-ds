@@ -21,7 +21,7 @@
 
   <div style="display:flex;flex-direction:column;gap:5px;">
     <div style="font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1.1;">Dados e feedback</div>
-    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:660px;">Badge, Avatar, Tabs, Tooltip, Progress, Alert, Toast, Card e Skeleton. Os exemplos usam o vocabulário real do produto — tarefa, label, contrato, board — porque componente medido com texto genérico esconde onde a linha quebra.</div>
+    <div style="font-size:14px;line-height:1.5;color:oklch(45% 0.03 257.7);max-width:660px;">Badge, Avatar, Tabs, Tooltip, Progress, Alert, Toast, Card, Accordion e Skeleton. Os exemplos usam o vocabulário real do produto — tarefa, label, contrato, board — porque componente medido com texto genérico esconde onde a linha quebra.</div>
   </div>
 
   <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:22px;">
@@ -138,38 +138,39 @@
   </div>
 </div></div></div>
     <div style="display:flex;flex-direction:column;gap:14px;"><p class="sec-title">Alerta e toast</p><div class="card" style="flex-grow:1;display:flex;flex-direction:column;gap:14px;">
+<span class="cap">alert · neutro, sucesso, atenção (amarelo, não é erro) e erro — sem borda, o tom desenha a faixa</span>
 <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px;">
   
-<div style="background:oklch(97% 0.015 262.6);border:1px solid oklch(88% 0.06 262.6);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
-  <span style="color:oklch(47% 0.185 262.6);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="7.8" r="0.7" fill="currentColor"/></svg></span>
-  <div style="display:flex;flex-direction:column;gap:2px;">
-    <span style="font-size:13px;font-weight:600;line-height:18px;">Contrato dessincronizado</span>
-    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O spec da API mudou. Rode o sync antes de mexer na tela.</span>
+<div style="background:oklch(0.958 0.010 94);color:oklch(0.32 0.02 248.5);border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(0.45 0.03 257.7);display:flex;flex-shrink:0;height:20px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 11v5M12 7.6v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;line-height:20px;">Contrato dessincronizado</span>
+    <span style="font-size:13px;line-height:19px;opacity:0.85;">O spec da API mudou. Rode o sync antes de mexer na tela.</span>
   </div>
 </div>
   
-<div style="background:oklch(97% 0.02 150);border:1px solid oklch(93% 0.05 150);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
-  <span style="color:oklch(58% 0.13 150);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.2 12.3 2.6 2.6 5-5.2"/></svg></span>
-  <div style="display:flex;flex-direction:column;gap:2px;">
-    <span style="font-size:13px;font-weight:600;line-height:18px;">Tudo sincronizado</span>
-    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">O client foi regenerado há 2 minutos.</span>
+<div style="background:oklch(0.935 0.05 150);color:oklch(0.42 0.11 150);border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(0.42 0.11 150);display:flex;flex-shrink:0;height:20px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="m8 12.3 2.7 2.7L16 9.6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;line-height:20px;">Tudo sincronizado</span>
+    <span style="font-size:13px;line-height:19px;opacity:0.85;">O client foi regenerado há 2 minutos.</span>
   </div>
 </div>
   
-<div style="background:oklch(97.5% 0.02 60);border:1px solid oklch(93% 0.06 60);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
-  <span style="color:oklch(66% 0.17 55);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.7" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg></span>
-  <div style="display:flex;flex-direction:column;gap:2px;">
-    <span style="font-size:13px;font-weight:600;line-height:18px;">Tarefa bloqueada há 3 dias</span>
-    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">Ninguém foi notificado do bloqueio ainda.</span>
-  </div>
+<div style="background:oklch(0.94 0.075 95);color:oklch(0.44 0.1 82);border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(0.44 0.1 82);display:flex;flex-shrink:0;height:20px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/><path d="M12 9v4.5M12 16.8v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;line-height:20px;">Tarefa bloqueada há 3 dias</span>
+    <span style="font-size:13px;line-height:19px;opacity:0.85;">Ninguém foi notificado do bloqueio ainda.</span>
+  </div><span style="align-self:center;height:28px;padding:0 10px;border-radius:7px;background:oklch(99.3% 0.002 85);color:oklch(32% 0.02 248.5);box-shadow:inset 0 0 0 1px oklch(92% 0.01 98);font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;">Ver</span>
 </div>
   
-<div style="background:oklch(97% 0.02 27);border:1px solid oklch(93% 0.05 27);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;">
-  <span style="color:oklch(55% 0.20 27);display:flex;flex-shrink:0;margin-top:1px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 8v5"/><circle cx="12" cy="16.6" r="0.7" fill="currentColor"/><path d="M10.3 3.9 2.5 18a1.9 1.9 0 0 0 1.7 2.9h15.6a1.9 1.9 0 0 0 1.7-2.9L13.7 3.9a1.9 1.9 0 0 0-3.4 0Z"/></svg></span>
-  <div style="display:flex;flex-direction:column;gap:2px;">
-    <span style="font-size:13px;font-weight:600;line-height:18px;">Falha ao salvar</span>
-    <span style="font-size:12.5px;line-height:17px;color:oklch(45% 0.03 257.7);">A conexão caiu. Suas alterações estão guardadas localmente.</span>
-  </div>
+<div style="background:oklch(0.935 0.045 27);color:oklch(0.43 0.16 27);border-radius:12px;padding:12px 12px 12px 14px;display:flex;gap:10px;align-items:flex-start;">
+  <span style="color:oklch(0.43 0.16 27);display:flex;flex-shrink:0;height:20px;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 7.5v5.5M12 16.4v.1" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+  <div style="display:flex;flex-direction:column;gap:2px;flex-grow:1;">
+    <span style="font-size:14px;font-weight:600;line-height:20px;">Falha ao salvar</span>
+    <span style="font-size:13px;line-height:19px;opacity:0.85;">A conexão caiu. Suas alterações estão guardadas localmente.</span>
+  </div><span style="width:24px;height:24px;display:flex;align-items:center;justify-content:center;opacity:0.7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
 </div>
 </div>
 <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
@@ -183,6 +184,63 @@
     <span style="font-size:12.5px;font-weight:500;color:oklch(47% 0.185 262.6);">Desfazer</span>
   </div>
 </div></div></div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <p class="sec-title">Card e accordion</p>
+    <div class="card">
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:start;">
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">card · title, description, action e footer depois do filete soft</span>
+    <div style="background:oklch(99.3% 0.002 85);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);overflow:hidden;">
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:20px 20px 0;">
+        <div style="flex-grow:1;display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:600;line-height:20px;color:oklch(26% 0.022 250);">Lançamento do app</span><span style="font-size:13px;line-height:18px;color:oklch(45% 0.03 257.7);">Projeto · 24 tarefas</span></div>
+        <span style="color:oklch(45% 0.03 257.7);display:flex;margin:-2px -4px 0 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></span>
+      </div>
+      <div style="padding:12px 20px 20px;"><div style="height:6px;border-radius:99px;background:oklch(97% 0.01 93.5);overflow:hidden;"><div style="width:62%;height:100%;background:oklch(47% 0.185 262.6);border-radius:99px;"></div></div></div>
+      <div style="height:1px;background:linear-gradient(to right, transparent, oklch(94.5% 0.011 96) 12%, oklch(94.5% 0.011 96) 88%, transparent);"></div>
+      <div style="padding:12px 20px;font-size:12px;color:oklch(45% 0.03 257.7);">Atualizado há 3 min</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">card padding="none" · a lista vai até a borda</span>
+    <div style="background:oklch(99.3% 0.002 85);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);overflow:hidden;">
+      <div style="padding:14px 16px 0;font-size:14px;font-weight:600;line-height:20px;color:oklch(26% 0.022 250);">Atividade</div>
+      <div style="margin-top:12px;"><div style="height:40px;display:flex;align-items:center;padding:0 16px;font-size:13px;">Revisar contrato OpenAPI</div><div style="height:40px;display:flex;align-items:center;padding:0 16px;font-size:13px;border-top:1px solid oklch(97% 0.01 93.5);">Regenerar client Kubb</div><div style="height:40px;display:flex;align-items:center;padding:0 16px;font-size:13px;border-top:1px solid oklch(97% 0.01 93.5);">Subir migration</div></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;">
+    <span class="cap">accordion · multiple (padrão) ou single; o corpo entra desfocado</span>
+    <div style="background:oklch(99.3% 0.002 85);border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:6px 0;">
+      
+<div style="">
+  <div style="height:38px;display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;color:oklch(45% 0.03 257.7);">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(90deg);"><path d="m9 6 6 6-6 6"/></svg><span class="mono" style="font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">Arquivos</span><span class="mono" style="font-size:10px;opacity:0.8;">3</span>
+    <span style="margin-left:auto;display:flex;"><span style="color:oklch(45% 0.03 257.7);font-size:15px;line-height:1;">+</span></span>
+  </div>
+  <div style="padding:0 14px 12px;font-size:13px;color:oklch(32% 0.02 248.5);">main.ts · util.ts · README.md</div>
+</div>
+      <div style="height:1px;background:oklch(97% 0.01 93.5);"></div>
+      
+<div style="">
+  <div style="height:38px;display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;color:oklch(45% 0.03 257.7);">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(0deg);"><path d="m9 6 6 6-6 6"/></svg><span class="mono" style="font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">Testes</span><span class="mono" style="font-size:10px;opacity:0.8;">5/6</span>
+    
+  </div>
+  
+</div>
+      <div style="height:1px;background:oklch(97% 0.01 93.5);"></div>
+      
+<div style="opacity:0.45;">
+  <div style="height:38px;display:flex;align-items:center;gap:6px;padding:0 6px 0 10px;color:oklch(45% 0.03 257.7);">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(0deg);"><path d="m9 6 6 6-6 6"/></svg><span class="mono" style="font-size:9.5px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;">Notas</span>
+    
+  </div>
+  
+</div>
+    </div>
+  </div>
+</div></div>
   </div>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
