@@ -80,6 +80,35 @@ export interface TaskDraft {
   attachments: TaskModalAttachment[]
 }
 
+/**
+ * Comentário da conversa. `who` é o nome de quem escreveu; `reactions` mapeia
+ * emoji → nomes de quem reagiu. Respostas são comentários (um nível só).
+ */
+export interface TaskModalComment {
+  id: string
+  who: string
+  text: string
+  /** Já formatado pelo consumidor ("há 2 h", "seg"). */
+  when: string
+  reactions?: Record<string, string[]>
+  replies?: TaskModalComment[]
+  /** Chegou desde a última visita: ganha o selo "Novo". */
+  fresh?: boolean
+}
+
+/** Evento do histórico ("mudou o status para Em andamento"). */
+export interface TaskModalEvent {
+  id?: string
+  who: string
+  text: string
+  when: string
+}
+
+/** O que acontece na task, em ordem: comentários e eventos misturados. */
+export type TaskModalActivity =
+  | ({ type: "comment" } & TaskModalComment)
+  | ({ type: "event" } & TaskModalEvent)
+
 /** Cria um rascunho vazio com defaults seguros. */
 export function emptyTaskDraft(statusId = ""): TaskDraft {
   return {

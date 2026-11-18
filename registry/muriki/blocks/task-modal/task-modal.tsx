@@ -35,6 +35,7 @@ import { useTranslate } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
 import { TaskModalAttachments } from "./task-modal-attachments"
+import { TaskModalCollab } from "./task-modal-collab"
 import { TaskModalDescription } from "./task-modal-description"
 import {
   TaskModalPropertyList,
@@ -44,6 +45,7 @@ import { TaskModalSubtasks } from "./task-modal-subtasks"
 import { TaskModalTitle, type TaskTitleSize } from "./task-modal-title"
 import type {
   TaskDraft,
+  TaskModalActivity,
   TaskModalMode,
   TaskModalPersonOption,
   TaskModalProjectOption,
@@ -99,6 +101,19 @@ export interface TaskModalProps {
   requireDueDate?: boolean
   dueDateError?: string | null
   onSubmit: (options: TaskModalSubmitOptions) => void | Promise<void>
+  /**
+   * Comentários e eventos da task. Passar isto (ou `onComment`) liga as abas
+   * Conversa · Histórico embaixo do detalhe. Sem os dois, o modal é o de antes.
+   */
+  activity?: TaskModalActivity[]
+  /** Nome de quem está usando (reação própria, "Você" na menção). */
+  me?: string
+  /** Task pessoal: a aba vira Notas, sem menção, reações nem respostas. */
+  personal?: boolean
+  /** ⌘↵ no campo envia. Sem ele, não há campo. */
+  onComment?: (text: string) => void
+  onReply?: (commentId: string, text: string) => void
+  onReact?: (commentId: string, emoji: string) => void
 }
 
 // Nada de pele aqui. Superfície, sombra, raio e filete vêm do Dialog e do
@@ -132,6 +147,12 @@ export function TaskModal({
   requireDueDate = false,
   dueDateError = null,
   onSubmit,
+  activity,
+  me,
+  personal = false,
+  onComment,
+  onReply,
+  onReact,
 }: TaskModalProps) {
   const t = useTranslate()
   const [createMore, setCreateMore] = useState(false)
@@ -276,6 +297,17 @@ export function TaskModal({
                     ),
                   })
                 }
+              />
+            )}
+            {(activity !== undefined || onComment !== undefined) && (
+              <TaskModalCollab
+                activity={activity ?? []}
+                people={people}
+                me={me}
+                personal={personal}
+                onComment={onComment}
+                onReply={onReply}
+                onReact={onReact}
               />
             )}
           </div>

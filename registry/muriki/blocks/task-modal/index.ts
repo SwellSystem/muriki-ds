@@ -13,6 +13,8 @@ export type {
 } from "./task-modal-property-list"
 export { TaskModalDescription } from "./task-modal-description"
 export type { TaskModalDescriptionProps } from "./task-modal-description"
+export { TaskModalCollab } from "./task-modal-collab"
+export type { TaskModalCollabProps } from "./task-modal-collab"
 export { TaskModalAttachments } from "./task-modal-attachments"
 export type { TaskModalAttachmentsProps } from "./task-modal-attachments"
 export { emptyTaskDraft, TASK_POINT_OPTIONS } from "./task-modal-types"
@@ -27,4 +29,7 @@ export type {
   TaskModalTagOption,
   TaskModalSubtask,
   TaskModalAttachment,
+  TaskModalComment,
+  TaskModalEvent,
+  TaskModalActivity,
 } from "./task-modal-types"
