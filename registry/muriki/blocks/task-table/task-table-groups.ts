@@ -9,6 +9,7 @@
 // mesmo que o status dela seja outro, senão o grupo "Concluído" ganharia
 // fileiras soltas, sem a mãe por perto.
 import type {
+  TaskTableColumnId,
   TaskTableGroupBy,
   TaskTablePriority,
   TaskTableStatus,
@@ -133,4 +134,58 @@ export function groupTasks(
       Number(a.key === TASK_TABLE_EMPTY_GROUP) -
       Number(b.key === TASK_TABLE_EMPTY_GROUP)
   )
+}
+
+/** Cada tarefa-raiz com as descendentes logo embaixo, na ordem da lista. */
+export function rootBlocks(rows: TaskTableTask[]): TaskTableTask[][] {
+  const ids = new Set(rows.map((r) => r.id))
+  const blocks: TaskTableTask[][] = []
+  for (const row of rows) {
+    if (!row.parentId || !ids.has(row.parentId) || !blocks.length)
+      blocks.push([row])
+    else blocks[blocks.length - 1].push(row)
+  }
+  return blocks
+}
+
+const byName = (a?: string, b?: string) =>
+  a === b ? 0 : a == null ? 1 : b == null ? -1 : a.localeCompare(b)
+
+/**
+ * Ordena só as raízes; a subtarefa continua embaixo da mãe. O prazo ordena
+ * por `end` (ISO), porque `due` é texto pronto para exibir.
+ */
+export function sortTasks(
+  rows: TaskTableTask[],
+  id: "task" | TaskTableColumnId,
+  dir: "asc" | "desc"
+): TaskTableTask[] {
+  const cmp = (a: TaskTableTask, b: TaskTableTask): number => {
+    switch (id) {
+      case "task":
+        return a.title.localeCompare(b.title)
+      case "owner":
+        return byName(a.owner?.name ?? a.owner?.initials, b.owner?.name ?? b.owner?.initials)
+      case "status":
+        return STATUS_ORDER.indexOf(a.status) - STATUS_ORDER.indexOf(b.status)
+      case "project":
+        return byName(a.project?.name, b.project?.name)
+      case "priority":
+        return (
+          PRIORITY_ORDER.indexOf(a.priority ?? "none") -
+          PRIORITY_ORDER.indexOf(b.priority ?? "none")
+        )
+      case "subtasks": {
+        const r = (t: TaskTableTask) =>
+          t.progress?.total ? t.progress.done / t.progress.total : -1
+        return r(a) - r(b)
+      }
+      case "due":
+        return byName(a.end, b.end)
+    }
+  }
+  const s = dir === "asc" ? 1 : -1
+  return rootBlocks(rows)
+    .sort((a, b) => s * cmp(a[0], b[0]))
+    .flat()
 }

@@ -50,6 +50,20 @@ export type TaskTableGroupBy =
   | "project"
   | "assignee"
 
+/** Colunas que andam (a de Task fica fixa na frente). */
+export type TaskTableColumnId =
+  | "owner"
+  | "status"
+  | "project"
+  | "priority"
+  | "subtasks"
+  | "due"
+
+/** O que as células editáveis mudam (`TaskTableProps.onChange`). */
+export type TaskTablePatch = Partial<
+  Pick<TaskTableTask, "status" | "priority" | "owner">
+>
+
 export interface TaskTableProgress {
   done: number
   total: number

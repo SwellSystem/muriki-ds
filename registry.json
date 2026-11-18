@@ -3971,13 +3971,16 @@
       "title": "Task Table",
       "description": "Tabela hierárquica de tasks (epic → task → sub, ou subtarefas em children) com toolbar de busca e filtros, seleção em massa, colapso, agrupamento por status/prioridade/projeto/responsável com faixas presas que empilham, slots de composição e paginação.",
       "dependencies": [
-        "@phosphor-icons/react"
+        "@phosphor-icons/react",
+        "@base-ui/react"
       ],
       "registryDependencies": [
         "utils",
         "SwellSystem/muriki-ds/dropdown-menu",
         "SwellSystem/muriki-ds/button",
-        "SwellSystem/muriki-ds/i18n"
+        "SwellSystem/muriki-ds/i18n",
+        "SwellSystem/muriki-ds/skeleton",
+        "SwellSystem/muriki-ds/row-actions"
       ],
       "files": [
         {
@@ -4001,6 +4004,11 @@
           "target": "components/blocks/task-table/task-table-groups.ts"
         },
         {
+          "path": "registry/muriki/blocks/task-table/task-table-parts.tsx",
+          "type": "registry:component",
+          "target": "components/blocks/task-table/task-table-parts.tsx"
+        },
+        {
           "path": "registry/muriki/blocks/task-table/types.ts",
           "type": "registry:component",
           "target": "components/blocks/task-table/types.ts"
@@ -4011,7 +4019,7 @@
           "target": "components/blocks/task-table/index.ts"
         }
       ],
-      "docs": "Agrupamento: passe groupBy ('none' | 'status' | 'priority' | 'project' | 'assignee') e dê altura ao pai — a tabela rola sozinha, com faixas de grupo presas que empilham. Subtarefas podem vir em children (herdam o projeto). Sem groupBy, o agrupamento continua do caller: renderGroupHeaderBefore + trailingRows.",
+      "docs": "Modo do DS: passe groupBy ('none' | 'status' | 'priority' | 'project' | 'assignee') e dê altura ao pai — a tabela rola sozinha, com faixas de grupo presas que empilham, colunas que arrastam/redimensionam/ordenam, cálculos e \"Mostrar mais\" por grupo (páginas sem grupo), pickers com onChange, rowActions na ponta e no botão direito, skeleton com loading e a barra da seleção embaixo no centro. A barra cobre o canto dos toasts: enquanto houver seleção, passe offset ao <Toaster> (ex.: offset={{ bottom: 88 }}). Subtarefas podem vir em children (herdam o projeto). Sem groupBy, nada muda: o agrupamento continua do caller via renderGroupHeaderBefore + trailingRows.",
       "css": {
         "@keyframes muriki-tt-in": {
           "from": {
@@ -4041,8 +4049,18 @@
         ".muriki-tt-swap": {
           "animation": "muriki-tt-swap 0.3s cubic-bezier(.16,1,.3,1)"
         },
+        "@keyframes muriki-tt-colin": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(8px)",
+            "transform": "translateY(4px)"
+          }
+        },
+        ".muriki-tt-colin": {
+          "animation": "muriki-tt-colin 0.45s cubic-bezier(.16,1,.3,1)"
+        },
         "@media (prefers-reduced-motion: reduce)": {
-          ".muriki-tt-in > td > *, .muriki-tt-out > td > *, .muriki-tt-swap": {
+          ".muriki-tt-in > td > *, .muriki-tt-out > td > *, .muriki-tt-swap, .muriki-tt-colin": {
             "animation": "none"
           }
         }
