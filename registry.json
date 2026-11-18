@@ -3963,7 +3963,19 @@
           "target": "components/blocks/task-modal/index.ts"
         }
       ],
-      "docs": "Portado do muriki-platform e adaptado à casa: a pele (superfície, sombra, raio, filete) vem do Dialog e do Sheet com anatomy=\"framed\"; os selos viram Badge, os controles viram Checkbox e Progress, e o seletor de três modos passa a ser o ViewToggle. A locale das datas entra por prop (localeTag), padrão pt-BR."
+      "docs": "Portado do muriki-platform e adaptado à casa: a pele (superfície, sombra, raio, filete) vem do Dialog e do Sheet com anatomy=\"framed\"; os selos viram Badge, os controles viram Checkbox e Progress, e o seletor de três modos passa a ser o ViewToggle. A locale das datas entra por prop (localeTag), padrão pt-BR. Layout da direção D (prototipos/tarefa-v2): pílulas de status, prioridade, responsáveis e prazo logo abaixo do título e, a partir de 760px de corpo (container query), o trilho com todas as propriedades ao lado; as duas leem o mesmo value. Mais estreito, o trilho vira uma lista curta com o que as pílulas não têm. Cada coluna rola sozinha, e o cabeçalho ganha o filete quando a principal sai do topo. O modal central desfoca o fundo (classe muriki-task-modal-central); o painel lateral não.",
+      "css": {
+        "[data-slot=\"dialog-backdrop\"]:has(~ .muriki-task-modal-central)": {
+          "-webkit-backdrop-filter": "blur(6px)",
+          "backdrop-filter": "blur(6px)"
+        },
+        "@media (prefers-reduced-transparency: reduce)": {
+          "[data-slot=\"dialog-backdrop\"]:has(~ .muriki-task-modal-central)": {
+            "-webkit-backdrop-filter": "none",
+            "backdrop-filter": "none"
+          }
+        }
+      }
     },
     {
       "name": "task-table",

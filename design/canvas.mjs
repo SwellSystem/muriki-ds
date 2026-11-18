@@ -18,6 +18,7 @@ const P2 = [
 const P1b = [
   ['Controles.dc.html', 1180, 820, 'Campos e seleção'],
   ['Dados.dc.html', 1180, 1600, 'Dados e feedback'],
+  ['Tarefa.dc.html', 1300, 3100, 'Tarefa'],
 ];
 
 const row = async (list, page, y) => {

@@ -7,7 +7,10 @@ export type { TaskModeSwitchProps } from "./task-mode-switch"
 export { TaskModalTitle } from "./task-modal-title"
 export type { TaskModalTitleProps, TaskTitleSize } from "./task-modal-title"
 export { TaskModalPropertyList } from "./task-modal-property-list"
-export type { TaskModalPropertyListProps } from "./task-modal-property-list"
+export type {
+  TaskModalPropertyListProps,
+  TaskModalPropertyField,
+} from "./task-modal-property-list"
 export { TaskModalDescription } from "./task-modal-description"
 export type { TaskModalDescriptionProps } from "./task-modal-description"
 export { TaskModalAttachments } from "./task-modal-attachments"
