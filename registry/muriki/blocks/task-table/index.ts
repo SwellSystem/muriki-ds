@@ -13,10 +13,15 @@ export type {
 } from "./task-table-toolbar"
 export type {
   TaskTableAvatarTone,
+  TaskTableDueState,
+  TaskTableGroupBy,
   TaskTableKind,
   TaskTableOwner,
   TaskTablePriority,
   TaskTableProgress,
+  TaskTableProject,
   TaskTableStatus,
+  TaskTableSubtask,
   TaskTableTask,
+  TaskTableTone,
 } from "./types"

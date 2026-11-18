@@ -19,15 +19,18 @@ import {
   Warning,
   X,
 } from "@phosphor-icons/react"
+import { CalendarBlankIcon, WarningCircleIcon } from "@phosphor-icons/react"
 
 import { cn } from "@/lib/utils"
 
 import type {
   TaskTableAvatarTone,
+  TaskTableDueState,
   TaskTableKind,
   TaskTablePriority,
   TaskTableStatus,
   TaskTableTask,
+  TaskTableTone,
 } from "./types"
 
 const avatarToneClass: Record<TaskTableAvatarTone, string> = {
@@ -122,10 +125,31 @@ function PriorityCell({ priority }: { priority: TaskTablePriority }) {
   const config = PRIORITY_CELL_CONFIG[priority]
   const IconComponent = config.icon
 
+  // Sem prioridade é só o ícone de três traços (o PriorityIcon do DS): o
+  // texto repetido em toda fileira vazia virava ruído, e o traço "—" sozinho
+  // parecia dado faltando, não uma prioridade escolhida.
   if (priority === "none") {
+    const label = t("task_table.priority_empty")
     return (
-      <span className="text-muted-foreground">
-        {t("task_table.priority.none")}
+      <span
+        role="img"
+        aria-label={label}
+        title={label}
+        className="inline-flex text-muted-foreground/60"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+          {[0, 1, 2].map((i) => (
+            <rect
+              key={i}
+              x={1.5 + i * 4}
+              y={6.25}
+              width={3}
+              height={1.5}
+              rx={0.75}
+              fill="currentColor"
+            />
+          ))}
+        </svg>
       </span>
     )
   }
@@ -157,6 +181,62 @@ function ProgressCell({ done, total }: { done: number; total: number }) {
     </span>
   )
 }
+
+/**
+ * O pill do prazo. O valor é `flex: 0 1 auto` e o pill não tem largura 100%:
+ * com largura cheia, uma coluna estreita cortava "Hoje" em "Hoj" mesmo com
+ * espaço sobrando, porque o texto encolhia junto com a célula.
+ */
+const dueStateClass: Record<TaskTableDueState, string> = {
+  overdue: "bg-tone-red text-tone-red-foreground",
+  today: "bg-tone-orange text-tone-orange-foreground",
+  tomorrow: "bg-tone-yellow text-tone-yellow-foreground",
+  week: "bg-muted text-foreground-strong",
+  later: "text-muted-foreground",
+  done: "text-muted-foreground line-through",
+}
+
+function DuePill({ due, state }: { due: string; state?: TaskTableDueState }) {
+  const Icone = state === "overdue" ? WarningCircleIcon : CalendarBlankIcon
+  return (
+    <span
+      data-state={state}
+      className={cn(
+        "inline-flex h-[22px] max-w-full items-center gap-[5px] rounded-sm pr-[7px] pl-1.5 text-[12px] font-medium whitespace-nowrap tabular-nums",
+        dueStateClass[state ?? "later"]
+      )}
+    >
+      <Icone size={13} className="shrink-0" aria-hidden />
+      <span className="min-w-0 flex-[0_1_auto] truncate">{due}</span>
+    </span>
+  )
+}
+
+const projectDotClass: Record<TaskTableTone, string> = {
+  gray: "bg-tone-gray-dot",
+  blue: "bg-tone-blue-dot",
+  cyan: "bg-tone-cyan-dot",
+  green: "bg-tone-green-dot",
+  yellow: "bg-tone-yellow-dot",
+  orange: "bg-tone-orange-dot",
+  red: "bg-tone-red-dot",
+  pink: "bg-tone-pink-dot",
+  purple: "bg-tone-purple-dot",
+}
+
+/**
+ * As três faixas do modo agrupado: off-white → card → azul suave, contando
+ * só as fileiras de cada grupo. No lugar do degrau por profundidade, porque
+ * com grupos a árvore já se lê pelo recuo e pelo fio, e o revezamento é o que
+ * guia o olho numa fileira longa sem régua.
+ */
+const stripeBgClass = [
+  "bg-[color-mix(in_oklab,var(--background),var(--muted))]",
+  "bg-card",
+  "bg-[color-mix(in_oklab,var(--card)_50%,var(--primary-subtle))]",
+] as const
+const stripeSelectedClass =
+  "bg-[color-mix(in_oklab,var(--primary-subtle)_88%,var(--primary)_12%)]"
 
 /**
  * O tingimento da fileira é a ÚNICA coisa que separa uma linha da outra —
@@ -205,6 +285,15 @@ export interface TaskTableRowProps {
   onCancel?: (taskId: string) => void
   renderRowMenu?: (taskId: string) => React.ReactNode
   showOwnerColumn?: boolean
+  /** Coluna Projeto (sem projeto, "Pessoal"). Default: false. */
+  showProjectColumn?: boolean
+  /**
+   * Faixa da fileira no modo agrupado (0, 1, 2). Sem ela, vale o degrau por
+   * profundidade de antes.
+   */
+  stripe?: 0 | 1 | 2
+  /** Grupo ou subtarefas abrindo ("in") ou fechando ("out"): a fileira entra e sai desfocada. */
+  motion?: "in" | "out"
 }
 
 export function TaskTableRow({
@@ -225,6 +314,9 @@ export function TaskTableRow({
   onCancel,
   renderRowMenu,
   showOwnerColumn = true,
+  showProjectColumn = false,
+  stripe,
+  motion,
 }: TaskTableRowProps) {
   const t = useTranslate()
 
@@ -247,22 +339,43 @@ export function TaskTableRow({
       : null
   )
 
-  const tdBgClass = getRowBgClass(task)
-  const cellClass = cn("relative", tdBgClass, hoverBgClass, "transition-colors")
+  const isStriped = stripe !== undefined
+  const tdBgClass = isStriped
+    ? checked || task.selected
+      ? stripeSelectedClass
+      : stripeBgClass[stripe]
+    : getRowBgClass(task)
+  const cellClass = cn(
+    "relative",
+    tdBgClass,
+    isStriped ? "group-hover/row:bg-muted" : hoverBgClass,
+    "transition-colors"
+  )
 
   return (
     <tr
       data-id={task.id}
       data-depth={task.depth}
       data-parent={task.parentId}
+      data-st={stripe}
       onClick={onSelect ? () => onSelect(task.id) : undefined}
       className={cn(
         "group/row",
         hidden && "hidden",
+        motion === "in" && "muriki-tt-in",
+        motion === "out" && "muriki-tt-out",
         onSelect && "cursor-pointer"
       )}
     >
-      <td className={cn(cellClass, "w-[22px] py-[10px] pl-3")}>
+      <td
+        className={cn(
+          cellClass,
+          "w-[22px] py-[10px] pl-3",
+          isStriped &&
+            (checked || task.selected) &&
+            "shadow-[inset_3px_0_0_var(--primary)]"
+        )}
+      >
         {/* status rail */}
         <span
           aria-hidden
@@ -399,6 +512,27 @@ export function TaskTableRow({
         </span>
       </td>
 
+      {showProjectColumn && (
+        <td className={cn(cellClass, "px-2.5 py-[10px] text-[12.5px]")}>
+          {task.project ? (
+            <span className="inline-flex max-w-full min-w-0 items-center gap-1.5">
+              <span
+                aria-hidden
+                className={cn(
+                  "size-2 shrink-0 rounded-full",
+                  projectDotClass[task.project.tone ?? "gray"]
+                )}
+              />
+              <span className="truncate">{task.project.name}</span>
+            </span>
+          ) : (
+            <span className="text-muted-foreground/60">
+              {t("task_table.project_personal")}
+            </span>
+          )}
+        </td>
+      )}
+
       <td className={cn(cellClass, "px-2.5 py-[10px]")}>
         <PriorityCell priority={task.priority ?? "none"} />
       </td>
@@ -409,13 +543,8 @@ export function TaskTableRow({
         ) : null}
       </td>
 
-      <td
-        className={cn(
-          cellClass,
-          "px-2.5 py-[10px] font-mono text-[12px] text-muted-foreground"
-        )}
-      >
-        {task.due}
+      <td className={cn(cellClass, "px-2.5 py-[10px] whitespace-nowrap")}>
+        {task.due ? <DuePill due={task.due} state={task.dueState} /> : null}
       </td>
 
       <td className={cn(cellClass, "w-0 py-[10px] pr-1 whitespace-nowrap")}>
