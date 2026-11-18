@@ -691,7 +691,7 @@
       "name": "sonner",
       "type": "registry:ui",
       "title": "Toaster",
-      "description": "Sonner vestido com a paleta: info neutro, success e warning tingidos como badge, error sólido porque precisa interromper.",
+      "description": "Sonner em pílula, embaixo no centro: fundo de cartão e o tipo dito pelo selo (o ícone num círculo no tom do badge: info cinza, sucesso verde, atenção laranja, erro vermelho, carregando azul). Empilha, abre no hover e troca no lugar pelo id (loading → success); a largura acompanha o texto e, com descrição, vira cartão de 22px. Funciona no centro ou num canto (no canto, encosta nele), com o mesmo movimento: entra e sai desfocando, e na troca o ícone e o texto chegam desfocados. Erro com ação: passe duration: Infinity.",
       "dependencies": [
         "sonner",
         "@phosphor-icons/react"

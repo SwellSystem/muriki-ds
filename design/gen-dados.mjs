@@ -166,14 +166,21 @@ const alerts = `
   ${alert(N.danger50, N.danger100, N.danger, ico.alert, 'Falha ao salvar', 'A conexão caiu. Suas alterações estão guardadas localmente.')}
 </div>
 <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;">
-  ${cap('toast')}
-  <div style="align-self:flex-start;background:${N.surface};border:1px solid ${N.border};border-radius:11px;padding:12px 14px;display:flex;gap:11px;align-items:center;box-shadow:${shadow.lg};min-width:320px;">
-    <span style="color:${N.success};display:flex;">${ico.circCheck}</span>
-    <div style="display:flex;flex-direction:column;gap:1px;flex-grow:1;">
-      <span style="font-size:13px;font-weight:500;">Tarefa movida para Concluída</span>
-      <span style="font-size:12px;color:${N.muted};">MRK-1284 · Revisar contrato OpenAPI</span>
+  ${cap('toast · pílula embaixo no centro, o tipo no selo; com descrição vira cartão')}
+  <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 0 2px;">
+    <div style="background:${N.surface};border-radius:999px;padding:6px 12px 6px 6px;display:flex;gap:10px;align-items:center;box-shadow:inset 0 0 0 1px ${N.border}, ${shadow.lg};">
+      <span style="width:28px;height:28px;border-radius:50%;background:${N.success100};color:${N.success};display:grid;place-items:center;flex-shrink:0;">${ico.circCheck}</span>
+      <span style="font-size:14px;font-weight:500;white-space:nowrap;">Tarefa concluída</span>
+      <span style="height:28px;padding:0 12px;border-radius:999px;background:${N.success100};color:${N.success};font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;">Desfazer</span>
     </div>
-    <span style="font-size:12.5px;font-weight:500;color:${N.brand};">Desfazer</span>
+    <div style="background:${N.surface};border-radius:22px;padding:10px 14px 10px 10px;display:flex;gap:10px;align-items:flex-start;box-shadow:inset 0 0 0 1px ${N.border}, ${shadow.lg};max-width:400px;">
+      <span style="width:28px;height:28px;border-radius:50%;background:${N.danger100};color:${N.danger};display:grid;place-items:center;flex-shrink:0;">${ico.alert}</span>
+      <div style="display:flex;flex-direction:column;gap:1px;padding-top:4px;flex-grow:1;">
+        <span style="font-size:14px;font-weight:500;">Não deu para exportar</span>
+        <span style="font-size:13px;line-height:18px;color:${N.muted};">A conexão caiu no meio. Nada foi perdido.</span>
+      </div>
+      <span style="align-self:center;height:28px;padding:0 12px;border-radius:999px;background:${N.danger100};color:${N.danger};font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;">Tentar</span>
+    </div>
   </div>
 </div>`;
 
