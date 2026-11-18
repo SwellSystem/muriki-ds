@@ -14,7 +14,20 @@ export type ButtonProps = ButtonPrimitive.Props &
      * rótulo fica — "Salvando…" é opcional, o spinner já diz que está indo.
      */
     loading?: boolean
+    /**
+     * Com texto de carregando, a troca é no lugar: o rótulo sai desfocado
+     * subindo e o spinner + "Salvando" entra desfocado de baixo, os dois na
+     * mesma célula de grid — o botão fica com a largura do maior e não pula.
+     * Passe sempre que o botão carrega (não só quando `loading`), para a
+     * largura já estar reservada antes do clique.
+     */
+    loadingText?: React.ReactNode
   }
+
+// o desfoque de sempre: sai subindo, entra de baixo; com "reduzir movimento", só troca
+const TROCA =
+  "inline-flex items-center gap-[inherit] [grid-area:1/1] transition-[opacity,filter,translate] duration-300 ease-[cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none"
+const FORA = "opacity-0 blur-[6px]"
 
 /**
  * Muriki Button. Base UI por baixo — use `render` para trocar o elemento
@@ -26,10 +39,13 @@ function Button({
   size = "default",
   effect = "none",
   loading = false,
+  loadingText,
   disabled,
   children,
   ...props
 }: ButtonProps) {
+  const spinner = <Spinner size={size === "xs" || size === "sm" ? "sm" : "default"} />
+  const troca = loadingText != null && !String(size).startsWith("icon")
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -44,8 +60,22 @@ function Button({
       )}
       {...props}
     >
-      {loading ? <Spinner size={size === "xs" || size === "sm" ? "sm" : "default"} /> : null}
-      {children}
+      {troca ? (
+        <span className="inline-grid place-items-center gap-[inherit]">
+          <span className={cn(TROCA, loading && `${FORA} -translate-y-[3px]`)} aria-hidden={loading || undefined}>
+            {children}
+          </span>
+          <span className={cn(TROCA, !loading && `${FORA} translate-y-[3px]`)} aria-hidden={!loading || undefined}>
+            {spinner}
+            {loadingText}
+          </span>
+        </span>
+      ) : (
+        <>
+          {loading ? spinner : null}
+          {children}
+        </>
+      )}
     </ButtonPrimitive>
   )
 }

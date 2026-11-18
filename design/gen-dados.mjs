@@ -200,10 +200,24 @@ const composites = `
       ${taskRow(false, 'Escrever teste do webhook de subscriptions', 'border-bottom:none;')}
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
-      ${cap('skeleton · carregando')}
+      ${cap('skeleton · o osso tem a cor do que vai chegar: texto neutro, selo e avatar azul (tone="color")')}
       <div style="background:${N.surface};border:1px solid ${N.border};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:11px;">
-        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:${N.b200};"></span><span style="height:9px;border-radius:5px;background:${N.b200};flex-grow:1;max-width:280px;"></span><span style="height:9px;width:48px;border-radius:5px;background:${N.b100};"></span></div>
-        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:${N.b200};"></span><span style="height:9px;border-radius:5px;background:${N.b200};flex-grow:1;max-width:200px;"></span><span style="height:9px;width:48px;border-radius:5px;background:${N.b100};"></span></div>
+        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:${N.b200};"></span><span style="height:9px;border-radius:5px;background:${N.b200};flex-grow:1;max-width:280px;"></span><span style="height:20px;width:64px;border-radius:999px;background:${N.brand100};"></span><span style="width:22px;height:22px;border-radius:50%;background:${N.brand100};"></span></div>
+        <div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:${N.b200};"></span><span style="height:9px;border-radius:5px;background:${N.b200};flex-grow:1;max-width:200px;"></span><span style="height:20px;width:64px;border-radius:999px;background:${N.brand100};"></span><span style="width:22px;height:22px;border-radius:50%;background:${N.brand100};"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+      ${cap('loading de tela inteira · antes de existir tela (LoadingScreen)')}
+      <div style="background:${N.bg};border:1px solid ${N.border};border-radius:11px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+        <div style="position:relative;width:84px;height:84px;">
+          <div style="position:absolute;inset:0;border-radius:50%;background:oklch(47% 0.185 262.6 / 0.2);filter:blur(28px);"></div>
+          <div style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:${N.brand};border-right-color:oklch(47% 0.185 262.6 / 0.6);"></div>
+          <div style="position:absolute;inset:9px;border-radius:50%;border:2px solid transparent;border-bottom-color:oklch(87.8% 0.18 93.9);border-left-color:oklch(87.8% 0.18 93.9 / 0.7);"></div>
+          <div style="position:absolute;inset:18px;border-radius:50%;background:${N.surface};border:1px solid ${N.border};"></div>
+          <span style="position:absolute;left:38px;top:38px;width:8px;height:8px;border-radius:50%;background:${N.brand};box-shadow:0 0 12px ${N.brand};"></span>
+        </div>
+        <div style="text-align:center;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;font-weight:600;">Carregando</span><span style="font-size:12px;color:${N.muted};">Isso leva só alguns segundos</span></div>
+        <span style="width:200px;height:6px;border-radius:99px;background:${N.b100};overflow:hidden;display:block;"><span style="display:block;width:60%;height:100%;margin-left:20%;background:linear-gradient(90deg,transparent,oklch(47% 0.185 262.6 / 0.5),transparent);"></span></span>
       </div>
     </div>
   </div>

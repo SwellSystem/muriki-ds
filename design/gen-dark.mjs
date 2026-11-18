@@ -2,6 +2,7 @@ import { page } from './tokens.mjs';
 import { D, DC, dbtn, dibtn, dbg, dinput, dcard, rr } from './dark.mjs';
 const cap = t => `<span class="cap" style="color:${D.muted};">${t}</span>`;
 const I = {
+  spin:`<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-opacity="0.2" stroke-width="2"/><path d="M14.5 8A6.5 6.5 0 0 0 8 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
   finger:`<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11v3.5a6 6 0 0 1-1.2 3.6"/><path d="M8.5 11a3.5 3.5 0 0 1 7 0v2.2c0 1.4-.3 2.8-.9 4.1"/><path d="M5.4 13.6A7 7 0 0 1 5 11a7 7 0 0 1 10.6-6"/><path d="M19 11v2c0 1.1-.1 2.2-.4 3.3"/></svg>`,
   mail:`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.6 7 7.3 5.3a2 2 0 0 0 2.2 0L20.4 7"/></svg>`,
   plus:`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
@@ -150,6 +151,32 @@ const login = `
   </div>
 </div>`;
 
+const carregamento = `
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+  <div style="display:flex;flex-direction:column;gap:16px;">
+    ${grp('skeleton · texto neutro, selo e avatar no osso azul (tone="color")', `
+    <div style="width:100%;background:${D.surface};border-radius:11px;padding:12px;display:flex;flex-direction:column;gap:11px;">
+      ${['280px','200px'].map(w => `<div style="display:flex;gap:11px;align-items:center;"><span style="width:16px;height:16px;border-radius:5px;background:oklch(1 0 0 / 0.07);"></span><span style="height:9px;border-radius:5px;background:oklch(1 0 0 / 0.07);flex-grow:1;max-width:${w};"></span><span style="height:20px;width:64px;border-radius:999px;background:oklch(70% 0.145 262.6 / 0.3);"></span><span style="width:22px;height:22px;border-radius:50%;background:oklch(70% 0.145 262.6 / 0.3);"></span></div>`).join('')}
+    </div>`)}
+    ${grp('botão carregando · o rótulo sai, "Salvando" entra no lugar', [
+      `${dbtn('primary')}<span style="display:flex;opacity:0.85;">${I.spin}</span>Salvando</span>`,
+      `${dbtn('outline')}Salvar alterações</span>`,
+    ].join(''))}
+  </div>
+  ${grp('loading de tela inteira', `
+  <div style="width:100%;background:${D.bg};box-shadow:inset 0 0 0 1px ${D.hair};border-radius:11px;height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+    <div style="position:relative;width:84px;height:84px;">
+      <div style="position:absolute;inset:0;border-radius:50%;background:oklch(70% 0.145 262.6 / 0.15);filter:blur(28px);"></div>
+      <div style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:${D.brand};border-right-color:oklch(70% 0.145 262.6 / 0.6);"></div>
+      <div style="position:absolute;inset:9px;border-radius:50%;border:2px solid transparent;border-bottom-color:${D.acc};border-left-color:oklch(83% 0.165 93 / 0.7);"></div>
+      <div style="position:absolute;inset:18px;border-radius:50%;background:${D.surface};box-shadow:inset 0 0 0 1px ${D.hair};"></div>
+      <span style="position:absolute;left:38px;top:38px;width:8px;height:8px;border-radius:50%;background:${D.brand};box-shadow:0 0 12px ${D.brand};"></span>
+    </div>
+    <div style="text-align:center;display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;font-weight:600;color:${D.fg};">Carregando</span><span style="font-size:12px;color:${D.muted};">Isso leva só alguns segundos</span></div>
+    <span style="width:200px;height:6px;border-radius:99px;background:${D.surface2};overflow:hidden;display:block;"><span style="display:block;width:60%;height:100%;margin-left:20%;background:linear-gradient(90deg,transparent,oklch(70% 0.145 262.6 / 0.5),transparent);"></span></span>
+  </div>`)}
+</div>`;
+
 const body = `
 <div style="display:flex;flex-direction:column;gap:14px;">
   <p class="sec-title" style="color:${D.muted};">As cinco regras da tradução</p>
@@ -159,6 +186,7 @@ const body = `
   ${rail('Botões', 'a família<br>inteira', botoes)}
   ${rail('Badges', 'nove matizes<br>luz invertida', badges)}
   ${rail('Campos', 'e seleção', campos)}
+  ${rail('Carregamento', 'skeleton, botão<br>e tela inteira', carregamento)}
   ${rail('Na tela', 'login e lista<br>em paridade', login, true)}
 </div>`;
 

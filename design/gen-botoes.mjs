@@ -73,7 +73,7 @@ ${grp('ícone à esquerda · à direita · só ícone · menu', [
   `${ibtn('ghost', 32, 'rest', I.dots)}`,
   `${btn('danger')}<span style="display:flex;">${I.trash}</span>Excluir</span>`,
 ].join(''))}
-${grp('carregando · desabilitado', [
+${grp('carregando (loadingText: o rótulo sai desfocado e "Salvando" entra no lugar, sem mudar a largura) · desabilitado', [
   `${btn('primary', 32, 'rest')}<span style="display:flex;opacity:0.8;">${I.spin}</span>Salvando</span>`,
   `${btn('outline', 32, 'disabled')}Indisponível no plano</span>`,
 ].join(''))}
