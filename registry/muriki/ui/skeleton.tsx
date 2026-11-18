@@ -22,13 +22,25 @@
  * faixa ao mesmo tempo — a tela lê como UMA espera, não como vinte. Com
  * prefers-reduced-motion, fica só o buraco parado. O CSS (.muriki-skeleton
  * e o @keyframes) vem com o item.
+ *
+ * O OSSO TEM A COR DO QUE VAI CHEGAR. Texto é neutro (o buraco de sempre);
+ * o que chega com cor — selo de status, chip, avatar, barra de andamento —
+ * usa `tone="color"`, o osso azul (a marca a 16% no claro, 30% no escuro).
+ * Assim a espera já desenha onde a cor vai estar, e a troca não acende a
+ * tela de uma vez.
  */
 import { cn } from "@/lib/utils"
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+export interface SkeletonProps extends React.ComponentProps<"div"> {
+  /** `color` para o que chega com cor (status, chip, avatar, andamento). */
+  tone?: "neutral" | "color"
+}
+
+function Skeleton({ className, tone = "neutral", ...props }: SkeletonProps) {
   return (
     <div
       data-slot="skeleton"
+      data-tone={tone === "color" ? "color" : undefined}
       aria-hidden
       className={cn("muriki-skeleton rounded-[8px]", className)}
       {...props}
