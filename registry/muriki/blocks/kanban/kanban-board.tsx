@@ -1,11 +1,29 @@
-// Porte do FocusKanbanBoard do muriki-platform: colunas-bandeja em scroll
-// horizontal com snap, cabeçalho mono, coluna vazia poética — e o drag-drop
-// inter-colunas via @dnd-kit com o mesmo vocabulário de efeitos: overlay
-// clonado com rotação e sombra cinematográfica, original como fantasma
-// físico, colunas não-alvo desbotadas, "Solte aqui." no alvo vazio e
-// aria-live anunciando o movimento. Sem Yjs: o estado volta pro caller
-// via `onTasksChange` (array flat reordenado).
-"use client";
+// O quadro aprovado no Muriki DS (prototipos/kanban), no lugar das
+// colunas-bandeja do platform. Colunas sem caixa, só tingidas pela cor do
+// status: o fio colorido embaixo do cabeçalho diz de que coluna é cada
+// cartão mesmo com o nome fora da tela. O contador vira "n/limite" e fica
+// laranja quando a coluna passa do limite — WIP estourado é aviso, não erro.
+// O rodapé resume a coluna sem abrir nada: quantas, quanto das subtarefas
+// já foi, e a barra no prazo · com alerta · sem prazo.
+//
+// Criar é no topo da coluna (o "+" do cabeçalho ou `add()` da barra): a
+// tarefa nova nasce onde o olho já está, e Enter cria e continua.
+//
+// O quadro é controlado. As tarefas vêm de fora e cada gesto volta por
+// callback: `onMove(id, status, index)` (use `placeTask` para aplicar),
+// `onComplete`, `onOpen`, `onCreate`. Mover e concluir avisam com Desfazer
+// pelo sonner — monte um `<Toaster />` na página.
+//
+// API nova (troca a do bloco antigo): `columns` é `{ id, label, limit? }`
+// com `id` sendo um dos status do DS (a cor vem dele, não de `color`);
+// `onTasksChange`/`onMoved` viram `onMove`, `onToggleDone` vira
+// `onComplete`, `onAddCard` vira `onCreate(status, title)` e
+// `onCardClick` vira `onOpen(id)`.
+//
+// Arrasto: @dnd-kit, como antes (teclado incluso: Espaço pega e solta).
+// O cartão erguido inclina 1,6° com a sombra funda; no lugar dele fica o
+// espaço tingido da coluna.
+"use client"
 
 import {
   DndContext,
@@ -20,590 +38,507 @@ import {
   useSensor,
   useSensors,
   type CollisionDetection,
+  type DragEndEvent,
   type DragOverEvent,
   type DragStartEvent,
-} from "@dnd-kit/core";
+} from "@dnd-kit/core"
 import {
   SortableContext,
+  sortableKeyboardCoordinates,
   useSortable,
   verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Plus } from "@phosphor-icons/react";
-import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { KanbanIcon, PlusIcon, WarningCircleIcon } from "@phosphor-icons/react"
+import * as React from "react"
+import { toast } from "sonner"
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import type { BadgeTone } from "@/components/ui/badge-variants"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
-import { KanbanCard, type KanbanTask } from "./kanban-card";
 import {
-  flattenColumns,
-  moveTaskLocally,
-  type KanbanColumnState,
-} from "./kanban-drop";
+  KanbanCard,
+  KanbanStatusIcon,
+  kanbanAlert,
+  kanbanNoon,
+  type KanbanProject,
+  type KanbanStatus,
+  type KanbanTask,
+} from "./kanban-card"
+import { moveTaskLocally, type KanbanColumnState } from "./kanban-drop"
 
 export interface KanbanColumnSpec {
-  id: string;
-  name: string;
-  /** Cor do status (qualquer cor CSS). `null` → ponto tracejado, borda neutra. */
-  color: string | null;
-}
-
-const EMPTY_VARIANTS = ["Um respiro.", "Vazio por enquanto.", "Silêncio."];
-
-function pickEmptyVariant(columnId: string): string {
-  let hash = 0;
-  for (let i = 0; i < columnId.length; i++) {
-    hash = (hash * 31 + columnId.charCodeAt(i)) | 0;
-  }
-  return EMPTY_VARIANTS[Math.abs(hash) % EMPTY_VARIANTS.length]!;
+  id: KanbanStatus
+  label: string
+  /** Limite de tarefas: o contador vira "n/limite" e fica laranja quando passa. */
+  limit?: number
 }
 
 export interface KanbanBoardProps {
-  columns: KanbanColumnSpec[];
-  tasks: KanbanTask[];
-  /** Recebe o array flat reordenado (statusId já atualizado) após um drop. */
-  onTasksChange?: (tasks: KanbanTask[]) => void;
-  /** Disparado quando um drop muda a task de coluna. */
-  onMoved?: (task: KanbanTask, columnName: string) => void;
-  onToggleDone?: (slug: string, next: boolean) => void;
-  onAddCard?: (columnId: string) => void;
-  onCardClick?: (task: KanbanTask) => void;
-  className?: string;
+  tasks: KanbanTask[]
+  /** Padrão: os seis status do DS, na ordem. */
+  columns?: KanbanColumnSpec[]
+  projects?: KanbanProject[]
+  /** Soltou o cartão: `index` é a posição na coluna de destino, sem contar a própria. O Desfazer chama de novo com a posição antiga. */
+  onMove?: (taskId: KanbanTask["id"], toStatus: KanbanStatus, index: number) => void
+  /** Clique no status do cartão. O Desfazer chama `onMove` com a coluna e a posição antigas. */
+  onComplete?: (taskId: KanbanTask["id"]) => void
+  /** Clique (sem arrastar) ou Enter no cartão. */
+  onOpen?: (taskId: KanbanTask["id"]) => void
+  /** Liga o "+" das colunas e a criação rápida no topo da coluna. */
+  onCreate?: (status: KanbanStatus, title: string) => void
+  title?: React.ReactNode
+  /** Nós extras no fim da barra. Como função, recebe `add(status?)`, que abre a criação rápida. */
+  toolbar?: React.ReactNode | ((api: { add: (status?: KanbanStatus) => void }) => React.ReactNode)
+  now?: Date
+  "aria-label"?: string
+  className?: string
+  style?: React.CSSProperties
 }
 
+const STATUS: KanbanColumnSpec[] = [
+  { id: "backlog", label: "Backlog" },
+  { id: "todo", label: "A fazer" },
+  { id: "progress", label: "Em andamento" },
+  { id: "review", label: "Em revisão" },
+  { id: "done", label: "Concluído" },
+  { id: "canceled", label: "Cancelado" },
+]
+
+const TOM: Record<KanbanStatus, BadgeTone> = {
+  backlog: "gray",
+  todo: "gray",
+  progress: "blue",
+  review: "purple",
+  done: "green",
+  canceled: "red",
+}
+const tomDaColuna = (id: KanbanStatus) =>
+  ({ "--tone": `var(--tone-${TOM[id] ?? "gray"}-dot)`, "--tone-bg": `var(--tone-${TOM[id] ?? "gray"})` }) as React.CSSProperties
+
+const rotulo = (t: KanbanTask) => (t.code ? `${t.code} · ` : "") + t.title
+
 export function KanbanBoard({
-  columns: columnSpecs,
   tasks,
-  onTasksChange,
-  onMoved,
-  onToggleDone,
-  onAddCard,
-  onCardClick,
+  columns: colunasProp,
+  projects = [],
+  onMove,
+  onComplete,
+  onOpen,
+  onCreate,
+  title,
+  toolbar,
+  now,
+  "aria-label": ariaLabel,
   className,
+  style,
 }: KanbanBoardProps) {
-  const columns: KanbanColumnState[] = useMemo(
-    () =>
-      columnSpecs.map((spec) => ({
-        ...spec,
-        tasks: tasks.filter((t) => t.statusId === spec.id),
-      })),
-    [columnSpecs, tasks]
-  );
+  const COLS = colunasProp ?? STATUS
+  const noon = kanbanNoon(now)
+  const alertaDe = (t: KanbanTask) => kanbanAlert(t, noon, tasks)
+  const projetoDe = (id?: string) => projects.find((p) => p.id === id) ?? null
+  const colunaDe = (id: KanbanStatus) => COLS.find((c) => c.id === id)
+
+  const tasksRef = React.useRef(tasks)
+  tasksRef.current = tasks
+  const onMoveRef = React.useRef(onMove)
+  onMoveRef.current = onMove
+
+  const [criando, setCriando] = React.useState<KanbanStatus | null>(null)
+  // a tarefa nova (onCreate) entra com desfoque: é a primeira que aparece na coluna depois do pedido
+  const pedido = React.useRef<{ col: KanbanStatus; conhecidas: KanbanTask["id"][] } | null>(null)
+  const nascida = React.useRef<KanbanTask["id"] | null>(null)
+  if (pedido.current) {
+    const nova = tasks.find((t) => t.status === pedido.current!.col && !pedido.current!.conhecidas.includes(t.id))
+    if (nova) {
+      nascida.current = nova.id
+      pedido.current = null
+    }
+  }
+
+  /* ---------- arrasto (@dnd-kit) ---------- */
+  const colunas: KanbanColumnState[] = React.useMemo(
+    () => COLS.map((c) => ({ id: c.id, tasks: tasks.filter((t) => t.status === c.id) })),
+    [COLS, tasks]
+  )
+  const [local, setLocal] = React.useState(colunas)
+  const [ativo, setAtivo] = React.useState<{ task: KanbanTask; h: number; w: number; from: KanbanStatus; fromIdx: number } | null>(null)
+  React.useEffect(() => {
+    if (!ativo) setLocal(colunas)
+  }, [colunas, ativo])
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, {
-      activationConstraint: { delay: 250, tolerance: 5 },
-    }),
-    useSensor(KeyboardSensor)
-  );
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    // Espaço pega e solta; Enter fica livre para abrir o cartão
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+      keyboardCodes: { start: ["Space"], cancel: ["Escape"], end: ["Space"] },
+    })
+  )
+  // board com coluna vazia: ponteiro dentro primeiro, interseção de retângulos como reserva
+  const colisao = React.useCallback<CollisionDetection>((args) => {
+    const dentro = pointerWithin(args)
+    if (dentro.length > 0) return dentro
+    const inter = rectIntersection(args)
+    return getFirstCollision(inter) ? inter : []
+  }, [])
 
-  // Pattern canônico do @dnd-kit pra boards com containers vazios:
-  // pointerWithin primeiro, rectIntersection como fallback.
-  const collisionDetection = useCallback<CollisionDetection>((args) => {
-    const pointerCollisions = pointerWithin(args);
-    if (pointerCollisions.length > 0) return pointerCollisions;
-    const intersection = rectIntersection(args);
-    const first = getFirstCollision(intersection);
-    return first ? intersection : [];
-  }, []);
-
-  const [activeTask, setActiveTask] = useState<KanbanTask | null>(null);
-  const [overColumnId, setOverColumnId] = useState<string | null>(null);
-  const [liveMessage, setLiveMessage] = useState("");
-
-  // Espelho local rearranjado em tempo real durante o drag; sincroniza de
-  // volta com o snapshot quando não há drag ativo.
-  const [localColumns, setLocalColumns] = useState(columns);
-  useEffect(() => {
-    if (!activeTask) setLocalColumns(columns);
-  }, [columns, activeTask]);
-
-  const originalColumnIdRef = useRef<string | null>(null);
-
-  // Cursor `grabbing` no documento inteiro enquanto há drag ativo.
-  useEffect(() => {
-    if (!activeTask) return;
-    const previous = document.body.style.cursor;
-    document.body.style.cursor = "grabbing";
-    return () => {
-      document.body.style.cursor = previous;
-    };
-  }, [activeTask]);
-
-  const handleDragStart = useCallback(
-    (event: DragStartEvent) => {
-      const task = event.active.data.current?.task as KanbanTask | undefined;
-      if (!task) return;
-      setActiveTask(task);
-      originalColumnIdRef.current =
-        columns.find((c) => c.tasks.some((t) => t.slug === task.slug))?.id ??
-        null;
-    },
-    [columns]
-  );
-
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    const { active, over } = event;
-    const activeId = String(active.id);
-    if (over?.id == null) {
-      setOverColumnId(null);
-      return;
+  const inicio = (e: DragStartEvent) => {
+    const task = e.active.data.current?.task as KanbanTask | undefined
+    if (!task) return
+    // mede o próprio cartão: o rect do @dnd-kit ainda é nulo no início
+    const r = document.querySelector(`[data-card="${window.CSS.escape(String(task.id))}"]`)?.getBoundingClientRect()
+    const lista = tasks.filter((x) => x.status === task.status)
+    setAtivo({ task, h: r?.height ?? 80, w: r?.width ?? 280, from: task.status, fromIdx: lista.findIndex((x) => x.id === task.id) })
+  }
+  const sobre = (e: DragOverEvent) => {
+    if (e.over?.id == null) return
+    setLocal((cols) => moveTaskLocally(cols, e.active.id, e.over!.id))
+  }
+  const fim = (_e: DragEndEvent) => {
+    const a = ativo
+    setAtivo(null)
+    if (!a) return
+    const col = local.find((c) => c.tasks.some((t) => t.id === a.task.id))
+    if (!col) return setLocal(colunas)
+    const idx = col.tasks.findIndex((t) => t.id === a.task.id)
+    if (col.id === a.from && idx === a.fromIdx) return
+    onMove?.(a.task.id, col.id, idx)
+    if (col.id !== a.from) {
+      toast.success(`Movida para ${colunaDe(col.id)?.label ?? col.id}`, {
+        description: rotulo(a.task),
+        action: { label: "Desfazer", onClick: () => onMoveRef.current?.(a.task.id, a.from, a.fromIdx) },
+      })
     }
-    const overId = String(over.id);
+  }
+  const cancela = () => {
+    setAtivo(null)
+    setLocal(colunas)
+  }
+  const sobreColuna = ativo ? local.find((c) => c.tasks.some((t) => t.id === ativo.task.id))?.id : undefined
 
-    setLocalColumns((cols) => moveTaskLocally(cols, activeId, overId));
-    setLocalColumns((cols) => {
-      const colByCard = cols.find((c) =>
-        c.tasks.some((t) => t.slug === overId)
-      );
-      if (colByCard) {
-        setOverColumnId(colByCard.id);
-        return cols;
-      }
-      const colDirect = cols.find((c) => c.id === overId);
-      setOverColumnId(colDirect?.id ?? null);
-      return cols;
-    });
-  }, []);
+  /* ---------- concluir e criar ---------- */
+  const concluir = (t: KanbanTask) => {
+    if (t.status === "done") return
+    const from = t.status
+    const fromIdx = tasksRef.current.filter((x) => x.status === from).findIndex((x) => x.id === t.id)
+    onComplete?.(t.id)
+    toast.success("Concluída", {
+      description: rotulo(t),
+      action: { label: "Desfazer", onClick: () => onMoveRef.current?.(t.id, from, fromIdx) },
+    })
+  }
+  const criar = (status: KanbanStatus, titulo: string) => {
+    pedido.current = { col: status, conhecidas: tasksRef.current.map((x) => x.id) }
+    onCreate?.(status, titulo)
+  }
+  const primeira = colunaDe("todo") ? "todo" : COLS[0]?.id
+  const barra = typeof toolbar === "function" ? toolbar({ add: (s) => setCriando(s ?? primeira ?? null) }) : toolbar
 
-  const handleDragEnd = useCallback(() => {
-    const task = activeTask;
-    const original = originalColumnIdRef.current;
-    setActiveTask(null);
-    setOverColumnId(null);
-    originalColumnIdRef.current = null;
-    if (!task || !original) return;
-
-    const targetColumn = localColumns.find((c) =>
-      c.tasks.some((t) => t.slug === task.slug)
-    );
-    if (!targetColumn) {
-      setLocalColumns(columns);
-      return;
-    }
-
-    onTasksChange?.(flattenColumns(localColumns));
-    if (targetColumn.id !== original) {
-      onMoved?.(task, targetColumn.name);
-      setLiveMessage(`${task.title} movida para ${targetColumn.name}`);
-    }
-  }, [activeTask, columns, localColumns, onMoved, onTasksChange]);
-
-  const handleDragCancel = useCallback(() => {
-    setActiveTask(null);
-    setOverColumnId(null);
-    originalColumnIdRef.current = null;
-    setLocalColumns(columns);
-  }, [columns]);
-
-  // Véus nas bordas + métricas do indicador de scroll (trilho de encaixe
-  // desenhado pelo componente — a barra nativa fica oculta).
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const [fade, setFade] = useState({ left: false, right: false });
-  const [bar, setBar] = useState({ left: 0, width: 100, overflow: false });
-  const [barDragging, setBarDragging] = useState(false);
-  // O trilho só se mostra enquanto o board realmente rola; some sozinho.
-  const [railActive, setRailActive] = useState(false);
-  const railTimer = useRef<number | null>(null);
-  const pokeRail = useCallback(() => {
-    setRailActive(true);
-    if (railTimer.current) window.clearTimeout(railTimer.current);
-    railTimer.current = window.setTimeout(() => setRailActive(false), 900);
-  }, []);
-
-  const updateFades = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const left = el.scrollLeft > 4;
-    const right = el.scrollLeft < el.scrollWidth - el.clientWidth - 4;
-    setFade((f) => (f.left === left && f.right === right ? f : { left, right }));
-    const overflow = el.scrollWidth > el.clientWidth + 1;
-    const width = overflow
-      ? Math.max((el.clientWidth / el.scrollWidth) * 100, 8)
-      : 100;
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    const barLeft =
-      overflow && maxScroll > 0
-        ? (el.scrollLeft / maxScroll) * (100 - width)
-        : 0;
-    setBar((b) =>
-      b.left === barLeft && b.width === width && b.overflow === overflow
-        ? b
-        : { left: barLeft, width, overflow }
-    );
-  }, []);
-  useEffect(() => {
-    updateFades();
-    const el = scrollRef.current;
-    if (!el) return;
-    const onScroll = () => {
-      updateFades();
-      pokeRail();
-    };
-    el.addEventListener("scroll", onScroll, { passive: true });
-    const ro = new ResizeObserver(updateFades);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener("scroll", onScroll);
-      ro.disconnect();
-      if (railTimer.current) window.clearTimeout(railTimer.current);
-    };
-  }, [updateFades, pokeRail]);
-
-  // Arrasto do thumb: desliga o snap enquanto dura, senão as colunas
-  // brigam com o dedo.
-  const handleThumbPointerDown = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const el = scrollRef.current;
-    const track = trackRef.current;
-    if (!el || !track) return;
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    const thumbFrac = Math.max(el.clientWidth / el.scrollWidth, 0.08);
-    const travel = track.clientWidth * (1 - thumbFrac);
-    if (maxScroll <= 0 || travel <= 0) return;
-    const startX = e.clientX;
-    const startScroll = el.scrollLeft;
-    setBarDragging(true);
-    const onMove = (ev: PointerEvent) => {
-      el.scrollLeft = startScroll + (ev.clientX - startX) * (maxScroll / travel);
-    };
-    const onUp = () => {
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerup", onUp);
-      setBarDragging(false);
-    };
-    window.addEventListener("pointermove", onMove);
-    window.addEventListener("pointerup", onUp);
-  }, []);
-
-  const handleTrackPointerDown = useCallback((e: React.PointerEvent) => {
-    const el = scrollRef.current;
-    const track = trackRef.current;
-    if (!el || !track) return;
-    const rect = track.getBoundingClientRect();
-    const thumbFrac = Math.max(el.clientWidth / el.scrollWidth, 0.08);
-    const travel = rect.width * (1 - thumbFrac);
-    const maxScroll = el.scrollWidth - el.clientWidth;
-    if (travel <= 0 || maxScroll <= 0) return;
-    const target =
-      ((e.clientX - rect.left - (rect.width * thumbFrac) / 2) / travel) *
-      maxScroll;
-    el.scrollTo({
-      left: Math.max(0, Math.min(maxScroll, target)),
-      behavior: "smooth",
-    });
-  }, []);
-
-  useEffect(() => {
-    if (!barDragging) return;
-    const previous = document.body.style.cursor;
-    document.body.style.cursor = "grabbing";
-    return () => {
-      document.body.style.cursor = previous;
-    };
-  }, [barDragging]);
+  const total = tasks.filter((t) => t.status !== "canceled").length
+  const feitas = tasks.filter((t) => t.status === "done").length
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={collisionDetection}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
+    <div
+      data-slot="kanban"
+      className={cn("muriki-kb relative flex h-full min-h-0 flex-col overflow-hidden bg-[var(--kb-panel)] text-foreground", className)}
+      style={style}
     >
-      <div className={cn("flex flex-col", className)}>
-        <div className="relative">
+      <div className="flex h-[52px] flex-none items-center gap-2 pr-3 pl-[18px] shadow-[inset_0_-1px_0_var(--kb-hair)]">
+        <KanbanIcon className="size-4 text-muted-foreground" />
+        {title ? <h2 className="m-0 text-sm font-semibold whitespace-nowrap text-foreground-strong">{title}</h2> : null}
+        <span className="flex min-w-0 items-center gap-1.5 text-[12.5px] whitespace-nowrap text-muted-foreground">
+          <b className="font-semibold text-foreground-strong">{feitas}</b> de {total} concluídas
+        </span>
+        <span className="flex-1" />
+        {barra}
+      </div>
+
+      <DndContext sensors={sensors} collisionDetection={colisao} onDragStart={inicio} onDragOver={sobre} onDragEnd={fim} onDragCancel={cancela}>
+        <div className="relative flex min-h-0 flex-1">
           <div
-            ref={scrollRef}
-            role="list"
-            aria-label="Board de tasks"
-            className={cn(
-              "muriki-scroll-x flex items-stretch gap-3 overflow-x-auto px-0.5 pt-1 pb-1",
-              "scroll-pl-4",
-              barDragging ? "snap-none" : "snap-x snap-mandatory"
-            )}
+            data-slot="kanban-board"
+            tabIndex={0}
+            aria-label={ariaLabel ?? `Quadro com ${COLS.length} colunas`}
+            className="muriki-scroll-x absolute inset-0 overflow-x-auto overflow-y-hidden outline-none"
           >
-            {localColumns.map((column, index) => (
-              <KanbanColumn
-                key={column.id}
-                column={column}
-                index={index}
-                hasDragActive={activeTask !== null}
-                isOverTarget={overColumnId === column.id}
-                onToggleDone={onToggleDone}
-                onAddCard={onAddCard}
-                onCardClick={onCardClick}
-              />
-            ))}
+            <div className="box-border flex h-full w-max items-start gap-[18px] px-5 pt-4 pb-3.5">
+              {COLS.map((c) => {
+                const lista = local.find((x) => x.id === c.id)?.tasks ?? []
+                return (
+                  <Coluna
+                    key={c.id}
+                    col={c}
+                    lista={lista}
+                    sobre={sobreColuna === c.id}
+                    arrastando={ativo?.task.id}
+                    alturaArrasto={ativo?.h ?? 0}
+                    alertaDe={alertaDe}
+                    projetoDe={projetoDe}
+                    now={now}
+                    nascida={nascida.current}
+                    criando={criando === c.id}
+                    podeCriar={!!onCreate}
+                    onAbrirCriacao={() => setCriando(c.id)}
+                    onFecharCriacao={() => setCriando(null)}
+                    onCriar={(v) => criar(c.id, v)}
+                    onConcluir={concluir}
+                    onOpen={onOpen}
+                  />
+                )
+              })}
+            </div>
           </div>
-          <div
-            aria-hidden
-            className={cn(
-              "pointer-events-none absolute inset-y-1 left-0 z-10 w-14 bg-gradient-to-r from-background to-transparent transition-opacity duration-200",
-              fade.left ? "opacity-100" : "opacity-0"
-            )}
-          />
-          <div
-            aria-hidden
-            className={cn(
-              "pointer-events-none absolute inset-y-1 right-0 z-10 w-14 bg-gradient-to-l from-background to-transparent transition-opacity duration-200",
-              fade.right ? "opacity-100" : "opacity-0"
-            )}
-          />
         </div>
 
-        {bar.overflow && (
-          <div
-            ref={trackRef}
-            aria-hidden
-            onPointerDown={handleTrackPointerDown}
-            onMouseEnter={() => {
-              if (railTimer.current) window.clearTimeout(railTimer.current);
-              if (railActive) setRailActive(true);
-            }}
-            onMouseLeave={pokeRail}
-            className={cn(
-              // trilho: encaixe — recuado, aresta de cima na sombra no claro,
-              // fio de luz no topo no escuro
-              // claro: encaixe. escuro: chapado — em 10px, relevo vira sujeira
-              "relative mt-2 h-2.5 shrink-0 cursor-pointer rounded-full bg-sunken",
-              "transition-opacity duration-300",
-              railActive || barDragging
-                ? "opacity-100"
-                : "pointer-events-none opacity-0",
-              "shadow-[inset_0_1px_2px_rgba(0,0,0,0.09),inset_0_0_0_1px_var(--border)]",
-              "dark:shadow-none"
-            )}
-          >
-            <div
-              onPointerDown={handleThumbPointerDown}
-              className={cn(
-                // thumb: objeto elevado — sobe por sombra no claro, por luz no escuro
-                "absolute top-[2px] bottom-[2px] cursor-grab rounded-full active:cursor-grabbing",
-                "bg-card shadow-[inset_0_0_0_1px_var(--input),0_1px_2px_rgba(0,0,0,0.22)]",
-                "dark:bg-[oklch(0.42_0.006_107)] dark:shadow-none dark:hover:bg-[oklch(0.47_0.006_107)]",
-                !barDragging && "transition-[left] duration-75"
-              )}
-              style={{ left: `${bar.left}%`, width: `${bar.width}%` }}
-            />
-          </div>
-        )}
-      </div>
-
-      <DragOverlay dropAnimation={null}>
-        {activeTask ? <DragPreviewCard task={activeTask} /> : null}
-      </DragOverlay>
-
-      <div role="status" aria-live="polite" className="sr-only">
-        {liveMessage}
-      </div>
-    </DndContext>
-  );
+        <DragOverlay dropAnimation={null}>
+          {ativo ? (
+            <div style={{ width: ativo.w }} className="muriki-kb-lift">
+              <KanbanCard
+                task={ativo.task}
+                alert={alertaDe(ativo.task)}
+                project={projetoDe(ativo.task.project)}
+                now={now}
+                className="cursor-grabbing"
+                style={{ transform: "rotate(1.6deg)", transformOrigin: "50% 20%" }}
+              />
+            </div>
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </div>
+  )
 }
 
-interface KanbanColumnProps {
-  column: KanbanColumnState;
-  index: number;
-  hasDragActive: boolean;
-  isOverTarget: boolean;
-  onToggleDone?: (slug: string, next: boolean) => void;
-  onAddCard?: (columnId: string) => void;
-  onCardClick?: (task: KanbanTask) => void;
+/* ---------- coluna ---------- */
+interface ColunaProps {
+  col: KanbanColumnSpec
+  lista: KanbanTask[]
+  sobre: boolean
+  arrastando?: KanbanTask["id"]
+  alturaArrasto: number
+  alertaDe: (t: KanbanTask) => ReturnType<typeof kanbanAlert>
+  projetoDe: (id?: string) => KanbanProject | null
+  now?: Date
+  nascida: KanbanTask["id"] | null
+  criando: boolean
+  podeCriar: boolean
+  onAbrirCriacao: () => void
+  onFecharCriacao: () => void
+  onCriar: (titulo: string) => void
+  onConcluir: (t: KanbanTask) => void
+  onOpen?: (id: KanbanTask["id"]) => void
 }
 
-function KanbanColumn({
-  column,
-  index,
-  hasDragActive,
-  isOverTarget,
-  onToggleDone,
-  onAddCard,
-  onCardClick,
-}: KanbanColumnProps) {
-  const { setNodeRef } = useDroppable({ id: column.id });
-  const hasTasks = column.tasks.length > 0;
-  const isDropTarget = isOverTarget;
-  // Durante um drag ativo, colunas que NÃO são alvo ficam sutilmente
-  // desbotadas pra focar a atenção no alvo em potencial.
-  const isDimmed = hasDragActive && !isDropTarget;
+function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, projetoDe, now, nascida, criando, podeCriar, onAbrirCriacao, onFecharCriacao, onCriar, onConcluir, onOpen }: ColunaProps) {
+  const { setNodeRef } = useDroppable({ id: c.id })
+  // o cartão erguido não conta: o resumo é do que fica na coluna
+  const fica = lista.filter((t) => t.id !== arrastando)
+  const count = lista.length
+  const alertas = fica.filter((t) => alertaDe(t)).length
+  const noPrazo = fica.filter((t) => !alertaDe(t) && t.due).length
+  const semPrazo = fica.filter((t) => !alertaDe(t) && !t.due).length
+  const comSub = fica.filter((t) => t.sub)
+  const pct = comSub.length
+    ? Math.round((comSub.reduce((a, t) => a + t.sub![0], 0) / comSub.reduce((a, t) => a + t.sub![1], 0)) * 100)
+    : null
+  const fechada = c.id === "done" || c.id === "canceled"
+  const segs = fechada
+    ? [{ n: fica.length, c: "var(--tone)", l: c.id === "done" ? "concluídas" : "canceladas" }]
+    : [
+        { n: noPrazo, c: "color-mix(in oklch, var(--tone) 70%, transparent)", l: "no prazo" },
+        { n: alertas, c: "var(--tone-red-dot)", l: "com alerta" },
+        { n: semPrazo, c: "color-mix(in oklch, var(--muted-foreground) 30%, transparent)", l: "sem prazo" },
+      ]
+  const estourou = !!c.limit && count > c.limit
 
   return (
-    <motion.section
+    <section
       ref={setNodeRef}
-      role="listitem"
-      aria-label={column.name}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.32,
-        ease: [0.2, 0.8, 0.2, 1],
-        delay: Math.min(index * 0.04, 0.24),
-      }}
+      data-s={c.id}
+      data-over={sobre || undefined}
+      aria-label={c.label}
+      style={tomDaColuna(c.id)}
       className={cn(
-        "flex w-72 shrink-0 snap-start flex-col rounded-lg bg-muted/40 p-3 ring-1 ring-border/60 transition-[box-shadow,background-color,opacity] duration-200 outline-none focus:outline-none",
-        isDropTarget && "bg-primary/5 ring-primary/50",
-        isDimmed && "opacity-60"
+        "relative box-border flex max-h-full w-[300px] flex-none flex-col rounded-2xl px-2.5 pt-3 pb-2.5",
+        "bg-[color-mix(in_oklch,var(--tone)_6%,var(--kb-panel))] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--tone)_12%,transparent)]",
+        "transition-[width,background,box-shadow] duration-300 ease-[cubic-bezier(.16,1,.3,1)]",
+        "data-[over]:bg-[color-mix(in_oklch,var(--tone)_12%,var(--kb-panel))] data-[over]:shadow-[inset_0_0_0_1.5px_color-mix(in_oklch,var(--tone)_45%,transparent)]",
+        "group/col"
       )}
-      tabIndex={-1}
     >
-      <header
-        className={cn(
-          "flex items-center gap-2 border-b pb-3",
-          !column.color && "border-border/40"
-        )}
-        style={
-          column.color
-            ? {
-                borderColor: `color-mix(in oklch, ${column.color} 35%, transparent)`,
-              }
-            : undefined
-        }
-      >
-        {column.color ? (
-          <span
-            aria-hidden
-            className="size-2.5 shrink-0 rounded-full"
-            style={{ backgroundColor: column.color }}
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="size-2.5 shrink-0 rounded-full border border-dashed border-muted-foreground/40"
-          />
-        )}
-        <h3 className="min-w-0 flex-1 truncate font-mono text-[11px] font-medium tracking-[0.2em] text-foreground uppercase">
-          {column.name}
-        </h3>
+      <header className="flex h-[38px] flex-none items-center gap-2 pr-0.5 pb-2.5 pl-1">
+        <KanbanStatusIcon status={c.id} size={15} />
+        <b className="text-sm font-semibold whitespace-nowrap text-foreground-strong">{c.label}</b>
         <span
-          aria-label={`${column.tasks.length} tasks`}
-          className="shrink-0 font-mono text-[10px] tracking-wider text-muted-foreground/70 tabular-nums"
-        >
-          {column.tasks.length.toString().padStart(2, "0")}
-        </span>
-        <button
-          type="button"
-          onClick={onAddCard ? () => onAddCard(column.id) : undefined}
-          aria-label={`Adicionar card em ${column.name}`}
-          disabled={!onAddCard}
-          className="inline-flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground/60 transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <Plus size={12} weight="bold" aria-hidden="true" />
-        </button>
-      </header>
-
-      {hasTasks ? (
-        <SortableContext
-          items={column.tasks.map((t) => t.slug)}
-          strategy={verticalListSortingStrategy}
-        >
-          <ul className="m-0 flex list-none flex-col gap-2.5 p-0 pt-3">
-            {column.tasks.map((task) => (
-              <SortableKanbanCard
-                key={task.slug}
-                task={task}
-                onToggleDone={onToggleDone}
-                onCardClick={onCardClick}
-              />
-            ))}
-          </ul>
-        </SortableContext>
-      ) : (
-        <div
+          title={c.limit ? `Limite da coluna: ${c.limit}` : undefined}
           className={cn(
-            "mt-3 flex flex-1 flex-col justify-center gap-2.5 rounded-md border border-dashed px-3 py-6 transition-colors",
-            isDropTarget
-              ? "border-primary/40 bg-primary/10"
-              : "border-muted-foreground/25 bg-transparent"
+            "box-border inline-grid h-5 min-w-[22px] place-items-center rounded-full px-1.5 text-[11.5px] font-semibold tabular-nums",
+            estourou ? "bg-tone-orange text-tone-orange-foreground" : "bg-[var(--tone-bg)] text-foreground-strong"
           )}
         >
-          <p
-            className={cn(
-              // Sem `font-serif`: o sistema não tem serifada, e a classe
-              // cairia no serifado do navegador. O sussurro fica em itálico
-              // na mesma família da interface.
-              "text-center text-sm italic transition-colors",
-              isDropTarget ? "text-primary/80" : "text-muted-foreground/40"
-            )}
-          >
-            {isDropTarget ? "Solte aqui." : pickEmptyVariant(column.id)}
-          </p>
-        </div>
-      )}
-    </motion.section>
-  );
+          {c.limit ? `${count}/${c.limit}` : count}
+        </span>
+        <span className="flex-1" />
+        {alertas ? (
+          <Tooltip>
+            <TooltipTrigger render={<span className="inline-flex items-center gap-1 text-xs font-semibold text-tone-red-foreground" />}>
+              <WarningCircleIcon className="size-[13px]" weight="fill" />
+              {alertas}
+            </TooltipTrigger>
+            <TooltipContent>{alertas > 1 ? `${alertas} tarefas pedem atenção` : "1 tarefa pede atenção"}</TooltipContent>
+          </Tooltip>
+        ) : null}
+        {podeCriar ? (
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button variant="ghost" size="icon-xs" aria-label={`Nova tarefa em ${c.label}`} onClick={onAbrirCriacao} className="text-muted-foreground" />
+              }
+            >
+              <PlusIcon />
+            </TooltipTrigger>
+            <TooltipContent>{`Nova tarefa em ${c.label}`}</TooltipContent>
+          </Tooltip>
+        ) : null}
+      </header>
+      <div className={cn("mx-1 mb-3 h-[3px] flex-none rounded-[3px]", estourou ? "bg-tone-orange-dot" : "bg-[var(--tone)]")} />
+
+      <div className="muriki-scroll-x -mx-0.5 flex min-h-0 flex-auto flex-col gap-2 overflow-y-auto p-0.5">
+        {criando ? <CriacaoRapida onAdd={onCriar} onClose={onFecharCriacao} /> : null}
+        <SortableContext items={lista.map((t) => t.id)} strategy={verticalListSortingStrategy}>
+          {lista.map((t) => (
+            <CartaoArrastavel
+              key={t.id}
+              task={t}
+              alturaArrasto={alturaArrasto}
+              nascida={t.id === nascida}
+              alert={alertaDe(t)}
+              project={projetoDe(t.project)}
+              now={now}
+              onConcluir={onConcluir}
+              onOpen={onOpen}
+            />
+          ))}
+        </SortableContext>
+        {!lista.length && !criando ? (
+          <div className="rounded-xl px-2.5 py-[22px] text-center text-[12.5px] text-muted-foreground shadow-[inset_0_0_0_1.5px_color-mix(in_oklch,var(--tone)_22%,transparent)]">
+            {sobre ? "Solte aqui" : "Nenhuma tarefa"}
+          </div>
+        ) : null}
+      </div>
+
+      {fica.length ? (
+        <footer className="mt-2.5 grid flex-none gap-[7px] px-1 pt-2.5 pb-0.5 shadow-[inset_0_1px_0_color-mix(in_oklch,var(--tone)_18%,transparent)]">
+          <div className="flex items-baseline gap-1.5 text-xs text-muted-foreground">
+            <b className="text-[13px] font-semibold text-foreground-strong tabular-nums">{fica.length}</b>
+            {fica.length > 1 ? "tarefas" : "tarefa"}
+            {pct != null ? (
+              <span className="ml-auto">
+                <b className="text-[13px] font-semibold text-foreground-strong tabular-nums">{pct}%</b> das subtarefas
+              </span>
+            ) : null}
+          </div>
+          <div className="flex h-1 gap-0.5">
+            {segs.filter((s) => s.n).map((s) => (
+              <span key={s.l} className="rounded-[9px] transition-[flex-grow] duration-500 ease-[cubic-bezier(.16,1,.3,1)]" style={{ flexGrow: s.n, background: s.c }} />
+            ))}
+          </div>
+          {fechada ? null : (
+            <div className="flex flex-wrap gap-x-3 gap-y-[3px] text-[11.5px] text-muted-foreground">
+              {segs.filter((s) => s.n).map((s) => (
+                <span key={s.l} className="inline-flex items-center gap-[5px]">
+                  <i className="size-1.5 rounded-[2px]" style={{ background: s.c }} />
+                  {s.n} {s.l}
+                </span>
+              ))}
+            </div>
+          )}
+        </footer>
+      ) : null}
+    </section>
+  )
 }
 
-interface SortableKanbanCardProps {
-  task: KanbanTask;
-  onToggleDone?: (slug: string, next: boolean) => void;
-  onCardClick?: (task: KanbanTask) => void;
-}
-
-function SortableKanbanCard({
+/* ---------- cartão no @dnd-kit ---------- */
+function CartaoArrastavel({
   task,
-  onToggleDone,
-  onCardClick,
-}: SortableKanbanCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: task.slug, data: { task } });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
-  const handleClick = onCardClick
-    ? () => {
-        if (isDragging) return;
-        onCardClick(task);
-      }
-    : undefined;
-
+  alturaArrasto,
+  nascida,
+  alert,
+  project,
+  now,
+  onConcluir,
+  onOpen,
+}: {
+  task: KanbanTask
+  alturaArrasto: number
+  nascida: boolean
+  alert: ReturnType<typeof kanbanAlert>
+  project: KanbanProject | null
+  now?: Date
+  onConcluir: (t: KanbanTask) => void
+  onOpen?: (id: KanbanTask["id"]) => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id, data: { task } })
+  const style = { transform: CSS.Transform.toString(transform), transition }
+  // erguido, o lugar dele vira o espaço tingido da coluna
+  if (isDragging) return <div ref={setNodeRef} style={{ ...style, height: alturaArrasto }} className="muriki-kb-ph" />
   return (
-    <li
+    <KanbanCard
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      aria-roledescription="Card arrastável"
-      onClick={handleClick}
-      className={cn(
-        "group relative cursor-grab outline-none focus:outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-inset active:cursor-grabbing",
-        // Original permanece no lugar como "fantasma físico" enquanto o
-        // overlay é arrastado.
-        isDragging && "scale-[0.98] opacity-30 blur-[1px] saturate-50"
-      )}
-    >
-      <KanbanCard
-        task={task}
-        onToggleDone={(next) => onToggleDone?.(task.slug, next)}
-      />
-    </li>
-  );
+      data-card={String(task.id)}
+      aria-roledescription="Cartão arrastável"
+      aria-label={rotulo(task)}
+      task={task}
+      alert={alert}
+      project={project}
+      now={now}
+      onComplete={onConcluir}
+      className={nascida ? "muriki-kb-born" : undefined}
+      onClick={() => onOpen?.(task.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onOpen?.(task.id)
+        listeners?.onKeyDown?.(e)
+      }}
+    />
+  )
 }
 
-function DragPreviewCard({ task }: { task: KanbanTask }) {
+/* ---------- criação rápida no topo ---------- */
+function CriacaoRapida({ onAdd, onClose }: { onAdd: (v: string) => void; onClose: () => void }) {
+  const [v, setV] = React.useState("")
   return (
-    <div
-      className={cn(
-        "pointer-events-none w-72",
-        "scale-[1.04] -rotate-2",
-        "rounded-md ring-2 ring-primary/40 ring-offset-4 ring-offset-background/60",
-        "shadow-[0_20px_60px_-12px_color-mix(in_oklab,var(--foreground)_30%,transparent)]"
-      )}
-    >
-      <KanbanCard task={task} />
+    <div className="flex-none animate-[muriki-kb-in_.3s_cubic-bezier(.16,1,.3,1)_both] rounded-xl bg-card px-3 py-2.5 shadow-[var(--kb-shadow-sm),inset_0_0_0_1.5px_color-mix(in_oklch,var(--primary)_45%,transparent)] motion-reduce:animate-none">
+      <textarea
+        autoFocus
+        rows={2}
+        value={v}
+        placeholder="Título da tarefa"
+        aria-label="Título da tarefa"
+        onChange={(e) => setV(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault()
+            if (v.trim()) {
+              onAdd(v.trim())
+              setV("")
+            }
+          }
+          if (e.key === "Escape") onClose()
+        }}
+        onBlur={() => {
+          if (!v.trim()) onClose()
+        }}
+        className="w-full resize-none border-0 bg-transparent p-0 text-[13.5px] leading-[19px] font-medium text-foreground-strong outline-0 placeholder:text-muted-foreground"
+      />
+      <small className="mt-1.5 block text-[11px] text-muted-foreground">Enter cria e continua. Esc fecha.</small>
     </div>
-  );
+  )
 }
