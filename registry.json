@@ -4131,18 +4131,16 @@
       "name": "kanban",
       "type": "registry:block",
       "title": "Kanban",
-      "description": "O quadro aprovado do DS: colunas tingidas pelo status com contador (n/limite), fio colorido e rodapé (total, % das subtarefas e barra no prazo · com alerta · sem prazo); cartão com status clicável, código, prioridade, próximo passo com anel, projeto, etiquetas, responsável, prazo, anexos e comentários; alerta em contorno + faixa (atrasada, vence hoje, bloqueada listrada); criação rápida no topo da coluna; arrasto pelo @dnd-kit e avisos com Desfazer.",
+      "description": "O quadro aprovado do DS: colunas tingidas pelo status com contador (n/limite), fio colorido e rodapé; cartão com status clicável, próximo passo com anel, projeto, etiquetas, prazo e conversa; alerta em contorno + faixa (atrasada, vence hoje, bloqueada listrada); criação rápida no topo. Arrasto com peso (lerp, inclinação pela velocidade, espaço que cresce, pouso em FLIP e voo até a coluna recolhida) e Alt+setas no teclado. Para os lados: lingueta, páginas, lombadas ou régua, mais a visão geral; sem barra de rolagem, o fundo arrasta.",
       "dependencies": [
         "@phosphor-icons/react",
-        "@dnd-kit/core",
-        "@dnd-kit/sortable",
-        "@dnd-kit/utilities",
         "sonner"
       ],
       "registryDependencies": [
         "utils",
         "SwellSystem/muriki-ds/theme",
         "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/dropdown-menu",
         "SwellSystem/muriki-ds/badge",
         "SwellSystem/muriki-ds/avatar",
         "SwellSystem/muriki-ds/tooltip",
@@ -4171,7 +4169,7 @@
           "target": "components/blocks/kanban/index.ts"
         }
       ],
-      "docs": "Controlado: as tarefas vêm de fora e cada gesto volta por callback — onMove(id, status, index) (aplique com placeTask, exportado), onComplete(id), onOpen(id), onCreate(status, title). Mover e concluir avisam pelo sonner com Desfazer (chama onMove com a posição antiga): monte um <Toaster /> na página. O quadro preenche o pai: dê altura a ele. API nova, troca a do bloco antigo: tarefa {id, code?, title, status, priority?, assignee?, due?, project?, labels?, sub?, next?, comments?, attachments?, unread?, blocked?} no lugar de {slug, statusId, progress, timeLabel, description}; columns {id: status do DS, label, limit?} no lugar de {id, name, color} (a cor vem do status); onTasksChange/onMoved → onMove; onToggleDone → onComplete; onAddCard → onCreate(status, title); onCardClick → onOpen(id).",
+      "docs": "Controlado: as tarefas vêm de fora e cada gesto volta por callback — onMove(id, status, index) (aplique com placeTask, exportado), onComplete(id), onOpen(id), onCreate(status, title). Mover e concluir avisam pelo sonner com Desfazer (chama onMove com a posição antiga): monte um <Toaster /> na página. O quadro preenche o pai: dê altura a ele. Props novas: defaultCollapsed (ids que começam recolhidas; padrão nenhuma) e navigation ('lingueta' padrão · 'paginas' · 'lombadas' · 'regua'; o menu Exibição troca). Teclado: Alt+←/→ troca de coluna, Alt+↑/↓ muda a posição, Enter abre. O @dnd-kit saiu. API nova, troca a do bloco antigo: tarefa {id, code?, title, status, priority?, assignee?, due?, project?, labels?, sub?, next?, comments?, attachments?, unread?, blocked?} no lugar de {slug, statusId, progress, timeLabel, description}; columns {id: status do DS, label, limit?} no lugar de {id, name, color} (a cor vem do status); onTasksChange/onMoved → onMove; onToggleDone → onComplete; onAddCard → onCreate(status, title); onCardClick → onOpen(id).",
       "css": {
         ".muriki-kb, .muriki-kb-card, .muriki-kb-lift": {
           "--kb-panel": "var(--rail)",
@@ -4221,10 +4219,10 @@
           "background": "repeating-linear-gradient(-45deg, var(--al) 0 7px, color-mix(in oklch, var(--al) 86%, black) 7px 14px)"
         },
         ".muriki-kb-lift .muriki-kb-card": {
-          "box-shadow": "-3px 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), 0 4px 10px -4px color-mix(in oklch, var(--foreground) 16%, transparent), inset 0 0 0 1px var(--kb-hair-strong)"
+          "box-shadow": "var(--sx, 0px) 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), 0 4px 10px -4px color-mix(in oklch, var(--foreground) 16%, transparent), inset 0 0 0 1px var(--kb-hair-strong)"
         },
         ".muriki-kb-lift .muriki-kb-card[data-k]": {
-          "box-shadow": "-3px 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), inset 0 0 0 1.5px var(--al)"
+          "box-shadow": "var(--sx, 0px) 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), inset 0 0 0 1.5px var(--al)"
         },
         ".muriki-kb-ph": {
           "flex": "none",
@@ -4258,9 +4256,184 @@
             "margin-bottom": "-8px"
           }
         },
+        ".muriki-kb-lift": {
+          "position": "fixed",
+          "z-index": "60",
+          "pointer-events": "none",
+          "will-change": "left, top"
+        },
+        ".muriki-kb-fly": {
+          "position": "fixed",
+          "z-index": "70",
+          "pointer-events": "none",
+          "margin": "0"
+        },
+        ".muriki-kb-dragging, .muriki-kb-dragging *, .muriki-kb-panning, .muriki-kb-panning *": {
+          "cursor": "grabbing !important",
+          "user-select": "none"
+        },
+        ".muriki-kb-flash": {
+          "animation": "muriki-kb-flash .9s cubic-bezier(.16,1,.3,1)"
+        },
+        "@keyframes muriki-kb-flash": {
+          "30%": {
+            "background": "color-mix(in oklch, var(--tone) 16%, transparent)"
+          }
+        },
+        ".muriki-kb-paging section": {
+          "animation": "muriki-kb-page .5s cubic-bezier(.16,1,.3,1)"
+        },
+        "@keyframes muriki-kb-page": {
+          "35%": {
+            "filter": "blur(3px)",
+            "opacity": ".7"
+          }
+        },
+        ".muriki-kb-overview section[data-s]": {
+          "cursor": "zoom-in"
+        },
+        ".muriki-kb-overview section[data-s]:hover": {
+          "box-shadow": "inset 0 0 0 2px var(--tone)"
+        },
+        ".muriki-kb-overview [data-card], .muriki-kb-overview section header button": {
+          "pointer-events": "none"
+        },
+        ".muriki-kb-edge": {
+          "position": "absolute",
+          "top": "0",
+          "bottom": "0",
+          "width": "48px",
+          "z-index": "5",
+          "pointer-events": "none",
+          "opacity": "0",
+          "transition": "opacity .3s cubic-bezier(.16,1,.3,1)"
+        },
+        ".muriki-kb-edge[data-on]": {
+          "opacity": "1"
+        },
+        ".muriki-kb-tongue": {
+          "position": "absolute",
+          "top": "50%",
+          "z-index": "7",
+          "display": "inline-flex",
+          "align-items": "center",
+          "gap": "0",
+          "height": "48px",
+          "margin-top": "-24px",
+          "padding": "0 3px",
+          "border": "0",
+          "background": "var(--card)",
+          "color": "var(--foreground-strong)",
+          "box-shadow": "0 6px 18px -8px color-mix(in oklch, var(--foreground) 35%, transparent), inset 0 0 0 1px var(--kb-hair-strong)",
+          "font": "inherit",
+          "font-size": "12.5px",
+          "cursor": "pointer",
+          "opacity": "0",
+          "pointer-events": "none",
+          "transition": "opacity .3s cubic-bezier(.16,1,.3,1), height .35s cubic-bezier(.16,1,.3,1), margin .35s cubic-bezier(.16,1,.3,1), padding .35s cubic-bezier(.16,1,.3,1), border-radius .35s cubic-bezier(.16,1,.3,1), gap .35s cubic-bezier(.16,1,.3,1), right .35s cubic-bezier(.16,1,.3,1), left .35s cubic-bezier(.16,1,.3,1)"
+        },
+        ".muriki-kb-tongue-r": {
+          "right": "0",
+          "border-radius": "10px 0 0 10px"
+        },
+        ".muriki-kb-tongue-l": {
+          "left": "0",
+          "border-radius": "0 10px 10px 0"
+        },
+        ".muriki-kb-tongue[data-on]": {
+          "opacity": "1",
+          "pointer-events": "auto"
+        },
+        ".muriki-kb-tongue-body": {
+          "display": "inline-flex",
+          "align-items": "center",
+          "gap": "10px",
+          "max-width": "0",
+          "opacity": "0",
+          "overflow": "hidden",
+          "white-space": "nowrap",
+          "transition": "max-width .4s cubic-bezier(.16,1,.3,1), opacity .25s cubic-bezier(.16,1,.3,1)"
+        },
+        ".muriki-kb-tongue[data-open], .muriki-kb-tongue:hover, .muriki-kb-tongue:focus-visible": {
+          "height": "36px",
+          "margin-top": "-18px",
+          "padding": "0 12px",
+          "gap": "8px",
+          "border-radius": "99px"
+        },
+        ".muriki-kb-tongue-r[data-open], .muriki-kb-tongue-r:hover, .muriki-kb-tongue-r:focus-visible": {
+          "right": "12px"
+        },
+        ".muriki-kb-tongue-l[data-open], .muriki-kb-tongue-l:hover, .muriki-kb-tongue-l:focus-visible": {
+          "left": "12px"
+        },
+        ".muriki-kb-tongue[data-open] .muriki-kb-tongue-body, .muriki-kb-tongue:hover .muriki-kb-tongue-body, .muriki-kb-tongue:focus-visible .muriki-kb-tongue-body": {
+          "max-width": "360px",
+          "opacity": "1"
+        },
+        ".muriki-kb-tongue:focus-visible": {
+          "outline": "2px solid var(--ring)",
+          "outline-offset": "2px"
+        },
+        ".muriki-kb-spines": {
+          "position": "absolute",
+          "top": "14px",
+          "z-index": "7",
+          "display": "flex",
+          "gap": "4px",
+          "padding": "4px",
+          "border-radius": "13px",
+          "background": "color-mix(in oklch, var(--kb-panel) 85%, transparent)",
+          "backdrop-filter": "blur(8px)",
+          "box-shadow": "0 6px 18px -10px color-mix(in oklch, var(--foreground) 30%, transparent)"
+        },
+        ".muriki-kb-spines:empty": {
+          "display": "none"
+        },
+        ".muriki-kb-spine": {
+          "position": "relative",
+          "display": "inline-flex",
+          "align-items": "center",
+          "gap": "6px",
+          "height": "30px",
+          "padding": "0 9px",
+          "border": "0",
+          "border-radius": "9px",
+          "background": "var(--card)",
+          "color": "var(--foreground-strong)",
+          "box-shadow": "inset 0 0 0 1px var(--kb-hair), inset 0 -2px 0 var(--tone)",
+          "font": "inherit",
+          "font-size": "12.5px",
+          "cursor": "pointer",
+          "transition": "transform .2s cubic-bezier(.16,1,.3,1)"
+        },
+        ".muriki-kb-spine:hover": {
+          "transform": "translateY(-1px)"
+        },
+        ".muriki-kb-spine-l": {
+          "max-width": "0",
+          "overflow": "hidden",
+          "white-space": "nowrap",
+          "opacity": "0",
+          "transition": "max-width .35s cubic-bezier(.16,1,.3,1), opacity .25s"
+        },
+        ".muriki-kb-spines:hover .muriki-kb-spine-l, .muriki-kb-spine:focus-visible .muriki-kb-spine-l": {
+          "max-width": "140px",
+          "opacity": "1"
+        },
+        ".muriki-kb-spine:focus-visible": {
+          "outline": "2px solid var(--ring)",
+          "outline-offset": "2px"
+        },
         "@media (prefers-reduced-motion: reduce)": {
           ".muriki-kb-ph, .muriki-kb-born": {
             "animation": "none"
+          },
+          ".muriki-kb-flash, .muriki-kb-paging section": {
+            "animation": "none !important"
+          },
+          ".muriki-kb-tongue, .muriki-kb-tongue-body, .muriki-kb-spine, .muriki-kb-spine-l, .muriki-kb-edge": {
+            "transition": "none"
           }
         }
       }
