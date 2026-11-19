@@ -4131,18 +4131,22 @@
       "name": "kanban",
       "type": "registry:block",
       "title": "Kanban",
-      "description": "Board de colunas-bandeja com drag-drop (@dnd-kit): overlay rotacionado, fantasma físico, colunas não-alvo desbotadas e aria-live. Card editorial com checkbox circular, selo do slug e pill de prioridade. Scroll lateral com véus e trilho de encaixe sob demanda.",
+      "description": "O quadro aprovado do DS: colunas tingidas pelo status com contador (n/limite), fio colorido e rodapé (total, % das subtarefas e barra no prazo · com alerta · sem prazo); cartão com status clicável, código, prioridade, próximo passo com anel, projeto, etiquetas, responsável, prazo, anexos e comentários; alerta em contorno + faixa (atrasada, vence hoje, bloqueada listrada); criação rápida no topo da coluna; arrasto pelo @dnd-kit e avisos com Desfazer.",
       "dependencies": [
         "@phosphor-icons/react",
-        "framer-motion",
         "@dnd-kit/core",
         "@dnd-kit/sortable",
-        "@dnd-kit/utilities"
+        "@dnd-kit/utilities",
+        "sonner"
       ],
       "registryDependencies": [
         "utils",
-        "SwellSystem/muriki-ds/tooltip",
         "SwellSystem/muriki-ds/theme",
+        "SwellSystem/muriki-ds/button",
+        "SwellSystem/muriki-ds/badge",
+        "SwellSystem/muriki-ds/avatar",
+        "SwellSystem/muriki-ds/tooltip",
+        "SwellSystem/muriki-ds/sonner",
         "SwellSystem/muriki-ds/priority-flag"
       ],
       "files": [
@@ -4167,13 +4171,97 @@
           "target": "components/blocks/kanban/index.ts"
         }
       ],
-      "docs": "O estado volta pro caller via onTasksChange (array flat com statusId atualizado). Colunas têm altura natural — a página cresce, sem scroll interno. O indicador de scroll usa a classe .muriki-scroll-x do tema.",
+      "docs": "Controlado: as tarefas vêm de fora e cada gesto volta por callback — onMove(id, status, index) (aplique com placeTask, exportado), onComplete(id), onOpen(id), onCreate(status, title). Mover e concluir avisam pelo sonner com Desfazer (chama onMove com a posição antiga): monte um <Toaster /> na página. O quadro preenche o pai: dê altura a ele. API nova, troca a do bloco antigo: tarefa {id, code?, title, status, priority?, assignee?, due?, project?, labels?, sub?, next?, comments?, attachments?, unread?, blocked?} no lugar de {slug, statusId, progress, timeLabel, description}; columns {id: status do DS, label, limit?} no lugar de {id, name, color} (a cor vem do status); onTasksChange/onMoved → onMove; onToggleDone → onComplete; onAddCard → onCreate(status, title); onCardClick → onOpen(id).",
       "css": {
+        ".muriki-kb, .muriki-kb-card, .muriki-kb-lift": {
+          "--kb-panel": "var(--rail)",
+          "--kb-hair": "color-mix(in oklch, var(--foreground) 12%, transparent)",
+          "--kb-hair-strong": "color-mix(in oklch, var(--foreground) 20%, transparent)",
+          "--kb-shadow-xs": "0 1px 2px rgba(12, 16, 14, 0.06)",
+          "--kb-shadow-sm": "0 1px 3px rgba(12, 16, 14, 0.08), 0 1px 2px rgba(12, 16, 14, 0.04)"
+        },
+        ".dark .muriki-kb, .dark .muriki-kb-card, .dark .muriki-kb-lift": {
+          "--kb-panel": "color-mix(in oklch, var(--background), var(--card))",
+          "--kb-shadow-xs": "0 1px 2px rgba(0, 0, 0, 0.4)",
+          "--kb-shadow-sm": "0 1px 3px rgba(0, 0, 0, 0.5)"
+        },
         ".muriki-scroll-x": {
           "scrollbar-width": "none"
         },
         ".muriki-scroll-x::-webkit-scrollbar": {
           "display": "none"
+        },
+        ".muriki-kb-card[data-k=\"overdue\"]": {
+          "--al": "var(--tone-red-dot)",
+          "box-shadow": "0 8px 20px -12px var(--al), inset 0 0 0 1.5px var(--al)"
+        },
+        ".muriki-kb-card[data-k=\"today\"]": {
+          "--al": "var(--tone-orange-dot)",
+          "box-shadow": "0 8px 20px -12px var(--al), inset 0 0 0 1.5px var(--al)"
+        },
+        ".muriki-kb-card[data-k=\"blocked\"]": {
+          "--al": "color-mix(in oklch, var(--tone-red-dot) 82%, black)",
+          "background": "repeating-linear-gradient(-45deg, color-mix(in oklch, var(--al) 4%, var(--card)) 0 7px, color-mix(in oklch, var(--al) 11%, var(--card)) 7px 14px)",
+          "box-shadow": "inset 0 0 0 1.5px var(--al)"
+        },
+        ".muriki-kb-say": {
+          "background": "var(--al)",
+          "color": "oklch(1 0 0)"
+        },
+        ".muriki-kb-say em": {
+          "color": "oklch(1 0 0 / 0.8)"
+        },
+        ".muriki-kb-say[data-k=\"today\"]": {
+          "color": "oklch(0.27 0.07 55)"
+        },
+        ".muriki-kb-say[data-k=\"today\"] em": {
+          "color": "oklch(0.27 0.07 55 / 0.75)"
+        },
+        ".muriki-kb-say[data-k=\"blocked\"]": {
+          "background": "repeating-linear-gradient(-45deg, var(--al) 0 7px, color-mix(in oklch, var(--al) 86%, black) 7px 14px)"
+        },
+        ".muriki-kb-lift .muriki-kb-card": {
+          "box-shadow": "-3px 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), 0 4px 10px -4px color-mix(in oklch, var(--foreground) 16%, transparent), inset 0 0 0 1px var(--kb-hair-strong)"
+        },
+        ".muriki-kb-lift .muriki-kb-card[data-k]": {
+          "box-shadow": "-3px 22px 44px -14px color-mix(in oklch, var(--foreground) 34%, transparent), inset 0 0 0 1.5px var(--al)"
+        },
+        ".muriki-kb-ph": {
+          "flex": "none",
+          "border-radius": "12px",
+          "overflow": "hidden",
+          "box-shadow": "inset 0 0 0 1.5px color-mix(in oklch, var(--tone) 40%, transparent)",
+          "background": "color-mix(in oklch, var(--tone) 10%, transparent)",
+          "animation": "muriki-kb-ph-grow .26s cubic-bezier(.2,.8,.2,1) both"
+        },
+        ".muriki-kb-born": {
+          "animation": "muriki-kb-in .35s cubic-bezier(.16,1,.3,1) both"
+        },
+        "@keyframes muriki-kb-in": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(6px)",
+            "transform": "translateY(4px)"
+          }
+        },
+        "@keyframes muriki-kb-swap": {
+          "from": {
+            "opacity": "0",
+            "filter": "blur(5px)",
+            "transform": "scale(.7)"
+          }
+        },
+        "@keyframes muriki-kb-ph-grow": {
+          "from": {
+            "height": "0",
+            "opacity": "0",
+            "margin-bottom": "-8px"
+          }
+        },
+        "@media (prefers-reduced-motion: reduce)": {
+          ".muriki-kb-ph, .muriki-kb-born": {
+            "animation": "none"
+          }
         }
       }
     },
