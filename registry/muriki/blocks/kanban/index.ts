@@ -1,5 +1,5 @@
 export { KanbanBoard } from "./kanban-board"
-export type { KanbanBoardProps, KanbanColumnSpec } from "./kanban-board"
+export type { KanbanBoardProps, KanbanColumnSpec, KanbanNavigation } from "./kanban-board"
 export { KanbanCard, KanbanStatusIcon, kanbanAlert, kanbanNoon } from "./kanban-card"
 export type {
   KanbanAlert,

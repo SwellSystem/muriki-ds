@@ -9,6 +9,24 @@
 // Criar é no topo da coluna (o "+" do cabeçalho ou `add()` da barra): a
 // tarefa nova nasce onde o olho já está, e Enter cria e continua.
 //
+// Arrasto com peso, pela lógica de ponteiro do DS (o @dnd-kit saiu: o
+// overlay dele segue o dedo sem atraso e reordena por transform, e os dois
+// brigavam com o atraso e o FLIP). O cartão segue o ponteiro com um lerp
+// curto, inclina pela velocidade sobre uma base de ±1,6° com sombra funda;
+// o espaço cresce no destino, os vizinhos deslizam e o pouso endireita
+// (FLIP). Numa coluna recolhida, o cartão voa até a faixa e some nela.
+// Perto da borda, o quadro rola sozinho. No teclado, com o cartão em foco:
+// Alt+←/→ troca de coluna e Alt+↑/↓ muda a posição; Enter abre.
+//
+// Para os lados não há barra de rolagem: o fundo arrasta. A navegação é
+// escolha de Exibição: lingueta nas bordas (padrão; abre com os nomes
+// quando o ponteiro chega perto), páginas na barra de status, lombadas
+// (os cabeçalhos que saíram empilham na borda) ou régua de colunas
+// (parar sobre uma aba durante o arrasto leva até a coluna). "Visão geral"
+// encolhe o quadro inteiro; clique numa coluna para voltar nela. Nenhuma
+// coluna começa recolhida: recolher é à mão, no "…" da coluna ou em
+// Exibição.
+//
 // O quadro é controlado. As tarefas vêm de fora e cada gesto volta por
 // callback: `onMove(id, status, index)` (use `placeTask` para aplicar),
 // `onComplete`, `onOpen`, `onCreate`. Mover e concluir avisam com Desfazer
@@ -19,43 +37,38 @@
 // `onTasksChange`/`onMoved` viram `onMove`, `onToggleDone` vira
 // `onComplete`, `onAddCard` vira `onCreate(status, title)` e
 // `onCardClick` vira `onOpen(id)`.
-//
-// Arrasto: @dnd-kit, como antes (teclado incluso: Espaço pega e solta).
-// O cartão erguido inclina 1,6° com a sombra funda; no lugar dele fica o
-// espaço tingido da coluna.
 "use client"
 
 import {
-  DndContext,
-  DragOverlay,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  getFirstCollision,
-  pointerWithin,
-  rectIntersection,
-  useDroppable,
-  useSensor,
-  useSensors,
-  type CollisionDetection,
-  type DragEndEvent,
-  type DragOverEvent,
-  type DragStartEvent,
-} from "@dnd-kit/core"
-import {
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { KanbanIcon, PlusIcon, WarningCircleIcon } from "@phosphor-icons/react"
+  ArrowsInSimpleIcon,
+  ArrowsOutSimpleIcon,
+  CaretDownIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  DotsThreeIcon,
+  EyeIcon,
+  KanbanIcon,
+  PlusIcon,
+  WarningCircleIcon,
+} from "@phosphor-icons/react"
 import * as React from "react"
+import { createPortal } from "react-dom"
 import { toast } from "sonner"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import type { BadgeTone } from "@/components/ui/badge-variants"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 import {
@@ -67,7 +80,6 @@ import {
   type KanbanStatus,
   type KanbanTask,
 } from "./kanban-card"
-import { moveTaskLocally, type KanbanColumnState } from "./kanban-drop"
 
 export interface KanbanColumnSpec {
   id: KanbanStatus
@@ -75,6 +87,8 @@ export interface KanbanColumnSpec {
   /** Limite de tarefas: o contador vira "n/limite" e fica laranja quando passa. */
   limit?: number
 }
+
+export type KanbanNavigation = "lingueta" | "paginas" | "lombadas" | "regua"
 
 export interface KanbanBoardProps {
   tasks: KanbanTask[]
@@ -89,6 +103,10 @@ export interface KanbanBoardProps {
   onOpen?: (taskId: KanbanTask["id"]) => void
   /** Liga o "+" das colunas e a criação rápida no topo da coluna. */
   onCreate?: (status: KanbanStatus, title: string) => void
+  /** Colunas que já começam recolhidas. Padrão: nenhuma. */
+  defaultCollapsed?: KanbanStatus[]
+  /** Como ir para os lados. Padrão "lingueta"; o menu Exibição troca. */
+  navigation?: KanbanNavigation
   title?: React.ReactNode
   /** Nós extras no fim da barra. Como função, recebe `add(status?)`, que abre a criação rápida. */
   toolbar?: React.ReactNode | ((api: { add: (status?: KanbanStatus) => void }) => React.ReactNode)
@@ -119,6 +137,32 @@ const tomDaColuna = (id: KanbanStatus) =>
   ({ "--tone": `var(--tone-${TOM[id] ?? "gray"}-dot)`, "--tone-bg": `var(--tone-${TOM[id] ?? "gray"})` }) as React.CSSProperties
 
 const rotulo = (t: KanbanTask) => (t.code ? `${t.code} · ` : "") + t.title
+const reduzido = () => typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+const sel = (id: KanbanTask["id"]) => `[data-card="${window.CSS.escape(String(id))}"]`
+function retangulos(root: HTMLElement | null) {
+  const m: Record<string, DOMRect> = {}
+  root?.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => {
+    m[el.dataset.card!] = el.getBoundingClientRect()
+  })
+  return m
+}
+
+type Id = KanbanTask["id"]
+interface Arrasto {
+  id: Id
+  x: number
+  y: number
+  ox: number
+  oy: number
+  w: number
+  h: number
+  col: KanbanStatus
+  idx: number
+  from: KanbanStatus
+  fromIdx: number
+  tilt: number
+  mini?: boolean
+}
 
 export function KanbanBoard({
   tasks,
@@ -128,6 +172,8 @@ export function KanbanBoard({
   onComplete,
   onOpen,
   onCreate,
+  defaultCollapsed,
+  navigation,
   title,
   toolbar,
   now,
@@ -141,15 +187,50 @@ export function KanbanBoard({
   const projetoDe = (id?: string) => projects.find((p) => p.id === id) ?? null
   const colunaDe = (id: KanbanStatus) => COLS.find((c) => c.id === id)
 
+  // callbacks e tarefas mais recentes, para os ouvintes de janela e o Desfazer
+  const props = React.useRef({ onMove, onOpen })
+  props.current = { onMove, onOpen }
   const tasksRef = React.useRef(tasks)
   tasksRef.current = tasks
-  const onMoveRef = React.useRef(onMove)
-  onMoveRef.current = onMove
 
+  const [mini, setMini] = React.useState<Partial<Record<KanbanStatus, boolean>>>(() =>
+    Object.fromEntries((defaultCollapsed ?? []).map((id) => [id, true]))
+  )
+  const miniRef = React.useRef(mini)
+  miniRef.current = mini
+  const setMiniDe = (id: KanbanStatus, v: boolean) => setMini((m) => ({ ...m, [id]: v }))
+
+  const [nav, setNav] = React.useState<KanbanNavigation>(navigation ?? "lingueta")
+  React.useEffect(() => {
+    if (navigation) setNav(navigation)
+  }, [navigation])
+
+  const [drag, setDrag] = React.useState<Arrasto | null>(null)
+  const dragRef = React.useRef<Arrasto | null>(null)
+  const [quente, setQuente] = React.useState<KanbanStatus | null>(null)
+  const quenteRef = React.useRef<{ id: KanbanStatus | null; t: number }>({ id: null, t: 0 })
   const [criando, setCriando] = React.useState<KanbanStatus | null>(null)
+  const [piscando, setPiscando] = React.useState<KanbanStatus | null>(null)
+  const [sc, setSc] = React.useState({ sl: 0, cw: 1, sw: 1 })
+  const [arrastandoFundo, setArrastandoFundo] = React.useState(false)
+  const [perto, setPerto] = React.useState({ l: false, r: false })
+  const [geral, setGeral] = React.useState(false)
+  const [aviso, setAviso] = React.useState("")
+
+  const boardRef = React.useRef<HTMLDivElement | null>(null)
+  const colRefs = React.useRef<Partial<Record<KanbanStatus, HTMLElement | null>>>({})
+  const liftRef = React.useRef<HTMLDivElement | null>(null)
+  const liftPos = React.useRef<{ x: number; y: number } | null>(null)
+  const liftTilt = React.useRef(0)
+  const landTilt = React.useRef(0)
+  const flip = React.useRef<Record<string, DOMRect> | null>(null)
+  const pouso = React.useRef<Id | null>(null)
+  const auto = React.useRef(0)
+  const focoDepois = React.useRef<Id | null>(null)
+
   // a tarefa nova (onCreate) entra com desfoque: é a primeira que aparece na coluna depois do pedido
-  const pedido = React.useRef<{ col: KanbanStatus; conhecidas: KanbanTask["id"][] } | null>(null)
-  const nascida = React.useRef<KanbanTask["id"] | null>(null)
+  const pedido = React.useRef<{ col: KanbanStatus; conhecidas: Id[] } | null>(null)
+  const nascida = React.useRef<Id | null>(null)
   if (pedido.current) {
     const nova = tasks.find((t) => t.status === pedido.current!.col && !pedido.current!.conhecidas.includes(t.id))
     if (nova) {
@@ -158,93 +239,416 @@ export function KanbanBoard({
     }
   }
 
-  /* ---------- arrasto (@dnd-kit) ---------- */
-  const colunas: KanbanColumnState[] = React.useMemo(
-    () => COLS.map((c) => ({ id: c.id, tasks: tasks.filter((t) => t.status === c.id) })),
-    [COLS, tasks]
-  )
-  const [local, setLocal] = React.useState(colunas)
-  const [ativo, setAtivo] = React.useState<{ task: KanbanTask; h: number; w: number; from: KanbanStatus; fromIdx: number } | null>(null)
-  React.useEffect(() => {
-    if (!ativo) setLocal(colunas)
-  }, [colunas, ativo])
-
-  const sensors = useSensors(
-    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
-    // Espaço pega e solta; Enter fica livre para abrir o cartão
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-      keyboardCodes: { start: ["Space"], cancel: ["Escape"], end: ["Space"] },
+  /* deslizar: curto e reto; o cartão que pousa sai da inclinação e da sombra funda */
+  const snap = () => {
+    flip.current = retangulos(boardRef.current)
+  }
+  React.useLayoutEffect(() => {
+    const antes = flip.current
+    flip.current = null
+    if (!antes || reduzido()) {
+      pouso.current = null
+      return
+    }
+    boardRef.current?.querySelectorAll<HTMLElement>("[data-card]").forEach((el) => {
+      const id = el.dataset.card!
+      const a = antes[id]
+      if (!a) return
+      const b = el.getBoundingClientRect()
+      const dx = a.left - b.left
+      const dy = a.top - b.top
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return
+      const pousa = pouso.current != null && String(pouso.current) === id
+      el.animate(
+        pousa
+          ? [
+              { transform: `translate(${dx}px,${dy}px) rotate(${landTilt.current.toFixed(2)}deg)`, boxShadow: "0 22px 44px -14px rgba(0,0,0,.32)", zIndex: 5 },
+              { transform: "none", zIndex: 5 },
+            ]
+          : [{ transform: `translate(${dx}px,${dy}px)` }, { transform: "none" }],
+        { duration: pousa ? 360 : 240, easing: "cubic-bezier(.2,.8,.2,1)" }
+      )
     })
-  )
-  // board com coluna vazia: ponteiro dentro primeiro, interseção de retângulos como reserva
-  const colisao = React.useCallback<CollisionDetection>((args) => {
-    const dentro = pointerWithin(args)
-    if (dentro.length > 0) return dentro
-    const inter = rectIntersection(args)
-    return getFirstCollision(inter) ? inter : []
+    pouso.current = null
+  })
+
+  // o cartão movido pelo teclado volta a ter o foco depois de trocar de coluna
+  React.useEffect(() => {
+    if (focoDepois.current == null) return
+    const el = boardRef.current?.querySelector<HTMLElement>(sel(focoDepois.current))
+    focoDepois.current = null
+    el?.focus()
+  })
+
+  const medir = () => {
+    const b = boardRef.current
+    if (b) setSc({ sl: b.scrollLeft, cw: b.clientWidth, sw: b.scrollWidth })
+  }
+  React.useEffect(() => {
+    const b = boardRef.current!
+    medir()
+    const ro = new ResizeObserver(medir)
+    ro.observe(b)
+    const mo = new MutationObserver(medir)
+    mo.observe(b, { subtree: true, attributes: true, attributeFilter: ["data-mini"] })
+    return () => {
+      ro.disconnect()
+      mo.disconnect()
+    }
   }, [])
 
-  const inicio = (e: DragStartEvent) => {
-    const task = e.active.data.current?.task as KanbanTask | undefined
-    if (!task) return
-    // mede o próprio cartão: o rect do @dnd-kit ainda é nulo no início
-    const r = document.querySelector(`[data-card="${window.CSS.escape(String(task.id))}"]`)?.getBoundingClientRect()
-    const lista = tasks.filter((x) => x.status === task.status)
-    setAtivo({ task, h: r?.height ?? 80, w: r?.width ?? 280, from: task.status, fromIdx: lista.findIndex((x) => x.id === task.id) })
+  const colEl = (id: KanbanStatus) => colRefs.current[id] ?? null
+  const suave = (): ScrollBehavior => (reduzido() ? "auto" : "smooth")
+  const piscar = (id: KanbanStatus) => {
+    setPiscando(id)
+    window.setTimeout(() => setPiscando(null), 900)
   }
-  const sobre = (e: DragOverEvent) => {
-    if (e.over?.id == null) return
-    setLocal((cols) => moveTaskLocally(cols, e.active.id, e.over!.id))
+  const irPara = (id: KanbanStatus) => {
+    const estava = miniRef.current[id]
+    if (estava) setMiniDe(id, false)
+    window.setTimeout(
+      () => {
+        const el = colEl(id)
+        const b = boardRef.current
+        if (!el || !b) return
+        const l = el.offsetLeft - 20
+        const r = el.offsetLeft + el.offsetWidth + 20 - b.clientWidth
+        b.scrollTo({ left: b.scrollLeft > l ? l : b.scrollLeft < r ? r : b.scrollLeft, behavior: suave() })
+        piscar(id)
+      },
+      estava ? 360 : 0
+    )
   }
-  const fim = (_e: DragEndEvent) => {
-    const a = ativo
-    setAtivo(null)
-    if (!a) return
-    const col = local.find((c) => c.tasks.some((t) => t.id === a.task.id))
-    if (!col) return setLocal(colunas)
-    const idx = col.tasks.findIndex((t) => t.id === a.task.id)
-    if (col.id === a.from && idx === a.fromIdx) return
-    onMove?.(a.task.id, col.id, idx)
-    if (col.id !== a.from) {
-      toast.success(`Movida para ${colunaDe(col.id)?.label ?? col.id}`, {
-        description: rotulo(a.task),
-        action: { label: "Desfazer", onClick: () => onMoveRef.current?.(a.task.id, a.from, a.fromIdx) },
-      })
-    }
-  }
-  const cancela = () => {
-    setAtivo(null)
-    setLocal(colunas)
-  }
-  const sobreColuna = ativo ? local.find((c) => c.tasks.some((t) => t.id === ativo.task.id))?.id : undefined
 
-  /* ---------- concluir e criar ---------- */
+  /* um cartão que entra numa coluna recolhida voa até a faixa e some nela */
+  const voarPara = (de: Element | null | undefined, colId: KanbanStatus) => {
+    const faixa = colEl(colId)
+    if (!de || !faixa || reduzido()) return piscar(colId)
+    const r = de.getBoundingClientRect()
+    const clone = de.cloneNode(true) as HTMLElement
+    clone.classList.add("muriki-kb-fly")
+    Object.assign(clone.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, transformOrigin: "0 0", transform: "none" })
+    document.body.appendChild(clone)
+    window.setTimeout(() => clone.remove(), 600)
+    window.setTimeout(() => {
+      const sr = faixa.getBoundingClientRect()
+      const dx = sr.left + sr.width / 2 - (r.left + r.width * 0.1)
+      const dy = sr.top + 70 - (r.top + r.height * 0.1)
+      clone.animate(
+        [
+          { transform: "none", opacity: 1, filter: "none" },
+          { transform: `translate(${dx}px,${dy}px) scale(.2)`, opacity: 0, filter: "blur(4px)" },
+        ],
+        { duration: 520, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" }
+      )
+      window.setTimeout(() => piscar(colId), 380)
+    }, 0)
+  }
+
+  /* o cartão segue o ponteiro com um atraso mínimo: peso sem elástico */
+  const arrastando = !!drag
+  React.useEffect(() => {
+    if (!arrastando) return
+    let raf = 0
+    let tilt = 0
+    const loop = () => {
+      const d = dragRef.current
+      const el = liftRef.current
+      if (d && el) {
+        const tx = d.x - d.ox
+        const ty = d.y - d.oy - 2
+        const c = liftPos.current ?? (liftPos.current = { x: tx, y: ty })
+        const px = c.x
+        c.x += (tx - c.x) * 0.38
+        c.y += (ty - c.y) * 0.38
+        el.style.left = `${c.x}px`
+        el.style.top = `${c.y}px`
+        // um cartão de verdade inclina para onde é puxado e endireita quando para; a base fica levemente diagonal
+        const alvo = Math.max(-6, Math.min(6, d.tilt + (c.x - px) * 0.45))
+        tilt += (alvo - tilt) * 0.16
+        const card = el.firstElementChild as HTMLElement | null
+        if (card) {
+          card.style.transform = `rotate(${tilt.toFixed(2)}deg)`
+          card.style.setProperty("--sx", `${(-tilt * 2).toFixed(1)}px`)
+        }
+        liftTilt.current = tilt
+      }
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    // perto da borda, o quadro rola sozinho
+    const rola = window.setInterval(() => {
+      if (auto.current && boardRef.current) boardRef.current.scrollLeft += auto.current
+    }, 16)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearInterval(rola)
+      liftPos.current = null
+    }
+  }, [arrastando])
+
+  /* arrasto */
+  const alvo = (x: number, y: number): Pick<Arrasto, "col" | "idx" | "mini"> | null => {
+    for (const c of COLS) {
+      const el = colEl(c.id)
+      if (!el) continue
+      const r = el.getBoundingClientRect()
+      if (x >= r.left - 9 && x <= r.right + 9) {
+        if (miniRef.current[c.id]) return { col: c.id, idx: 0, mini: true }
+        const cards = Array.from(el.querySelectorAll("[data-card]"))
+        let idx = cards.length
+        for (let j = 0; j < cards.length; j++) {
+          const cr = cards[j]!.getBoundingClientRect()
+          if (y < cr.top + cr.height / 2) {
+            idx = j
+            break
+          }
+        }
+        return { col: c.id, idx }
+      }
+    }
+    return null
+  }
+  const pegar = (e: React.PointerEvent<HTMLElement>, t: KanbanTask) => {
+    if (e.button !== 0) return
+    const r = e.currentTarget.getBoundingClientRect()
+    const sx = e.clientX
+    const sy = e.clientY
+    let comecou = false
+    const mover = (ev: PointerEvent) => {
+      if (!comecou) {
+        if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 5) return
+        comecou = true
+        const lista = tasksRef.current.filter((x) => x.status === t.status)
+        const idx = lista.findIndex((x) => x.id === t.id)
+        const d0: Arrasto = {
+          id: t.id, x: ev.clientX, y: ev.clientY, ox: sx - r.left, oy: sy - r.top, w: r.width, h: r.height,
+          col: t.status, idx, from: t.status, fromIdx: idx, tilt: ev.clientX >= sx ? 1.6 : -1.6,
+        }
+        liftPos.current = { x: r.left, y: r.top - 2 }
+        dragRef.current = d0
+        snap()
+        setDrag(d0)
+        return
+      }
+      const d = dragRef.current!
+      const tg = alvo(ev.clientX, ev.clientY) ?? { col: d.col, idx: d.idx }
+      const nd: Arrasto = { ...d, x: ev.clientX, y: ev.clientY, mini: false, ...tg }
+      if (tg.col !== d.col || tg.idx !== d.idx) snap()
+      dragRef.current = nd
+      setDrag(nd)
+      const b = boardRef.current!.getBoundingClientRect()
+      auto.current = ev.clientX > b.right - 60 ? 12 : ev.clientX < b.left + 60 ? -12 : 0
+      // régua: parar sobre uma aba leva até a coluna
+      const aba = (document.elementFromPoint(ev.clientX, ev.clientY) as HTMLElement | null)?.closest<HTMLElement>("[data-kb-tab]")
+      if (aba) {
+        const id = aba.dataset.s as KanbanStatus
+        if (quenteRef.current.id !== id) {
+          quenteRef.current = { id, t: Date.now() }
+          setQuente(id)
+        } else if (quenteRef.current.t && Date.now() - quenteRef.current.t > 450) {
+          quenteRef.current.t = 0
+          irPara(id)
+        }
+      } else if (quenteRef.current.id) {
+        quenteRef.current = { id: null, t: 0 }
+        setQuente(null)
+      }
+    }
+    const soltar = () => {
+      window.removeEventListener("pointermove", mover)
+      window.removeEventListener("pointerup", soltar)
+      auto.current = 0
+      if (!comecou) return props.current.onOpen?.(t.id)
+      const d = dragRef.current!
+      dragRef.current = null
+      const lift = liftRef.current?.firstElementChild
+      const lr = lift?.getBoundingClientRect()
+      if (d.mini) voarPara(lift, d.col)
+      quenteRef.current = { id: null, t: 0 }
+      setQuente(null)
+      snap()
+      if (lr && !d.mini) {
+        flip.current![String(d.id)] = lr
+        pouso.current = d.id
+        landTilt.current = liftTilt.current
+      }
+      if (d.col !== d.from || d.idx !== d.fromIdx) props.current.onMove?.(d.id, d.col, d.idx)
+      setDrag(null)
+      if (d.col !== d.from) avisarMovida(t, d.col, d.from, d.fromIdx)
+    }
+    window.addEventListener("pointermove", mover)
+    window.addEventListener("pointerup", soltar)
+  }
+  const avisarMovida = (t: KanbanTask, col: KanbanStatus, from: KanbanStatus, fromIdx: number) => {
+    const nome = colunaDe(col)?.label ?? col
+    setAviso(`${t.title} movida para ${nome}`)
+    toast.success(`Movida para ${nome}`, {
+      description: rotulo(t),
+      action: {
+        label: "Desfazer",
+        onClick: () => {
+          snap()
+          props.current.onMove?.(t.id, from, fromIdx)
+        },
+      },
+    })
+  }
+
+  /* teclado: Alt+←/→ troca de coluna, Alt+↑/↓ muda a posição */
+  const teclado = (e: React.KeyboardEvent<HTMLElement>, t: KanbanTask) => {
+    if (e.key === "Enter") return onOpen?.(t.id)
+    if (!e.altKey) return
+    const naCol = (s: KanbanStatus) => tasksRef.current.filter((x) => x.status === s && x.id !== t.id)
+    const ci = COLS.findIndex((c) => c.id === t.status)
+    const idx = tasksRef.current.filter((x) => x.status === t.status).findIndex((x) => x.id === t.id)
+    let col = t.status
+    let to = idx
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      const nc = COLS[ci + (e.key === "ArrowRight" ? 1 : -1)]
+      if (!nc) return
+      col = nc.id
+      to = Math.min(idx, naCol(col).length)
+    } else if (e.key === "ArrowUp") to = Math.max(0, idx - 1)
+    else if (e.key === "ArrowDown") to = Math.min(naCol(col).length, idx + 1)
+    else return
+    e.preventDefault()
+    if (col === t.status && to === idx) return
+    if (miniRef.current[col]) setMiniDe(col, false)
+    snap()
+    focoDepois.current = t.id
+    onMove?.(t.id, col, to)
+    if (col !== t.status) avisarMovida(t, col, t.status, idx)
+    else setAviso(`${t.title}: posição ${to + 1} em ${colunaDe(col)?.label ?? col}`)
+  }
+
+  /* concluir e criar */
   const concluir = (t: KanbanTask) => {
     if (t.status === "done") return
     const from = t.status
     const fromIdx = tasksRef.current.filter((x) => x.status === from).findIndex((x) => x.id === t.id)
+    if (miniRef.current.done) voarPara(boardRef.current?.querySelector(sel(t.id)), "done")
+    else snap()
     onComplete?.(t.id)
     toast.success("Concluída", {
       description: rotulo(t),
-      action: { label: "Desfazer", onClick: () => onMoveRef.current?.(t.id, from, fromIdx) },
+      action: {
+        label: "Desfazer",
+        onClick: () => {
+          snap()
+          props.current.onMove?.(t.id, from, fromIdx)
+        },
+      },
     })
   }
   const criar = (status: KanbanStatus, titulo: string) => {
+    snap()
     pedido.current = { col: status, conhecidas: tasksRef.current.map((x) => x.id) }
     onCreate?.(status, titulo)
   }
   const primeira = colunaDe("todo") ? "todo" : COLS[0]?.id
   const barra = typeof toolbar === "function" ? toolbar({ add: (s) => setCriando(s ?? primeira ?? null) }) : toolbar
 
+  /* fundo arrasta para rolar */
+  const arrastarFundo = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || (e.target as HTMLElement).closest("[data-card], button, textarea, header, [role=menu]")) return
+    const b = boardRef.current!
+    const sx = e.clientX
+    const sl = b.scrollLeft
+    let moveu = false
+    const mv = (ev: PointerEvent) => {
+      const dx = ev.clientX - sx
+      if (!moveu && Math.abs(dx) < 4) return
+      if (!moveu) {
+        moveu = true
+        setArrastandoFundo(true)
+      }
+      b.scrollLeft = sl - dx
+    }
+    const up = () => {
+      window.removeEventListener("pointermove", mv)
+      window.removeEventListener("pointerup", up)
+      setArrastandoFundo(false)
+    }
+    window.addEventListener("pointermove", mv)
+    window.addEventListener("pointerup", up)
+  }
+  const naBorda = (e: React.PointerEvent<HTMLDivElement>) => {
+    const r = e.currentTarget.getBoundingClientRect()
+    const n = { l: e.clientX < r.left + 130, r: e.clientX > r.right - 130 }
+    if (n.l !== perto.l || n.r !== perto.r) setPerto(n)
+  }
+  const teclaQuadro = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== boardRef.current) return
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      e.preventDefault()
+      boardRef.current!.scrollBy({ left: e.key === "ArrowRight" ? 318 : -318, behavior: suave() })
+    }
+  }
+
+  /* visão geral, páginas e o que saiu da tela */
+  const escalaGeral = Math.min(1, (sc.cw - 8) / Math.max(1, sc.sw))
+  const cliqueGeral = (e: React.MouseEvent) => {
+    if (!geral) return
+    const col = (e.target as HTMLElement).closest<HTMLElement>("section[data-s]")
+    e.preventDefault()
+    e.stopPropagation()
+    setGeral(false)
+    if (col) window.setTimeout(() => irPara(col.dataset.s as KanbanStatus), 520)
+  }
+  const larga = COLS.map((c) => colEl(c.id)).find((el) => el && !el.hasAttribute("data-mini"))
+  const porPagina = Math.max(1, Math.floor((sc.cw - 40 + 18) / ((larga?.offsetWidth || 300) + 18)))
+  const paginas = Math.ceil(COLS.length / porPagina)
+  const primeiraVisivel = Math.max(0, COLS.findIndex((c) => { const el = colEl(c.id); return !!el && el.offsetLeft >= sc.sl + 4 }))
+  const pagina = sc.sl + sc.cw >= sc.sw - 4 ? paginas - 1 : Math.min(paginas - 1, Math.floor(primeiraVisivel / porPagina))
+  const irPagina = (p: number) => {
+    p = Math.max(0, Math.min(paginas - 1, p))
+    const b = boardRef.current!
+    b.classList.remove("muriki-kb-paging")
+    void b.offsetWidth
+    b.classList.add("muriki-kb-paging")
+    window.setTimeout(() => b.classList.remove("muriki-kb-paging"), 520)
+    const el = colEl(COLS[p * porPagina]!.id)
+    b.scrollTo({ left: p === 0 ? 0 : (el?.offsetLeft ?? 0) - 20, behavior: suave() })
+  }
+  const nomesDaPagina = (p: number) => COLS.slice(p * porPagina, p * porPagina + porPagina).map((c) => c.label).join(", ")
+  const escondidasD = COLS.filter((c) => { const el = colEl(c.id); return !!el && el.offsetLeft + el.offsetWidth > sc.sl + sc.cw + 8 })
+  const escondidasE = COLS.filter((c) => { const el = colEl(c.id); return !!el && el.offsetLeft < sc.sl - 8 })
+  const daColuna = (id: KanbanStatus) => tasks.filter((t) => t.status === id)
+  const alertasDe = (id: KanbanStatus) => daColuna(id).filter((t) => alertaDe(t)).length
+
   const total = tasks.filter((t) => t.status !== "canceled").length
   const feitas = tasks.filter((t) => t.status === "done").length
+  const vivas = drag ? tasks.filter((x) => x.id !== drag.id) : tasks
+  const erguida = drag ? tasks.find((x) => x.id === drag.id) : undefined
+
+  const cartao = (t: KanbanTask) => (
+    <KanbanCard
+      key={t.id}
+      data-card={String(t.id)}
+      tabIndex={0}
+      aria-label={rotulo(t)}
+      aria-roledescription="Cartão arrastável"
+      aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Alt+ArrowUp Alt+ArrowDown"
+      task={t}
+      alert={alertaDe(t)}
+      project={projetoDe(t.project)}
+      now={now}
+      onComplete={concluir}
+      className={t.id === nascida.current ? "muriki-kb-born" : undefined}
+      onPointerDown={(e) => pegar(e, t)}
+      onKeyDown={(e) => teclado(e, t)}
+    />
+  )
 
   return (
     <div
       data-slot="kanban"
-      className={cn("muriki-kb relative flex h-full min-h-0 flex-col overflow-hidden bg-[var(--kb-panel)] text-foreground", className)}
+      className={cn(
+        "muriki-kb relative flex h-full min-h-0 flex-col overflow-hidden bg-[var(--kb-panel)] text-foreground",
+        drag && "muriki-kb-dragging",
+        className
+      )}
       style={style}
     >
       <div className="flex h-[52px] flex-none items-center gap-2 pr-3 pl-[18px] shadow-[inset_0_-1px_0_var(--kb-hair)]">
@@ -254,100 +658,359 @@ export function KanbanBoard({
           <b className="font-semibold text-foreground-strong">{feitas}</b> de {total} concluídas
         </span>
         <span className="flex-1" />
+        <Tooltip>
+          <TooltipTrigger render={<Button variant={geral ? "secondary" : "ghost"} size="sm" onClick={() => setGeral((v) => !v)} />}>
+            {geral ? <ArrowsInSimpleIcon /> : <ArrowsOutSimpleIcon />}
+            {geral ? "Sair da visão geral" : "Visão geral"}
+          </TooltipTrigger>
+          <TooltipContent>{geral ? "Voltar ao tamanho normal" : "Ver o quadro inteiro"}</TooltipContent>
+        </Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+            <KanbanIcon />
+            Colunas
+            <CaretDownIcon />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel>Ir para a coluna</DropdownMenuLabel>
+            {COLS.map((c) => {
+              const al = alertasDe(c.id)
+              return (
+                <DropdownMenuItem key={c.id} onClick={() => irPara(c.id)}>
+                  <KanbanStatusIcon status={c.id} />
+                  {c.label}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {daColuna(c.id).length}
+                    {al ? ` · ${al} com alerta` : ""}
+                    {mini[c.id] ? " · recolhida" : ""}
+                  </span>
+                </DropdownMenuItem>
+              )
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+            <EyeIcon />
+            Exibição
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel>Exibição</DropdownMenuLabel>
+            <DropdownMenuRadioGroup value={nav} onValueChange={(v) => setNav(v as KanbanNavigation)}>
+              <DropdownMenuRadioItem value="lingueta">
+                Lingueta nas bordas<span className="ml-auto text-xs text-muted-foreground">Padrão</span>
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="paginas">Páginas na barra de status</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="lombadas">Lombadas</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="regua">Régua de colunas</DropdownMenuRadioItem>
+            </DropdownMenuRadioGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuCheckboxItem
+              checked={!!(mini.done && mini.canceled)}
+              onCheckedChange={(on) => setMini((m) => ({ ...m, done: on, canceled: on }))}
+            >
+              Recolher Concluído e Cancelado
+            </DropdownMenuCheckboxItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         {barra}
       </div>
 
-      <DndContext sensors={sensors} collisionDetection={colisao} onDragStart={inicio} onDragOver={sobre} onDragEnd={fim} onDragCancel={cancela}>
-        <div className="relative flex min-h-0 flex-1">
+      {nav === "regua" ? (
+        <nav
+          data-slot="kanban-ruler"
+          aria-label="Colunas do quadro"
+          className="flex flex-none animate-[muriki-kb-in_.3s_cubic-bezier(.16,1,.3,1)] gap-1 overflow-hidden px-3 py-2 shadow-[inset_0_-1px_0_var(--kb-hair)] motion-reduce:animate-none"
+        >
+          {COLS.map((c) => {
+            const el = colEl(c.id)
+            const vis = !!el && el.offsetLeft + el.offsetWidth > sc.sl + 30 && el.offsetLeft < sc.sl + sc.cw - 30
+            return (
+              <button
+                key={c.id}
+                type="button"
+                data-kb-tab=""
+                data-s={c.id}
+                data-vis={vis || undefined}
+                data-hot={quente === c.id || undefined}
+                aria-current={vis || undefined}
+                title={c.label + (mini[c.id] ? " (recolhida)" : "")}
+                onClick={() => irPara(c.id)}
+                style={tomDaColuna(c.id)}
+                className={cn(
+                  "relative flex h-8 min-w-0 flex-[1_1_0] cursor-pointer items-center gap-[7px] rounded-[9px] px-2.5 text-[12.5px] text-muted-foreground",
+                  "transition-[background,color,box-shadow] duration-200 ease-[cubic-bezier(.16,1,.3,1)] hover:bg-muted hover:text-foreground-strong",
+                  "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
+                  "data-[vis]:bg-card data-[vis]:text-foreground-strong data-[vis]:shadow-[var(--kb-shadow-xs),inset_0_0_0_1px_var(--kb-hair)]",
+                  "data-[vis]:after:absolute data-[vis]:after:right-2.5 data-[vis]:after:-bottom-px data-[vis]:after:left-2.5 data-[vis]:after:h-0.5 data-[vis]:after:rounded-sm data-[vis]:after:bg-[var(--tone)]",
+                  "data-[hot]:bg-[color-mix(in_oklch,var(--tone)_12%,var(--card))] data-[hot]:shadow-[inset_0_0_0_1.5px_var(--tone)]"
+                )}
+              >
+                <KanbanStatusIcon status={c.id} />
+                <span className="min-w-0 truncate">{c.label}</span>
+                {alertasDe(c.id) ? <span className="size-1.5 flex-none rounded-full bg-tone-red-dot" /> : null}
+                <b className="ml-auto font-semibold tabular-nums">{daColuna(c.id).length}</b>
+              </button>
+            )
+          })}
+        </nav>
+      ) : null}
+
+      <div className="relative flex min-h-0 flex-1">
+        <div
+          className={cn("relative min-w-0 flex-1 overflow-hidden", geral && "muriki-kb-overview")}
+          onPointerMove={naBorda}
+          onPointerLeave={() => setPerto({ l: false, r: false })}
+        >
           <div
+            ref={boardRef}
             data-slot="kanban-board"
             tabIndex={0}
             aria-label={ariaLabel ?? `Quadro com ${COLS.length} colunas`}
-            className="muriki-scroll-x absolute inset-0 overflow-x-auto overflow-y-hidden outline-none"
+            onScroll={medir}
+            onKeyDown={teclaQuadro}
+            onPointerDown={arrastarFundo}
+            onClickCapture={cliqueGeral}
+            className={cn(
+              "muriki-scroll-x absolute inset-0 overflow-x-auto overflow-y-hidden outline-none",
+              geral && "overflow-hidden",
+              arrastandoFundo && "muriki-kb-panning"
+            )}
           >
-            <div className="box-border flex h-full w-max items-start gap-[18px] px-5 pt-4 pb-3.5">
+            <div
+              data-slot="kanban-cols"
+              style={geral ? { transform: `scale(${escalaGeral})` } : undefined}
+              className="box-border flex h-full w-max origin-top-left items-start gap-[18px] px-5 pt-4 pb-3.5 transition-transform duration-500 ease-[cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none"
+            >
               {COLS.map((c) => {
-                const lista = local.find((x) => x.id === c.id)?.tasks ?? []
+                const lista = vivas.filter((t) => t.status === c.id)
+                const sobre = !!drag && drag.col === c.id
+                const count = lista.length + (sobre ? 1 : 0)
+                const ref = (el: HTMLElement | null) => {
+                  colRefs.current[c.id] = el
+                }
+                const comum = {
+                  ref,
+                  "data-s": c.id,
+                  "data-over": sobre || undefined,
+                  style: tomDaColuna(c.id),
+                }
+                const alertas = lista.filter((t) => alertaDe(t)).length
+                if (mini[c.id])
+                  return (
+                    <section
+                      key={c.id}
+                      {...comum}
+                      data-mini=""
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${c.label}, ${count} tarefas. Abrir coluna`}
+                      onClick={() => setMiniDe(c.id, false)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") setMiniDe(c.id, false)
+                      }}
+                      className={cn(COLUNA, "w-12 cursor-pointer px-0 py-2.5 hover:bg-[color-mix(in_oklch,var(--tone)_12%,var(--kb-panel))]", piscando === c.id && "muriki-kb-flash")}
+                    >
+                      <div className="flex flex-col items-center gap-2.5 pt-1.5 pb-3">
+                        <KanbanStatusIcon status={c.id} size={15} />
+                        <span data-n="" className={PILULA}>{count}</span>
+                        {alertas ? <span title={`${alertas} com alerta`} className="size-1.5 rounded-full bg-tone-red-dot" /> : null}
+                        <b className="text-[13.5px] font-semibold whitespace-nowrap text-foreground-strong [writing-mode:vertical-rl]">{c.label}</b>
+                      </div>
+                    </section>
+                  )
                 return (
                   <Coluna
                     key={c.id}
+                    comum={comum}
                     col={c}
                     lista={lista}
-                    sobre={sobreColuna === c.id}
-                    arrastando={ativo?.task.id}
-                    alturaArrasto={ativo?.h ?? 0}
+                    count={count}
+                    alertas={alertas}
+                    piscando={piscando === c.id}
                     alertaDe={alertaDe}
-                    projetoDe={projetoDe}
-                    now={now}
-                    nascida={nascida.current}
+                    corpo={(() => {
+                      const corpo = lista.map(cartao)
+                      if (sobre && drag) corpo.splice(Math.min(drag.idx, corpo.length), 0, <div key="ph" className="muriki-kb-ph" style={{ height: drag.h }} />)
+                      return corpo
+                    })()}
+                    sobre={sobre}
                     criando={criando === c.id}
                     podeCriar={!!onCreate}
                     onAbrirCriacao={() => setCriando(c.id)}
                     onFecharCriacao={() => setCriando(null)}
                     onCriar={(v) => criar(c.id, v)}
-                    onConcluir={concluir}
-                    onOpen={onOpen}
+                    onRecolher={() => setMiniDe(c.id, true)}
                   />
                 )
               })}
             </div>
           </div>
-        </div>
+          <div aria-hidden data-on={sc.sl > 4 || undefined} className="muriki-kb-edge left-0 bg-gradient-to-r from-[var(--kb-panel)] to-transparent" />
+          <div aria-hidden data-on={sc.sl + sc.cw < sc.sw - 4 || undefined} className="muriki-kb-edge right-0 bg-gradient-to-l from-[var(--kb-panel)] to-transparent" />
 
-        <DragOverlay dropAnimation={null}>
-          {ativo ? (
-            <div style={{ width: ativo.w }} className="muriki-kb-lift">
-              <KanbanCard
-                task={ativo.task}
-                alert={alertaDe(ativo.task)}
-                project={projetoDe(ativo.task.project)}
-                now={now}
-                className="cursor-grabbing"
-                style={{ transform: "rotate(1.6deg)", transformOrigin: "50% 20%" }}
+          {!geral && nav === "lingueta"
+            ? (["l", "r"] as const).map((lado) => {
+                const lista = lado === "l" ? escondidasE.slice().reverse() : escondidasD
+                const on = lista.length > 0
+                return (
+                  <button
+                    key={lado}
+                    type="button"
+                    data-tongue={lado}
+                    data-on={on || undefined}
+                    data-open={(on && perto[lado]) || undefined}
+                    tabIndex={on ? 0 : -1}
+                    aria-label={(lado === "l" ? "Voltar para " : "Ir para ") + (lista[0]?.label ?? "")}
+                    onClick={() => lista[0] && irPara(lista[0].id)}
+                    className={cn("muriki-kb-tongue", lado === "l" ? "muriki-kb-tongue-l" : "muriki-kb-tongue-r")}
+                  >
+                    {lado === "l" ? <CaretLeftIcon className="size-[13px]" weight="bold" /> : null}
+                    <span className="muriki-kb-tongue-body">
+                      <b className="font-semibold tabular-nums">{lista.length}</b>
+                      <span className="inline-flex gap-2.5">
+                        {lista.slice(0, 3).map((c) => (
+                          <span key={c.id} className="inline-flex items-center gap-[5px]">
+                            <KanbanStatusIcon status={c.id} size={13} />
+                            {c.label}
+                          </span>
+                        ))}
+                      </span>
+                    </span>
+                    {lado === "r" ? <CaretRightIcon className="size-[13px]" weight="bold" /> : null}
+                  </button>
+                )
+              })
+            : null}
+
+          {!geral && nav === "lombadas"
+            ? (["l", "r"] as const).map((lado) => {
+                const lista = lado === "l" ? escondidasE : escondidasD
+                return (
+                  <div key={lado} data-spines={lado} className={cn("muriki-kb-spines", lado === "l" ? "left-2" : "right-2")}>
+                    {lista.map((c, i) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        style={{ ...tomDaColuna(c.id), zIndex: lado === "r" ? lista.length - i : i + 1 }}
+                        onClick={() => irPara(c.id)}
+                        aria-label={`${c.label}, ${daColuna(c.id).length} tarefas`}
+                        className="muriki-kb-spine"
+                      >
+                        <KanbanStatusIcon status={c.id} />
+                        <span className="muriki-kb-spine-l">{c.label}</span>
+                        <b className="font-semibold tabular-nums">{daColuna(c.id).length}</b>
+                      </button>
+                    ))}
+                  </div>
+                )
+              })
+            : null}
+        </div>
+      </div>
+
+      {!geral && nav === "paginas" ? (
+        <div data-slot="kanban-pages" className="flex h-10 flex-none items-center justify-center gap-2.5 px-4 text-xs text-muted-foreground shadow-[inset_0_1px_0_var(--kb-hair)]">
+          <span className="min-w-0 flex-1 truncate text-right">
+            {paginas > 1 ? (
+              <>
+                Página <b className="font-semibold text-foreground-strong">{pagina + 1}</b> de {paginas}
+              </>
+            ) : (
+              "Todas as colunas à vista"
+            )}
+          </span>
+          <Button variant="ghost" size="icon-xs" aria-label="Página anterior" disabled={pagina === 0} onClick={() => irPagina(pagina - 1)}>
+            <CaretLeftIcon />
+          </Button>
+          <div className="flex gap-1.5">
+            {Array.from({ length: paginas }, (_, p) => (
+              <button
+                key={p}
+                type="button"
+                aria-label={`Página ${p + 1}: ${nomesDaPagina(p)}`}
+                aria-current={p === pagina || undefined}
+                onClick={() => irPagina(p)}
+                className="h-2 w-2 cursor-pointer rounded-full bg-[color-mix(in_oklch,var(--foreground)_18%,transparent)] transition-[width,background] duration-300 ease-[cubic-bezier(.16,1,.3,1)] aria-[current]:w-[22px] aria-[current]:bg-primary"
               />
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+            ))}
+          </div>
+          <Button variant="ghost" size="icon-xs" aria-label="Próxima página" disabled={pagina >= paginas - 1} onClick={() => irPagina(pagina + 1)}>
+            <CaretRightIcon />
+          </Button>
+          <span className="min-w-0 flex-1 truncate">{nomesDaPagina(pagina)}</span>
+        </div>
+      ) : null}
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {aviso}
+      </div>
+
+      {drag && erguida
+        ? createPortal(
+            <div
+              className="muriki-kb-lift"
+              style={{ width: drag.w }}
+              ref={(el) => {
+                liftRef.current = el
+                if (el && liftPos.current && !el.style.left) {
+                  el.style.left = `${liftPos.current.x}px`
+                  el.style.top = `${liftPos.current.y}px`
+                }
+              }}
+            >
+              <KanbanCard
+                task={{ ...erguida, status: drag.col }}
+                alert={alertaDe({ ...erguida, status: drag.col })}
+                project={projetoDe(erguida.project)}
+                now={now}
+                className="origin-[50%_20%] cursor-grabbing"
+              />
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   )
 }
 
-/* ---------- coluna ---------- */
+const COLUNA = cn(
+  "relative box-border flex max-h-full w-[300px] flex-none flex-col rounded-2xl px-2.5 pt-3 pb-2.5",
+  "bg-[color-mix(in_oklch,var(--tone)_6%,var(--kb-panel))] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--tone)_12%,transparent)]",
+  "transition-[width,background,box-shadow] duration-300 ease-[cubic-bezier(.16,1,.3,1)] motion-reduce:transition-none",
+  "data-[over]:bg-[color-mix(in_oklch,var(--tone)_12%,var(--kb-panel))] data-[over]:shadow-[inset_0_0_0_1.5px_color-mix(in_oklch,var(--tone)_45%,transparent)]"
+)
+const PILULA = "box-border inline-grid h-5 min-w-[22px] place-items-center rounded-full bg-[var(--tone-bg)] px-1.5 text-[11.5px] font-semibold text-foreground-strong tabular-nums"
+
+/* ---------- coluna aberta ---------- */
 interface ColunaProps {
+  comum: { ref: (el: HTMLElement | null) => void; "data-s": KanbanStatus; "data-over"?: boolean; style: React.CSSProperties }
   col: KanbanColumnSpec
   lista: KanbanTask[]
-  sobre: boolean
-  arrastando?: KanbanTask["id"]
-  alturaArrasto: number
+  count: number
+  alertas: number
+  piscando: boolean
   alertaDe: (t: KanbanTask) => ReturnType<typeof kanbanAlert>
-  projetoDe: (id?: string) => KanbanProject | null
-  now?: Date
-  nascida: KanbanTask["id"] | null
+  corpo: React.ReactNode[]
+  sobre: boolean
   criando: boolean
   podeCriar: boolean
   onAbrirCriacao: () => void
   onFecharCriacao: () => void
   onCriar: (titulo: string) => void
-  onConcluir: (t: KanbanTask) => void
-  onOpen?: (id: KanbanTask["id"]) => void
+  onRecolher: () => void
 }
 
-function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, projetoDe, now, nascida, criando, podeCriar, onAbrirCriacao, onFecharCriacao, onCriar, onConcluir, onOpen }: ColunaProps) {
-  const { setNodeRef } = useDroppable({ id: c.id })
-  // o cartão erguido não conta: o resumo é do que fica na coluna
-  const fica = lista.filter((t) => t.id !== arrastando)
-  const count = lista.length
-  const alertas = fica.filter((t) => alertaDe(t)).length
-  const noPrazo = fica.filter((t) => !alertaDe(t) && t.due).length
-  const semPrazo = fica.filter((t) => !alertaDe(t) && !t.due).length
-  const comSub = fica.filter((t) => t.sub)
+function Coluna({ comum, col: c, lista, count, alertas, piscando, alertaDe, corpo, sobre, criando, podeCriar, onAbrirCriacao, onFecharCriacao, onCriar, onRecolher }: ColunaProps) {
+  const noPrazo = lista.filter((t) => !alertaDe(t) && t.due).length
+  const semPrazo = lista.filter((t) => !alertaDe(t) && !t.due).length
+  const comSub = lista.filter((t) => t.sub)
   const pct = comSub.length
     ? Math.round((comSub.reduce((a, t) => a + t.sub![0], 0) / comSub.reduce((a, t) => a + t.sub![1], 0)) * 100)
     : null
   const fechada = c.id === "done" || c.id === "canceled"
   const segs = fechada
-    ? [{ n: fica.length, c: "var(--tone)", l: c.id === "done" ? "concluídas" : "canceladas" }]
+    ? [{ n: lista.length, c: "var(--tone)", l: c.id === "done" ? "concluídas" : "canceladas" }]
     : [
         { n: noPrazo, c: "color-mix(in oklch, var(--tone) 70%, transparent)", l: "no prazo" },
         { n: alertas, c: "var(--tone-red-dot)", l: "com alerta" },
@@ -356,29 +1019,14 @@ function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, pro
   const estourou = !!c.limit && count > c.limit
 
   return (
-    <section
-      ref={setNodeRef}
-      data-s={c.id}
-      data-over={sobre || undefined}
-      aria-label={c.label}
-      style={tomDaColuna(c.id)}
-      className={cn(
-        "relative box-border flex max-h-full w-[300px] flex-none flex-col rounded-2xl px-2.5 pt-3 pb-2.5",
-        "bg-[color-mix(in_oklch,var(--tone)_6%,var(--kb-panel))] shadow-[inset_0_0_0_1px_color-mix(in_oklch,var(--tone)_12%,transparent)]",
-        "transition-[width,background,box-shadow] duration-300 ease-[cubic-bezier(.16,1,.3,1)]",
-        "data-[over]:bg-[color-mix(in_oklch,var(--tone)_12%,var(--kb-panel))] data-[over]:shadow-[inset_0_0_0_1.5px_color-mix(in_oklch,var(--tone)_45%,transparent)]",
-        "group/col"
-      )}
-    >
+    <section {...comum} aria-label={c.label} className={cn(COLUNA, "group/col", piscando && "muriki-kb-flash")}>
       <header className="flex h-[38px] flex-none items-center gap-2 pr-0.5 pb-2.5 pl-1">
         <KanbanStatusIcon status={c.id} size={15} />
         <b className="text-sm font-semibold whitespace-nowrap text-foreground-strong">{c.label}</b>
         <span
+          data-n=""
           title={c.limit ? `Limite da coluna: ${c.limit}` : undefined}
-          className={cn(
-            "box-border inline-grid h-5 min-w-[22px] place-items-center rounded-full px-1.5 text-[11.5px] font-semibold tabular-nums",
-            estourou ? "bg-tone-orange text-tone-orange-foreground" : "bg-[var(--tone-bg)] text-foreground-strong"
-          )}
+          className={cn(PILULA, estourou && "bg-tone-orange text-tone-orange-foreground")}
         >
           {c.limit ? `${count}/${c.limit}` : count}
         </span>
@@ -392,12 +1040,23 @@ function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, pro
             <TooltipContent>{alertas > 1 ? `${alertas} tarefas pedem atenção` : "1 tarefa pede atenção"}</TooltipContent>
           </Tooltip>
         ) : null}
+        <span className="flex gap-px opacity-0 transition-opacity duration-150 group-hover/col:opacity-100 focus-within:opacity-100 has-[[aria-expanded=true]]:opacity-100">
+          <DropdownMenu>
+            <DropdownMenuTrigger render={<Button variant="ghost" size="icon-xs" aria-label={`Opções de ${c.label}`} className="text-muted-foreground" />}>
+              <DotsThreeIcon weight="bold" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={onRecolher}>
+                <ArrowsInSimpleIcon />
+                Recolher coluna
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </span>
         {podeCriar ? (
           <Tooltip>
             <TooltipTrigger
-              render={
-                <Button variant="ghost" size="icon-xs" aria-label={`Nova tarefa em ${c.label}`} onClick={onAbrirCriacao} className="text-muted-foreground" />
-              }
+              render={<Button variant="ghost" size="icon-xs" aria-label={`Nova tarefa em ${c.label}`} onClick={onAbrirCriacao} className="text-muted-foreground" />}
             >
               <PlusIcon />
             </TooltipTrigger>
@@ -409,33 +1068,18 @@ function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, pro
 
       <div className="muriki-scroll-x -mx-0.5 flex min-h-0 flex-auto flex-col gap-2 overflow-y-auto p-0.5">
         {criando ? <CriacaoRapida onAdd={onCriar} onClose={onFecharCriacao} /> : null}
-        <SortableContext items={lista.map((t) => t.id)} strategy={verticalListSortingStrategy}>
-          {lista.map((t) => (
-            <CartaoArrastavel
-              key={t.id}
-              task={t}
-              alturaArrasto={alturaArrasto}
-              nascida={t.id === nascida}
-              alert={alertaDe(t)}
-              project={projetoDe(t.project)}
-              now={now}
-              onConcluir={onConcluir}
-              onOpen={onOpen}
-            />
-          ))}
-        </SortableContext>
-        {!lista.length && !criando ? (
+        {corpo.length ? corpo : criando ? null : (
           <div className="rounded-xl px-2.5 py-[22px] text-center text-[12.5px] text-muted-foreground shadow-[inset_0_0_0_1.5px_color-mix(in_oklch,var(--tone)_22%,transparent)]">
             {sobre ? "Solte aqui" : "Nenhuma tarefa"}
           </div>
-        ) : null}
+        )}
       </div>
 
-      {fica.length ? (
+      {lista.length ? (
         <footer className="mt-2.5 grid flex-none gap-[7px] px-1 pt-2.5 pb-0.5 shadow-[inset_0_1px_0_color-mix(in_oklch,var(--tone)_18%,transparent)]">
           <div className="flex items-baseline gap-1.5 text-xs text-muted-foreground">
-            <b className="text-[13px] font-semibold text-foreground-strong tabular-nums">{fica.length}</b>
-            {fica.length > 1 ? "tarefas" : "tarefa"}
+            <b className="text-[13px] font-semibold text-foreground-strong tabular-nums">{lista.length}</b>
+            {lista.length > 1 ? "tarefas" : "tarefa"}
             {pct != null ? (
               <span className="ml-auto">
                 <b className="text-[13px] font-semibold text-foreground-strong tabular-nums">{pct}%</b> das subtarefas
@@ -460,54 +1104,6 @@ function Coluna({ col: c, lista, sobre, arrastando, alturaArrasto, alertaDe, pro
         </footer>
       ) : null}
     </section>
-  )
-}
-
-/* ---------- cartão no @dnd-kit ---------- */
-function CartaoArrastavel({
-  task,
-  alturaArrasto,
-  nascida,
-  alert,
-  project,
-  now,
-  onConcluir,
-  onOpen,
-}: {
-  task: KanbanTask
-  alturaArrasto: number
-  nascida: boolean
-  alert: ReturnType<typeof kanbanAlert>
-  project: KanbanProject | null
-  now?: Date
-  onConcluir: (t: KanbanTask) => void
-  onOpen?: (id: KanbanTask["id"]) => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id, data: { task } })
-  const style = { transform: CSS.Transform.toString(transform), transition }
-  // erguido, o lugar dele vira o espaço tingido da coluna
-  if (isDragging) return <div ref={setNodeRef} style={{ ...style, height: alturaArrasto }} className="muriki-kb-ph" />
-  return (
-    <KanbanCard
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      data-card={String(task.id)}
-      aria-roledescription="Cartão arrastável"
-      aria-label={rotulo(task)}
-      task={task}
-      alert={alert}
-      project={project}
-      now={now}
-      onComplete={onConcluir}
-      className={nascida ? "muriki-kb-born" : undefined}
-      onClick={() => onOpen?.(task.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") onOpen?.(task.id)
-        listeners?.onKeyDown?.(e)
-      }}
-    />
   )
 }
 

@@ -50,6 +50,7 @@ const status = (s, T, size = 15) => {
     progress: anel + `<path d="M7 3.5 A3.5 3.5 0 0 1 7 10.5 Z" fill="currentColor"/>`,
     review: anel + `<path d="M7 7 L7 3.5 A3.5 3.5 0 1 1 3.5 7 Z" fill="currentColor"/>`,
     done: `<circle cx="7" cy="7" r="6.25" fill="currentColor"/><path d="M4.4 7.2 L6.2 9 L9.6 5.4" fill="none" stroke="${T.card}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`,
+    canceled: `<circle cx="7" cy="7" r="6.25" fill="currentColor"/><path d="M5 5 L9 9 M9 5 L5 9" fill="none" stroke="${T.card}" stroke-width="1.5" stroke-linecap="round"/>`,
   }[s];
   return `<svg width="${size}" height="${size}" viewBox="0 0 14 14" style="color:${cor};flex:none;display:block;">${f}</svg>`;
 };
@@ -133,16 +134,31 @@ const notas = T => `<div style="display:flex;gap:32px;flex-wrap:wrap;">
   ${nota(T, 'Coluna sem caixa', 'Só tingida pela cor do status, com o fio colorido embaixo do cabeçalho. O contador vira n/limite e fica laranja quando passa.')}
   ${nota(T, 'Alerta = contorno + faixa', 'Atrasada vermelha, vence hoje laranja com texto escuro, bloqueada listrada. Nunca fundo tingido: numa coluna cheia, fundo vermelho vira mancha.')}
   ${nota(T, 'Próximo passo', 'O anel das subtarefas com a próxima a fazer. "2 de 4" sozinho não diz o que fazer agora.')}
-  ${nota(T, 'Arrasto com peso', 'O cartão inclina 1,6° com sombra funda; o espaço tingido cresce na coluna de destino.')}
+  ${nota(T, 'Arrasto com peso', 'O cartão segue o ponteiro com um atraso mínimo, inclina pela velocidade (base 1,6°) com sombra funda; o espaço cresce no destino e o pouso endireita. Na faixa recolhida, ele voa até ela.')}
+</div>`;
+
+
+// para os lados: lingueta (padrão), páginas, lombadas, régua — e a faixa recolhida
+const caixa = (T, rot, inner) => `<div style="display:flex;flex-direction:column;gap:9px;"><span style="font:10px 'Geist Mono',monospace;color:${T.muted};">${rot}</span>${inner}</div>`;
+const pill = (T, inner, extra = '') => `<span style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:99px;background:${T.card};color:${T.fg};font-size:12.5px;box-shadow:0 6px 18px -8px ${mix(T.body, 35)}, inset 0 0 0 1px ${T.hairStrong};${extra}">${inner}</span>`;
+const nome = (T, s, n) => `<span style="display:inline-flex;align-items:center;gap:5px;">${status(s, T, 13)}${n}</span>`;
+const navegacao = T => `<div style="display:flex;gap:36px;flex-wrap:wrap;align-items:flex-start;">
+  ${caixa(T, 'lingueta · repouso e perto da borda', `<div style="display:flex;align-items:center;gap:18px;"><span style="width:19px;height:48px;border-radius:10px 0 0 10px;background:${T.card};box-shadow:inset 0 0 0 1px ${T.hairStrong};display:inline-grid;place-items:center;color:${T.fg};">›</span>${pill(T, `<b>2</b>${nome(T, 'done', 'Concluído')}${nome(T, 'canceled', 'Cancelado')}<span>›</span>`)}</div>`)}
+  ${caixa(T, 'páginas na barra de status', `<div style="display:flex;align-items:center;gap:10px;font-size:12px;color:${T.muted};">Página <b style="color:${T.fg};">1</b> de 2 <span style="display:flex;gap:6px;"><i style="width:22px;height:8px;border-radius:99px;background:${T.primary};"></i><i style="width:8px;height:8px;border-radius:99px;background:${mix(T.body, 18)};"></i></span> Backlog, A fazer, Em andamento</div>`)}
+  ${caixa(T, 'lombadas · cabeçalhos que saíram', `<div style="display:flex;gap:4px;padding:4px;border-radius:13px;background:${mix(T.panel, 85)};box-shadow:0 6px 18px -10px ${mix(T.body, 30)};">${['done:3', 'canceled:1'].map(x => { const [s, n] = x.split(':'); return `<span style="display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 9px;border-radius:9px;background:${T.card};color:${T.fg};font-size:12.5px;box-shadow:inset 0 0 0 1px ${T.hair}, inset 0 -2px 0 ${T.tons[COR[s]][2]};">${status(s, T, 14)}<b>${n}</b></span>`; }).join('')}</div>`)}
+  ${caixa(T, 'régua de colunas', `<div style="display:flex;gap:4px;width:460px;">${[['todo', 'A fazer', 4, 1], ['progress', 'Em andamento', 3, 1], ['done', 'Concluído', 3, 0]].map(([s, n, q, v]) => `<span style="position:relative;flex:1;display:flex;align-items:center;gap:7px;height:32px;padding:0 10px;border-radius:9px;font-size:12.5px;white-space:nowrap;${v ? `background:${T.card};color:${T.fg};box-shadow:inset 0 0 0 1px ${T.hair};` : `color:${T.muted};`}">${status(s, T, 14)}${n}<b style="margin-left:auto;">${q}</b>${v ? `<i style="position:absolute;left:10px;right:10px;bottom:-1px;height:2px;border-radius:2px;background:${T.tons[COR[s]][2]};"></i>` : ''}</span>`).join('')}</div>`)}
+  ${caixa(T, 'coluna recolhida (só à mão)', `<div style="width:48px;padding:16px 0 12px;border-radius:16px;background:${mix(T.tons.green[2], 6, T.panel)};box-shadow:inset 0 0 0 1px ${mix(T.tons.green[2], 12)};display:flex;flex-direction:column;align-items:center;gap:10px;">${status('done', T)}<span style="min-width:22px;height:20px;border-radius:99px;background:${T.tons.green[0]};color:${T.fg};font-size:11.5px;font-weight:600;display:inline-grid;place-items:center;">3</span><b style="writing-mode:vertical-rl;font-size:13.5px;color:${T.fg};">Concluído</b></div>`)}
 </div>`;
 
 const body = `
 ${quadro(TEMA.claro)}
 ${notas(TEMA.claro)}
-${darkHalf('No escuro', 'A coluna tinge 6% da cor do status sobre o painel; a faixa do alerta continua sólida, e o "vence hoje" mantém o texto escuro no laranja.', quadro(TEMA.escuro))}`;
+<p class="sec-title">Para os lados</p>
+${navegacao(TEMA.claro)}
+${darkHalf('No escuro', 'A coluna tinge 6% da cor do status sobre o painel; a faixa do alerta continua sólida, e o "vence hoje" mantém o texto escuro no laranja.', quadro(TEMA.escuro) + navegacao(TEMA.escuro))}`;
 
 const html = page('Kanban',
-  'O quadro aprovado: colunas tingidas pelo status, cartão que diz o próximo passo, alerta em contorno + faixa e arrasto com peso. Criar é no topo da coluna, e mover ou concluir avisa com Desfazer.',
+  'O quadro aprovado: colunas tingidas pelo status, cartão que diz o próximo passo, alerta em contorno + faixa e arrasto com peso. Sem barra de rolagem: o fundo arrasta, e a lingueta (ou páginas, lombadas, régua) mostra o que ficou de fora.',
   body);
 await Bun.write('Kanban.dc.html', html);
 console.log('Kanban.dc.html', html.length, 'bytes');
